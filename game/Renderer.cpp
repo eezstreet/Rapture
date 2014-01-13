@@ -4,7 +4,6 @@ namespace RenderCode {
 	Cvar* r_fullscreen = NULL;
 	Cvar* r_width = NULL;
 	Cvar* r_height = NULL;
-	Cvar* r_hardware = NULL;
 	Cvar* r_windowtitle = NULL;
 	Cvar* r_gamma = NULL;
 
@@ -15,7 +14,6 @@ namespace RenderCode {
 		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", Cvar::CVAR_ARCHIVE, false);
 		r_width = Cvar::Get<int>("r_width", "Resolution: width", Cvar::CVAR_ARCHIVE, 1024);
 		r_height = Cvar::Get<int>("r_height", "Resolution: height", Cvar::CVAR_ARCHIVE, 768);
-		r_hardware = Cvar::Get<bool>("r_hardware", "Dictates whether hardware acceleration is used", Cvar::CVAR_ARCHIVE, true);
 		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", Cvar::CVAR_ARCHIVE | Cvar::CVAR_ROM, "Rapture");
 		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", Cvar::CVAR_ARCHIVE, 1.2f);
 	}
@@ -40,8 +38,7 @@ namespace RenderCode {
 			return;
 		}
 
-		renderer = SDL_CreateRenderer(window, -1, r_hardware->Bool() ?
-										SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if(renderer == NULL) {
 			SDL_Quit();
 			return;
