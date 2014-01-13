@@ -19,33 +19,53 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_config_h
-#define _SDL_config_h
-
-#include "SDL_platform.h"
-
 /**
- *  \file SDL_config.h
+ *  \file SDL_vertex.h
+ *  
+ *  Header file for SDL_vertex definition and management functions.
  */
 
-/* Add any platform that doesn't build using the configure system. */
-#if defined(__WIN32__)
-#include "SDL_config_windows.h"
-#elif defined(__MACOSX__)
-#include "SDL_config_macosx.h"
-#elif defined(__IPHONEOS__)
-#include "SDL_config_iphoneos.h"
-#elif defined(__ANDROID__)
-#include "SDL_config_android.h"
-#elif defined(__PSP__)
-#include "SDL_config_psp.h"
-#else
-/* This is a minimal configuration just to get SDL running on new platforms */
-#include "SDL_config_minimal.h"
-#endif /* platform config */
+#ifndef _SDL_vertex_h
+#define _SDL_vertex_h
 
-#ifdef USING_GENERATED_CONFIG_H
-#error Wrong SDL_config.h, check your include path?
+#include "SDL_pixels.h"
+
+#include "begin_code.h"
+/* Set up for C function definitions, even when using C++ */
+#ifdef __cplusplus
+/* *INDENT-OFF* */
+extern "C" {
+/* *INDENT-ON* */
 #endif
 
-#endif /* _SDL_config_h */
+typedef struct
+{
+    float x;
+    float y;
+} SDL_Vector2f;
+
+/**
+ *  \brief  The structure that defines a vertex
+ *
+ */
+typedef struct
+{
+    SDL_Vector2f position;
+    union {
+        SDL_Color color;
+        SDL_Color colour;
+    };
+    SDL_Vector2f tex_coord;
+} SDL_Vertex;
+
+/* Ends C function definitions when using C++ */
+#ifdef __cplusplus
+/* *INDENT-OFF* */
+}
+/* *INDENT-ON* */
+#endif
+#include "close_code.h"
+
+#endif /* _SDL_vertex_h */
+
+/* vi: set ts=4 sw=4 expandtab: */
