@@ -44,3 +44,15 @@ bool atob(const char* str) {
 		istringstream(str) >> boolalpha >> b;
 	return b;
 }
+
+// http://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
+string trim(const string& str, const string& trim) {
+	const auto strBegin = str.find_first_not_of(trim);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    const auto strEnd = str.find_last_not_of(trim);
+    const auto strRange = strEnd - strBegin + 1;
+
+    return str.substr(strBegin, strRange);
+}

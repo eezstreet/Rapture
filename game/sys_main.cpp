@@ -41,7 +41,9 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	// Init rand (cuz we will DEFINITELY need it ;D)
 
 	// Init UI
-	//InitUI();
+	UI::Initialize();
+
+	UI::TestDisplay();
 }
 
 /* Called after the main loop has finished and we are ready to shut down */
@@ -56,7 +58,10 @@ RaptureGame::~RaptureGame() {
 void RaptureGame::RunLoop() {
 	SDL_PumpEvents();
 
+	UI::SendInput();
+
 	RenderCode::BlankFrame();
+	UI::Render();
 	RenderCode::Display();
 }
 

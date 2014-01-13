@@ -45,14 +45,20 @@ namespace FS {
 	}
 };
 
-pair<bool, File&> File::Open(const string& fileName, const string& mode) {
+File* File::Open(const string& fileName, const string& mode) {
+	// Trim off any leading (or trailing) whitespace
+	string fixedName = trim(fileName);
+	// Now make sure we start with a '/'
+	if(fixedName[0] != '/')
+		fixedName = '/' + fixedName;
+
 	// If a file has been opened before, we can open it again using the same search path as we did previously.
-	unordered_map<string, File*>::iterator it = FS::fs->files.find(fileName);
+	unordered_map<string, File*>::iterator it = FS::fs->files.find(fixedName);
 	if(it != FS::fs->files.end()) {
-		string path = it->second->searchpath + fileName;
-		if(it->second->handle) return make_pair(false, File());
+		string path = it->second->searchpath + fixedName;
+		if(it->second->handle) return NULL;
 		it->second->handle = fopen(path.c_str(), mode.c_str());
-		return make_pair(true, *it->second);
+		return it->second;
 	}
 
 	// If we are reading, we need to reverse the searchpath list (so we read from homepath last)
@@ -62,18 +68,18 @@ pair<bool, File&> File::Open(const string& fileName, const string& mode) {
 
 	for(auto it = searchpaths.begin(); it != searchpaths.end(); ++it) {
 		// if file found in this search path, good to go
-		string path = *it + fileName;
+		string path = *it + fixedName;
 		FILE* file = fopen(path.c_str(), mode.c_str());
 		if(file) {
-			File *F = (File*)Zone::Alloc(sizeof(File), Zone::TAG_FILES);
+			File *F = (File*)Zone::New<File>(Zone::TAG_FILES);
 			F->searchpath = *it;
 			F->handle = file;
-			FS::fs->files[fileName] = F;
-			return make_pair(true, *F);
+			FS::fs->files[fixedName] = F;
+			return F;
 		}
 	}
 
-	return make_pair(false, File());
+	return NULL;
 }
 
 void File::Close() {
@@ -95,16 +101,13 @@ string File::ReadPlaintext(size_t numChars) {
 	return retval;
 }
 
-unsigned char* File::ReadBinary(size_t numBytes) {
+size_t File::ReadBinary(unsigned char* bytes, size_t numBytes) {
 	if(!handle) return NULL;
 	if(numBytes == 0) { // reset cursor to beginning of file and read whole thing
 		fseek(handle, 0L, SEEK_SET);
 		numBytes = GetSize()/sizeof(unsigned char);
 	}
-	unsigned char* buf = (unsigned char*)Zone::Alloc(sizeof(unsigned char)*numBytes, Zone::TAG_FILES);
-	fread(buf, sizeof(unsigned char), numBytes, handle);
-	// FIXME: dangling memory
-	return buf;
+	return fread(bytes, sizeof(unsigned char), numBytes, handle);
 }
 
 wstring File::ReadUnicode(size_t numChars) {

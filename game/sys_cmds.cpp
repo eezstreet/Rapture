@@ -56,12 +56,12 @@ void Cmd_Seta_f(vector<string>& args) {
 void Cmd_Exec_f(vector<string>& args) {
 	if(args.size() < 2) 
 		return; // usage: exec <file.cfg>
-	pair<bool, File&> p = File::Open(args[1], "r");
-	bool bWasOpened = p.first;
-	if(!bWasOpened)
-		return; // could not exec X.cfg
-	string text = p.second.ReadPlaintext();
-	p.second.Close();
+	File* p = File::Open(args[1], "r");
+	if(p == NULL)
+		return;
+	string text = p->ReadPlaintext();
+	p->Close();
+	Zone::Free(p);
 
 	vector<string> lines = split(text, ';');
 	for(auto it = lines.begin(); it != lines.end(); ++it)

@@ -33,8 +33,8 @@ namespace RenderCode {
 										SDL_WINDOWPOS_CENTERED,
 										r_width->Integer(),
 										r_height->Integer(),
-										r_fullscreen->Bool() ? 
-										SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN);
+										SDL_WINDOW_OPENGL | (r_fullscreen->Bool() ? 
+										SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN));
 		if(window == NULL) {
 			SDL_Quit();
 			return;
@@ -67,5 +67,13 @@ namespace RenderCode {
 
 	void Display() {
 		SDL_RenderPresent(renderer);
+	}
+
+	void* TexFromSurface(void* surface) {
+		return (void*)SDL_CreateTextureFromSurface(renderer, (SDL_Surface*)surface);
+	}
+
+	void GetWindowSize(int* w, int* h) {
+		SDL_GetWindowSize(window, w, h);
 	}
 };

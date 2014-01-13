@@ -1,6 +1,7 @@
 #pragma once
 #include "sys_shared.h"
 #include "tr_shared.h"
+#include "ui_shared.h"
 
 class RaptureGame {
 public:
@@ -205,16 +206,18 @@ class File {
 	FILE* handle;
 	string searchpath;
 public:
-	static pair<bool, File&> Open(const string &file, const string& mode);
+	static File* Open(const string &file, const string& mode);
 	void Close();
 	string ReadPlaintext(size_t numchar = 0);
-	unsigned char* ReadBinary(size_t numbytes = 0);
+	size_t ReadBinary(unsigned char* bytes, size_t numbytes = 0);
 	wstring ReadUnicode(size_t numchars = 0);
 	size_t GetSize();
 	inline size_t GetUnicodeSize() { return GetSize()/2; }
 	size_t WritePlaintext(const string& text) { return fwrite(text.c_str(), sizeof(char), text.length(), handle); }
 	size_t WriteUnicode(const wstring& text) { return fwrite(text.c_str(), sizeof(wchar_t), text.length(), handle); }
 	size_t WriteBinary(void* bytes, size_t numbytes) { return fwrite(bytes, sizeof(unsigned char), numbytes, handle); }
+	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
+	size_t Tell() { return ftell(handle); }
 friend class File;
 };
 

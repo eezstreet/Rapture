@@ -250,10 +250,9 @@ void CvarSystem::Cache_Free(const string& sName) {
 }
 
 void CvarSystem::ArchiveCvars() {
-	pair<bool, File&> ff = File::Open("raptureconfig.cfg", "w");
-	if(!ff.first)
-		return; // ?? should not happen
-	File& f = ff.second;
+	File* ff = File::Open("raptureconfig.cfg", "w");
+	if(!ff)
+		return; // also should not happen
 	for(auto it = cvars.begin(); it != cvars.end(); ++it) {
 		Cvar* cv = it->second;
 		if(cv->flags & Cvar::CVAR_ARCHIVE) {
@@ -274,9 +273,11 @@ void CvarSystem::ArchiveCvars() {
 					break;
 			}
 			ss << '\n';
-			f.WritePlaintext(ss.str());
+			ff->WritePlaintext(ss.str());
 		}
 	}
+	ff->Close();
+	Zone::Free(ff);
 }
 
 bool CvarSystem::init = false;
