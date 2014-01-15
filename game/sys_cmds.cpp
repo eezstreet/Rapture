@@ -26,6 +26,8 @@ void Cmd_Set_f(vector<string>& args) {
 
 	if(!Cvar::Exists(args[1]))
 	{
+		CvarSystem::CacheCvar(args[1], args[2]);
+		return;
 	}
 
 	Cvar::cvarType_e eType = CvarSystem::GetCvarType(args[1]);
@@ -41,7 +43,7 @@ void Cmd_Set_f(vector<string>& args) {
 			CvarSystem::SetFloatValue(args[1], atof(args[2].c_str()));
 			break;
 		case Cvar::CV_BOOLEAN:
-
+			CvarSystem::SetBooleanValue(args[1], atob(args[2].c_str()));
 			break;
 	}
 }
@@ -50,7 +52,15 @@ void Cmd_Seta_f(vector<string>& args) {
 	if(args.size() < 3)
 		return;
 
+	if(!Cvar::Exists(args[1])) {
+		CvarSystem::CacheCvar(args[1], args[2], true);
+		return;
+	}
+
 	Cmd_Set_f(args);
+	int flags = CvarSystem::GetCvarFlags(args[1]);
+	flags = flags | Cvar::CVAR_ARCHIVE;
+	CvarSystem::SetCvarFlags(args[1], flags);
 }
 
 void Cmd_Exec_f(vector<string>& args) {
@@ -61,7 +71,7 @@ void Cmd_Exec_f(vector<string>& args) {
 		return;
 	string text = p->ReadPlaintext();
 	p->Close();
-	Zone::Free(p);
+	Zone::FastFree(p, "files");
 
 	vector<string> lines = split(text, ';');
 	for(auto it = lines.begin(); it != lines.end(); ++it)

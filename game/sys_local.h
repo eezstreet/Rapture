@@ -2,6 +2,7 @@
 #include "sys_shared.h"
 #include "tr_shared.h"
 #include "ui_shared.h"
+#include <SDL.h>
 
 class RaptureGame {
 public:
@@ -12,6 +13,7 @@ public:
 	RaptureGame& operator= (RaptureGame other) { bHasFinished = other.bHasFinished; return *this; }
 
 	void HandleCommandline(int argc, char **argv);
+	void PassQuitEvent();
 
 	bool bHasFinished;
 	void RunLoop();
@@ -132,6 +134,11 @@ public:
 	static void SetIntegerValue(string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
 	static void SetFloatValue(string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; }
 	static void SetBooleanValue(string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; }
+
+	static string GetStringValue(const string& sName);
+	static int GetIntegerValue(const string& sName);
+	static float GetFloatValue(const string& sName);
+	static bool GetBooleanValue(const string& sName);
 friend class Cvar;
 };
 
@@ -141,15 +148,25 @@ namespace Zone {
 		TAG_NONE,
 		TAG_CVAR,
 		TAG_FILES,
+		TAG_RENDERER,
 		TAG_CUSTOM, // should only be used by mods
 		TAG_MAX,
 	};
 
 	extern string tagNames[];
 
+	struct ZoneChunk {
+		size_t memInUse;
+		bool isClassObject;
+
+		ZoneChunk(size_t mem, bool bClass) : 
+		memInUse(mem), isClassObject(bClass) {}
+		ZoneChunk() { memInUse = 0; isClassObject = false; }
+	};
+
 	struct ZoneTag {
 		size_t zoneInUse;
-		unordered_map<void*, pair<size_t, bool>> zone;
+		map<void*, ZoneChunk> zone;
 
 		ZoneTag() : zoneInUse(0) { }
 	};
@@ -170,8 +187,9 @@ namespace Zone {
 		template<typename T>
 		T* AllocClass(zoneTags_e tag) {
 			T* retVal = new T();
+			ZoneChunk zc(sizeof(T), true);
 			zone[tagNames[tag]].zoneInUse += sizeof(T);
-			zone[tagNames[tag]].zone[retVal] = make_pair(sizeof(T), true);
+			zone[tagNames[tag]].zone[retVal] = zc;
 			return retVal;
 		}
 	};
@@ -218,6 +236,7 @@ public:
 	size_t WriteBinary(void* bytes, size_t numbytes) { return fwrite(bytes, sizeof(unsigned char), numbytes, handle); }
 	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
 	size_t Tell() { return ftell(handle); }
+	static string GetFileSearchPath(string fileName);
 friend class File;
 };
 
@@ -247,6 +266,39 @@ namespace Cmd {
 	void ClearCommandList();
 	vector<string> Tokenize(const string &str);
 };
+
+/* Input.cpp */
+class InputManager {
+private:
+	map<SDL_Scancode, string> binds;
+	list<SDL_Scancode> thisFrameKeysDown;
+	void BindCommandMouse(string keycodeArg, string commandArg);
+	void (*Keycatcher)(SDL_Keycode key);
+public:
+	void SendKeyUpEvent(SDL_Keysym key);
+	void SendKeyDownEvent(SDL_Keysym key);
+	void InputFrame();
+	void ExecuteBind(string bindName);
+	void BindCommand(string keycodeArg, string commandArg);
+	void SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y);
+	void SendMouseMoveEvent(int x, int y);
+	InputManager();
+};
+
+extern InputManager *Input;
+void InitInput();
+void DeleteInput();
+
+/* Console.cpp */
+class Console {
+public:
+	string currentlyTyped; // Text which is currently being typed into the console
+	Console();
+};
+
+extern Console* con;
+void CreateConsole();
+void DestroyConsole();
 
 // sys_cmds.cpp
 void Sys_InitCommands();

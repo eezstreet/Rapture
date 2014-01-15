@@ -4,60 +4,24 @@ using namespace Rocket::Core;
 
 void UIRenderInterface::RenderGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, 
 		TextureHandle texture, const Vector2f& translation) {
-	glPushMatrix();
-	glTranslatef(translation.x, translation.y, 0);
 
-	vector<Vector2f> p(num_vertices);
-	vector<Colourb> c(num_vertices);
-	vector<Vector2f> t(num_vertices);
-
-	for(int i = 0; i < num_vertices; i++) {
-		p[i] = vertices[i].position;
-		c[i] = vertices[i].colour;
-		t[i] = vertices[i].tex_coord;
-	}
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glVertexPointer(2, GL_FLOAT, 0, &p[0]);
-	glColorPointer(4, GL_UNSIGNED_BYTE, 0, &c[0]);
-	glTexCoordPointer(2, GL_FLOAT, 0, &t[0]);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	SDL_Texture* tex = (SDL_Texture*)texture;
-	if(tex)
-		SDL_GL_BindTexture(tex, NULL, NULL);
-	else {
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
-	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, indices);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glColor4f(1, 1, 1, 1);
-
-	glPopMatrix();
+	SDL_Renderer* r = (SDL_Renderer*)RenderCode::GetRenderer();
+	SDL_RenderGeometry(r, (SDL_Texture*)texture, (SDL_Vertex*)vertices, num_vertices, indices, num_indices, (SDL_Vector2f*)&translation);
 }
 
 void UIRenderInterface::EnableScissorRegion(bool enable) {
-	//if(enable)
-	//	glEnable(GL_SCISSOR_TEST);
-	//else
-	//	glDisable(GL_SCISSOR_TEST);
+	SDL_Renderer* r = (SDL_Renderer*)RenderCode::GetRenderer();
+	if(enable)
+		SDL_EnableScissor(r);
+	else
+		SDL_DisableScissor(r);
 }
 
 void UIRenderInterface::SetScissorRegion(int x, int y, int width, int height) {
-	//int iWindowWidth, iWindowHeight;
-	//RenderCode::GetWindowSize(&iWindowWidth, &iWindowHeight);
-	//glScissor(x, iWindowHeight - (y + iWindowHeight), width, height);
+	SDL_Renderer* r = (SDL_Renderer*)RenderCode::GetRenderer();
+	SDL_Rect rect;
+	rect.x = x; rect.y = y; rect.w = width; rect.h = height;
+	SDL_ScissorRegion(r, &rect);
 }
 
 bool UIRenderInterface::LoadTexture(TextureHandle& handle, Vector2i& dimensions, const String& source) {

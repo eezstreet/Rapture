@@ -245,7 +245,7 @@ void CvarSystem::Cache_Free(const string& sName) {
 	auto it = cache.find(sName);
 	if(it == cache.end())
 		return; // FIXME: use the iterator for the next two calls (performance)
-	Zone::Free(cache[sName]);
+	Zone::FastFree(cache[sName], "cvar");
 	cache.erase(sName);
 }
 
@@ -277,7 +277,43 @@ void CvarSystem::ArchiveCvars() {
 		}
 	}
 	ff->Close();
-	Zone::Free(ff);
+	Zone::FastFree(ff, "files");
+}
+
+string CvarSystem::GetStringValue(const string& sName) {
+	if(!Cvar::Exists(sName)) { // use cache
+		return ""; // FIXME
+	}
+	else {
+		return Cvar::Get<char*>(sName, "", 0, "")->s.currentVal;
+	}
+}
+
+int CvarSystem::GetIntegerValue(const string& sName) {
+	if(!Cvar::Exists(sName)) { // use cache
+		return 0; // FIXME
+	}
+	else {
+		return Cvar::Get<int>(sName, "", 0, 0)->i.currentVal;
+	}
+}
+
+float CvarSystem::GetFloatValue(const string& sName) {
+	if(!Cvar::Exists(sName)) {
+		return 0.0f; // FIXME
+	}
+	else {
+		return Cvar::Get<float>(sName, "", 0, 0.0f)->v.currentVal;
+	}
+}
+
+bool CvarSystem::GetBooleanValue(const string& sName) {
+	if(!Cvar::Exists(sName)) {
+		return false; // FIXME
+	}
+	else {
+		return Cvar::Get<bool>(sName, "", 0, false)->b.currentVal;
+	}
 }
 
 bool CvarSystem::init = false;

@@ -1,69 +1,118 @@
 #include "ui_local.h"
 
 using namespace UI;
+using namespace Awesomium;
 
-static UIFileInterface *uiFS = NULL;
-static UIRenderInterface *uiTR = NULL;
-static UISystemInterface *uiSYS = NULL;
+WebCore *wc = NULL;
+static WebSession *sess = NULL;
+static WebView *mainView = NULL;
 
-static Rocket::Core::Context *cContext;
+static bool bConsoleIsActive = false;
 
-void UI::Initialize() {
-	uiFS = new UIFileInterface();
-	uiTR = new UIRenderInterface();
-	uiSYS = new UISystemInterface();
-
-	Rocket::Core::SetFileInterface(uiFS);
-	Rocket::Core::SetRenderInterface(uiTR);
-	Rocket::Core::SetSystemInterface(uiSYS);
-
-	Rocket::Core::Initialise();
-	Rocket::Controls::Initialise();
-
-	Rocket::Core::FontDatabase::LoadFontFace("/fonts/Delicious-Bold.otf");
-
-	cContext = Rocket::Core::CreateContext("default", Rocket::Core::Vector2i(1024, 768));
+static vector<WebView*> renderables;
+void AddRenderable(WebView* wv) {
+	renderables.push_back(wv);
 }
 
-static unordered_map<string, Rocket::Core::Context*> contexts;
-
-void UI::RegisterContext(const string& name, int width, int height) {
-	contexts[name] = Rocket::Core::CreateContext(name.c_str(), Rocket::Core::Vector2i(width, height));
-}
-
-void UI::DestroyContext(const string& name) {
-	contexts[name]->RemoveReference();
-	contexts.erase(name);
-}
-
-void UI::SendInput() {
-	for(auto it = contexts.begin(); it != contexts.end(); ++it) {
-		it->second->Update();
+void RemoveRenderable(WebView* wv) {
+	for(auto it = renderables.begin(); it != renderables.end(); ++it) {
+		if(*it == wv)
+			renderables.erase(it);
 	}
+}
+
+WebView* currentFocus = NULL; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
+
+/* UI Class */
+void UI::Initialize() {
+	wc = WebCore::Initialize(WebConfig());
+	sess = wc->CreateWebSession(WSLit("C:\\Rapture\\Gamedata\\core\\session"), WebPreferences()); // TODO: use homepath
+	mainView = wc->CreateWebView(1024, 768, sess);
+	mainView->LoadURL(WebURL(WSLit("http://jkhub.org")));
+	while(mainView->IsLoading())
+		wc->Update();
+	AddRenderable(mainView);
+
+}
+
+void UI::Shutdown() {
+	if(bConsoleIsActive)
+		DestroyConsole(); // destroy the console if it's open
+	WebCore::Shutdown();
+}
+
+void UI::Update() {
+	wc->Update();
 }
 
 void UI::Render() {
-	cContext->Render();
-	for(auto it = contexts.begin(); it != contexts.end(); ++it) {
-		it->second->Render();
+	for(auto it = renderables.begin(); it != renderables.end(); ++it) {
+		BitmapSurface* bmp = (BitmapSurface*)(*it)->surface();
+		if(!bmp)
+			return;
+		SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		//SDL_ConvertSurfaceFormat(x, SDL_PIXELFORMAT_BGRA8888, 0);
+		RenderCode::AddSurface((void*)x);
 	}
 }
 
-void UI::Destroy() {
-	// Destroy any remaining contexts
-	for(auto it = contexts.begin(); it != contexts.end(); ++it) {
-		it->second->RemoveReference();
+void UI::KeyboardEvent(SDL_Scancode sc) {
+	if(sc == SDL_SCANCODE_GRAVE) {
+		bConsoleIsActive = !bConsoleIsActive;
+		if(bConsoleIsActive) {
+			// Activate the console.
+			CreateConsole();
+		}
+		else {
+			// Deactivate the console.
+			DestroyConsole();
+		}
 	}
-	contexts.clear();
-	cContext->RemoveReference();
-	// Clean up librocket
-	Rocket::Core::Shutdown();
 }
 
-void UI::TestDisplay() {
-	Rocket::Core::ElementDocument* doc = cContext->LoadDocument("/ui/testdocument.rml");
-	if(doc) {
-		doc->Show();
-		doc->RemoveReference();
+void PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down) {
+	if(buttonId & SDL_BUTTON_LMASK) {
+		if(down)
+			wv->InjectMouseDown(Awesomium::kMouseButton_Left);
+		else
+			wv->InjectMouseUp(Awesomium::kMouseButton_Left);
+	}
+	if(buttonId & SDL_BUTTON_MMASK) {
+		if(down)
+			wv->InjectMouseDown(Awesomium::kMouseButton_Middle);
+		else
+			wv->InjectMouseUp(Awesomium::kMouseButton_Middle);
+	}
+	if(buttonId & SDL_BUTTON_RMASK) {
+		if(down)
+			wv->InjectMouseDown(Awesomium::kMouseButton_Right);
+		else
+			wv->InjectMouseUp(Awesomium::kMouseButton_Right);
+	}
+}
+
+void UI::MouseButtonEvent(unsigned int buttonId, bool down) {
+	if(currentFocus != NULL) {
+		PipeMouseInputToWebView(currentFocus, buttonId, down);
+	}
+	else {
+		for(auto it = renderables.begin(); it != renderables.end(); ++it) {
+			PipeMouseInputToWebView(*it, buttonId, down);
+		}
+	}
+}
+
+void PipeMouseMovementToWebView(WebView* wv, int x, int y) {
+	if(wv)
+		wv->InjectMouseMove(x, y);
+}
+
+void UI::MouseMoveEvent(int x, int y) {
+	if(currentFocus)
+		currentFocus->InjectMouseMove(x, y);
+	else {
+		for(auto it = renderables.begin(); it != renderables.end(); ++it) {
+			(*it)->InjectMouseMove(x,y);
+		}
 	}
 }

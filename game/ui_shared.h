@@ -1,14 +1,13 @@
 #pragma once
 #include "sys_shared.h"
+#include <SDL.h>
 
 namespace UI {
 	void Initialize();
-	void RegisterContext(const string& name, int width, int height);
-	void DestroyContext(const string& name);
 	void Render();
-	void SendInput();
-	void Destroy();
-
-	// test
-	void TestDisplay();
+	void Shutdown();
+	void Update();
+	void KeyboardEvent(SDL_Scancode sc);
+	void MouseButtonEvent(unsigned int buttonId, bool down);
+	void MouseMoveEvent(int x, int y);
 };

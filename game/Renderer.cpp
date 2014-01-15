@@ -8,14 +8,16 @@ namespace RenderCode {
 	Cvar* r_gamma = NULL;
 
 	static SDL_Window *window;
-	static SDL_Renderer *renderer;
+	SDL_Renderer *renderer;
+
+	static vector<SDL_Texture*> texs = vector<SDL_Texture*>();
 
 	static void InitCvars() {
 		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", Cvar::CVAR_ARCHIVE, false);
 		r_width = Cvar::Get<int>("r_width", "Resolution: width", Cvar::CVAR_ARCHIVE, 1024);
 		r_height = Cvar::Get<int>("r_height", "Resolution: height", Cvar::CVAR_ARCHIVE, 768);
 		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", Cvar::CVAR_ARCHIVE | Cvar::CVAR_ROM, "Rapture");
-		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", Cvar::CVAR_ARCHIVE, 1.2f);
+		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", Cvar::CVAR_ARCHIVE, 1.0f);
 	}
 
 	void Initialize() {
@@ -64,13 +66,18 @@ namespace RenderCode {
 
 	void Display() {
 		SDL_RenderPresent(renderer);
+		for(auto it = texs.begin(); it != texs.end(); ++it) {
+			SDL_DestroyTexture(*it);
+		}
+		texs.clear(); // clear out the texture pool
 	}
 
-	void* TexFromSurface(void* surface) {
-		return (void*)SDL_CreateTextureFromSurface(renderer, (SDL_Surface*)surface);
-	}
-
-	void GetWindowSize(int* w, int* h) {
-		SDL_GetWindowSize(window, w, h);
+	void* AddSurface(void* surf) {
+		SDL_Surface* sdlsurf = (SDL_Surface*)surf;
+		SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, sdlsurf);
+		SDL_RenderCopy(renderer, text, NULL, NULL);
+		SDL_FreeSurface(sdlsurf);
+		texs.push_back(text);
+		return text;
 	}
 };

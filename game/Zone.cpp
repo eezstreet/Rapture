@@ -8,6 +8,7 @@ namespace Zone {
 			"none",
 			"cvar",
 			"files",
+			"renderer",
 			"custom",
 			"max"
 	};
@@ -19,26 +20,21 @@ namespace Zone {
 		}
 
 		zone[tagNames[tag]].zoneInUse += iSize;
-		void *mem = malloc(iSize);
-		zone[tagNames[tag]].zone[mem] = make_pair(iSize, false);
-		return mem;
+		void *memory = malloc(iSize);
+		ZoneChunk z(iSize, false);
+		zone[tagNames[tag]].zone[memory] = z;
+		return memory;
 	}
 
 	// free some zone memory (SLOW)
 	void MemoryManager::Free(void* memory) {
 		for(auto it = zone.begin(); it != zone.end(); ++it) {
-			try {
-				unordered_map<void*, pair<size_t, bool>>::iterator it2 = it->second.zone.find(memory);
-				it->second.zoneInUse -= it2->second.first;
-				it->second.zone.erase(memory);
-				if(!it2->second.second)
+			for(auto it2 = it->second.zone.begin(); it2 != it->second.zone.end(); ++it2) {
+				if(it2->first == memory) {
+					it->second.zoneInUse -= it2->second.memInUse;
+					it->second.zone.erase(it2);
 					free(memory);
-				else
-					delete memory;
-				return;
-			} 
-			catch( out_of_range e ) {
-				continue;
+				}
 			}
 		}
 		// Zone::Free(): corrupt zone memory
@@ -47,10 +43,10 @@ namespace Zone {
 	// free some zone memory (quicker but still SLOW and not recommended)
 	void MemoryManager::FastFree(void* memory, const string tag) {
 		try {
-			pair<size_t, bool> mpair = zone[tag].zone.find(memory)->second;
-			zone[tag].zoneInUse -= mpair.first;
+			auto mpair = zone[tag].zone.find(memory)->second;
+			zone[tag].zoneInUse -= mpair.memInUse;
 			zone[tag].zone.erase(memory);
-			if(!mpair.second)
+			if(!mpair.isClassObject)
 				free(memory);
 			else
 				delete memory;
@@ -66,24 +62,23 @@ namespace Zone {
 		zone[tag].zoneInUse = 0;
 		for(auto it = zone[tag].zone.begin();
 			it != zone[tag].zone.end(); ++it) {
-				zone[tag].zone.erase(it->first);
-				if(!it->second.second)
+				if(!it->second.isClassObject)
 					free(it->first);
 				else
 					delete it->first;
 		}
+		zone[tag].zone.clear();
 	}
 
 	void* MemoryManager::Reallocate(void* memory, size_t iNewSize) {
 		for(auto it = zone.begin(); it != zone.end(); ++it) {
 			try {
-				unordered_map<void*, pair<size_t, bool>>::iterator it2 = it->second.zone.find(memory);
-				if(it2->second.second) return memory; // do NOT allow reallocations on classes
-				__int64 difference = iNewSize - it2->second.first;
+				auto it2 = it->second.zone.find(memory);
+				if(it2->second.isClassObject) return memory; // do NOT allow reallocations on classes
+				__int64 difference = iNewSize - it2->second.memInUse;
 				it->second.zoneInUse += difference;
-				it->second.zone.erase(memory);
 				memory = realloc(memory, iNewSize);
-				it->second.zone[memory] = make_pair(iNewSize, false);
+				it->second.zone[memory] = ZoneChunk(iNewSize, false);
 				return memory;
 			}
 			catch( out_of_range e ) {

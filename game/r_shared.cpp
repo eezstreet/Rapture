@@ -56,3 +56,10 @@ string trim(const string& str, const string& trim) {
 
     return str.substr(strBegin, strRange);
 }
+
+// http://stackoverflow.com/questions/12851379/c-how-do-i-convert-hex-integer-to-string
+string hexstring(const int address) {
+	std::stringstream ss;
+	ss << address;
+	return ss.str();
+}

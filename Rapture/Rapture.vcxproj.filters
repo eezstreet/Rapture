@@ -45,16 +45,13 @@
     <ClCompile Include="..\game\sys_cmds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\UIFileInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\UISystemInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\UIRenderInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\ui_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -53,12 +53,15 @@ File* File::Open(const string& fileName, const string& mode) {
 		fixedName = '/' + fixedName;
 
 	// If a file has been opened before, we can open it again using the same search path as we did previously.
-	unordered_map<string, File*>::iterator it = FS::fs->files.find(fixedName);
-	if(it != FS::fs->files.end()) {
-		string path = it->second->searchpath + fixedName;
-		if(it->second->handle) return NULL;
-		it->second->handle = fopen(path.c_str(), mode.c_str());
-		return it->second;
+	if(mode.find('w') == string::npos && mode.find('a') == string::npos) {
+		// We don't do this when writing (because we always write to homepath)
+		auto it = FS::fs->files.find(fixedName);
+		if(it != FS::fs->files.end()) {
+			string path = it->second->searchpath + fixedName;
+			if(it->second->handle) return NULL;
+			it->second->handle = fopen(path.c_str(), mode.c_str());
+			return it->second;
+		}
 	}
 
 	// If we are reading, we need to reverse the searchpath list (so we read from homepath last)
@@ -94,10 +97,13 @@ string File::ReadPlaintext(size_t numChars) {
 		fseek(handle, 0L, SEEK_SET);
 		numChars = GetSize()/sizeof(char);
 	}
+	if(numChars == 0) { // blank!
+		return "";
+	}
 	char* buf = (char*)Zone::Alloc(sizeof(char)*numChars, Zone::TAG_FILES);
 	fread(buf, sizeof(char), numChars, handle);
 	string retval = buf;
-	Zone::Free(buf);
+	Zone::FastFree(buf, "files");
 	return retval;
 }
 
@@ -119,7 +125,7 @@ wstring File::ReadUnicode(size_t numChars) {
 	wchar_t *buf = (wchar_t*)Zone::Alloc(sizeof(wchar_t)*numChars, Zone::TAG_FILES);
 	fread(buf, sizeof(wchar_t), numChars, handle);
 	wstring retval = buf;
-	Zone::Free(buf);
+	Zone::FastFree(buf, "files");
 	return retval;
 }
 
@@ -129,4 +135,23 @@ size_t File::GetSize() {
 	size_t size = ftell(handle);
 	fseek(handle, currentPos, SEEK_SET);
 	return size;
+}
+
+string File::GetFileSearchPath(string fileName) {
+	// Get a file's search path without opening the file itself.
+	// This is extremely handy in the case of Awesomium, where it handles files on its own.
+
+	// Trim off any leading (or trailing) whitespace
+	string fixedName = trim(fileName);
+	// Now make sure we start with a '/'
+	if(fixedName[0] != '/')
+		fixedName = '/' + fixedName;
+	for(auto it = FS::fs->searchpaths.begin(); it != FS::fs->searchpaths.end(); ++it) {
+		string path = *it + fixedName;
+		FILE* f = fopen(path.c_str(), "r");
+		if(f) {
+			fclose(f);
+			return path;
+		}
+	}
 }
