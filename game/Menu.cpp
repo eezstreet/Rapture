@@ -158,11 +158,15 @@ returningTable_t tbl_return [] = {
 void Menu::SetupBaseCommands(JSObject* obj) {
 	int i;
 
-	for(i = 0; tbl_nonreturn[i].func; i++)
+	for(i = 0; tbl_nonreturn[i].func; i++) {
 		m_pfNonReturning.insert(make_pair(tbl_nonreturn[i].name, tbl_nonreturn[i].func));
+		obj->SetCustomMethod(WSLit(tbl_nonreturn[i].name.c_str()), false);
+	}
 
-	for(i = 0; tbl_return[i].func; i++)
+	for(i = 0; tbl_return[i].func; i++) {
 		m_pfReturning.insert(make_pair(tbl_return[i].name, tbl_return[i].func));
+		obj->SetCustomMethod(WSLit(tbl_return[i].name.c_str()), true);
+	}
 }
 
 bool Menu::ExecuteBaseCommand(const string& command, const JSArray& args) {

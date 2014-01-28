@@ -15,7 +15,7 @@ MainMenu::MainMenu() {
 	R_Printf("done.\n");
 	AddRenderable(wView);
 
-	global = wView->CreateGlobalJavascriptObject(WSLit("MenuManager"));
+	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
 	SetupBaseCommands(&jObj);

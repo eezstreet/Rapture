@@ -6,13 +6,22 @@
 		
 		<script>
 			var GameManager;
+            
+            function QuitGame() {
+                //GameManager.execCommand("quit");
+                alert("We should be exiting the game.");
+            }
+            
 			$(document).ready(function() {
-				$('#menudraggable').draggable({ containment: '#menucontainer'});
 				$('#menuaccordion').accordion({ active: false, collapsible: true});
 				
 				$(window).scroll(function() {
 					scroll(0,0);
 				});
+                
+                $('#menu-exit-button').on('click', function() {
+                    QuitGame();
+                });
 			});
 		</script>
 		
@@ -46,11 +55,11 @@
 			<div style="position:fixed;left:3%;">
 				<img src="images/alphalogo.png">
 			</div>
-			<div id="menudraggable" class="ui-widget-content" style="width:20%;position:fixed;right:5%;bottom:10%;">
+			<div class="ui-widget-content" style="width:20%;position:fixed;right:5%;bottom:10%;">
 				<div id="menuaccordion">
 					<h3>New Game</h3>
 					<div>
-						<p>Some crap here</p>
+						<button class="ui-button mainbutton" id="menu-new-button">New Game</button>
 					</div>
 					<h3>Options</h3>
 					<div>
@@ -58,7 +67,7 @@
 					</div>
 					<h3>Exit</h3>
 					<div>
-						<p>Are you sure? <a href="#"><button class="ui-button" id="menu-exit-button">Exit Game</button></a></p>
+						<p>Are you sure? <p><a href="#"><button class="ui-button mainbutton" id="menu-exit-button">Exit Game</button></a></p>
 					</div>
 				</div>
 			</div>
