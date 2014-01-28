@@ -1,4 +1,5 @@
 #include "sys_local.h"
+#include "ui_shared.h"
 
 InputManager *Input = NULL;
 
@@ -129,20 +130,26 @@ void DeleteInput() {
 	delete Input;
 }
 
-void InputManager::SendKeyDownEvent(SDL_Keysym key) {
+void InputManager::SendKeyDownEvent(SDL_Keysym key, char* text) {
 	SDL_Scancode k = key.scancode;
 	auto it = find(thisFrameKeysDown.begin(), thisFrameKeysDown.end(), k);
 	if(it != thisFrameKeysDown.end())
 		return;
 	thisFrameKeysDown.push_back(k);
+
+	// TODO: keycatchers
+	UI::KeyboardEvent(key, true, text);
 }
 
-void InputManager::SendKeyUpEvent(SDL_Keysym key) {
+void InputManager::SendKeyUpEvent(SDL_Keysym key, char* text) {
 	SDL_Scancode k = key.scancode;
 	auto it = find(thisFrameKeysDown.begin(), thisFrameKeysDown.end(), k);
 	if(it == thisFrameKeysDown.end())
 		return;
 	thisFrameKeysDown.erase(it);
+
+	// TODO: keycatchers
+	UI::KeyboardEvent(key, false, text);
 }
 
 void InputManager::InputFrame() {
@@ -154,7 +161,7 @@ void InputManager::InputFrame() {
 void InputManager::BindCommand(string keycodeArg, string commandArg) {
 	int i;
 	for(i = 0; i < SDL_SCANCODE_F19; i++) {
-		if(keycodeNames[i] == keycodeArg)
+		if(keycodeNames[i] == keycodeArg) // FIXME
 			break;
 	}
 	if(i >= SDL_SCANCODE_KP_EQUALS)
@@ -179,4 +186,8 @@ void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char sta
 
 void InputManager::SendMouseMoveEvent(int x, int y) {
 	UI::MouseMoveEvent(x, y);
+}
+
+void InputManager::SendTextInputEvent(char* text) {
+	UI::TextEvent(text);
 }

@@ -21,11 +21,10 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 			sys->PassQuitEvent();
 			break;
 		case SDL_KEYDOWN:
-			Input->SendKeyDownEvent(e->key.keysym);
-			UI::KeyboardEvent(e->key.keysym.scancode);
+			Input->SendKeyDownEvent(e->key.keysym, e->text.text);
 			break;
 		case SDL_KEYUP:
-			Input->SendKeyUpEvent(e->key.keysym);
+			Input->SendKeyUpEvent(e->key.keysym, e->text.text);
 			break;
 		case SDL_MOUSEMOTION:
 			Input->SendMouseMoveEvent(e->motion.x, e->motion.y);
@@ -35,6 +34,12 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 			Input->SendMouseButtonEvent(e->button.button, e->button.state, e->button.x, e->button.y);
 			break;
 		case SDL_JOYAXISMOTION:
+			break;
+		case SDL_TEXTINPUT:
+			Input->SendTextInputEvent(e->text.text);
+			break;
+		case SDL_TEXTEDITING:
+			// Not used?
 			break;
 		case SDL_JOYBALLMOTION:
 			break;
@@ -125,4 +130,17 @@ void RaptureGame::HandleCommandline(int argc, char** argv) {
 /* Quit the game. */
 void RaptureGame::PassQuitEvent() {
 	bHasFinished = true;
+}
+
+/* Some shared functions */
+#include "ui_local.h"
+void R_Printf(const char *fmt, ...) {
+	va_list args;
+	char str[1024];
+
+	va_start(args, fmt);
+	vsnprintf(str, 1024, fmt, args);
+	va_end(args);
+
+	Console::PushConsoleMessage(str);
 }

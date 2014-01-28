@@ -1,0 +1,184 @@
+#include "ui_local.h"
+
+using namespace Awesomium;
+
+void EXPORT_execCommand(const JSArray& args) {
+	// TODO: print something on error?
+	if(args.size() != 1)
+		return;
+	if(!args[0].IsString())
+		return;
+	Cmd::ProcessCommand(ToString(args[0].ToString()).c_str());
+}
+
+bool CvarGet_IsValid(const JSArray& args) {
+	if(args.size() != 1) {
+		R_Printf("JS warning: getCvar bad arguments\n");
+		return false;
+	}
+	if(!args[0].IsString()) {
+		R_Printf("JS warning: getCvar arg not string\n");
+		return false;
+	}
+	return true;
+}
+
+JSValue EXPORT_getCvarString(const JSArray& args) {
+	if(!CvarGet_IsValid(args))
+		return JSValue::Null();
+	string cvarName = ToString(args[0].ToString());
+	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
+	if(type != Cvar::CV_STRING) {
+		R_Printf("JS warning: getCvarString: cvar %s is not string type\n", cvarName.c_str());
+		return JSValue::Null();
+	}
+	string value = CvarSystem::GetStringValue(cvarName);
+	return JSValue(WSLit(value.c_str()));
+}
+
+JSValue EXPORT_getCvarInteger(const JSArray& args) {
+	if(!CvarGet_IsValid(args))
+		return JSValue::Null();
+	string cvarName = ToString(args[0].ToString());
+	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
+	if(type != Cvar::CV_INTEGER) {
+		R_Printf("JS warning: getCvarInteger: cvar %s is not integer type\n", cvarName.c_str());
+		return JSValue::Null();
+	}
+	return JSValue(CvarSystem::GetIntegerValue(cvarName));
+}
+
+JSValue EXPORT_getCvarFloat(const JSArray& args) {
+	if(!CvarGet_IsValid(args))
+		return JSValue::Null();
+	string cvarName = ToString(args[0].ToString());
+	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
+	if(type != Cvar::CV_FLOAT) {
+		R_Printf("JS warning: getCvarFloat: cvar %s is not float type\n", cvarName.c_str());
+		return JSValue::Null();
+	}
+	return JSValue(CvarSystem::GetFloatValue(cvarName));
+}
+
+JSValue EXPORT_getCvarBoolean(const JSArray& args) {
+	if(!CvarGet_IsValid(args))
+		return JSValue::Null();
+	string cvarName = ToString(args[0].ToString());
+	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
+	if(type != Cvar::CV_BOOLEAN) {
+		R_Printf("JS warning: getCvarBoolean: cvar %s is not boolean type\n", cvarName.c_str());
+		return JSValue::Null();
+	}
+	return JSValue(CvarSystem::GetBooleanValue(cvarName));
+}
+
+bool CvarSet_IsValid(const JSArray& args) {
+	if(args.size() != 2) {
+		R_Printf("JS warning: setCvar using incorrect arguments\n");
+		return false;
+	}
+	if(!args[0].IsString()) {
+		R_Printf("JS warning: setCvar: first arg is not string\n");
+		return false;
+	}
+	if(!Cvar::Exists(ToString(args[0].ToString()))) {
+		R_Printf("JS warning: setCvar: cvar doesn't exist\n");
+		return false;
+	}
+	return true;
+}
+
+void EXPORT_setCvarString(const JSArray& args) {
+	if(!CvarSet_IsValid(args))
+		return;
+	if(!args[1].IsString()) {
+		R_Printf("JS warning: setCvarString: second arg is not string\n");
+		return;
+	}
+	CvarSystem::SetStringValue(ToString(args[0].ToString()), (char*)ToString(args[1].ToString()).c_str());
+}
+
+void EXPORT_setCvarInteger(const JSArray& args) {
+	if(!CvarSet_IsValid(args))
+		return;
+	if(!args[1].IsInteger()) {
+		R_Printf("JS warning: setCvarInteger: second arg is not integer\n");
+		return;
+	}
+	CvarSystem::SetIntegerValue(ToString(args[0].ToString()), args[1].ToInteger());
+}
+
+void EXPORT_setCvarFloat(const JSArray& args) {
+	if(!CvarSet_IsValid(args))
+		return;
+	if(!args[1].IsDouble()) {
+		R_Printf("JS warning: setCvarFloat: second arg is not float\n");
+		return;
+	}
+	CvarSystem::SetFloatValue(ToString(args[0].ToString()), args[1].ToDouble());
+}
+
+void EXPORT_setCvarBoolean(const JSArray& args) {
+	if(!CvarSet_IsValid(args))
+		return;
+	if(!args[1].IsBoolean()) {
+		R_Printf("JS warning: setCvarBoolean: second arg is not boolean\n");
+		return;
+	}
+	CvarSystem::SetBooleanValue(ToString(args[0].ToString()), args[1].ToBoolean());
+}
+
+/* End function definitions */
+template<class T>
+struct funcTable_t {
+	string name;
+	T func;
+};
+
+typedef funcTable_t<Menu::menuNonReturning> nonReturningTable_t;
+typedef funcTable_t<Menu::menuReturning> returningTable_t;
+
+nonReturningTable_t tbl_nonreturn [] = {
+	{ "execCommand", EXPORT_execCommand },
+	{ "setCvarString", EXPORT_setCvarString },
+	{ "setCvarInteger", EXPORT_setCvarInteger },
+	{ "setCvarFloat", EXPORT_setCvarFloat },
+	{ "setCvarBoolean", EXPORT_setCvarBoolean },
+	{ "END", NULL }
+};
+
+returningTable_t tbl_return [] = {
+	{ "getCvarString", EXPORT_getCvarString },
+	{ "getCvarInteger", EXPORT_getCvarInteger },
+	{ "getCvarFloat", EXPORT_getCvarFloat },
+	{ "getCvarBoolean", EXPORT_getCvarBoolean },
+	{ "END", NULL }
+};
+
+void Menu::SetupBaseCommands(JSObject* obj) {
+	int i;
+
+	for(i = 0; tbl_nonreturn[i].func; i++)
+		m_pfNonReturning.insert(make_pair(tbl_nonreturn[i].name, tbl_nonreturn[i].func));
+
+	for(i = 0; tbl_return[i].func; i++)
+		m_pfReturning.insert(make_pair(tbl_return[i].name, tbl_return[i].func));
+}
+
+bool Menu::ExecuteBaseCommand(const string& command, const JSArray& args) {
+	auto it = m_pfNonReturning.find(command);
+	if(it == m_pfNonReturning.end())
+		return false;
+	it->second(args);
+	return true;
+}
+
+pair<bool, JSValue> Menu::ExecuteBaseCommandWithReturn(const string& command, const JSArray& args) {
+	JSValue returnValue;
+	auto it = m_pfReturning.find(command);
+	if(it == m_pfReturning.end())
+		return make_pair(false, returnValue);
+	returnValue = it->second(args);
+	return make_pair(true, returnValue);
+}
+

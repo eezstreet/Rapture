@@ -16,7 +16,8 @@ namespace Zone {
 	// allocate some zone memory
 	void* MemoryManager::Allocate(int iSize, zoneTags_e tag) {
 		if(tag == TAG_NONE) {
-			return NULL; // Zone::Alloc: passed TAG_NONE
+			R_Printf("Zone::Alloc: passed TAG_NONE\n");
+			return NULL;
 		}
 
 		zone[tagNames[tag]].zoneInUse += iSize;
@@ -37,7 +38,7 @@ namespace Zone {
 				}
 			}
 		}
-		// Zone::Free(): corrupt zone memory
+		R_Printf("Zone::Free(): corrupt zone memory\n");
 	}
 
 	// free some zone memory (quicker but still SLOW and not recommended)
@@ -52,7 +53,7 @@ namespace Zone {
 				delete memory;
 		}
 		catch( out_of_range e ) {
-			// Zone::FastFree(): corrupt zone memory
+			R_Printf("Zone::FastFree(): corrupt zone memory\n");
 			return;
 		}
 	}
@@ -85,11 +86,12 @@ namespace Zone {
 				continue;
 			}
 		}
-		// Zone::Realloc: corrupt zone memory
+		R_Printf("Zone::Realloc: corrupt zone memory\n");
 		return NULL;
 	}
 
 	MemoryManager::MemoryManager() {
+		R_Printf("Initializing zone memory\n");
 	}
 
 	MemoryManager::~MemoryManager() {
@@ -106,6 +108,7 @@ namespace Zone {
 	}
 
 	void Shutdown() {
+		R_Printf("Shutting down zone memory...");
 		delete mem; // yea fuck up dem peasant's RAM
 	}
 

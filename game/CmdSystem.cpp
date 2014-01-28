@@ -6,12 +6,14 @@ namespace Cmd {
 	void ProcessCommand(const char *cmd) {
 		// in the future, mods will add more to this list
 		vector<string> arguments = Tokenize(cmd);
-		try {
-			auto it = cmdlist.find(arguments[0]);
+		auto it = cmdlist.find(arguments[0]);
+		if(it != cmdlist.end()) {
 			auto cmd = (*it).second;
 			cmd(arguments);
 		}
-		catch(out_of_range e){} // unknown cmd
+		else {
+			R_Printf("unknown cmd '%s'\n", cmd);
+		}
 	}
 
 	void AddCommand(string cmdName, conCmd_t cmd) {
@@ -38,8 +40,8 @@ namespace Cmd {
 		for(i = 0; i < str.length(); i++) {
 			char c = str[i];
 			if(c == ' ') {
-				retVal.push_back(str.substr(lastSplit, i));
-				lastSplit = i;
+				retVal.push_back(str.substr(lastSplit, i-lastSplit));
+				lastSplit = i+1;
 			} else if(c == '\"') {
 				size_t quoteStart = ++i;
 				while(i < str.length() && str[i] != '\"')

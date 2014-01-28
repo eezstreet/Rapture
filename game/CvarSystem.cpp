@@ -75,6 +75,8 @@ Cvar& Cvar::operator= (bool val) {
 bool Cvar::Exists(const string& sName) {
 	try {
 		auto it = CvarSystem::cvars.find(sName);
+		if(it == CvarSystem::cvars.end())
+			return false;
 		return true;
 	}
 	catch( out_of_range e ) {
@@ -226,19 +228,18 @@ void CvarSystem::Destroy() {
 
 void CvarSystem::CacheCvar(const string& sName, const string& sValue, bool bArchive) {
 	// check and make sure the cvar isn't already cached
-	try 
-	{
-		auto it = cache.find(sName);
-		cache[sName]->archive = bArchive;
-		cache[sName]->initvalue = sValue;
-	}
-	catch(out_of_range e)
-	{
+	auto it = cache.find(sName);
+	if(it == cache.end()) {
 		CvarCacheObject* cv = Zone::New<CvarCacheObject>(Zone::TAG_CVAR);
 		cv->initvalue = sValue;
 		cv->archive = bArchive;
 		cache[sName] = cv;
 	}
+	else {
+		cache[sName]->archive = bArchive;
+		cache[sName]->initvalue = sValue;
+	}
+	R_Printf("Caching cvar %s\n", sName.c_str());
 }
 
 void CvarSystem::Cache_Free(const string& sName) {

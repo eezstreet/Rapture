@@ -251,6 +251,7 @@ namespace FS {
 		FileSystem();
 		~FileSystem();
 		inline vector<string>& GetSearchPaths() { return searchpaths; }
+		void PrintSearchPaths();
 	friend class File;
 	};
 
@@ -275,30 +276,24 @@ private:
 	void BindCommandMouse(string keycodeArg, string commandArg);
 	void (*Keycatcher)(SDL_Keycode key);
 public:
-	void SendKeyUpEvent(SDL_Keysym key);
-	void SendKeyDownEvent(SDL_Keysym key);
+	void SendKeyUpEvent(SDL_Keysym key, char* text);
+	void SendKeyDownEvent(SDL_Keysym key, char* text);
 	void InputFrame();
 	void ExecuteBind(string bindName);
 	void BindCommand(string keycodeArg, string commandArg);
 	void SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y);
 	void SendMouseMoveEvent(int x, int y);
+	void SendTextInputEvent(char* text);
 	InputManager();
 };
 
 extern InputManager *Input;
 void InitInput();
 void DeleteInput();
+extern const string keycodeNames[];
 
-/* Console.cpp */
-class Console {
-public:
-	string currentlyTyped; // Text which is currently being typed into the console
-	Console();
-};
-
-extern Console* con;
-void CreateConsole();
-void DestroyConsole();
+// sys_main.cpp
+void R_Printf(const char *fmt, ...);
 
 // sys_cmds.cpp
 void Sys_InitCommands();
@@ -306,3 +301,5 @@ void Sys_InitCommands();
 // sys_<platform>.cpp
 char* Sys_FS_GetHomepath();
 char* Sys_FS_GetBasepath();
+string Sys_GetClipboardContents();
+void Sys_SendToClipboard(string text);

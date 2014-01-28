@@ -15,6 +15,7 @@ namespace FS {
 	static FileSystem* fs;
 
 	void Init() {
+		R_Printf("fs_init\n");
 		fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; contains all essential game data.", Cvar::CVAR_ROM, "core");
 		fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "homepath", Cvar::CVAR_ROM, Sys_FS_GetBasepath());
 		fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", Cvar::CVAR_ROM, "");
@@ -26,6 +27,7 @@ namespace FS {
 		fs->AddSearchPath(fs_basepath->String());
 		fs->AddCoreSearchPath(fs_basepath->String(), fs_core->String());
 		fs->CreateModSearchPaths(fs_basepath->String(), fs_modlist->String());
+		fs->PrintSearchPaths();
 	}
 
 	void Shutdown() {
@@ -42,6 +44,13 @@ namespace FS {
 
 	inline vector<string> GetSearchPaths() {
 		return fs->GetSearchPaths();
+	}
+
+	void FileSystem::PrintSearchPaths() {
+		R_Printf("All search paths:\n");
+		for_each(searchpaths.begin(), searchpaths.end(), [](string& s) {
+			R_Printf("%s\n", s.c_str());
+		});
 	}
 };
 
@@ -154,4 +163,5 @@ string File::GetFileSearchPath(string fileName) {
 			return path;
 		}
 	}
+	return "";
 }

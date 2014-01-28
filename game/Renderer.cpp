@@ -1,11 +1,12 @@
 #include "tr_local.h"
 
+Cvar* r_fullscreen = NULL;
+Cvar* r_width = NULL;
+Cvar* r_height = NULL;
+Cvar* r_windowtitle = NULL;
+Cvar* r_gamma = NULL;
+
 namespace RenderCode {
-	Cvar* r_fullscreen = NULL;
-	Cvar* r_width = NULL;
-	Cvar* r_height = NULL;
-	Cvar* r_windowtitle = NULL;
-	Cvar* r_gamma = NULL;
 
 	static SDL_Window *window;
 	SDL_Renderer *renderer;
@@ -21,13 +22,16 @@ namespace RenderCode {
 	}
 
 	void Initialize() {
+		R_Printf("Initializing renderer\n");
 		InitCvars();
 
+		R_Printf("SDL_Init()\n");
 		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0) {
 			printf("could not init SDL (error code: %s)\n", SDL_GetError());
 			return;
 		}
 
+		R_Printf("SDL_CreateWindow()\n");
 		window = SDL_CreateWindow(r_windowtitle->String(),
 										SDL_WINDOWPOS_CENTERED, 
 										SDL_WINDOWPOS_CENTERED,
@@ -57,6 +61,10 @@ namespace RenderCode {
 	}
 
 	void Exit() {
+		// bring the gamma ramp down
+		unsigned short ramp[256];
+		SDL_CalculateGammaRamp(1.0f, ramp);
+		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 	}
 
 	void BlankFrame() {

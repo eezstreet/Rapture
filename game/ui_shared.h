@@ -7,7 +7,10 @@ namespace UI {
 	void Render();
 	void Shutdown();
 	void Update();
-	void KeyboardEvent(SDL_Scancode sc);
+	void KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text);
+	void TextEvent(char* text);
 	void MouseButtonEvent(unsigned int buttonId, bool down);
 	void MouseMoveEvent(int x, int y);
 };
+
+void PushConsoleMessage(string message);

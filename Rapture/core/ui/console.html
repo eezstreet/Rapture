@@ -1,0 +1,172 @@
+<html>
+    <head>
+        <script type="text/javascript">
+            var ConsoleManager; // global object
+        </script>
+        <script type="text/javascript" src="scripts/jQuery-2.0.3.min.js"></script>
+        <style>
+            body {
+                background-color:transparent;
+                margin: 0px;
+            }
+            .conwindow {
+                background-color:rgba(0,0,0,0.85);
+                margin: 0px;
+                padding: 3px;
+                font-family: Consolas, Courier New;
+                color: lime;
+                height: 33%;
+                position:relative;
+            }
+			.conwindow::selection {
+				// What gets actually used by the game
+				background-color:white;
+				color:blue;
+			}
+			.conwindow::-moz-selection {
+				// What gets shown in previews on Mozilla Firefox
+				background-color:white;
+				color:blue;
+			}
+            .coninput {
+                border-style: solid;
+                border-width: 1px;
+                border-color: lime;
+                font-family: Consolas, Courier New;
+                padding: 2px;
+                background-color:rgba(0,0,0,0.50);
+                font-weight:bold;
+                color:lime;
+                margin: 0px;
+                bottom: 1px;
+                width:95%;
+            }
+			.coninput::selection {
+				background-color:white;
+				color:blue;
+			}
+			.coninput::-moz-selection {
+				background-color:white;
+				color:blue;
+			}
+            .context {
+                color: lime;
+                font-family: Consolas, Courier New;
+                font-size: 10px;
+            }
+			.context::selection {
+				background-color:white;
+				color:blue;
+			}
+			.context::-moz-selection {
+				background-color:white;
+				color:blue;
+			}
+            
+            textarea#conlines {
+                margin: 0px;
+                width:100%;
+                height: 100%;
+                background-color:rgba(0,0,0,0.3);
+                color:lime;
+                font-family: Consolas, Courier New;
+                font-size: 10px;
+                resize: none;
+                line-height:10px;
+                overflow:hidden;
+                !important;
+            }
+            
+            ::selection {
+                background:white;
+                color:blue;
+            }
+            
+            ::-moz-selection {
+                background:white;
+                color:blue;
+            }
+            
+            ::-webkit-selection {
+                background:white;
+                color:blue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="conwindow">
+            <div style="width:100%;position:absolute;bottom:2px;height:100%;">
+                <table border="0" style="width:100%;margin:0px;height:100%;">
+                    <tr style="height:100%;bottom:2px;"><td>
+                        <textarea readonly wrap="soft" id="conlines"></textarea>
+                    </td></tr>
+                    <tr><td style="color:lime;">
+                        <form id="conform">
+                            &gt; <input type="text" class="coninput" id="coninput"/>
+                        </form>
+                    </td></tr>
+                </table>
+                
+            </div>
+        </div>
+    </body>
+	<script type="text/javascript">
+		function UNIX_TextSelect(e) {
+			// Whenever we select text in the main window, it gets added to the clipboard
+			// This is the only UNIX_ function not called by C++ code
+			var selectedText = document.getSelection();
+			if(selectedText.length < 1)
+				return;
+			ConsoleManager.sendToClipboard(selectedText);
+		}
+		
+		function UNIX_DeselectAll() {
+			// Called directly by C++ code
+			window.getSelection().removeAllRanges();
+		}
+        
+        function WeJustOpenedForBusiness() {
+            ConsoleManager.openSaysAMe();
+        }
+        
+        $(document).ready(function() {
+            $("#coninput").bind("keypress", function(event) {
+                var charCode;
+                if(!event) event = window.event;
+                charCode = event.which;
+                if(charCode == 96) {
+                    event.preventDefault();
+                    $("#conform").submit();
+                    return false;
+                }
+            });
+            
+            $("#conform").submit(function(event) {
+                var currentCommand = document.getElementById("coninput").value;
+                ConsoleManager.sendConsoleCommand(currentCommand);
+                document.getElementById("coninput").value = "";
+                event.preventDefault();
+                return false;
+            });
+            
+            WeJustOpenedForBusiness();
+        });
+        
+        // Handle the text area
+        function EXPORT_ClearConsoleDisplay() {
+            document.getElementById("conlines").value = "";
+        }
+        
+        function EXPORT_SetDisplayLines(text) {
+            // Happens on console open. Set display lines to console buffer`
+            document.getElementById("conlines").value = text;
+            $('#conlines').scrollTop($('#conlines')[0].scrollHeight - $('#conlines').height());
+        }
+        
+        function EXPORT_SendNewLine(newLine) {
+            // This happens whenever we get a new line in the console while it is open
+            document.getElementById("conlines").value = document.getElementById("conlines").value.concat(newLine);
+            $('#conlines').scrollTop($('#conlines')[0].scrollHeight - $('#conlines').height());
+        }
+	</script>
+</html>

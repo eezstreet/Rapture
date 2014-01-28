@@ -20,3 +20,5 @@ bool atob(const char* str);
 string trim(const string& str, const string& trim = " \t");
 string hexstring(const int address);
 typedef void (__cdecl *conCmd_t)(vector<string>& args);
+void tostring(const wstring& in, string& out);
+void towstring(const string& in, wstring& out);

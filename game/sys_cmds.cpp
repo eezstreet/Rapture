@@ -64,11 +64,16 @@ void Cmd_Seta_f(vector<string>& args) {
 }
 
 void Cmd_Exec_f(vector<string>& args) {
-	if(args.size() < 2) 
-		return; // usage: exec <file.cfg>
-	File* p = File::Open(args[1], "r");
-	if(p == NULL)
+	if(args.size() < 2) {
+		R_Printf("usage: exec <filename.cfg>\n");
 		return;
+	}
+	File* p = File::Open(args[1], "r");
+	if(p == NULL) {
+		R_Printf("could not exec %s\n", args[1].c_str());
+		return;
+	}
+	R_Printf("executing %s\n", args[1].c_str());
 	string text = p->ReadPlaintext();
 	p->Close();
 	Zone::FastFree(p, "files");
@@ -78,9 +83,16 @@ void Cmd_Exec_f(vector<string>& args) {
 		Cmd::ProcessCommand((*it).c_str());
 }
 
+void Cmd_Quit_f(vector<string>& args) {
+	SDL_Event e;
+	e.type = SDL_QUIT;
+	SDL_PushEvent(&e);
+}
+
 void Sys_InitCommands() {
 	// Register commands from the engine
 	Cmd::AddCommand("set", Cmd_Set_f);
 	Cmd::AddCommand("seta", Cmd_Seta_f);
 	Cmd::AddCommand("exec", Cmd_Exec_f);
+	Cmd::AddCommand("quit", Cmd_Quit_f);
 }

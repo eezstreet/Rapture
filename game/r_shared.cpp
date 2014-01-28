@@ -63,3 +63,15 @@ string hexstring(const int address) {
 	ss << address;
 	return ss.str();
 }
+
+// http://stackoverflow.com/questions/2573834/c-convert-string-or-char-to-wstring-or-wchar- inspiration
+
+void tostring(const wstring& in, string& out) {
+	string temp(in.begin(), in.end());
+	out = temp;
+}
+
+void towstring(const string& in, wstring& out) {
+	wstring temp(in.begin(), in.end());
+	out = temp;
+}
