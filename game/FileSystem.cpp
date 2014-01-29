@@ -21,12 +21,14 @@ namespace FS {
 		fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", Cvar::CVAR_ROM, "");
 		fs_basepath = CvarSystem::RegisterCvar("fs_basepath", "Directory to gamedata", Cvar::CVAR_ROM, Sys_FS_GetBasepath());
 
-		fs = new FileSystem(); // TODO: use smart pointer
+		fs = new FileSystem();
 		// the order of these searchpaths matters!
-		fs->AddSearchPath(fs_homepath->String());
-		fs->AddSearchPath(fs_basepath->String());
-		fs->AddCoreSearchPath(fs_basepath->String(), fs_core->String());
+		// These were originally reversed, but reading is done more often than writing, and it resulted in a lot of reversing
+		// I figured this would be a nice little optimization
 		fs->CreateModSearchPaths(fs_basepath->String(), fs_modlist->String());
+		fs->AddCoreSearchPath(fs_basepath->String(), fs_core->String());
+		fs->AddSearchPath(fs_basepath->String());
+		fs->AddSearchPath(fs_homepath->String());
 		fs->PrintSearchPaths();
 	}
 
@@ -52,6 +54,51 @@ namespace FS {
 			R_Printf("%s\n", s.c_str());
 		});
 	}
+
+	int FileSystem::ListFiles(string dir, vector<string>& in) {
+		// hm. loop through each searchpath i guess
+		DIR* xdir;
+		struct dirent *ent;
+		int numFiles = 0;
+		auto x = FS::fs->GetSearchPaths();
+		for(auto it = x.begin(); it != x.end(); ++it) {
+			string compString = *it + dir; // hm, this'll be searchpath + search dir
+			if((xdir = opendir(compString.c_str())) != NULL) {
+				// loop through all files
+				while((ent = readdir(xdir)) != NULL) {
+					string fName = ent->d_name;
+					fName.erase(0, fName.find_first_not_of(compString));
+					in.push_back(fName);
+					numFiles++;
+				}
+				closedir(xdir);
+			}
+		}
+		return numFiles;
+	}
+
+	int FileSystem::ListFiles(string dir, vector<string>& in, string extension) {
+		DIR* xdir;
+		struct dirent *ent;
+		int numFiles = 0;
+		auto x = FS::fs->GetSearchPaths();
+		for(auto it = x.begin(); it != x.end(); ++it) {
+			string compString = *it + dir; // hm, this'll be searchpath + search dir
+			if((xdir = opendir(compString.c_str())) != NULL) {
+				// loop through all files
+				while((ent = readdir(xdir)) != NULL) {
+					string fName = ent->d_name;
+					if(!checkExtension(fName, extension))
+						continue;
+					fName.erase(0, fName.find_first_not_of(compString));
+					in.push_back(fName);
+					numFiles++;
+				}
+				closedir(xdir);
+			}
+		}
+		return numFiles;
+	}
 };
 
 File* File::Open(const string& fileName, const string& mode) {
@@ -62,9 +109,11 @@ File* File::Open(const string& fileName, const string& mode) {
 		fixedName = '/' + fixedName;
 
 	// If a file has been opened before, we can open it again using the same search path as we did previously.
+	bool bWeAreReading = false;
 	if(mode.find('w') == string::npos && mode.find('a') == string::npos) {
 		// We don't do this when writing (because we always write to homepath)
 		auto it = FS::fs->files.find(fixedName);
+		bWeAreReading = true;
 		if(it != FS::fs->files.end()) {
 			string path = it->second->searchpath + fixedName;
 			if(it->second->handle) return NULL;
@@ -75,7 +124,7 @@ File* File::Open(const string& fileName, const string& mode) {
 
 	// If we are reading, we need to reverse the searchpath list (so we read from homepath last)
 	vector<string> searchpaths = FS::GetSearchPaths();
-	if(mode.find('w') == string::npos && mode.find('a') == string::npos)
+	if(!bWeAreReading) // This is said optimization in the init code
 		reverse(searchpaths.begin(), searchpaths.end());
 
 	for(auto it = searchpaths.begin(); it != searchpaths.end(); ++it) {
@@ -155,13 +204,16 @@ string File::GetFileSearchPath(string fileName) {
 	// Now make sure we start with a '/'
 	if(fixedName[0] != '/')
 		fixedName = '/' + fixedName;
+	reverse(FS::fs->searchpaths.begin(), FS::fs->searchpaths.end());
 	for(auto it = FS::fs->searchpaths.begin(); it != FS::fs->searchpaths.end(); ++it) {
 		string path = *it + fixedName;
 		FILE* f = fopen(path.c_str(), "r");
 		if(f) {
 			fclose(f);
+			reverse(FS::fs->searchpaths.begin(), FS::fs->searchpaths.end());
 			return path;
 		}
 	}
+	reverse(FS::fs->searchpaths.begin(), FS::fs->searchpaths.end());
 	return "";
 }

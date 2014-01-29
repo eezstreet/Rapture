@@ -11,6 +11,7 @@
 #include <sstream>
 #include <algorithm>
 #include <map>
+#include <dirent.h>
 using namespace std;
 
 vector<string>& split(const string& str, const char delim);
@@ -22,3 +23,4 @@ string hexstring(const int address);
 typedef void (__cdecl *conCmd_t)(vector<string>& args);
 void tostring(const wstring& in, string& out);
 void towstring(const string& in, wstring& out);
+bool checkExtension (string const &fullString, string const &ending);

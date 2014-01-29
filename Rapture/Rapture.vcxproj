@@ -77,6 +77,7 @@
     <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
+    <ClCompile Include="..\game\MapManager.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
     <ClCompile Include="..\game\r_shared.cpp" />
@@ -87,6 +88,8 @@
     <ClCompile Include="..\game\Zone.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\game\drlg_local.h" />
+    <ClInclude Include="..\game\drlg_shared.h" />
     <ClInclude Include="..\game\sys_local.h" />
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\game\tr_local.h" />
