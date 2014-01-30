@@ -126,9 +126,9 @@ public:
 	static void Initialize();
 	static void Destroy();
 
-	static int GetCvarFlags(string& sName) { return cvars[sName]->flags; }
-	static void SetCvarFlags(string& sName, int flags) { cvars[sName]->flags = flags; }
-	static Cvar::cvarType_e GetCvarType(string& sName) { return cvars[sName]->type; }
+	static int GetCvarFlags(const string& sName) { return cvars[sName]->flags; }
+	static void SetCvarFlags(const string& sName, int flags) { cvars[sName]->flags = flags; }
+	static Cvar::cvarType_e GetCvarType(const string& sName) { return cvars[sName]->type; }
 
 	static void SetStringValue(string &sName, char* newValue) { cvars[sName]->s.currentVal = newValue; }
 	static void SetIntegerValue(string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
@@ -180,7 +180,7 @@ namespace Zone {
 		void FastFree(void* memory, const string tag);
 		void FreeAll(const string tag);
 		void* Reallocate(void *memory, size_t iNewSize);
-		void CreateZoneTag(string& tag) { zone[tag] = ZoneTag(); }
+		void CreateZoneTag(const string& tag) { zone[tag] = ZoneTag(); }
 		MemoryManager();
 		~MemoryManager(); // deliberately ignoring rule of three
 
