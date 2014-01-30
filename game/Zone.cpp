@@ -42,7 +42,7 @@ namespace Zone {
 	}
 
 	// free some zone memory (quicker but still SLOW and not recommended)
-	void MemoryManager::FastFree(void* memory, const string tag) {
+	void MemoryManager::FastFree(void* memory, const string& tag) {
 		try {
 			auto mpair = zone[tag].zone.find(memory)->second;
 			zone[tag].zoneInUse -= mpair.memInUse;
@@ -59,7 +59,7 @@ namespace Zone {
 	}
 
 	// free all memory belonging to a tag (FAST)
-	void MemoryManager::FreeAll(string tag) {
+	void MemoryManager::FreeAll(const string& tag) {
 		zone[tag].zoneInUse = 0;
 		for(auto it = zone[tag].zone.begin();
 			it != zone[tag].zone.end(); ++it) {
@@ -76,7 +76,7 @@ namespace Zone {
 			try {
 				auto it2 = it->second.zone.find(memory);
 				if(it2->second.isClassObject) return memory; // do NOT allow reallocations on classes
-				__int64 difference = iNewSize - it2->second.memInUse;
+				size_t difference = iNewSize - it2->second.memInUse;
 				it->second.zoneInUse += difference;
 				memory = realloc(memory, iNewSize);
 				it->second.zone[memory] = ZoneChunk(iNewSize, false);
@@ -120,11 +120,11 @@ namespace Zone {
 		mem->Free(memory);
 	}
 
-	void FastFree(void *memory, const string tag) {
+	void FastFree(void *memory, const string& tag) {
 		mem->FastFree(memory, tag);
 	}
 
-	void FreeAll(const string tag) {
+	void FreeAll(const string& tag) {
 		mem->FreeAll(tag);
 	}
 

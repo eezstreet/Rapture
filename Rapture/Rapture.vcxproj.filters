@@ -95,5 +95,8 @@
     <ClInclude Include="..\game\drlg_shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\game\Zone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
