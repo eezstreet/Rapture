@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <map>
 #include <dirent.h>
+#include <functional>
 using namespace std;
 
 vector<string>& split(const string& str, const char delim);
