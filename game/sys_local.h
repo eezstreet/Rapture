@@ -130,10 +130,10 @@ public:
 	static void SetCvarFlags(const string& sName, int flags) { cvars[sName]->flags = flags; }
 	static Cvar::cvarType_e GetCvarType(const string& sName) { return cvars[sName]->type; }
 
-	static void SetStringValue(string &sName, char* newValue) { cvars[sName]->s.currentVal = newValue; }
-	static void SetIntegerValue(string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
-	static void SetFloatValue(string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; }
-	static void SetBooleanValue(string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; }
+	static void SetStringValue(const string &sName, char* newValue) { cvars[sName]->s.currentVal = newValue; }
+	static void SetIntegerValue(const string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
+	static void SetFloatValue(const string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; }
+	static void SetBooleanValue(const string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; }
 
 	static string GetStringValue(const string& sName);
 	static int GetIntegerValue(const string& sName);
@@ -177,8 +177,8 @@ namespace Zone {
 	public:
 		void* Allocate(int iSize, zoneTags_e tag);
 		void Free(void* memory);
-		void FastFree(void* memory, const string tag);
-		void FreeAll(const string tag);
+		void FastFree(void* memory, const string& tag);
+		void FreeAll(const string& tag);
 		void* Reallocate(void *memory, size_t iNewSize);
 		void CreateZoneTag(const string& tag) { zone[tag] = ZoneTag(); }
 		MemoryManager();
@@ -201,8 +201,8 @@ namespace Zone {
 
 	void* Alloc(int iSize, zoneTags_e tag);
 	void  Free(void* memory);
-	void  FastFree(void *memory, const string tag);
-	void  FreeAll(const string tag);
+	void  FastFree(void *memory, const string& tag);
+	void  FreeAll(const string& tag);
 	void* Realloc(void *memory, size_t iNewSize);
 	template<typename T>
 	T* New(zoneTags_e tag) { return mem->AllocClass<T>(tag); }
@@ -236,7 +236,7 @@ public:
 	size_t WriteBinary(void* bytes, size_t numbytes) { return fwrite(bytes, sizeof(unsigned char), numbytes, handle); }
 	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
 	size_t Tell() { return ftell(handle); }
-	static string GetFileSearchPath(string fileName);
+	static string GetFileSearchPath(const string& fileName);
 friend class File;
 };
 
@@ -245,9 +245,9 @@ namespace FS {
 		vector<string> searchpaths;
 		unordered_map<string, File*> files;
 	public:
-		void AddSearchPath(string searchpath) { searchpaths.push_back(searchpath); }
-		inline void AddCoreSearchPath(string basepath, string core) { AddSearchPath(basepath + '/' + core); }
-		void CreateModSearchPaths(string basepath, string modlist);
+		void AddSearchPath(const string& searchpath) { searchpaths.push_back(searchpath); }
+		inline void AddCoreSearchPath(const string& basepath, const string& core) { AddSearchPath(basepath + '/' + core); }
+		void CreateModSearchPaths(const string& basepath, const string& modlist);
 		FileSystem();
 		~FileSystem();
 		inline vector<string>& GetSearchPaths() { return searchpaths; }
@@ -263,8 +263,8 @@ namespace FS {
 /* CmdSystem.cpp */
 namespace Cmd {
 	void ProcessCommand(const char *cmd);
-	void AddCommand(string cmdName, conCmd_t cmd);
-	void RemoveCommand(string cmdName);
+	void AddCommand(const string& cmdName, conCmd_t cmd);
+	void RemoveCommand(const string& cmdName);
 	void ClearCommandList();
 	vector<string> Tokenize(const string &str);
 };
@@ -274,14 +274,14 @@ class InputManager {
 private:
 	map<SDL_Scancode, string> binds;
 	list<SDL_Scancode> thisFrameKeysDown;
-	void BindCommandMouse(string keycodeArg, string commandArg);
+	void BindCommandMouse(const string& keycodeArg, const string& commandArg);
 	void (*Keycatcher)(SDL_Keycode key);
 public:
 	void SendKeyUpEvent(SDL_Keysym key, char* text);
 	void SendKeyDownEvent(SDL_Keysym key, char* text);
 	void InputFrame();
-	void ExecuteBind(string bindName);
-	void BindCommand(string keycodeArg, string commandArg);
+	void ExecuteBind(const string& bindName);
+	void BindCommand(const string& keycodeArg, string commandArg);
 	void SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y);
 	void SendMouseMoveEvent(int x, int y);
 	void SendTextInputEvent(char* text);

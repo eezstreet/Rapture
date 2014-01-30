@@ -1,5 +1,7 @@
 #include "drlg_local.h"
+extern "C" {
 #include "../json/cJSON.h"
+}
 
 typedef void (*jParseFunction)(Level&, cJSON*);
 static unordered_map<const char*, function<void (Level&, cJSON*)>> levelParseFuncs;

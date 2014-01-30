@@ -16,7 +16,7 @@ namespace Cmd {
 		}
 	}
 
-	void AddCommand(string cmdName, conCmd_t cmd) {
+	void AddCommand(const string& cmdName, conCmd_t cmd) {
 		cmdlist[cmdName] = cmd;
 	}
 

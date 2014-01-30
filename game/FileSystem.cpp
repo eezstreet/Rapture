@@ -36,7 +36,7 @@ namespace FS {
 		delete fs;
 	}
 
-	void FileSystem::CreateModSearchPaths(string basepath, string modlist) {
+	void FileSystem::CreateModSearchPaths(const string& basepath, const string& modlist) {
 		if(modlist.length() < 1)
 			return; // blank modlist
 		vector<string> mods = split(modlist, ';');
@@ -44,7 +44,7 @@ namespace FS {
 			fs->AddCoreSearchPath(fs_basepath->String(), *it);
 	}
 
-	inline vector<string> GetSearchPaths() {
+	inline vector<string>& GetSearchPaths() {
 		return fs->GetSearchPaths();
 	}
 
@@ -173,7 +173,7 @@ size_t File::GetSize() {
 	return size;
 }
 
-string File::GetFileSearchPath(string fileName) {
+string File::GetFileSearchPath(const string& fileName) {
 	// Get a file's search path without opening the file itself.
 	// This is extremely handy in the case of Awesomium, where it handles files on its own.
 

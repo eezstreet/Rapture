@@ -3,7 +3,7 @@
 
 struct LevelTypeHeader {
 	unsigned char nNumTiles;
-	vector<string&> tileSets;
+	vector<string> tileSets;
 };
 
 struct Level {

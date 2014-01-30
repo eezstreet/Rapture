@@ -158,7 +158,7 @@ void InputManager::InputFrame() {
 		ExecuteBind(binds[*it]);
 }
 
-void InputManager::BindCommand(string keycodeArg, string commandArg) {
+void InputManager::BindCommand(const string& keycodeArg, string commandArg) {
 	int i;
 	for(i = 0; i < SDL_SCANCODE_F19; i++) {
 		if(keycodeNames[i] == keycodeArg) // FIXME
@@ -174,7 +174,7 @@ InputManager::InputManager() {
 	Keycatcher = NULL;
 }
 
-void InputManager::ExecuteBind(string bindStuff) {
+void InputManager::ExecuteBind(const string& bindStuff) {
 }
 
 void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y) {
