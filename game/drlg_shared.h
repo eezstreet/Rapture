@@ -8,6 +8,8 @@ private:
 
 	void LoadLevelData();
 	void LoadIndividualLevel(const string& levelPath);
+
+	void InitMapParsers();
 public:
 	MapManager(unsigned short act = 0, unsigned short levelId = 0);
 	~MapManager();

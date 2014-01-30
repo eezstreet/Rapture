@@ -7,7 +7,9 @@ struct LevelTypeHeader {
 };
 
 struct Level {
-	unsigned char sSignature[4]; // Four bytes - 'RLVL'
-	unsigned char nLevelType;
+	unsigned int nLevelId;
+	unsigned char nAct;
+	char sLevelType;
 	unsigned int mTileMask;
+
 };
