@@ -55,8 +55,7 @@ namespace FS {
 		});
 	}
 
-	int FileSystem::ListFiles(string dir, vector<string>& in) {
-		// hm. loop through each searchpath i guess
+	int FileSystem::ListFiles(const string& dir, vector<string>& in, const string& extension) {
 		DIR* xdir;
 		struct dirent *ent;
 		int numFiles = 0;
@@ -67,28 +66,7 @@ namespace FS {
 				// loop through all files
 				while((ent = readdir(xdir)) != NULL) {
 					string fName = ent->d_name;
-					fName.erase(0, fName.find_first_not_of(compString));
-					in.push_back(fName);
-					numFiles++;
-				}
-				closedir(xdir);
-			}
-		}
-		return numFiles;
-	}
-
-	int FileSystem::ListFiles(string dir, vector<string>& in, string extension) {
-		DIR* xdir;
-		struct dirent *ent;
-		int numFiles = 0;
-		auto x = FS::fs->GetSearchPaths();
-		for(auto it = x.begin(); it != x.end(); ++it) {
-			string compString = *it + dir; // hm, this'll be searchpath + search dir
-			if((xdir = opendir(compString.c_str())) != NULL) {
-				// loop through all files
-				while((ent = readdir(xdir)) != NULL) {
-					string fName = ent->d_name;
-					if(!checkExtension(fName, extension))
+					if(extension.length() != 0 && !checkExtension(fName, extension))
 						continue;
 					fName.erase(0, fName.find_first_not_of(compString));
 					in.push_back(fName);

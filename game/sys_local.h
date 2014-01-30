@@ -252,8 +252,7 @@ namespace FS {
 		~FileSystem();
 		inline vector<string>& GetSearchPaths() { return searchpaths; }
 		void PrintSearchPaths();
-		static int ListFiles(string dir, vector<string>& in);
-		static int ListFiles(string dir, vector<string>& in, string extension);
+		static int ListFiles(const string& dir, vector<string>& in, const string& extension="");
 	friend class File;
 	};
 
