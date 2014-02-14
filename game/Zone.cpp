@@ -21,6 +21,9 @@ namespace Zone {
 		}
 
 		zone[tagNames[tag]].zoneInUse += iSize;
+		if(zone[tagNames[tag]].zoneInUse > zone[tagNames[tag]].peakUsage) {
+			zone[tagNames[tag]].peakUsage = zone[tagNames[tag]].zoneInUse;
+		}
 		void *memory = malloc(iSize);
 		ZoneChunk z(iSize, false);
 		zone[tagNames[tag]].zone[memory] = z;
@@ -78,6 +81,9 @@ namespace Zone {
 				if(it2->second.isClassObject) return memory; // do NOT allow reallocations on classes
 				size_t difference = iNewSize - it2->second.memInUse;
 				it->second.zoneInUse += difference;
+				if(it->second.zoneInUse > it->second.peakUsage) {
+					it->second.peakUsage = it->second.zoneInUse;
+				}
 				memory = realloc(memory, iNewSize);
 				it->second.zone[memory] = ZoneChunk(iNewSize, false);
 				return memory;
@@ -97,6 +103,18 @@ namespace Zone {
 	MemoryManager::~MemoryManager() {
 		for(int i = TAG_NONE+1; i < TAG_MAX; i++) {
 			FreeAll(tagNames[i]);
+		}
+	}
+
+	void MemoryManager::PrintMemUsage() {
+		R_Printf("\n%-10s %20s %20s %20s %20s %20s %20s\n", "Tag", "Cur Usage (b)", "Cur Usage (KB)", "Cur Usage (MB)", "Peak Usage (b)", "Peak Usage (KB)", "Peak Usage (MB)");
+		R_Printf("%-10s %20s %20s %20s %20s %20s %20s\n", "-----", "-------------", "--------------", "--------------", "--------------", "---------------", "---------------");
+		for(int i = TAG_NONE+1; i < TAG_MAX; i++) {
+			string tag = tagNames[i];
+			R_Printf("%-10s %20i %20.2f %20.2f %20i %20.2f %20.2f\n", tag.c_str(), zone[tag].zoneInUse, 
+				(float)((double)zone[tag].zoneInUse/1024.0f), (float)((double)zone[tag].zoneInUse/1048576.0f),
+				zone[tag].peakUsage,
+				(float)((double)zone[tag].peakUsage/1024.0f), (float)((double)zone[tag].peakUsage/1048576.0f));
 		}
 	}
 
@@ -130,5 +148,9 @@ namespace Zone {
 
 	void* Realloc(void *memory, size_t iNewSize) {
 		return mem->Reallocate(memory, iNewSize);
+	}
+
+	void MemoryUsage() {
+		mem->PrintMemUsage();
 	}
 }

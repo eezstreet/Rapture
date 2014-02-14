@@ -3,6 +3,41 @@
 namespace Cmd {
 	static unordered_map<string, conCmd_t> cmdlist;
 
+	static string GetFirstCommand(bool& bFoundCommand) {
+		auto it = cmdlist.begin();
+		if(it == cmdlist.end())
+			bFoundCommand = false;
+		else
+			bFoundCommand = true;
+		return it->first;
+	}
+
+	static string GetNextCommand(string lastCommand, bool& bFoundCommand) {
+		auto it = cmdlist.find(lastCommand);
+		if(it == cmdlist.end()) {
+			bFoundCommand = false;
+			return "";
+		}
+		else {
+			++it;
+			if(it == cmdlist.end()) {
+				bFoundCommand = false;
+				return "";
+			}
+			else {
+				bFoundCommand = true;
+			}
+		}
+		return it->first;
+	}
+
+	void ListCommands() {
+		bool bFoundCommand = true;
+		for(string s = GetFirstCommand(bFoundCommand); bFoundCommand; s = GetNextCommand(s, bFoundCommand)) {
+			R_Printf("%s\n", s.c_str());
+		}
+	}
+
 	void ProcessCommand(const char *cmd) {
 		// in the future, mods will add more to this list
 		vector<string> arguments = Tokenize(cmd);
@@ -27,6 +62,8 @@ namespace Cmd {
 	void ClearCommandList() { 
 		cmdlist.clear(); 
 	}
+
+
 
 	// This uses a standard quote-token system.
 	// Example:

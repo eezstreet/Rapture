@@ -1,27 +1,27 @@
 #include "drlg_local.h"
-extern "C" {
-#include "../json/cJSON.h"
-}
+#include "drlg_shared.h"
 
-typedef void (*jParseFunction)(Level&, cJSON*);
-static unordered_map<const char*, function<void (Level&, cJSON*)>> levelParseFuncs;
+unordered_map<const char*, function<void (MapManager::Level&, cJSON*)>> MapManager::levelParseFuncs;
 
 #define INTPARSER(x) levelParseFuncs["##x##"] = [](Level& lvl, cJSON* json) -> void { lvl.##x = cJSON_ToInteger(json); }
+#define STRPARSER(x) levelParseFuncs["##x##"] = [](Level& lvl, cJSON* json) -> void { lvl.##x = cJSON_ToString(json); }
 void MapManager::InitMapParsers() {
 	INTPARSER(nLevelId);
 	INTPARSER(nAct);
 	INTPARSER(mTileMask);
+	STRPARSER(sLevelType);
+	STRPARSER(sIdentifier);
 }
 
-void ProcessLevel(Level& out, const string& text) {
+void ProcessLevel(MapManager::Level& out, const string& text) {
 	const char *cText = text.c_str();
 	char error[1024];
 	cJSON* json = cJSON_ParsePooled(cText, error, 1024);
 	if(!json)
 		return;
 	for(cJSON* x = cJSON_GetFirstItem(json); x; x = cJSON_GetNextItem(json)) {
-		auto it = levelParseFuncs.find(cJSON_GetItemKey(x));
-		if(it != levelParseFuncs.end())
+		auto it = MapManager::levelParseFuncs.find(cJSON_GetItemKey(x));
+		if(it != MapManager::levelParseFuncs.end())
 			it->second(out, x);
 	}
 }
@@ -31,8 +31,9 @@ void MapManager::LoadIndividualLevel(const string& levelPath) {
 	File* f = File::Open(levelPath, "r");
 	string& text = f->ReadPlaintext();
 	// Load the map's info from JSON
-	Level lvl;
-	ProcessLevel(lvl, text);
+	Level *lvl = (Level*)Zone::Alloc(sizeof(Level), Zone::TAG_CUSTOM);
+	ProcessLevel(*lvl, text);
+
 }
 
 void MapManager::LoadLevelData() {
@@ -53,13 +54,20 @@ MapManager::MapManager(unsigned short act /* = 0 */, unsigned short levelId /* =
 }
 
 MapManager::~MapManager() {
+	for_each(levels.begin(), levels.end(), [](pair<string, Level*> lvl) -> void {
+		Zone::Free(lvl.second); // hmm? slow? probably better idea to use a designated tag
+	});
 }
 
 MapManager::MapManager(MapManager& other) : nAct(other.nAct), nCurrentLevel(other.nCurrentLevel) {
+	levelParseFuncs = other.levelParseFuncs;
+	levels = other.levels;
 }
 
 MapManager& MapManager::operator=(MapManager& other) {
 	nAct = other.nAct;
 	nCurrentLevel = other.nCurrentLevel;
+	levelParseFuncs = other.levelParseFuncs;
+	levels = other.levels;
 	return *this;
 }

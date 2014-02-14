@@ -317,6 +317,39 @@ bool CvarSystem::GetBooleanValue(const string& sName) {
 	}
 }
 
+// Used by list command
+string CvarSystem::GetFirstCvar(bool& bFoundCommand) {
+	auto it = cvars.begin();
+	if(it == cvars.end()) {
+		bFoundCommand = false;
+		return "";
+	}
+	bFoundCommand = true;
+	return it->first;
+}
+
+string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand) {
+	auto it = cvars.find(previous);
+	if(it == cvars.end()) {
+		bFoundCommand = false;
+		return "";
+	}
+	++it;
+	if(it == cvars.end()) {
+		bFoundCommand = false;
+		return "";
+	}
+	bFoundCommand = true;
+	return it->first;
+}
+
+void CvarSystem::ListCvars() {
+	bool bFoundCommand = true;
+	for(string s = GetFirstCvar(bFoundCommand); bFoundCommand; s = GetNextCvar(s, bFoundCommand)) {
+		R_Printf("%s\n", s.c_str());
+	}
+}
+
 bool CvarSystem::init = false;
 unordered_map<string, Cvar*> CvarSystem::cvars;
 unordered_map<string, CvarCacheObject*> CvarSystem::cache;

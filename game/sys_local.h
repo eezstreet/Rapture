@@ -116,6 +116,8 @@ class CvarSystem {
 	static bool init;
 	static void Cache_Free(const string& sName);
 	static void ArchiveCvars();
+	static string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand);
+	static string CvarSystem::GetFirstCvar(bool& bFoundCommand);
 public:
 	static Cvar* RegisterCvar(Cvar *cvar);
 	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, char* startValue);
@@ -139,6 +141,8 @@ public:
 	static int GetIntegerValue(const string& sName);
 	static float GetFloatValue(const string& sName);
 	static bool GetBooleanValue(const string& sName);
+
+	static void ListCvars();
 friend class Cvar;
 };
 
@@ -166,9 +170,10 @@ namespace Zone {
 
 	struct ZoneTag {
 		size_t zoneInUse;
+		size_t peakUsage;
 		map<void*, ZoneChunk> zone;
 
-		ZoneTag() : zoneInUse(0) { }
+		ZoneTag() : zoneInUse(0), peakUsage(0) { }
 	};
 
 	class MemoryManager {
@@ -183,12 +188,16 @@ namespace Zone {
 		void CreateZoneTag(const string& tag) { zone[tag] = ZoneTag(); }
 		MemoryManager();
 		~MemoryManager(); // deliberately ignoring rule of three
+		void PrintMemUsage();
 
 		template<typename T>
 		T* AllocClass(zoneTags_e tag) {
 			T* retVal = new T();
 			ZoneChunk zc(sizeof(T), true);
 			zone[tagNames[tag]].zoneInUse += sizeof(T);
+			if(zone[tagNames[tag]].zoneInUse > zone[tagNames[tag]].peakUsage) {
+				zone[tagNames[tag]].peakUsage = zone[tagNames[tag]].zoneInUse;
+			}
 			zone[tagNames[tag]].zone[retVal] = zc;
 			return retVal;
 		}
@@ -206,6 +215,7 @@ namespace Zone {
 	void* Realloc(void *memory, size_t iNewSize);
 	template<typename T>
 	T* New(zoneTags_e tag) { return mem->AllocClass<T>(tag); }
+	void MemoryUsage();
 };
 
 namespace Hunk {
@@ -266,6 +276,7 @@ namespace Cmd {
 	void AddCommand(const string& cmdName, conCmd_t cmd);
 	void RemoveCommand(const string& cmdName);
 	void ClearCommandList();
+	void ListCommands();
 	vector<string> Tokenize(const string &str);
 };
 

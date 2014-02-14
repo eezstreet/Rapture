@@ -89,10 +89,25 @@ void Cmd_Quit_f(vector<string>& args) {
 	SDL_PushEvent(&e);
 }
 
+void Cmd_Cmdlist_f(vector<string>& args) {
+	Cmd::ListCommands();
+}
+
+void Cmd_Cvarlist_f(vector<string>& args) {
+	CvarSystem::ListCvars();
+}
+
+void Cmd_Zoneinfo_f(vector<string>& args) {
+	Zone::MemoryUsage();
+}
+
 void Sys_InitCommands() {
 	// Register commands from the engine
 	Cmd::AddCommand("set", Cmd_Set_f);
 	Cmd::AddCommand("seta", Cmd_Seta_f);
 	Cmd::AddCommand("exec", Cmd_Exec_f);
 	Cmd::AddCommand("quit", Cmd_Quit_f);
+	Cmd::AddCommand("cmdlist", Cmd_Cmdlist_f);
+	Cmd::AddCommand("cvarlist", Cmd_Cvarlist_f);
+	Cmd::AddCommand("zoneinfo", Cmd_Zoneinfo_f);
 }
