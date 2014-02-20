@@ -45,12 +45,16 @@ Console::Console() {
 	global = wView->CreateGlobalJavascriptObject(WSLit(("ConsoleManager")));
 	wView->set_js_method_handler(this);
 
+	inputBuffer.push_back("");
+
 	JSObject& obj = global.ToObject();
 	SetupBaseCommands(&obj);
 	obj.SetCustomMethod(WSLit("sendToClipboard"), false);
 	obj.SetCustomMethod(WSLit("getClipboard"), true);
 	obj.SetCustomMethod(WSLit("sendConsoleCommand"), false);
 	obj.SetCustomMethod(WSLit("openSaysAMe"), false);
+	obj.SetCustomMethod(WSLit("inputBufferUp"), false);
+	obj.SetCustomMethod(WSLit("inputBufferDown"), false);
 
 	window = wView->ExecuteJavascriptWithResult(WSLit("window"), WSLit(""));
 }
@@ -87,6 +91,8 @@ void Console::Show(){
 	wView->Focus();
 	wView->Focus();
 	ReplaceConsoleContents();
+	itBufferPosition = inputBuffer.end()-1;
+	UpdateInputBufferPosition();
 }
 
 void Console::Hide() {
@@ -126,8 +132,25 @@ void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_calle
 	else if(method_name == WSLit("sendConsoleCommand")) {
 		WebString buffer = args[0].ToString();
 		if(buffer.length() < 1) return;
+		inputBuffer.insert(inputBuffer.end()-1, 1, ToString(buffer));
+		itBufferPosition = inputBuffer.end()-1;
+		UpdateInputBufferPosition();
 		PushConsoleMessage("] " + ToString(buffer) + '\n');
 		Cmd::ProcessCommand(ToString(buffer).c_str());
+	}
+	else if(method_name == WSLit("inputBufferUp")) {
+		if(itBufferPosition == inputBuffer.begin()) {
+			return;
+		}
+		itBufferPosition--;
+		UpdateInputBufferPosition();
+	}
+	else if(method_name == WSLit("inputBufferDown")) {
+		if(itBufferPosition == inputBuffer.end()-1) {
+			return;
+		}
+		itBufferPosition++;
+		UpdateInputBufferPosition();
 	}
 	else if(method_name == WSLit("openSaysAMe")) {
 		ReplaceConsoleContents();
@@ -142,4 +165,10 @@ JSValue Console::OnMethodCallWithReturnValue(Awesomium::WebView* caller, unsigne
 	if(method_name == WSLit("getClipboard")) {
 		return JSValue(WSLit(Sys_GetClipboardContents().c_str()));
 	}
+}
+
+void Console::UpdateInputBufferPosition() {
+	JSArray args;
+	args.Insert(JSValue(WSLit(itBufferPosition->c_str())), 0);
+	window.ToObject().Invoke(WSLit("InputBufferUpdated"), args);
 }
