@@ -77,12 +77,19 @@ void towstring(const string& in, wstring& out) {
 }
 
 // http://stackoverflow.com/questions/874134/find-if-string-endswith-another-string-in-c
-
 bool checkExtension (string const &fullString, string const &ending)
 {
 	if (fullString.length() >= ending.length()) {
 		return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
 	} else {
 		return false;
+	}
+}
+
+// http://stackoverflow.com/questions/10030626/replace-char-in-string-with-some-string-inplace
+void stringreplace(string& fullString, const string& sequence, const string& replace) {
+	size_t pos;
+	while ((pos = fullString.find(sequence)) != string::npos) {
+		fullString.replace(pos, sequence.length(), replace);
 	}
 }

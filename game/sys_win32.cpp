@@ -14,6 +14,10 @@ char* Sys_FS_GetBasepath() {
 	return cwd;
 }
 
+void Sys_FS_MakeDirectory(const char* path) {
+	CreateDirectory(path, NULL);
+}
+
 void Sys_RunThread(void (*threadRun)(void*), void* arg) {
 	_beginthread(threadRun, 0, arg);
 }

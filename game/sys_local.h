@@ -255,8 +255,9 @@ namespace FS {
 	class FileSystem {
 		vector<string> searchpaths;
 		unordered_map<string, File*> files;
+		void RecursivelyTouch(const string& path);
 	public:
-		void AddSearchPath(const string& searchpath) { searchpaths.push_back(searchpath); }
+		void AddSearchPath(const string& searchpath) { string s = searchpath; stringreplace(s, "\\", "/"); searchpaths.push_back(s); }
 		inline void AddCoreSearchPath(const string& basepath, const string& core) { AddSearchPath(basepath + '/' + core); }
 		void CreateModSearchPaths(const string& basepath, const string& modlist);
 		FileSystem();
@@ -316,3 +317,4 @@ char* Sys_FS_GetHomepath();
 char* Sys_FS_GetBasepath();
 string Sys_GetClipboardContents();
 void Sys_SendToClipboard(string text);
+void Sys_FS_MakeDirectory(const char* path);

@@ -77,11 +77,23 @@ namespace FS {
 		}
 		return numFiles;
 	}
+
+	void FileSystem::RecursivelyTouch(const string& path) {
+		size_t lastPos = 0;
+		size_t nextSlash = 0;
+		while((nextSlash = path.find_first_of('/', lastPos)) != path.npos) {
+			const string s = path.substr(0, nextSlash+1);
+			Sys_FS_MakeDirectory(s.c_str());
+			lastPos = nextSlash+1;
+		}
+	}
 };
 
 File* File::Open(const string& fileName, const string& mode) {
 	// Trim off any leading (or trailing) whitespace
 	string fixedName = trim(fileName);
+	// Replace all instances of \\ with / (Windows fix)
+	stringreplace(fixedName, "\\", "/");
 	// Now make sure we start with a '/'
 	if(fixedName[0] != '/')
 		fixedName = '/' + fixedName;
@@ -100,14 +112,18 @@ File* File::Open(const string& fileName, const string& mode) {
 		}
 	}
 
-	// If we are reading, we need to reverse the searchpath list (so we read from homepath last)
+	// If we are writing, we need to reverse the searchpath list (so we write to homepath first)
 	vector<string> searchpaths = FS::GetSearchPaths();
-	if(!bWeAreReading) // This is said optimization in the init code
+	if(!bWeAreReading)
 		reverse(searchpaths.begin(), searchpaths.end());
 
 	for(auto it = searchpaths.begin(); it != searchpaths.end(); ++it) {
 		// if file found in this search path, good to go
 		string path = *it + fixedName;
+		if(!bWeAreReading) {
+			// If we are writing, make sure that the folder exists
+			FS::fs->RecursivelyTouch(path);
+		}
 		FILE* file = fopen(path.c_str(), mode.c_str());
 		if(file) {
 			File *F = (File*)Zone::New<File>(Zone::TAG_FILES);

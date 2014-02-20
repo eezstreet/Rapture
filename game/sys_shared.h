@@ -25,3 +25,4 @@ typedef void (__cdecl *conCmd_t)(vector<string>& args);
 void tostring(const wstring& in, string& out);
 void towstring(const string& in, wstring& out);
 bool checkExtension (string const &fullString, string const &ending);
+void stringreplace(string& fullString, const string& sequence, const string& replace);
