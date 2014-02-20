@@ -247,6 +247,7 @@ public:
 	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
 	size_t Tell() { return ftell(handle); }
 	static string GetFileSearchPath(const string& fileName);
+	bool Exists(const string &file);
 friend class File;
 };
 

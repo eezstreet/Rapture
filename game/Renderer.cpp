@@ -10,6 +10,8 @@ namespace RenderCode {
 
 	static SDL_Window *window;
 	SDL_Renderer *renderer;
+	static bool screenshotQueued = false;
+	static string screenshotName = "";
 
 	static vector<SDL_Texture*> texs = vector<SDL_Texture*>();
 
@@ -55,12 +57,19 @@ namespace RenderCode {
 			SDL_CalculateGammaRamp(r_gamma->Value(), ramp);
 			SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 		}
+
+		R_Printf("Initializing FreeImage\n");
+		FreeImage_Initialise();
+		R_Printf("FreeImage found, version %s\n", FreeImage_GetVersion());
+		R_Printf("%s\n", FreeImage_GetCopyrightMessage());
 	}
 
 	void Restart() {
 	}
 
 	void Exit() {
+		R_Printf("Shutting down FreeImage\n");
+		FreeImage_DeInitialise();
 		// bring the gamma ramp down
 		unsigned short ramp[256];
 		SDL_CalculateGammaRamp(1.0f, ramp);
@@ -72,8 +81,38 @@ namespace RenderCode {
 		SDL_RenderClear(renderer);
 	}
 
+	static void CreateScreenshot(const string& filename) {
+		SDL_Surface* s = SDL_GetWindowSurface(window);
+		unsigned int numPixels = s->w * s->h * s->format->BytesPerPixel;
+		unsigned char * pixels = new (nothrow) unsigned char[numPixels];
+		SDL_RenderReadPixels(renderer, &s->clip_rect, s->format->format, pixels, s->w * s->format->BytesPerPixel);
+		SDL_Surface* screenshot = SDL_ConvertSurfaceFormat(
+			SDL_CreateRGBSurfaceFrom(pixels, s->w, s->h, s->format->BitsPerPixel, s->w * s->format->BytesPerPixel, s->format->Rmask, s->format->Gmask, s->format->Bmask, s->format->Amask),
+			SDL_PIXELFORMAT_RGB444, 0);
+
+		SDL_RWops *rw = SDL_RWFromMem(pixels, numPixels);
+		SDL_SaveBMP_RW(screenshot, rw, 0);
+		auto size = rw->size(rw);
+		ImageClass* img = new ImageClass(pixels, size);
+		bool bSuccess = img->WriteToFile(filename);
+		delete img;
+		SDL_FreeRW(rw);
+		delete pixels;
+		if(bSuccess) {
+			R_Printf("Screenshot: %s\n", filename.c_str());
+		}
+		else {
+			R_Printf("Could not write %s\n", filename.c_str());
+		}
+	}
+
 	void Display() {
 		SDL_RenderPresent(renderer);
+		if(screenshotQueued) {
+			// We have a screenshot command queued up, so we need to handle it.
+			CreateScreenshot(screenshotName);
+			screenshotQueued = false;
+		}
 		for(auto it = texs.begin(); it != texs.end(); ++it) {
 			SDL_DestroyTexture(*it);
 		}
@@ -87,5 +126,31 @@ namespace RenderCode {
 		SDL_FreeSurface(sdlsurf);
 		texs.push_back(text);
 		return text;
+	}
+
+	void QueueScreenshot(const string& fileName) {
+		screenshotQueued = true;
+		if(fileName.length() <= 0) {
+			const char *formatter = "screenshots/screenshot%04i.bmp";
+			char* s = (char*)Zone::Alloc(strlen(formatter)+1, Zone::TAG_RENDERER);
+			int i = 0;
+			for(int i = 0; i <= 9999; i++) {
+				sprintf(s, formatter, i);
+				if(!File::Open(s, "r")) {
+					break;
+				}
+			}
+			screenshotName = s;
+			Zone::FastFree(s, "renderer");
+			return;
+		}
+		// Tell the renderer that we need to screenshot the next frame
+		string thisIsMyFinalForm = fileName;
+		auto lastDot = thisIsMyFinalForm.find_last_of('.');
+		if(lastDot == thisIsMyFinalForm.npos) {
+			// go ahead and assume .bmp
+			thisIsMyFinalForm += ".bmp";
+		}
+		screenshotName = thisIsMyFinalForm;
 	}
 };

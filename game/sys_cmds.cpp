@@ -101,6 +101,15 @@ void Cmd_Zoneinfo_f(vector<string>& args) {
 	Zone::MemoryUsage();
 }
 
+void Cmd_Screenshot_f(vector<string>& args) {
+	if(args.size() >= 2) {
+		RenderCode::QueueScreenshot(args[1]);
+	}
+	else {
+		RenderCode::QueueScreenshot("");
+	}
+}
+
 void Sys_InitCommands() {
 	// Register commands from the engine
 	Cmd::AddCommand("set", Cmd_Set_f);
@@ -110,4 +119,7 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("cmdlist", Cmd_Cmdlist_f);
 	Cmd::AddCommand("cvarlist", Cmd_Cvarlist_f);
 	Cmd::AddCommand("zoneinfo", Cmd_Zoneinfo_f);
+
+	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
+	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);
 }

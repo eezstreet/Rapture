@@ -16,6 +16,9 @@
     <Filter Include="Libraries">
       <UniqueIdentifier>{ef6c0762-3d78-4a3e-b9fe-d417a5313bdc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries\JSON">
+      <UniqueIdentifier>{61209ff0-98d1-402d-9196-e2aa94d6f579}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\game\sys_main.cpp">
@@ -67,7 +70,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\json\cJSON.c">
-      <Filter>Libraries</Filter>
+      <Filter>Libraries\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Image.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -93,9 +99,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\game\drlg_shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\Zone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
