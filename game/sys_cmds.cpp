@@ -103,10 +103,28 @@ void Cmd_Zoneinfo_f(vector<string>& args) {
 
 void Cmd_Screenshot_f(vector<string>& args) {
 	if(args.size() >= 2) {
-		RenderCode::QueueScreenshot(args[1]);
+		RenderCode::QueueScreenshot(args[1], ".bmp");
 	}
 	else {
-		RenderCode::QueueScreenshot("");
+		RenderCode::QueueScreenshot("", ".bmp");
+	}
+}
+
+void Cmd_ScreenshotJPEG_f(vector<string>& args) {
+	if(args.size() >= 2) {
+		RenderCode::QueueScreenshot(args[1], ".jpg");
+	}
+	else {
+		RenderCode::QueueScreenshot("", ".jpg");
+	}
+}
+
+void Cmd_ScreenshotPCX_f(vector<string>& args) {
+	if(args.size() >= 2) {
+		RenderCode::QueueScreenshot(args[1], ".pcx");
+	}
+	else {
+		RenderCode::QueueScreenshot("", ".pcx");
 	}
 }
 
@@ -122,4 +140,7 @@ void Sys_InitCommands() {
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);
+	Cmd::AddCommand("screenshotJPG", Cmd_ScreenshotJPEG_f);
+	Cmd::AddCommand("screenshotJPEG", Cmd_ScreenshotJPEG_f);
+	Cmd::AddCommand("screenshotPCX", Cmd_ScreenshotPCX_f);
 }

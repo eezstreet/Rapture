@@ -128,14 +128,15 @@ namespace RenderCode {
 		return text;
 	}
 
-	void QueueScreenshot(const string& fileName) {
+	void QueueScreenshot(const string& fileName, const string& extension) {
 		screenshotQueued = true;
 		if(fileName.length() <= 0) {
-			const char *formatter = "screenshots/screenshot%04i.bmp";
-			char* s = (char*)Zone::Alloc(strlen(formatter)+1, Zone::TAG_RENDERER);
+			string formatter = "screenshots/screenshot%04i";
+			formatter.append(extension);
+			char* s = (char*)Zone::Alloc(formatter.size()+1, Zone::TAG_RENDERER);
 			int i = 0;
 			for(int i = 0; i <= 9999; i++) {
-				sprintf(s, formatter, i);
+				sprintf(s, formatter.c_str(), i);
 				if(!File::Open(s, "r")) {
 					break;
 				}
@@ -149,7 +150,7 @@ namespace RenderCode {
 		auto lastDot = thisIsMyFinalForm.find_last_of('.');
 		if(lastDot == thisIsMyFinalForm.npos) {
 			// go ahead and assume .bmp
-			thisIsMyFinalForm += ".bmp";
+			thisIsMyFinalForm += extension;
 		}
 		screenshotName = thisIsMyFinalForm;
 	}

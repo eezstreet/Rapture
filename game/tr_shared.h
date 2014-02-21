@@ -13,5 +13,5 @@ namespace RenderCode {
 	void Display();
 	
 	void* AddSurface(void* surf);
-	void QueueScreenshot(const string& fileName);
+	void QueueScreenshot(const string& fileName, const string& extension);
 };
