@@ -101,6 +101,9 @@ void Console::Hide() {
 	// Blanking the console prevents the game from drawing the console while it's onscreen, but it doesn't kill the webview as we need it later
 	BlankConsole();
 	RemoveRenderable(wView);
+	currentFocus = prevFocus;
+	currentFocus->Focus();
+	currentFocus->Focus();
 	rccb = NULL;
 }
 
