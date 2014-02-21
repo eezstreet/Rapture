@@ -65,7 +65,64 @@ namespace Cmd {
 		cmdlist.clear(); 
 	}
 
+	string TabComplete(const string& input) {
+		// TODO: perform exorcism
+		string returnValue = input;
+		vector<string> potentialVictims;
 
+		static vector<string> lastVictimSet;
+		static unsigned int lastVictim = -1;
+
+		// Loop through commands first, and then cvars.
+		for(auto it = cmdlist.begin(); it != cmdlist.end(); ++it) {
+			if(!it->first.compare(0, input.length(), input)) {
+				// Valid input, so okay
+				potentialVictims.push_back(it->first);
+			}
+		}
+
+		bool bFoundCommand = false;
+		for(string s = CvarSystem::GetFirstCvar(bFoundCommand); bFoundCommand; s = CvarSystem::GetNextCvar(s, bFoundCommand)) {
+			if(!s.compare(0, input.length(), input)) {
+				potentialVictims.push_back(s);
+			}
+		}
+
+		// Sort out our victims and choose the most worthy of the flock (evil laughter is heard)
+		sort(potentialVictims.begin(), potentialVictims.end());
+
+		if(lastVictimSet == potentialVictims && potentialVictims.size() > 1) {
+			// Our last victim set is the same as the one now, let's autocomplete
+			lastVictim++;
+			if(lastVictim >= potentialVictims.size()) {
+				lastVictim = 0;
+			}
+		}
+		else {
+			lastVictim = -1;
+		}
+
+		if(potentialVictims.size() == 1) {
+			// Don't print a list, just complete it for us automatically, no more nonsense.
+			returnValue = potentialVictims[0];
+		}
+		else if(potentialVictims.size() == 0) {
+			R_Printf("No commands found.\n");
+		}
+		else if(lastVictim != -1) {
+			returnValue = potentialVictims[lastVictim];
+		}
+		else {
+			R_Printf("\n");
+			for(auto it = potentialVictims.begin(); it != potentialVictims.end(); ++it) {
+				R_Printf("%s\n", it->c_str()); // TODO: special handling of cvars (show their current value)
+			}
+			R_Printf("\n");
+		}
+
+		lastVictimSet = potentialVictims;
+		return returnValue;
+	}
 
 	// This uses a standard quote-token system.
 	// Example:

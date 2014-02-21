@@ -159,6 +159,7 @@
             }
             else if(charCode == 9) {
                 // TODO: tab completion
+                ConsoleManager.tabComplete(document.getElementById("coninput").value);
                 event.preventDefault();
                 return false;
             }

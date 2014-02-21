@@ -121,9 +121,10 @@ class CvarSystem {
 	static bool init;
 	static void Cache_Free(const string& sName);
 	static void ArchiveCvars();
+public:
 	static string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand);
 	static string CvarSystem::GetFirstCvar(bool& bFoundCommand);
-public:
+
 	static Cvar* RegisterCvar(Cvar *cvar);
 	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, char* startValue);
 	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, int startValue);
@@ -287,6 +288,7 @@ namespace Cmd {
 	void ClearCommandList();
 	void ListCommands();
 	vector<string> Tokenize(const string &str);
+	string TabComplete(const string& input);
 };
 
 /* Input.cpp */

@@ -55,6 +55,7 @@ Console::Console() {
 	obj.SetCustomMethod(WSLit("openSaysAMe"), false);
 	obj.SetCustomMethod(WSLit("inputBufferUp"), false);
 	obj.SetCustomMethod(WSLit("inputBufferDown"), false);
+	obj.SetCustomMethod(WSLit("tabComplete"), false);
 
 	window = wView->ExecuteJavascriptWithResult(WSLit("window"), WSLit(""));
 }
@@ -154,6 +155,18 @@ void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_calle
 	}
 	else if(method_name == WSLit("openSaysAMe")) {
 		ReplaceConsoleContents();
+	}
+	else if(method_name == WSLit("tabComplete")) {
+		if(args.size() <= 0) {
+			return;
+		}
+		JSValue theArgument = args[0];
+		string value = ToString(theArgument.ToString());
+		string tabCompletion = Cmd::TabComplete(value);
+
+		JSArray args;
+		args.Push(WSLit(tabCompletion.c_str()));
+		window.ToObject().Invoke(WSLit("InputBufferUpdated"), args);
 	}
 }
 

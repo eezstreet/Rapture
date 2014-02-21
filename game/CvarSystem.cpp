@@ -401,3 +401,4 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 bool CvarSystem::init = false;
 unordered_map<string, Cvar*> CvarSystem::cvars;
 unordered_map<string, CvarCacheObject*> CvarSystem::cache;
+
