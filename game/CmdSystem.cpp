@@ -45,10 +45,12 @@ namespace Cmd {
 		if(it != cmdlist.end()) {
 			auto cmd = (*it).second;
 			cmd(arguments);
+			return;
 		}
-		else {
-			R_Printf("unknown cmd '%s'\n", cmd);
+		else if(CvarSystem::ProcessCvarCommand(arguments[0], arguments)) {
+			return;
 		}
+		R_Printf("unknown cmd '%s'\n", arguments[0].c_str());
 	}
 
 	void AddCommand(const string& cmdName, conCmd_t cmd) {

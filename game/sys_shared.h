@@ -26,3 +26,7 @@ void tostring(const wstring& in, string& out);
 void towstring(const string& in, wstring& out);
 bool checkExtension (string const &fullString, string const &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
+const char* btoa(bool b);
+
+// sys_main.cpp
+void R_Printf(const char *fmt, ...);

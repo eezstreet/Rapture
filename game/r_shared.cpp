@@ -45,6 +45,11 @@ bool atob(const char* str) {
 	return b;
 }
 
+const char* btoa(bool b) {
+	if(b) return "true";
+	return "false";
+}
+
 // http://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
 string trim(const string& str, const string& trim) {
 	const auto strBegin = str.find_first_not_of(trim);

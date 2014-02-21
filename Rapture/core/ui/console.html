@@ -130,6 +130,7 @@
 		}
         
         function WeJustOpenedForBusiness() {
+            document.getElementById("coninput").select();
             ConsoleManager.openSaysAMe();
         }
         
@@ -153,6 +154,11 @@
                 return false;
             }
             else if(charCode == 39 || charCode == 37) {
+                event.preventDefault();
+                return false;
+            }
+            else if(charCode == 9) {
+                // TODO: tab completion
                 event.preventDefault();
                 return false;
             }

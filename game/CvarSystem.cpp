@@ -350,6 +350,54 @@ void CvarSystem::ListCvars() {
 	}
 }
 
+bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& VArguments) {
+	auto cv = cvars.find(sName);
+	if(cv == cvars.end()) {
+		return false;
+	}
+
+	Cvar* cvar = cv->second;
+	if(VArguments.size() == 1) {
+		switch(cvar->GetType()) {
+			case Cvar::CV_BOOLEAN:
+				{
+					string sCurrentValue = cvar->Bool() ? "true" : "false";
+					string sDefaultValue = cvar->DefaultBool() ? "true" : "false";
+					R_Printf("%s is %s, default: %s\n", sName.c_str(), sCurrentValue, sDefaultValue);
+				}
+				break;
+			case Cvar::CV_FLOAT:
+				R_Printf("%s is %f, default: %f\n", sName.c_str(), cvar->Value(), cvar->DefaultValue());
+				break;
+			case Cvar::CV_INTEGER:
+				R_Printf("%s is %i, default: %i\n", sName.c_str(), cvar->Integer(), cvar->DefaultInteger());
+				break;
+			default:
+			case Cvar::CV_STRING:
+				R_Printf("%s is \"%s\", default: \"%s\"\n", sName.c_str(), cvar->String(), cvar->DefaultString());
+				break;
+		}
+	}
+	else {
+		switch(cvar->GetType()) {
+			case Cvar::CV_BOOLEAN:
+				cvar->SetValue(atob(VArguments[1]));
+				break;
+			case Cvar::CV_FLOAT:
+				cvar->SetValue((float)atof(VArguments[1].c_str()));
+				break;
+			case Cvar::CV_INTEGER:
+				cvar->SetValue(atoi(VArguments[1].c_str()));
+				break;
+			case Cvar::CV_STRING:
+			default:
+				cvar->SetValue(VArguments[1].c_str());
+				break;
+		}
+	}
+	return true;
+}
+
 bool CvarSystem::init = false;
 unordered_map<string, Cvar*> CvarSystem::cvars;
 unordered_map<string, CvarCacheObject*> CvarSystem::cache;

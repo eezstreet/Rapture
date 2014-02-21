@@ -46,6 +46,7 @@ public:
 	enum cvarFlags_e {
 		CVAR_ARCHIVE,
 		CVAR_ROM,
+		CVAR_ANNOUNCE,
 	};
 private:
 	cvarType_e type;
@@ -73,14 +74,18 @@ public:
 	string GetName() { return name; }
 	string GetDescription() { return description; }
 
-	void SetValue(char* value) { if(type != CV_STRING) return; s.currentVal = value; }
-	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; }
-	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; }
-	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; }
+	void SetValue(char* value) { if(type != CV_STRING) return; s.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %s\n", name.c_str(), value); }
+	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %i\n", name.c_str(), value); }
+	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %f\n", name.c_str(), value); }
+	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
 	inline char* String() { return s.currentVal; }
 	inline int Integer() { return i.currentVal; }
 	inline float Value() { return v.currentVal; }
 	inline bool Bool() { return b.currentVal; }
+	inline char* DefaultString() { return s.defaultVal; }
+	inline int DefaultInteger() { return i.defaultVal; }
+	inline float DefaultValue() { return v.defaultVal; }
+	inline bool DefaultBool() { return b.defaultVal; }
 
 	template<typename T>
 	static Cvar* Get(const string& sName, const string& sDesc, int iFlags, T startValue) {
@@ -143,6 +148,8 @@ public:
 	static bool GetBooleanValue(const string& sName);
 
 	static void ListCvars();
+
+	static bool ProcessCvarCommand(const string& sName, const vector<string>& VArguments);
 friend class Cvar;
 };
 
@@ -305,9 +312,6 @@ extern InputManager *Input;
 void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
-
-// sys_main.cpp
-void R_Printf(const char *fmt, ...);
 
 // sys_cmds.cpp
 void Sys_InitCommands();
