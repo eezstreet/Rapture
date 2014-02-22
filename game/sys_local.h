@@ -4,7 +4,23 @@
 #include "ui_shared.h"
 #include <SDL.h>
 
+typedef void* ptModule;
+typedef void* ptModuleFunction;
+
+class GameModule {
+	// modcode that gets loaded via shared objects
+private:
+	ptModule ptModuleHandle;
+public:
+	GameModule(string modulename);
+	~GameModule();
+	gameExports_s* GetRefAPI(gameImports_s* import);
+};
+
 class RaptureGame {
+private:
+	GameModule*		game;
+	gameExports_s*	trap;
 public:
 	RaptureGame(int argc, char **argv);
 	~RaptureGame();
@@ -17,6 +33,8 @@ public:
 
 	bool bHasFinished;
 	void RunLoop();
+
+	void CreateGameModule();
 };
 
 template<typename T>
@@ -324,3 +342,5 @@ char* Sys_FS_GetBasepath();
 string Sys_GetClipboardContents();
 void Sys_SendToClipboard(string text);
 void Sys_FS_MakeDirectory(const char* path);
+ptModule Sys_LoadLibrary(string name);
+ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);

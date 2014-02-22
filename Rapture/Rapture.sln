@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rapture", "Rapture.vcxproj", "{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamex86", "..\gamex86\gamex86.vcxproj", "{70549835-D4E2-4A31-8ED4-5D885CDE6D70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}.Debug|Win32.Build.0 = Debug|Win32
 		{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}.Release|Win32.ActiveCfg = Release|Win32
 		{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}.Release|Win32.Build.0 = Release|Win32
+		{70549835-D4E2-4A31-8ED4-5D885CDE6D70}.Debug|Win32.ActiveCfg = Debug|Win32
+		{70549835-D4E2-4A31-8ED4-5D885CDE6D70}.Debug|Win32.Build.0 = Debug|Win32
+		{70549835-D4E2-4A31-8ED4-5D885CDE6D70}.Release|Win32.ActiveCfg = Release|Win32
+		{70549835-D4E2-4A31-8ED4-5D885CDE6D70}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

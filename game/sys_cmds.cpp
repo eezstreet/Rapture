@@ -128,6 +128,11 @@ void Cmd_ScreenshotPCX_f(vector<string>& args) {
 	}
 }
 
+extern void NewGame();
+void Cmd_NewGameTest_f(vector<string>& args) {
+	NewGame();
+}
+
 void Sys_InitCommands() {
 	// Register commands from the engine
 	Cmd::AddCommand("set", Cmd_Set_f);
@@ -143,4 +148,6 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("screenshotJPG", Cmd_ScreenshotJPEG_f);
 	Cmd::AddCommand("screenshotJPEG", Cmd_ScreenshotJPEG_f);
 	Cmd::AddCommand("screenshotPCX", Cmd_ScreenshotPCX_f);
+
+	Cmd::AddCommand("newgametest", Cmd_NewGameTest_f);
 }

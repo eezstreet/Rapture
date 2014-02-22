@@ -58,14 +58,6 @@ void UI::Render() {
 		SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 		RenderCode::AddSurface((void*)x);
 	});
-	/*for(auto it = renderables.begin(); it != renderables.end(); ++it) {
-		BitmapSurface* bmp = (BitmapSurface*)(*it)->surface();
-		if(!bmp)
-			return;
-		SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-		//SDL_ConvertSurfaceFormat(x, SDL_PIXELFORMAT_BGRA8888, 0);
-		RenderCode::AddSurface((void*)x);
-	}*/
 }
 
 /* Input */

@@ -3,7 +3,7 @@
 
 /* main game initialization */
 
-static RaptureGame *sys;
+static RaptureGame *sys = NULL;
 
 int main(int argc, char** argv) {
 	sys = new RaptureGame(argc, argv);
@@ -61,6 +61,8 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 
 /* RaptureGame class, this does all the heavy lifting */
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
+	game = NULL;
+
 	// init cmds
 	Sys_InitCommands();
 
@@ -96,6 +98,11 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 
 /* Called after the main loop has finished and we are ready to shut down */
 RaptureGame::~RaptureGame() {
+	if(game) {
+		trap->shutdown();
+		delete game;
+	}
+
 	DeleteInput();
 	RenderCode::Exit();
 	CvarSystem::Destroy();
@@ -132,6 +139,18 @@ void RaptureGame::PassQuitEvent() {
 	bHasFinished = true;
 }
 
+/* Started a new game (probably from the menu) */
+void RaptureGame::CreateGameModule() {
+	game = new GameModule("gamex86");
+	gameImports_s imp;
+	imp.printf = R_Printf;
+	trap = game->GetRefAPI(&imp);
+	if(!trap) {
+		return;
+	}
+	trap->init();
+}
+
 /* Some shared functions */
 #include "ui_local.h"
 void R_Printf(const char *fmt, ...) {
@@ -143,4 +162,9 @@ void R_Printf(const char *fmt, ...) {
 	va_end(args);
 
 	Console::PushConsoleMessage(str);
+}
+
+void NewGame() {
+	MainMenu::DestroySingleton();
+	sys->CreateGameModule();
 }

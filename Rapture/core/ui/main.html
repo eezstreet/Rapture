@@ -11,6 +11,10 @@
                 GameManager.execCommand("quit");
             }
             
+            function NewGame() {
+                GameManager.execCommand("newgametest");
+            }
+            
 			$(document).ready(function() {
 				$('#menuaccordion').accordion({ active: false, collapsible: true});
 				
@@ -20,6 +24,10 @@
                 
                 $('#menu-exit-button').on('click', function() {
                     QuitGame();
+                });
+                
+                $('#menu-new-button').on('click', function() {
+                    NewGame();
                 });
 			});
 		</script>

@@ -65,3 +65,16 @@ void Sys_SendToClipboard(string text) {
 	CloseClipboard();
 }
 
+ptModule Sys_LoadLibrary(string name) {
+	name.append(".dll");
+	string filepath = File::GetFileSearchPath(name);
+	ptModule hLib = (ptModule)LoadLibrary(filepath.c_str());
+	if(!hLib) {
+		R_Printf("module load failure: %i\n", GetLastError());
+	}
+	return hLib;
+}
+
+ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name) {
+	return (ptModuleFunction)GetProcAddress((HMODULE)module, name.c_str());
+}

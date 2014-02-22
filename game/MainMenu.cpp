@@ -22,8 +22,10 @@ MainMenu::MainMenu() {
 }
 
 MainMenu::~MainMenu() {
+	RemoveRenderable(wView);
 	wView->Destroy();
 	wView = NULL;
+	currentFocus = NULL;
 }
 
 MainMenu::MainMenu(MainMenu& other) {
