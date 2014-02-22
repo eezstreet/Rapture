@@ -66,9 +66,6 @@
     <ClCompile Include="..\game\Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\MapManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\json\cJSON.c">
       <Filter>Libraries\JSON</Filter>
     </ClCompile>
@@ -96,12 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\game\ui_shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\drlg_local.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\drlg_shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

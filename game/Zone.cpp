@@ -9,6 +9,7 @@ namespace Zone {
 			"cvar",
 			"files",
 			"renderer",
+			"images",
 			"custom",
 			"max"
 	};

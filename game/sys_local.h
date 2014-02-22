@@ -179,6 +179,7 @@ namespace Zone {
 		TAG_CVAR,
 		TAG_FILES,
 		TAG_RENDERER,
+		TAG_IMAGES,
 		TAG_CUSTOM, // should only be used by mods
 		TAG_MAX,
 	};

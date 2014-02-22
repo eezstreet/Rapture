@@ -116,6 +116,11 @@ void RaptureGame::RunLoop() {
 	Input->InputFrame();
 	UI::Update();
 
+	// Do gamecode
+	if(game) {
+		trap->runactiveframe();
+	}
+
 	// Do rendering
 	RenderCode::BlankFrame();
 	UI::Render();
@@ -144,6 +149,8 @@ void RaptureGame::CreateGameModule() {
 	game = new GameModule("gamex86");
 	gameImports_s imp;
 	imp.printf = R_Printf;
+	imp.RegisterImage = RenderCode::RegisterImage;
+	imp.DrawImage = RenderCode::DrawImage;
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
 		return;

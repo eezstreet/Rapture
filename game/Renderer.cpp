@@ -58,6 +58,9 @@ namespace RenderCode {
 			SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 		}
 
+		R_Printf("ImageClass::InitImages()\n");
+		ImageClass::InitImages();
+
 		R_Printf("Initializing FreeImage\n");
 		FreeImage_Initialise();
 		R_Printf("FreeImage found, version %s\n", FreeImage_GetVersion());
@@ -70,7 +73,11 @@ namespace RenderCode {
 	void Exit() {
 		R_Printf("Shutting down FreeImage\n");
 		FreeImage_DeInitialise();
-		// bring the gamma ramp down
+
+		R_Printf("ImageClass::ShutdownImages()\n");
+		ImageClass::ShutdownImages();
+
+		R_Printf("gamma ramp down--\n");
 		unsigned short ramp[256];
 		SDL_CalculateGammaRamp(1.0f, ramp);
 		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
@@ -153,5 +160,13 @@ namespace RenderCode {
 			thisIsMyFinalForm += extension;
 		}
 		screenshotName = thisIsMyFinalForm;
+	}
+
+	void* RegisterImage(const char* name) {
+		return ImageClass::RegisterImage(name);
+	}
+
+	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct) {
+		ImageClass::RenderImage(image, xPct, yPct, wPct, hPct);
 	}
 };

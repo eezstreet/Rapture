@@ -27,14 +27,19 @@ void towstring(const string& in, wstring& out);
 bool checkExtension (string const &fullString, string const &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
 const char* btoa(bool b);
+string stripextension(const string& str);
 
 struct gameImports_s {
 	void (*printf)(const char* fmt, ...);
+	
+	void* (*RegisterImage)(const char* filename);
+	void (*DrawImage)(void* image, float xPct, float yPct, float wPct, float hPct);
 };
 
 struct gameExports_s {
 	void (*init)();
 	void (*shutdown)();
+	void (*runactiveframe)();
 };
 
 // sys_main.cpp

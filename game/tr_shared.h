@@ -3,10 +3,6 @@
 
 // Renderer.cpp
 namespace RenderCode {
-	enum ImageFormats {
-		IMG_BMP,
-	};
-
 	void Initialize();
 	void Exit();
 	void BlankFrame();
@@ -14,4 +10,7 @@ namespace RenderCode {
 	
 	void* AddSurface(void* surf);
 	void QueueScreenshot(const string& fileName, const string& extension);
+
+	void* RegisterImage(const char* name);
+	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct);
 };

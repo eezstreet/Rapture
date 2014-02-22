@@ -98,3 +98,10 @@ void stringreplace(string& fullString, const string& sequence, const string& rep
 		fullString.replace(pos, sequence.length(), replace);
 	}
 }
+
+// http://stackoverflow.com/questions/6417817/easy-way-to-remove-extension-from-a-filename
+string stripextension(const string& filename) {
+    size_t lastdot = filename.find_last_of(".");
+    if (lastdot == string::npos) return filename;
+    return filename.substr(0, lastdot); 
+}
