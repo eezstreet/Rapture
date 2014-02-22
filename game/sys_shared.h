@@ -28,5 +28,14 @@ bool checkExtension (string const &fullString, string const &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
 const char* btoa(bool b);
 
+struct gameImports_s {
+	void (*printf)(const char* fmt, ...);
+};
+
+struct gameExports_s {
+	void (*init)();
+	void (*shutdown)();
+};
+
 // sys_main.cpp
 void R_Printf(const char *fmt, ...);
