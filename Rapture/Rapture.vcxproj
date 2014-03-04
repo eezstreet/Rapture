@@ -48,11 +48,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../SDL_image/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;../freeimage/freeimage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -76,7 +77,6 @@
     <ClCompile Include="..\game\FileSystem.cpp" />
     <ClCompile Include="..\game\GameModule.cpp" />
     <ClCompile Include="..\game\Hunk.cpp" />
-    <ClCompile Include="..\game\Image.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />

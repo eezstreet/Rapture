@@ -147,7 +147,7 @@ void RaptureGame::PassQuitEvent() {
 /* Started a new game (probably from the menu) */
 void RaptureGame::CreateGameModule() {
 	game = new GameModule("gamex86");
-	gameImports_s imp;
+	static gameImports_s imp;
 	imp.printf = R_Printf;
 	imp.RegisterImage = RenderCode::RegisterImage;
 	imp.DrawImage = RenderCode::DrawImage;

@@ -8,7 +8,7 @@ static void* ptLoadScreenImage = NULL;
 
 void Game_Init() {
 	trap->printf("--- Game Initialization ---\n");
-	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
+	ptLoadScreenImage = trap->RegisterImage("ui/images/loading2");
 	bLoadingScreen = true;
 }
 

@@ -8,7 +8,7 @@ namespace RenderCode {
 	void BlankFrame();
 	void Display();
 	
-	void* AddSurface(void* surf);
+	void AddSurface(void* surf);
 	void QueueScreenshot(const string& fileName, const string& extension);
 
 	void* RegisterImage(const char* name);

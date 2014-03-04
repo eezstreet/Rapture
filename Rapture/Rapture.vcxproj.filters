@@ -69,9 +69,6 @@
     <ClCompile Include="..\json\cJSON.c">
       <Filter>Libraries\JSON</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\GameModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

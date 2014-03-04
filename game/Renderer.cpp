@@ -13,7 +13,8 @@ namespace RenderCode {
 	static bool screenshotQueued = false;
 	static string screenshotName = "";
 
-	static vector<SDL_Texture*> texs = vector<SDL_Texture*>();
+	static SDL_Surface* renderSurf = NULL;
+	static unordered_map<string, SDL_Surface*> images;
 
 	static void InitCvars() {
 		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", Cvar::CVAR_ARCHIVE, false);
@@ -58,24 +59,13 @@ namespace RenderCode {
 			SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 		}
 
-		R_Printf("ImageClass::InitImages()\n");
-		ImageClass::InitImages();
-
-		R_Printf("Initializing FreeImage\n");
-		FreeImage_Initialise();
-		R_Printf("FreeImage found, version %s\n", FreeImage_GetVersion());
-		R_Printf("%s\n", FreeImage_GetCopyrightMessage());
+		renderSurf = SDL_CreateRGBSurface(0, r_width->Integer(), r_height->Integer(), 32,  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	}
 
 	void Restart() {
 	}
 
 	void Exit() {
-		R_Printf("Shutting down FreeImage\n");
-		FreeImage_DeInitialise();
-
-		R_Printf("ImageClass::ShutdownImages()\n");
-		ImageClass::ShutdownImages();
 
 		R_Printf("gamma ramp down--\n");
 		unsigned short ramp[256];
@@ -99,13 +89,9 @@ namespace RenderCode {
 
 		SDL_RWops *rw = SDL_RWFromMem(pixels, numPixels);
 		SDL_SaveBMP_RW(screenshot, rw, 0);
-		auto size = rw->size(rw);
-		ImageClass* img = new ImageClass(pixels, size);
-		bool bSuccess = img->WriteToFile(filename);
-		delete img;
 		SDL_FreeRW(rw);
 		delete pixels;
-		if(bSuccess) {
+		if(true) {
 			R_Printf("Screenshot: %s\n", filename.c_str());
 		}
 		else {
@@ -114,25 +100,22 @@ namespace RenderCode {
 	}
 
 	void Display() {
+		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, renderSurf);
+		SDL_RenderCopy(renderer, tex, NULL, NULL);
 		SDL_RenderPresent(renderer);
+		SDL_FillRect(renderSurf, NULL, 0x00000000);
 		if(screenshotQueued) {
 			// We have a screenshot command queued up, so we need to handle it.
 			CreateScreenshot(screenshotName);
 			screenshotQueued = false;
 		}
-		for(auto it = texs.begin(); it != texs.end(); ++it) {
-			SDL_DestroyTexture(*it);
-		}
-		texs.clear(); // clear out the texture pool
+		SDL_DestroyTexture(tex);
 	}
 
-	void* AddSurface(void* surf) {
+	void AddSurface(void* surf) {
 		SDL_Surface* sdlsurf = (SDL_Surface*)surf;
-		SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, sdlsurf);
-		SDL_RenderCopy(renderer, text, NULL, NULL);
+		SDL_BlitSurface(sdlsurf, NULL, renderSurf, NULL);
 		SDL_FreeSurface(sdlsurf);
-		texs.push_back(text);
-		return text;
 	}
 
 	void QueueScreenshot(const string& fileName, const string& extension) {
@@ -163,10 +146,31 @@ namespace RenderCode {
 	}
 
 	void* RegisterImage(const char* name) {
-		return ImageClass::RegisterImage(name);
+		SDL_Surface* temp;
+		SDL_Surface* perm;
+
+		auto it = images.find(name);
+		if(it != images.end()) {
+			return (void*)it->second;
+		}
+
+		string path = File::GetFileSearchPath(name);
+		if(path.length() <= 0) {
+			return NULL;
+		}
+		
+		temp = IMG_Load(path.c_str());
+		if(temp == NULL) {
+			return temp;
+		}
+
+		perm = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
+		return perm;
 	}
 
 	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct) {
-		ImageClass::RenderImage(image, xPct, yPct, wPct, hPct);
+		if(!image) {
+			return;
+		}
 	}
 };
