@@ -30,6 +30,28 @@
                     NewGame();
                 });
 			});
+            
+            function preventDrag(e) {
+                if(e.stopPropagation) e.stopPropagation();
+                if(e.preventDefault) e.preventDefault();
+                e.cancelBubble=true;
+                e.returnValue=false;
+                return false;
+            }
+            
+            $(document).mousedown(function(e) {
+                if(!e) {
+                    e = window.event;
+                }
+                return preventDrag(e);
+            });
+            
+            $(document).mousemove(function(e) {
+                if(!e) {
+                    e = window.event;
+                }
+                return preventDrag(e);
+            });
 		</script>
 		
 		<style type="text/css">
