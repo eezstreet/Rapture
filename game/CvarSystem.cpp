@@ -363,7 +363,7 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 				{
 					string sCurrentValue = cvar->Bool() ? "true" : "false";
 					string sDefaultValue = cvar->DefaultBool() ? "true" : "false";
-					R_Printf("%s is %s, default: %s\n", sName.c_str(), sCurrentValue, sDefaultValue);
+					R_Printf("%s is %s, default: %s\n", sName.c_str(), sCurrentValue.c_str(), sDefaultValue.c_str());
 				}
 				break;
 			case Cvar::CV_FLOAT:

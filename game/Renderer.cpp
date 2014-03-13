@@ -6,6 +6,10 @@ Cvar* r_height = NULL;
 Cvar* r_windowtitle = NULL;
 Cvar* r_gamma = NULL;
 
+#ifdef _DEBUG
+Cvar* r_imgdebug = NULL;
+#endif
+
 namespace RenderCode {
 
 	static SDL_Window *window;
@@ -22,6 +26,11 @@ namespace RenderCode {
 		r_height = Cvar::Get<int>("r_height", "Resolution: height", Cvar::CVAR_ARCHIVE, 768);
 		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", Cvar::CVAR_ARCHIVE | Cvar::CVAR_ROM, "Rapture");
 		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", Cvar::CVAR_ARCHIVE, 1.0f);
+
+		// Debug cvars
+#ifdef _DEBUG
+		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, false);
+#endif
 	}
 
 	void Initialize() {
@@ -159,6 +168,41 @@ namespace RenderCode {
 		screenshotName = thisIsMyFinalForm;
 	}
 
+	string ResolveImagePath(const char *path) {
+		string pathret = File::GetFileSearchPath(path);
+		if(pathret.length() > 0) {
+			return pathret;
+		}
+		// Try next extension -- png
+		pathret = stripextension(path);
+		pathret += ".png";
+		pathret = File::GetFileSearchPath(pathret);
+		if(pathret.length() > 0) {
+			return pathret;
+		}
+		// Next -- .jpeg
+		pathret = stripextension(path);
+		pathret += ".jpg";
+		pathret = File::GetFileSearchPath(pathret);
+		if(pathret.length() > 0) {
+			return pathret;
+		}
+		// Maybe JPG failed? Try .jpeg
+		pathret = stripextension(path);
+		pathret += ".jpeg";
+		pathret = File::GetFileSearchPath(pathret);
+		if(pathret.length() > 0) {
+			return pathret;
+		}
+		// Last resort...BMP.
+		pathret = stripextension(path);
+		pathret += ".bmp";
+		pathret = File::GetFileSearchPath(pathret);
+		
+		// Returns either the correct file (with BMP extension) or nothing at all. Clever, eh?
+		return pathret;
+	}
+
 	void* RegisterImage(const char* name) {
 		SDL_Surface* temp;
 		SDL_Surface* perm;
@@ -168,7 +212,7 @@ namespace RenderCode {
 			return (void*)it->second;
 		}
 
-		string path = File::GetFileSearchPath(name);
+		string path = ResolveImagePath(name);
 		if(path.length() <= 0) {
 			return NULL;
 		}
@@ -182,9 +226,36 @@ namespace RenderCode {
 		return perm;
 	}
 
+#ifdef _DEBUG
+	void DebugImageDraw(SDL_Rect* rect) {
+		SDL_RenderDrawLine(renderer, rect->x, rect->y, rect->x + rect->w, rect->y);
+		SDL_RenderDrawLine(renderer, rect->x, rect->y, rect->x, rect->y + rect->h);
+		SDL_RenderDrawLine(renderer, rect->x, rect->y + rect->h, rect->x + rect->w, rect->y + rect->h);
+		SDL_RenderDrawLine(renderer, rect->x + rect->w, rect->y, rect->x + rect->w, rect->y + rect->h);
+	}
+#endif
+
 	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct) {
 		if(!image) {
 			return;
 		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		// These IGNORE the blitting procedure which is pretty ugly, need to rewrite the renderer to use commands instead of surfs :<
+		SDL_Rect wreckt;
+		const int width = r_width->Integer();
+		const int height = r_height->Integer();
+
+		wreckt.x = (width * xPct)/100; wreckt.y = (height * yPct)/100;
+		wreckt.w = (width * wPct)/100; wreckt.h = (height * hPct)/100;
+
+		//wreckt.x += wreckt.w / 2;
+		//wreckt.y += wreckt.h / 2; // >_>! SDL centers these. bad.
+		//SDL_BlitSurface(img, &wreckt, renderSurf, &wreckt);
+		SDL_BlitScaled(img, &img->clip_rect, renderSurf, &wreckt);
+#ifdef _DEBUG
+		if(r_imgdebug->Bool()) {
+			DebugImageDraw(&wreckt);
+		}
+#endif
 	}
 };
