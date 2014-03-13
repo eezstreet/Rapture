@@ -60,12 +60,21 @@ namespace RenderCode {
 		}
 
 		renderSurf = SDL_CreateRGBSurface(0, r_width->Integer(), r_height->Integer(), 32,  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+		int flags = IMG_INIT_JPG|IMG_INIT_PNG;
+		R_Printf("IMG_Init()\n");
+		if(IMG_Init(flags)&flags != flags) {
+			R_Printf("FAILED! %s\n", IMG_GetError());
+		}
+
 	}
 
 	void Restart() {
 	}
 
 	void Exit() {
+		R_Printf("IMG_Quit()\n");
+		IMG_Quit();
 
 		R_Printf("gamma ramp down--\n");
 		unsigned short ramp[256];
@@ -87,16 +96,21 @@ namespace RenderCode {
 			SDL_CreateRGBSurfaceFrom(pixels, s->w, s->h, s->format->BitsPerPixel, s->w * s->format->BytesPerPixel, s->format->Rmask, s->format->Gmask, s->format->Bmask, s->format->Amask),
 			SDL_PIXELFORMAT_RGB444, 0);
 
-		SDL_RWops *rw = SDL_RWFromMem(pixels, numPixels);
-		SDL_SaveBMP_RW(screenshot, rw, 0);
-		SDL_FreeRW(rw);
-		delete pixels;
+		File* f = File::Open(filename, "wb+"); // this is pretty hack
+		f->WritePlaintext("blah");
+		f->Close();
+		const string path = File::GetFileSearchPath(filename);
+		SDL_SaveBMP(screenshot, path.c_str()); 
 		if(true) {
 			R_Printf("Screenshot: %s\n", filename.c_str());
 		}
 		else {
 			R_Printf("Could not write %s\n", filename.c_str());
 		}
+
+		delete pixels;
+		SDL_FreeSurface(s);
+		SDL_FreeSurface(screenshot);
 	}
 
 	void Display() {
