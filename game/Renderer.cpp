@@ -235,6 +235,58 @@ namespace RenderCode {
 	}
 #endif
 
+	void R_DrawImage(SDL_Surface* image, int x, int y, int w, int h) {
+		if(!image) {
+			return;
+		}
+		SDL_Rect rect;
+		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
+		SDL_BlitScaled(image, &image->clip_rect, renderSurf, &rect);
+#ifdef _DEBUG
+		if(r_imgdebug->Bool()) {
+			DebugImageDraw(&rect);
+		}
+#endif
+	}
+
+	void R_DrawImageAbs(SDL_Surface* image, int x, int y, int w, int h) {
+		if(!image) {
+			return;
+		}
+		SDL_Rect rect;
+		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
+		SDL_BlitSurface(image, &image->clip_rect, renderSurf, &rect);
+#ifdef _DEBUG
+		if(r_imgdebug->Bool()) {
+			DebugImageDraw(&rect);
+		}
+#endif
+	}
+
+	void R_DrawImageClipped(SDL_Surface* image, SDL_Rect* spos, SDL_Rect* ipos) {
+		if(!image) {
+			return;
+		}
+		SDL_BlitScaled(image, ipos, renderSurf, spos);
+#ifdef _DEBUG
+		if(r_imgdebug->Bool()) {
+			DebugImageDraw(spos);
+		}
+#endif
+	}
+
+	void R_DrawImageClippedAbs(SDL_Surface* image, SDL_Rect* spos, SDL_Rect* ipos) {
+		if(!image) {
+			return;
+		}
+		SDL_BlitSurface(image, ipos, renderSurf, spos);
+#ifdef _DEBUG
+		if(r_imgdebug->Bool()) {
+			DebugImageDraw(spos);
+		}
+#endif
+	}
+
 	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct) {
 		if(!image) {
 			return;
@@ -248,14 +300,95 @@ namespace RenderCode {
 		wreckt.x = (width * xPct)/100; wreckt.y = (height * yPct)/100;
 		wreckt.w = (width * wPct)/100; wreckt.h = (height * hPct)/100;
 
-		//wreckt.x += wreckt.w / 2;
-		//wreckt.y += wreckt.h / 2; // >_>! SDL centers these. bad.
-		//SDL_BlitSurface(img, &wreckt, renderSurf, &wreckt);
-		SDL_BlitScaled(img, &img->clip_rect, renderSurf, &wreckt);
-#ifdef _DEBUG
-		if(r_imgdebug->Bool()) {
-			DebugImageDraw(&wreckt);
+		R_DrawImage(img, wreckt.x, wreckt.y, wreckt.w, wreckt.h);
+	}
+
+	void DrawImageAspectCorrection(void* image, float xPct, float yPct, float wPct, float hPct) {
+		if(!image) {
+			return;
 		}
-#endif
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		const float height = (float)r_height->Integer();
+		const float width = (float)(height/(float)r_width->Integer());
+		const float ycorrect = (float)(r_width->Integer()/height);
+
+		SDL_Rect rect;
+		rect.w = (width * wPct * r_width->Integer())/100;
+		rect.h = (height * hPct)/100;
+		rect.x = (r_width->Integer() * xPct)/100;
+		rect.y = (height * hPct * ycorrect)/100;
+
+		R_DrawImage(img, rect.x, rect.y, rect.w, rect.h);
+	}
+
+	void DrawImageNoScaling(void* image, float xPct, float yPct) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		const int x = (int)(r_width->Integer() * xPct)/100;
+		const int y = (int)(r_height->Integer() * yPct)/100;
+		const int w = img->w;
+		const int h = img->h;
+
+		R_DrawImageAbs(img, x, y, w, h);
+	}
+
+	void DrawImageClipped(void* image, float sxPct, float syPct, float swPct,
+		float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		const int sx = (int)(r_width->Integer() * sxPct)/100;
+		const int sy = (int)(r_height->Integer() * syPct)/100;
+		const int sw = (int)(r_width->Integer() * swPct)/100;
+		const int sh = (int)(r_height->Integer() * shPct)/100;
+		SDL_Rect screen;
+		screen.x = sx; screen.y = sy; screen.w = sw; screen.h = sh;
+		const int ix = (int)(img->w * ixPct)/100;
+		const int iy = (int)(img->h * iyPct)/100;
+		const int iw = (int)(img->w * iwPct)/100;
+		const int ih = (int)(img->h * ihPct)/100;
+		SDL_Rect irect;
+		irect.x = ix; irect.y = iy; irect.w = iw; irect.h = ih;
+		R_DrawImageClipped(img, &screen, &irect);
+	}
+
+	void DrawImageAbs(void* image, int x, int y, int w, int h) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		R_DrawImage(img, x, y, w, h);
+	}
+
+	void DrawImageAbsAspectCorrection(void* image, int x, int y, int w, int h) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		R_DrawImage(img, x * (float)((float)r_width->Integer()/(float)r_height->Integer()),
+			y, w * (float)(r_width->Integer() / (float)r_height->Integer()), h);
+	}
+
+	void DrawImageAbsNoScaling(void* image, int x, int y) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		R_DrawImageAbs(img, x, y, img->w, img->h);
+	}
+
+	void DrawImageAbsClipped(void* image, int sx, int sy, int sw, int sh, int ix, int iy, int iw, int ih) {
+		if(!image) {
+			return;
+		}
+		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		SDL_Rect screen;
+		screen.x = sx; screen.y = sy; screen.w = sw; screen.h = sw;
+		SDL_Rect imgc;
+		imgc.x = ix; imgc.y = iy; imgc.w = iw; imgc.h = ih;
+		R_DrawImageClippedAbs(img, &screen, &imgc);
 	}
 };

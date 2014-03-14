@@ -151,6 +151,13 @@ void RaptureGame::CreateGameModule() {
 	imp.printf = R_Printf;
 	imp.RegisterImage = RenderCode::RegisterImage;
 	imp.DrawImage = RenderCode::DrawImage;
+	imp.DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
+	imp.DrawImageNoScaling = RenderCode::DrawImageNoScaling;
+	imp.DrawImageClipped = RenderCode::DrawImageClipped;
+	imp.DrawImageAbs = RenderCode::DrawImageAbs;
+	imp.DrawImageAbsAspectCorrection = RenderCode::DrawImageAbsAspectCorrection;
+	imp.DrawImageAbsNoScaling = RenderCode::DrawImageAbsNoScaling;
+	imp.DrawImageAbsClipped = RenderCode::DrawImageAbsClipped;
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
 		return;

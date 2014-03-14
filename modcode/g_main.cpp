@@ -18,7 +18,8 @@ void Game_Shutdown() {
 
 void Game_Frame() {
 	if(bLoadingScreen) {
-		trap->DrawImage(ptLoadScreenImage, 37.5f, 37.5f, 25.0f, 25.0f);
+		trap->DrawImageAspectCorrection(ptLoadScreenImage, 37.5, 37.5, 25, 25);
+		//trap->DrawImage(ptLoadScreenImage, 37.5f, 37.5f, 25.0f, 25.0f);
 	}
 }
 
