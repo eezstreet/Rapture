@@ -149,6 +149,11 @@ void RaptureGame::CreateGameModule() {
 	game = new GameModule("gamex86");
 	static gameImports_s imp;
 	imp.printf = R_Printf;
+	imp.OpenFile = FS::EXPORT_OpenFile;
+	imp.CloseFile = FS::EXPORT_Close;
+	imp.GetFileSize = FS::EXPORT_GetFileSize;
+	imp.ListFilesInDir = FS::EXPORT_ListFilesInDir;
+	imp.ReadPlaintext = FS::EXPORT_ReadPlaintext;
 	imp.RegisterImage = RenderCode::RegisterImage;
 	imp.DrawImage = RenderCode::DrawImage;
 	imp.DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;

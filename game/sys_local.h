@@ -297,6 +297,12 @@ namespace FS {
 
 	void Init();
 	void Shutdown();
+
+	void* EXPORT_OpenFile(const char* filename, const char* mode);
+	void EXPORT_Close(void* filehandle);
+	int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char *extension);
+	string EXPORT_ReadPlaintext(void* filehandle, size_t numChars);
+	size_t EXPORT_GetFileSize(void* filehandle);
 };
 
 /* CmdSystem.cpp */

@@ -31,6 +31,13 @@ string stripextension(const string& str);
 
 struct gameImports_s {
 	void (*printf)(const char* fmt, ...);
+
+	void* (*OpenFile)(const char* filename, const char* mode);
+	void (*CloseFile)(void* filehandle);
+	int (*ListFilesInDir)(const char* dir, vector<string>& in, const char* extension);
+	string (*ReadPlaintext)(void* filehandle, size_t numChars);
+	size_t (*GetFileSize)(void* filehandle);
+
 	
 	void* (*RegisterImage)(const char* filename);
 	void (*DrawImage)(void* image, float xPct, float yPct, float wPct, float hPct);

@@ -13,15 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{bcd1794d-7d3c-4c39-baf7-4eba3a4b3dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\JSON">
+      <UniqueIdentifier>{3b2f6654-df3c-4409-9dad-c31980642313}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\modcode\g_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\json\cJSON.c">
+      <Filter>Libraries\JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\g_levels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\g_json.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\modcode\g_local.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\json\cJSON.h">
+      <Filter>Libraries\JSON</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

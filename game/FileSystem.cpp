@@ -87,6 +87,29 @@ namespace FS {
 			lastPos = nextSlash+1;
 		}
 	}
+
+	void* EXPORT_OpenFile(const char* filename, const char* mode) {
+		return (void*)File::Open(filename, mode);
+	}
+
+	void EXPORT_CloseFile(void* filehandle) {
+		File* f = (File*)filehandle;
+		f->Close();
+	}
+
+	int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char* ext) {
+		return fs->ListFiles(filename, in, ext);
+	}
+
+	string EXPORT_ReadPlaintext(void* filehandle, size_t numChars) {
+		File* f = (File*)filehandle;
+		return f->ReadPlaintext(numChars);
+	}
+
+	size_t EXPORT_GetFileSize(void* filehandle) {
+		File* f = (File*)filehandle;
+		return f->GetSize();
+	}
 };
 
 File* File::Open(const string& fileName, const string& mode) {

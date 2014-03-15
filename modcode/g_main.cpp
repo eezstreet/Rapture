@@ -3,23 +3,32 @@
 gameImports_s* trap;
 
 static gameExports_s exportFns;
-static bool bLoadingScreen = false;
+static int iLoadingScreen = 0;
 static void* ptLoadScreenImage = NULL;
 
 void Game_Init() {
 	trap->printf("--- Game Initialization ---\n");
 	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
-	bLoadingScreen = true;
+	iLoadingScreen = 1;
 }
 
 void Game_Shutdown() {
 	trap->printf("--- Game Shutdown ---\n");
 }
 
+void Game_Load() {
+}
+
 void Game_Frame() {
-	if(bLoadingScreen) {
+	if(iLoadingScreen == 1) {
+		// Force it to draw the loading screen
 		trap->DrawImageAspectCorrection(ptLoadScreenImage, 37.5, 37.5, 25, 25);
-		//trap->DrawImage(ptLoadScreenImage, 37.5f, 37.5f, 25.0f, 25.0f);
+		iLoadingScreen++;
+	}
+	else if(iLoadingScreen == 2) {
+		// Now do the actual loading
+		Game_Load();
+		iLoadingScreen = 0;
 	}
 }
 
