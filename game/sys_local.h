@@ -180,6 +180,7 @@ namespace Zone {
 		TAG_FILES,
 		TAG_RENDERER,
 		TAG_IMAGES,
+		TAG_MATERIALS,
 		TAG_CUSTOM, // should only be used by mods
 		TAG_MAX,
 	};

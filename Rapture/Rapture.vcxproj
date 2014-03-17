@@ -79,6 +79,7 @@
     <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
+    <ClCompile Include="..\game\MaterialHandler.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
     <ClCompile Include="..\game\r_shared.cpp" />

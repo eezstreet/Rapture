@@ -10,6 +10,7 @@ namespace Zone {
 			"files",
 			"renderer",
 			"images",
+			"materials",
 			"custom",
 			"max"
 	};

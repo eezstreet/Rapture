@@ -163,6 +163,9 @@ void RaptureGame::CreateGameModule() {
 	imp.DrawImageAbsAspectCorrection = RenderCode::DrawImageAbsAspectCorrection;
 	imp.DrawImageAbsNoScaling = RenderCode::DrawImageAbsNoScaling;
 	imp.DrawImageAbsClipped = RenderCode::DrawImageAbsClipped;
+	imp.InitMaterials = RenderCode::InitMaterials;
+	imp.ShutdownMaterials = RenderCode::ShutdownMaterials;
+	imp.RegisterMaterial = RenderCode::RegisterMaterial;
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
 		return;

@@ -6,9 +6,9 @@ bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseF
 	}
 	for(auto it = cJSON_GetFirstItem(root); it != NULL; it = cJSON_GetNextItem(it)) {
 		const char* name = cJSON_GetItemKey(it);
-		cJSON* json = cJSON_GetObjectItem(root, it->first);
-		if(parsers.find(name) != parsers.end()) {
-			parsers[name](it, (void*)output);
+		auto obj = parsers.find(name);
+		if(obj != parsers.end()) {
+			obj->second(it, output);
 		}
 		else {
 			R_Printf("WARNING: unknown JSON field (%s) found\n", name);
@@ -37,5 +37,5 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 		return false;
 	}
 
-	return JSON_ParseFieldSet(root, output);
+	return JSON_ParseFieldSet(root, parsers, output);
 }

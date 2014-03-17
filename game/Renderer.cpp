@@ -391,4 +391,18 @@ namespace RenderCode {
 		imgc.x = ix; imgc.y = iy; imgc.w = iw; imgc.h = ih;
 		R_DrawImageClippedAbs(img, &screen, &imgc);
 	}
+
+	void InitMaterials() {
+		R_Printf("Initializing materials..\n");
+		mats = new MaterialHandler();
+	}
+
+	void ShutdownMaterials() {
+		R_Printf("Freeing materials..\n");
+		delete mats;
+	}
+
+	void* RegisterMaterial(const char* name) {
+		return (void*)mats->GetMaterial(name);
+	}
 };

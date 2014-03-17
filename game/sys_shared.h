@@ -49,6 +49,10 @@ struct gameImports_s {
 	void (*DrawImageAbsAspectCorrection)(void* image, int x, int y, int w, int h);
 	void (*DrawImageAbsNoScaling)(void* image, int x, int y);
 	void (*DrawImageAbsClipped)(void* image, int sx, int sy, int sw, int sh, int ix, int iy, int iw, int ih);
+
+	void (*InitMaterials)();
+	void (*ShutdownMaterials)();
+	void* (*RegisterMaterial)(const char* name);
 };
 
 struct gameExports_s {
