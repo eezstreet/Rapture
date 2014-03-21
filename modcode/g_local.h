@@ -3,9 +3,10 @@
 #include "../json/cJSON.h"
 
 extern gameImports_s* trap;
+#define R_Printf trap->printf
 
 // JSON parser structs
-typedef void (*jsonParseFunc)(cJSON*, void*);
+typedef function<void (cJSON*, void*)> jsonParseFunc;
 bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 
@@ -71,4 +72,8 @@ private:
 	void LoadTile(void* file, const char* filename);
 public:
 	MapLoader(const string& presetsPath, const string& tilePath);
+	~MapLoader();
 };
+
+void InitLevels();
+void ShutdownLevels();

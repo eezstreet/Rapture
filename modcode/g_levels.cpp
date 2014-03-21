@@ -77,3 +77,18 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 		mTileResolver.insert(make_pair(t.name, vTiles.end()-1));
 	}
 }
+
+MapLoader::~MapLoader() {
+	mTileResolver.clear();
+	vTiles.clear();
+	tileParseFields.clear();
+}
+
+MapLoader* maps;
+void InitLevels() {
+	maps = new MapLoader("levels/preset", "levels/tiles");
+}
+
+void ShutdownLevels() {
+	delete maps;
+}

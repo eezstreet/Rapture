@@ -51,6 +51,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <Windows.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -883,7 +884,7 @@ static void cJSON_SS_Init(cJSON_StringStream *ss, const char* data)
 static int cJSON_vsnprintf( char *dest, int size, const char *fmt, va_list argptr ) {
 	int ret;
 
-#ifdef _WIN32
+#ifdef WIN32
 	ret = _vsnprintf( dest, size-1, fmt, argptr );
 #else
 	ret = vsnprintf( dest, size, fmt, argptr );

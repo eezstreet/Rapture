@@ -42,17 +42,33 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 MaterialHandler::MaterialHandler() {
 	vector<string> matFiles;
 	int numFiles = FS::EXPORT_ListFilesInDir("materials/", matFiles, ".json");
-	for(auto it = matFiles.begin(); it != matFiles.end(); ++it) {
-		LoadMaterial(it->c_str());
-	}
 	if(numFiles == 0) {
 		R_Printf("WARNING: no materials loaded\n");
 		return;
 	}
+	for(auto it = matFiles.begin(); it != matFiles.end(); ++it) {
+		LoadMaterial(it->c_str());
+	}
+	R_Printf("Loaded %i materials\n", numFiles);
 }
 
 MaterialHandler::~MaterialHandler() {
-	for(auto it = materials.begin(); it != materials.end(); ++it) {
-		Zone::FastFree(it->second, "materials");
+	Zone::FreeAll("materials");
+}
+
+Material* MaterialHandler::GetMaterial(const char* material) {
+	auto found = materials.find(material);
+	if(found == materials.end()) {
+		R_Printf("WARNING: material '%s' not found\n", material);
+		return NULL;
 	}
+	if(!found->second->bLoadedResources) {
+		// Then load them?
+		found->second->bLoadedResources = true;
+	}
+	return found->second;
+}
+
+Material::Material() {
+	bLoadedResources = false;
 }

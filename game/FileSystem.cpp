@@ -110,6 +110,11 @@ namespace FS {
 		File* f = (File*)filehandle;
 		return f->GetSize();
 	}
+
+	void EXPORT_Close(void* filehandle) {
+		File* f = (File*)filehandle;
+		f->Close();
+	}
 };
 
 File* File::Open(const string& fileName, const string& mode) {
