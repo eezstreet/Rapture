@@ -78,3 +78,19 @@ ptModule Sys_LoadLibrary(string name) {
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name) {
 	return (ptModuleFunction)GetProcAddress((HMODULE)module, name.c_str());
 }
+
+bool Sys_Assertion(const char* msg, const char* file, const unsigned int line) {
+	char text[256];
+	sprintf(text, "Assertion Failure!\r\nFile: %s\r\nLine: %i\r\nExpression: %s", file, line, msg);
+	int val = MessageBox(NULL, text, "Rapture Assertion Failure",  MB_ABORTRETRYIGNORE|MB_ICONWARNING|MB_TASKMODAL|MB_SETFOREGROUND|MB_TOPMOST);
+	switch(val) {
+		default:
+		case IDABORT:
+			Cmd::ProcessCommand("quit");
+			return false;
+		case IDRETRY:
+			return true;
+		case IDIGNORE:
+			return false;
+	}
+}

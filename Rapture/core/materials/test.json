@@ -1,0 +1,5 @@
+// Test Material File
+{
+    name: "TestFloorTile",
+    diffuseMap: "tiles/act1/test_floor"
+},
