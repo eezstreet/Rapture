@@ -63,6 +63,9 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	game = NULL;
 
+	Sys_CreateConsole();
+	Sys_ShowConsole(1, false);
+
 	// init cmds
 	Sys_InitCommands();
 

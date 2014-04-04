@@ -353,3 +353,6 @@ void Sys_FS_MakeDirectory(const char* path);
 ptModule Sys_LoadLibrary(string name);
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
+void Sys_Error(const char* error, ...);
+void Sys_ShowConsole(int vislevel, bool bQuitOnExit);
+void Sys_CreateConsole( void );

@@ -34,6 +34,7 @@ namespace RenderCode {
 	}
 
 	void Initialize() {
+		Sys_Error("herpderp");
 		R_Printf("Initializing renderer\n");
 		InitCvars();
 
