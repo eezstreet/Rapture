@@ -72,13 +72,13 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 		else if ( wParam == QUIT_ID )
 		{
-			if ( s_wcd.quitOnClose )
+			if ( !s_wcd.quitOnClose )
 			{
 				PostQuitMessage( 0 );
 			}
 			else
 			{
-				Cmd::ProcessCommand("quit");
+				setGameQuitting(true);
 			}
 		}
 		else if ( wParam == CLEAR_ID )
@@ -505,4 +505,6 @@ void Sys_SetErrorText( const char *buf )
 ** Sys_PassToViewlog
 */
 void Sys_PassToViewlog(const char* text) {
+	OutputDebugString(text);
+	Conbuf_AppendText(text);
 }

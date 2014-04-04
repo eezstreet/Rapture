@@ -106,4 +106,11 @@ void Sys_Error(const char* error, ...) {
 
 	Sys_ShowConsole(1, true);
 	Sys_SetErrorText(text);
+
+	setGameQuitting(false);
+	throw false;
+}
+
+void Sys_ClearConsoleWindow() {
+	ShowWindow( GetConsoleWindow(), SW_HIDE );
 }

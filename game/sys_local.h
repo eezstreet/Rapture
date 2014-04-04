@@ -356,3 +356,5 @@ bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
 void Sys_ShowConsole(int vislevel, bool bQuitOnExit);
 void Sys_CreateConsole( void );
+void Sys_PassToViewlog(const char* text);
+void Sys_ClearConsoleWindow();

@@ -4,12 +4,32 @@
 /* main game initialization */
 
 static RaptureGame *sys = NULL;
+bool bStartupQuit = false;
+
+void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFinished = true; }
 
 int main(int argc, char** argv) {
-	sys = new RaptureGame(argc, argv);
-	while(!sys->bHasFinished)
-		sys->RunLoop();
-	delete sys;
+	Sys_ClearConsoleWindow();
+	try {
+		sys = new RaptureGame(argc, argv);
+		while(!sys->bHasFinished)
+			sys->RunLoop();
+	}
+	catch(const bool error) {
+		while((sys && !sys->bHasFinished) || (!bStartupQuit)) {
+#ifdef _WIN32
+			MSG        msg;
+			if (!GetMessage (&msg, NULL, 0, 0)) {
+				break;
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+#endif
+		}
+	}
+	if(sys) {
+		delete sys;
+	}
 	return 0;
 }
 
@@ -187,6 +207,7 @@ void R_Printf(const char *fmt, ...) {
 	va_end(args);
 
 	Console::PushConsoleMessage(str);
+	Sys_PassToViewlog(str);
 }
 
 void NewGame() {
