@@ -172,6 +172,7 @@ void RaptureGame::CreateGameModule() {
 	game = new GameModule("gamex86");
 	static gameImports_s imp;
 	imp.printf = R_Printf;
+	imp.error = R_Error;
 	imp.OpenFile = FS::EXPORT_OpenFile;
 	imp.CloseFile = FS::EXPORT_Close;
 	imp.GetFileSize = FS::EXPORT_GetFileSize;

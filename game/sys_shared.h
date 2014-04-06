@@ -31,6 +31,7 @@ string stripextension(const string& str);
 
 struct gameImports_s {
 	void (*printf)(const char* fmt, ...);
+	void (*error)(const char* fmt, ...);
 
 	void* (*OpenFile)(const char* filename, const char* mode);
 	void (*CloseFile)(void* filehandle);
@@ -63,3 +64,4 @@ struct gameExports_s {
 
 // sys_main.cpp
 void R_Printf(const char *fmt, ...);
+void R_Error(const char *fmt, ...);

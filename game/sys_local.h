@@ -4,6 +4,8 @@
 #include "ui_shared.h"
 #include <SDL.h>
 
+#define R_Error Sys_Error
+
 typedef void* ptModule;
 typedef void* ptModuleFunction;
 
