@@ -341,6 +341,8 @@ void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
 
+void setGameQuitting(const bool b);
+
 // sys_cmds.cpp
 void Sys_InitCommands();
 

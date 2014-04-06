@@ -34,7 +34,6 @@ namespace RenderCode {
 	}
 
 	void Initialize() {
-		Sys_Error("herpderp");
 		R_Printf("Initializing renderer\n");
 		InitCvars();
 
@@ -76,20 +75,25 @@ namespace RenderCode {
 		if(IMG_Init(flags)&flags != flags) {
 			R_Printf("FAILED! %s\n", IMG_GetError());
 		}
-
 	}
 
 	void Restart() {
 	}
 
-	void Exit() {
-		R_Printf("IMG_Quit()\n");
+	void Exit(const bool bSilent) {
+		if(!bSilent) {
+			R_Printf("IMG_Quit()\n");
+		}
 		IMG_Quit();
 
-		R_Printf("gamma ramp down--\n");
+		if(!bSilent) {
+			R_Printf("gamma ramp down--\n");
+		}
 		unsigned short ramp[256];
 		SDL_CalculateGammaRamp(1.0f, ramp);
 		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
+
+		SDL_DestroyWindow(window);
 	}
 
 	void BlankFrame() {

@@ -68,7 +68,7 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	int numFiles = trap->ListFilesInDir(tilePath.c_str(), paths, ".json");
 	if(numFiles <= 0) {
 		R_Printf("FATAL: MapLoader could not load tiles (missing?)\n");
-		assert(0);
+//		assert(0);
 	}
 	for(auto it = paths.begin(); it != paths.end(); ++it) {
 		Tile t;

@@ -4,7 +4,7 @@
 // Renderer.cpp
 namespace RenderCode {
 	void Initialize();
-	void Exit();
+	void Exit(const bool bSilent = false);
 	void BlankFrame();
 	void Display();
 	

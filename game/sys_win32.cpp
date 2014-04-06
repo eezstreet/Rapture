@@ -104,6 +104,8 @@ void Sys_Error(const char* error, ...) {
 	R_Printf(text);
 	R_Printf("\n");
 
+	RenderCode::Exit(true);
+
 	Sys_ShowConsole(1, true);
 	Sys_SetErrorText(text);
 
