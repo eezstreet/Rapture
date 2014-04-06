@@ -33,7 +33,7 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	case WM_CLOSE:
 		if ( s_wcd.quitOnClose )
 		{
-			Cmd::ProcessCommand("quit");
+			setGameQuitting(true);
 		}
 		else
 		{
