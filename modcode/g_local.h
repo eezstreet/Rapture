@@ -4,6 +4,7 @@
 
 extern gameImports_s* trap;
 #define R_Printf trap->printf
+#define R_Error trap->error
 
 // JSON parser structs
 typedef function<void (cJSON*, void*)> jsonParseFunc;
@@ -52,6 +53,11 @@ struct Tile {
 
 	// Material
 	void* materialHandle;		// Pointer to material in memory
+
+	Tile() {
+		name[0] = lowmask = highmask = lightmask = vismask = '\0';
+		materialHandle = NULL;
+	}
 };
 
 // Each map belongs to the worldspace, consuming a portion of it.

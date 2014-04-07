@@ -59,17 +59,23 @@ namespace FS {
 		DIR* xdir;
 		struct dirent *ent;
 		int numFiles = 0;
+		string fixedDir;
+		if(dir.at(dir.length()-1) == '\\' || dir.at(dir.length()-1) == '/') {
+			fixedDir = dir;
+		}
+		else {
+			fixedDir = dir + '/';
+		}
 		auto x = FS::fs->GetSearchPaths();
 		for(auto it = x.begin(); it != x.end(); ++it) {
-			string compString = *it + dir; // hm, this'll be searchpath + search dir
+			string compString = *it + '/' + dir; // hm, this'll be searchpath + search dir
 			if((xdir = opendir(compString.c_str())) != NULL) {
 				// loop through all files
 				while((ent = readdir(xdir)) != NULL) {
 					string fName = ent->d_name;
 					if(extension.length() != 0 && !checkExtension(fName, extension))
 						continue;
-					fName.erase(0, fName.find_first_not_of(compString));
-					in.push_back(fName);
+					in.push_back(fixedDir + fName);
 					numFiles++;
 				}
 				closedir(xdir);
@@ -175,13 +181,14 @@ string File::ReadPlaintext(size_t numChars) {
 	if(!handle) return "";
 	if(numChars == 0) { // reset the cursor to beginning of file and read whole thing
 		fseek(handle, 0L, SEEK_SET);
-		numChars = GetSize()/sizeof(char);
+		numChars = GetSize();
 	}
 	if(numChars == 0) { // blank!
 		return "";
 	}
-	char* buf = (char*)Zone::Alloc(sizeof(char)*numChars, Zone::TAG_FILES);
+	char* buf = (char*)Zone::Alloc(sizeof(char)*numChars+1, Zone::TAG_FILES);
 	fread(buf, sizeof(char), numChars, handle);
+	buf[numChars] = '\0';
 	string retval = buf;
 	Zone::FastFree(buf, "files");
 	return retval;

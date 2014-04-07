@@ -36,7 +36,29 @@ void InitTileParseFields() {
 #define MAT_PARSER \
 	[](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; t->materialHandle = trap->RegisterMaterial(cJSON_ToString(j)); }
 
-	tileParseFields.insert(make_pair("subtile0", SUBTILE_PARSER(0)));
+	tileParseFields["subtile0"] = SUBTILE_PARSER(0);
+	tileParseFields["subtile1"] = SUBTILE_PARSER(1);
+	tileParseFields["subtile2"] = SUBTILE_PARSER(2);
+	tileParseFields["subtile3"] = SUBTILE_PARSER(3);
+	tileParseFields["subtile4"] = SUBTILE_PARSER(4);
+	tileParseFields["subtile5"] = SUBTILE_PARSER(5);
+	tileParseFields["subtile6"] = SUBTILE_PARSER(6);
+	tileParseFields["subtile7"] = SUBTILE_PARSER(7);
+	tileParseFields["subtile8"] = SUBTILE_PARSER(8);
+	tileParseFields["subtile9"] = SUBTILE_PARSER(9);
+	tileParseFields["subtile10"] = SUBTILE_PARSER(10);
+	tileParseFields["subtile11"] = SUBTILE_PARSER(11);
+	tileParseFields["subtile12"] = SUBTILE_PARSER(12);
+	tileParseFields["subtile13"] = SUBTILE_PARSER(13);
+	tileParseFields["subtile14"] = SUBTILE_PARSER(14);
+	tileParseFields["subtile15"] = SUBTILE_PARSER(15);
+	tileParseFields["lowmask"] = INT_PARSER(lowmask);
+	tileParseFields["highmask"] = INT_PARSER(highmask);
+	tileParseFields["lightmask"] = INT_PARSER(lightmask);
+	tileParseFields["vismask"] = INT_PARSER(vismask);
+	tileParseFields["name"] = NAME_PARSER;
+	tileParseFields["material"] = MAT_PARSER;
+	/*tileParseFields.insert(make_pair("subtile0", SUBTILE_PARSER(0)));
 	tileParseFields.insert(make_pair("subtile1", SUBTILE_PARSER(1)));
 	tileParseFields.insert(make_pair("subtile2", SUBTILE_PARSER(2)));
 	tileParseFields.insert(make_pair("subtile3", SUBTILE_PARSER(3)));
@@ -57,7 +79,7 @@ void InitTileParseFields() {
 	tileParseFields.insert(make_pair("lightmask", INT_PARSER(lightmask)));
 	tileParseFields.insert(make_pair("vismask", INT_PARSER(vismask)));
 	tileParseFields.insert(make_pair("name", NAME_PARSER));
-	tileParseFields.insert(make_pair("material", MAT_PARSER));
+	tileParseFields.insert(make_pair("material", MAT_PARSER));*/
 }
 
 
@@ -67,8 +89,7 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	vector<string> paths;
 	int numFiles = trap->ListFilesInDir(tilePath.c_str(), paths, ".json");
 	if(numFiles <= 0) {
-		R_Printf("FATAL: MapLoader could not load tiles (missing?)\n");
-//		assert(0);
+		R_Error("MapLoader could not load tiles (missing?)");
 	}
 	for(auto it = paths.begin(); it != paths.end(); ++it) {
 		Tile t;

@@ -88,18 +88,6 @@ namespace RenderCode {
 		// TODO
 	}
 
-	static void ShutdownCvars() {
-		Zone::Free(r_fullscreen);
-		Zone::Free(r_width);
-		Zone::Free(r_height);
-		Zone::Free(r_windowtitle);
-		Zone::Free(r_gamma);
-#ifdef _DEBUG
-		Zone::Free(r_imgdebug);
-#endif
-		Zone::Free(viewlog);
-	}
-
 	void Exit(const bool bSilent) {
 		if(!bSilent) {
 			R_Printf("IMG_Quit()\n");
@@ -112,8 +100,6 @@ namespace RenderCode {
 		unsigned short ramp[256];
 		SDL_CalculateGammaRamp(1.0f, ramp);
 		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
-
-		ShutdownCvars();
 
 		SDL_DestroyWindow(window);
 	}

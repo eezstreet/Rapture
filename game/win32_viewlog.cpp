@@ -44,7 +44,7 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		if ( ( HWND ) lParam == s_wcd.hwndBuffer )
 		{
 			SetBkColor( ( HDC ) wParam, RGB( 0, 0, 0 ) );
-			SetTextColor( ( HDC ) wParam, RGB( 249, 249, 000 ) );
+			SetTextColor( ( HDC ) wParam, RGB( 160, 020, 020 ) );
 			return ( long ) s_wcd.hbrEditBackground;
 		}
 		else if ( ( HWND ) lParam == s_wcd.hwndErrorBox )

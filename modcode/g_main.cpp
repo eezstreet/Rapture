@@ -7,13 +7,13 @@ static int iLoadingScreen = 0;
 static void* ptLoadScreenImage = NULL;
 
 void Game_Init() {
-	trap->printf("--- Game Initialization ---\n");
+	trap->printf("--- New Game ---\n");
 	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
 	iLoadingScreen = 1;
 }
 
 void Game_Shutdown() {
-	trap->printf("--- Game Shutdown ---\n");
+	trap->printf("--- Quit Game ---\n");
 	ShutdownLevels();
 	trap->ShutdownMaterials();
 }
