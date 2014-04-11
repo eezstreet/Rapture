@@ -4,19 +4,6 @@
 #define MAX_EDIT_LINE 256
 #define g_console_field_width 80
 
-void Sys_SetErrorText( const char *buf );
-enum {
-	COPY_ID = 1,
-	QUIT_ID,
-	CLEAR_ID,
-
-	ERRORBOX_ID = 10,
-	ERRORTEXT_ID,
-
-	EDIT_ID = 100,
-	INPUT_ID
-};
-
 struct field_t {
 	int		cursor;
 	int		scroll;
@@ -24,7 +11,28 @@ struct field_t {
 	char	buffer[MAX_EDIT_LINE];
 };
 
-typedef struct WinConData_s {
+class Win32Viewlog : public Viewlog {
+public:
+	Win32Viewlog();
+	~Win32Viewlog();
+
+	void SetErrorText(const string& message);
+	void Show();
+	void Hide();
+	void TestViewlogShow();
+
+	static enum {
+		COPY_ID = 1,
+		QUIT_ID,
+		CLEAR_ID,
+
+		ERRORBOX_ID = 10,
+		ERRORTEXT_ID,
+
+		EDIT_ID = 100,
+		INPUT_ID
+	};
+private:
 	HWND		hWnd;
 	HWND		hwndBuffer;
 
@@ -37,7 +45,7 @@ typedef struct WinConData_s {
 
 	HBITMAP		hbmLogo;
 	HBITMAP		hbmClearBitmap;
-
+	
 	HBRUSH		hbrEditBackground;
 	HBRUSH		hbrErrorBackground;
 
@@ -60,5 +68,6 @@ typedef struct WinConData_s {
 	int			nextHistoryLine;	// the last line in the history buffer, not masked
 	int			historyLine;		// the line being displayed from history buffer will be <= nextHistoryLine
 	field_t		historyEditLines[COMMAND_HISTORY];
+};
 
-} WinConData;
+void Sys_SetErrorText( const char *buf );

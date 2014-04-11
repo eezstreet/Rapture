@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h" />
+    <ClInclude Include="..\modcode\g_json.h" />
     <ClInclude Include="..\modcode\g_local.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

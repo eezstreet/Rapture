@@ -1,4 +1,4 @@
-#include "g_local.h"
+#include "g_json.h"
 
 // TILE PARSING
 static unordered_map<const char*, jsonParseFunc> tileParseFields;
@@ -58,30 +58,30 @@ void InitTileParseFields() {
 	tileParseFields["vismask"] = INT_PARSER(vismask);
 	tileParseFields["name"] = NAME_PARSER;
 	tileParseFields["material"] = MAT_PARSER;
-	/*tileParseFields.insert(make_pair("subtile0", SUBTILE_PARSER(0)));
-	tileParseFields.insert(make_pair("subtile1", SUBTILE_PARSER(1)));
-	tileParseFields.insert(make_pair("subtile2", SUBTILE_PARSER(2)));
-	tileParseFields.insert(make_pair("subtile3", SUBTILE_PARSER(3)));
-	tileParseFields.insert(make_pair("subtile4", SUBTILE_PARSER(4)));
-	tileParseFields.insert(make_pair("subtile5", SUBTILE_PARSER(5)));
-	tileParseFields.insert(make_pair("subtile6", SUBTILE_PARSER(6)));
-	tileParseFields.insert(make_pair("subtile7", SUBTILE_PARSER(7)));
-	tileParseFields.insert(make_pair("subtile8", SUBTILE_PARSER(8)));
-	tileParseFields.insert(make_pair("subtile9", SUBTILE_PARSER(9)));
-	tileParseFields.insert(make_pair("subtile10", SUBTILE_PARSER(10)));
-	tileParseFields.insert(make_pair("subtile11", SUBTILE_PARSER(11)));
-	tileParseFields.insert(make_pair("subtile12", SUBTILE_PARSER(12)));
-	tileParseFields.insert(make_pair("subtile13", SUBTILE_PARSER(13)));
-	tileParseFields.insert(make_pair("subtile14", SUBTILE_PARSER(14)));
-	tileParseFields.insert(make_pair("subtile15", SUBTILE_PARSER(15)));
-	tileParseFields.insert(make_pair("lowmask", INT_PARSER(lowmask)));
-	tileParseFields.insert(make_pair("highmask", INT_PARSER(highmask)));
-	tileParseFields.insert(make_pair("lightmask", INT_PARSER(lightmask)));
-	tileParseFields.insert(make_pair("vismask", INT_PARSER(vismask)));
-	tileParseFields.insert(make_pair("name", NAME_PARSER));
-	tileParseFields.insert(make_pair("material", MAT_PARSER));*/
 }
 
+// LEVEL PARSING
+static unordered_map<const char*, jsonParseFunc> levelParseFields;
+void InitLevelParseFields() {
+#define NAME_PARSER [](cJSON* j, void* p) -> void { MapDatum* t = (MapDatum*)p; strcpy(t->name, cJSON_ToString(j)); }
+#define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapDatum* t = (MapDatum*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
+#define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapDatum* t = (MapDatum*)p; t->iLink[x] = cJSON_ToInteger(j); }
+	levelParseFields["name"] = NAME_PARSER;
+	levelParseFields["level"] = LEVEL_PARSER;
+	levelParseFields["vis0"] = VIS_PARSER(0);
+	levelParseFields["vis1"] = VIS_PARSER(1);
+	levelParseFields["vis2"] = VIS_PARSER(2);
+	levelParseFields["vis3"] = VIS_PARSER(3);
+	levelParseFields["vis4"] = VIS_PARSER(4);
+	levelParseFields["vis5"] = VIS_PARSER(5);
+	levelParseFields["vis6"] = VIS_PARSER(6);
+	levelParseFields["vis7"] = VIS_PARSER(7);
+	levelParseFields["vis8"] = VIS_PARSER(8);
+	levelParseFields["vis9"] = VIS_PARSER(9);
+}
+
+Worldspace world;
+vector<MapDatum> vMapData;
 
 MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	// Load the tiles.
@@ -97,6 +97,11 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 		vTiles.push_back(t);
 		mTileResolver.insert(make_pair(t.name, vTiles.end()-1));
 	}
+
+	// Load the Levels.json
+	JSON_ParseMultifile<MapDatum>("levels/Levels.json", levelParseFields, vMapData);
+
+	// Finally, start loading the maps which are important.
 }
 
 MapLoader::~MapLoader() {

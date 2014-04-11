@@ -343,6 +343,21 @@ void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
 
+/* Viewlog.cpp */
+class Viewlog {
+protected:
+	Cvar* viewlog;
+	bool bIsShown;
+	bool bIsError;
+	string errorText;
+public:
+	virtual void SetErrorText(const string& message) = 0;
+	virtual void Show() = 0;
+	virtual void Hide() = 0;
+	virtual void TestViewlogShow() = 0;
+};
+Viewlog* viewlog;
+
 void setGameQuitting(const bool b);
 
 // sys_cmds.cpp

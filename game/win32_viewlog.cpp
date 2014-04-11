@@ -7,7 +7,7 @@
 #include <io.h>
 #include <conio.h>
 
-static WinConData s_wcd;
+static Win32Viewlog *wView;
 
 static void Field_Clear(field_t *in) {
 	in->cursor = 0;
@@ -65,12 +65,12 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		break;
 
 	case WM_COMMAND:
-		if ( wParam == COPY_ID )
+		if ( wParam == Win32Viewlog::COPY_ID )
 		{
 			SendMessage( s_wcd.hwndBuffer, EM_SETSEL, 0, -1 );
 			SendMessage( s_wcd.hwndBuffer, WM_COPY, 0, 0 );
 		}
-		else if ( wParam == QUIT_ID )
+		else if ( Win32Viewlog::QUIT_ID )
 		{
 			if ( !s_wcd.quitOnClose )
 			{
@@ -81,7 +81,7 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				setGameQuitting(true);
 			}
 		}
-		else if ( wParam == CLEAR_ID )
+		else if ( wParam == Win32Viewlog::CLEAR_ID )
 		{
 			SendMessage( s_wcd.hwndBuffer, EM_SETSEL, 0, -1 );
 			SendMessage( s_wcd.hwndBuffer, EM_REPLACESEL, FALSE, ( LPARAM ) "" );

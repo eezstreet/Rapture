@@ -41,5 +41,8 @@
     <ClInclude Include="..\json\cJSON.h">
       <Filter>Libraries\JSON</Filter>
     </ClInclude>
+    <ClInclude Include="..\modcode\g_json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
