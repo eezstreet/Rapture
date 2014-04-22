@@ -106,8 +106,8 @@ void Sys_Error(const char* error, ...) {
 
 	RenderCode::Exit(true);
 
-	viewlog->Show();
 	viewlog->SetErrorText(text);
+	viewlog->Show();
 
 	setGameQuitting(false);
 	throw false;

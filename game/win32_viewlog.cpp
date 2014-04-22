@@ -87,7 +87,7 @@ static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			SendMessage( hwndBuffer, EM_SETSEL, 0, -1 );
 			SendMessage( hwndBuffer, WM_COPY, 0, 0 );
 		}
-		else if ( Win32Viewlog::QUIT_ID )
+		else if ( wParam == Win32Viewlog::QUIT_ID )
 		{
 			if ( 1 )
 			{
@@ -318,7 +318,6 @@ Win32Viewlog::Win32Viewlog()
 												( HMENU ) QUIT_ID,	// child window ID
 												NULL, NULL );
 
-
 	//
 	// create the scrollbuffer
 	//
@@ -379,14 +378,13 @@ void Win32Viewlog::SetErrorText(const string& text) {
 
 	if ( !hwndErrorBox )
 	{
-		hwndErrorBox = CreateWindow( "static", NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN,
+		hwndErrorBox = CreateWindow( "static", errorString, WS_CHILD | WS_VISIBLE | SS_SUNKEN,
 													6, 5, windowWidth-20, 30,
 													hWND,
 													( HMENU ) ERRORBOX_ID,	// child window ID
 													NULL, NULL );
 		SendMessage( hwndErrorBox, WM_SETFONT, ( WPARAM ) hfBufferFont, 0 );
 		SetWindowText( hwndErrorBox, errorString );
-
 		DestroyWindow( hwndInputLine );
 		hwndInputLine = NULL;
 	}

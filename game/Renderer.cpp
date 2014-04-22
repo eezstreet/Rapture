@@ -101,8 +101,6 @@ namespace RenderCode {
 		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 
 		SDL_DestroyWindow(window);
-
-		delete viewlog;
 	}
 
 	void BlankFrame() {
