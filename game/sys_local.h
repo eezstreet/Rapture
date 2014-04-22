@@ -346,7 +346,7 @@ extern const string keycodeNames[];
 /* Viewlog.cpp */
 class Viewlog {
 protected:
-	Cvar* viewlog;
+	Cvar* cvViewlog;
 	bool bIsShown;
 	bool bIsError;
 	string errorText;
@@ -356,7 +356,8 @@ public:
 	virtual void Hide() = 0;
 	virtual void TestViewlogShow() = 0;
 };
-Viewlog* viewlog;
+extern Viewlog* viewlog;
+void Sys_InitViewlog();
 
 void setGameQuitting(const bool b);
 
@@ -373,7 +374,4 @@ ptModule Sys_LoadLibrary(string name);
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
-void Sys_ShowConsole(int vislevel, bool bQuitOnExit);
-void Sys_CreateConsole( void );
 void Sys_PassToViewlog(const char* text);
-void Sys_ClearConsoleWindow();

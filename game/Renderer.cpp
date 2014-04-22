@@ -10,8 +10,6 @@ Cvar* r_gamma = NULL;
 Cvar* r_imgdebug = NULL;
 #endif
 
-Cvar* viewlog = NULL;
-
 namespace RenderCode {
 
 	static SDL_Window *window;
@@ -33,10 +31,13 @@ namespace RenderCode {
 #ifdef _DEBUG
 		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, false);
 #endif
-		viewlog = Cvar::Get<bool>("viewlog", "Display the viewlog", Cvar::CVAR_ARCHIVE, false);
+		//viewlog = Cvar::Get<bool>("viewlog", "Display the viewlog", Cvar::CVAR_ARCHIVE, false);
 	}
 
 	void Initialize() {
+		R_Printf("Viewlog init\n");
+		Sys_InitViewlog();
+
 		R_Printf("Initializing renderer\n");
 		InitCvars();
 
@@ -59,6 +60,8 @@ namespace RenderCode {
 			return;
 		}
 
+		viewlog->TestViewlogShow();
+
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if(renderer == NULL) {
 			SDL_Quit();
@@ -77,10 +80,6 @@ namespace RenderCode {
 		R_Printf("IMG_Init()\n");
 		if(IMG_Init(flags)&flags != flags) {
 			R_Printf("FAILED! %s\n", IMG_GetError());
-		}
-
-		if(!viewlog->Bool()) {
-			Sys_ShowConsole(0, false);
 		}
 	}
 
@@ -102,6 +101,8 @@ namespace RenderCode {
 		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
 
 		SDL_DestroyWindow(window);
+
+		delete viewlog;
 	}
 
 	void BlankFrame() {

@@ -8,7 +8,7 @@ extern gameImports_s* trap;
 
 // JSON parser structs
 typedef function<void (cJSON*, void*)> jsonParseFunc;
-bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
+bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, cJSON* rootNode, void* output);
 bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 
 // Generic Cache class
@@ -132,7 +132,7 @@ private:
 	void LoadTile(void* file, const char* filename);
 public:
 	MapLoader(const string& presetsPath, const string& tilePath);
-	void BeginLoad(unsigned int levelId)
+	void BeginLoad(unsigned int levelId);
 	~MapLoader();
 };
 

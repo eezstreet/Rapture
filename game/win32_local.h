@@ -16,6 +16,7 @@ public:
 	Win32Viewlog();
 	~Win32Viewlog();
 
+	void AppendText(const string& message);
 	void SetErrorText(const string& message);
 	void Show();
 	void Hide();
@@ -33,41 +34,23 @@ public:
 		INPUT_ID
 	};
 private:
-	HWND		hWnd;
-	HWND		hwndBuffer;
-
-	HWND		hwndButtonClear;
-	HWND		hwndButtonCopy;
-	HWND		hwndButtonQuit;
-
-	HWND		hwndErrorBox;
-	HWND		hwndErrorText;
-
 	HBITMAP		hbmLogo;
 	HBITMAP		hbmClearBitmap;
-	
-	HBRUSH		hbrEditBackground;
-	HBRUSH		hbrErrorBackground;
 
 	HFONT		hfBufferFont;
 	HFONT		hfButtonFont;
 
-	HWND		hwndInputLine;
-
-	char		errorString[80];
-
-	char		consoleText[512], returnedText[512];
-	int			visLevel;
-	bool		quitOnClose;
 	int			windowWidth, windowHeight;
 
-	WNDPROC		SysInputLineWndProc;
-
+public:
 	// console
 	field_t		g_consoleField;
 	int			nextHistoryLine;	// the last line in the history buffer, not masked
 	int			historyLine;		// the line being displayed from history buffer will be <= nextHistoryLine
 	field_t		historyEditLines[COMMAND_HISTORY];
-};
 
-void Sys_SetErrorText( const char *buf );
+	char		errorString[80];
+	char		consoleText[512], returnedText[512];
+
+	bool		quitOnClose;
+};

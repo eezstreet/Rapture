@@ -20,7 +20,8 @@ bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, 
 		R_Printf("ERROR: %s: %s\n", filename, error);
 		return false;
 	}
-	for(auto it = cJSON_GetFirstItem(root), int i = 0; it; it = cJSON_GetNextItem(it), i++) {
+	int i = 0;
+	for(auto it = cJSON_GetFirstItem(root); it; it = cJSON_GetNextItem(it), i++) {
 		T x;
 		JSON_ParseFieldSet(it, parsers, root, (void*)&x);
 		out.push_back(x);

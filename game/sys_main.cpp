@@ -9,7 +9,6 @@ bool bStartupQuit = false;
 void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFinished = true; }
 
 int main(int argc, char** argv) {
-	Sys_ClearConsoleWindow();
 	try {
 		sys = new RaptureGame(argc, argv);
 		while(!sys->bHasFinished)
@@ -83,8 +82,7 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	game = NULL;
 
-	Sys_CreateConsole();
-	Sys_ShowConsole(1, false);
+	Sys_InitViewlog();
 
 	// init cmds
 	Sys_InitCommands();

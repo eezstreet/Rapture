@@ -106,13 +106,9 @@ void Sys_Error(const char* error, ...) {
 
 	RenderCode::Exit(true);
 
-	Sys_ShowConsole(1, true);
-	Sys_SetErrorText(text);
+	viewlog->Show();
+	viewlog->SetErrorText(text);
 
 	setGameQuitting(false);
 	throw false;
-}
-
-void Sys_ClearConsoleWindow() {
-	ShowWindow( GetConsoleWindow(), SW_HIDE );
 }
