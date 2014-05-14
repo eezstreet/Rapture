@@ -99,6 +99,7 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	}
 
 	// Load the Levels.json
+	InitLevelParseFields();
 	JSON_ParseMultifile<MapDatum>("levels/Levels.json", levelParseFields, vMapData);
 
 	// Finally, start loading the maps which are important.
