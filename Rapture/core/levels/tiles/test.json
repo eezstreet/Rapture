@@ -1,5 +1,5 @@
 // Test Tile File
 {
-    name: "Test Floor Tile 01",
-    material: "TestFloorTile"
+    "name": "Test Floor Tile 01",
+    "material": "TestFloorTile"
 }
