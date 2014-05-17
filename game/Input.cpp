@@ -143,6 +143,9 @@ void InputManager::SendKeyDownEvent(SDL_Keysym key, char* text) {
 
 void InputManager::SendKeyUpEvent(SDL_Keysym key, char* text) {
 	SDL_Scancode k = key.scancode;
+	if(thisFrameKeysDown.end() == thisFrameKeysDown.begin()) {
+		return;
+	}
 	auto it = find(thisFrameKeysDown.begin(), thisFrameKeysDown.end(), k);
 	if(it == thisFrameKeysDown.end())
 		return;

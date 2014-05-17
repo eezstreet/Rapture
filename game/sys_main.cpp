@@ -34,6 +34,10 @@ int main(int argc, char** argv) {
 
 // This accounts for all input
 int RaptureInputCallback(void *notUsed, SDL_Event* e) {
+	if(sys->bHasFinished) {
+		// DONT send input...
+		return 1;
+	}
 	switch(e->type) {
 		case SDL_APP_TERMINATING:
 		case SDL_QUIT:
