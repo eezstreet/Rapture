@@ -89,6 +89,7 @@ void Console::Show(){
 	prevFocus = currentFocus;
 	currentFocus = wView;
 	rccb = /*FIXME*/ NULL;
+	// HACK: Sometimes doesn't work on first focus, so we need to do this twice
 	wView->Focus();
 	wView->Focus();
 	ReplaceConsoleContents();
@@ -102,8 +103,11 @@ void Console::Hide() {
 	BlankConsole();
 	RemoveRenderable(wView);
 	currentFocus = prevFocus;
-	currentFocus->Focus();
-	currentFocus->Focus();
+	if(currentFocus) {
+		// HACK: Sometimes doesn't work on first focus, so we need to do this twice
+		currentFocus->Focus();
+		currentFocus->Focus();
+	}
 	rccb = NULL;
 }
 
