@@ -156,6 +156,7 @@ void InputManager::InputFrame() {
 	SDL_PumpEvents();
 	for(auto it = thisFrameKeysDown.begin(); it != thisFrameKeysDown.end(); ++it)
 		ExecuteBind(binds[*it]);
+	thisFrameKeysDown.clear();
 }
 
 void InputManager::BindCommand(const string& keycodeArg, string commandArg) {
