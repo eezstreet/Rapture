@@ -143,6 +143,9 @@ void InputManager::SendKeyDownEvent(SDL_Keysym key, char* text) {
 
 void InputManager::SendKeyUpEvent(SDL_Keysym key, char* text) {
 	SDL_Scancode k = key.scancode;
+	if(thisFrameKeysDown.end() == thisFrameKeysDown.begin()) {
+		return;
+	}
 	auto it = find(thisFrameKeysDown.begin(), thisFrameKeysDown.end(), k);
 	if(it == thisFrameKeysDown.end())
 		return;
@@ -156,6 +159,7 @@ void InputManager::InputFrame() {
 	SDL_PumpEvents();
 	for(auto it = thisFrameKeysDown.begin(); it != thisFrameKeysDown.end(); ++it)
 		ExecuteBind(binds[*it]);
+	thisFrameKeysDown.clear();
 }
 
 void InputManager::BindCommand(const string& keycodeArg, string commandArg) {
