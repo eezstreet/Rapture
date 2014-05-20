@@ -69,6 +69,7 @@
     <ClCompile Include="..\modcode\g_json.cpp" />
     <ClCompile Include="..\modcode\g_main.cpp" />
     <ClCompile Include="..\modcode\g_levels.cpp" />
+    <ClCompile Include="..\modcode\g_preset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h" />

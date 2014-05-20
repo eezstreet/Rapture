@@ -112,6 +112,22 @@ struct Map {
 	}
 };
 
+struct PresetFileData {
+	struct PFDHeader {
+		char name[64];
+		unsigned short version;
+		unsigned int sizeX;
+		unsigned int sizeY;
+		unsigned int numTileBlocks;
+	};
+	PFDHeader head;
+	struct LoadedTile {
+		char name[64];
+		unsigned int pos[1024][2];
+	};
+	LoadedTile* tileBlocks;
+};
+
 // The worldspace resembles an entire act's maps, all crammed into a gigantic grid
 class Worldspace {
 	map<coords_t, Tile*> tiles;

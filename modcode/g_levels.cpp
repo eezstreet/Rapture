@@ -103,6 +103,8 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	JSON_ParseMultifile<MapDatum>("levels/Levels.json", levelParseFields, vMapData);
 
 	// Finally, start loading the maps which are important.
+	/*** TEST ***/
+	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
 }
 
 MapLoader::~MapLoader() {
