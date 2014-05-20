@@ -180,6 +180,7 @@ void RaptureGame::CreateGameModule() {
 	imp.GetFileSize = FS::EXPORT_GetFileSize;
 	imp.ListFilesInDir = FS::EXPORT_ListFilesInDir;
 	imp.ReadPlaintext = FS::EXPORT_ReadPlaintext;
+	imp.ReadBinary = FS::EXPORT_ReadBinary;
 	imp.RegisterImage = RenderCode::RegisterImage;
 	imp.DrawImage = RenderCode::DrawImage;
 	imp.DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;

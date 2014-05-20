@@ -267,7 +267,7 @@ public:
 	static File* Open(const string &file, const string& mode);
 	void Close();
 	string ReadPlaintext(size_t numchar = 0);
-	size_t ReadBinary(unsigned char* bytes, size_t numbytes = 0);
+	size_t ReadBinary(unsigned char* bytes, size_t numbytes, const bool bDontResetCursor);
 	wstring ReadUnicode(size_t numchars = 0);
 	size_t GetSize();
 	inline size_t GetUnicodeSize() { return GetSize()/2; }
@@ -304,6 +304,7 @@ namespace FS {
 	void* EXPORT_OpenFile(const char* filename, const char* mode);
 	void EXPORT_Close(void* filehandle);
 	int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char *extension);
+	size_t EXPORT_ReadBinary(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	string EXPORT_ReadPlaintext(void* filehandle, size_t numChars);
 	size_t EXPORT_GetFileSize(void* filehandle);
 };

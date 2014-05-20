@@ -112,6 +112,11 @@ namespace FS {
 		return f->ReadPlaintext(numChars);
 	}
 
+	size_t EXPORT_ReadBinary(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {
+		File* f = (File*)filehandle;
+		return f->ReadBinary(bytes, numBytes, bDontResetCursor);
+	}
+
 	size_t EXPORT_GetFileSize(void* filehandle) {
 		File* f = (File*)filehandle;
 		return f->GetSize();
@@ -194,11 +199,17 @@ string File::ReadPlaintext(size_t numChars) {
 	return retval;
 }
 
-size_t File::ReadBinary(unsigned char* bytes, size_t numBytes) {
+size_t File::ReadBinary(unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {
 	if(!handle) return NULL;
-	if(numBytes == 0) { // reset cursor to beginning of file and read whole thing
+	if(numBytes == 0 && !bDontResetCursor) { // reset cursor to beginning of file and read whole thing
 		fseek(handle, 0L, SEEK_SET);
 		numBytes = GetSize()/sizeof(unsigned char);
+	} else if(numBytes == 0) { // DONT reset cursor, but read the whole thing
+		int s = ftell(handle);
+		fseek(handle, 0L, SEEK_SET);
+		size_t totalChars = GetSize();
+		fseek(handle, s, SEEK_SET);
+		numBytes = totalChars - s;
 	}
 	return fread(bytes, sizeof(unsigned char), numBytes, handle);
 }

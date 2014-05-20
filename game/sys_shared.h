@@ -37,6 +37,7 @@ struct gameImports_s {
 	void (*CloseFile)(void* filehandle);
 	int (*ListFilesInDir)(const char* dir, vector<string>& in, const char* extension);
 	string (*ReadPlaintext)(void* filehandle, size_t numChars);
+	size_t (*ReadBinary)(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	size_t (*GetFileSize)(void* filehandle);
 
 	
