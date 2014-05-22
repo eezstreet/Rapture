@@ -36,6 +36,9 @@
     <ClCompile Include="..\modcode\g_preset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\g_shared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\modcode\g_local.h">

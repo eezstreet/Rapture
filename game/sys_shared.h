@@ -39,7 +39,6 @@ struct gameImports_s {
 	string (*ReadPlaintext)(void* filehandle, size_t numChars);
 	size_t (*ReadBinary)(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	size_t (*GetFileSize)(void* filehandle);
-
 	
 	void* (*RegisterImage)(const char* filename);
 	void (*DrawImage)(void* image, float xPct, float yPct, float wPct, float hPct);

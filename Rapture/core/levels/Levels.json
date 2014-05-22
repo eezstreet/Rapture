@@ -1,6 +1,8 @@
 // Levels.json, which defines all of the levels in the game
 {
     "Act 1 - Town" : {
-        "name": "Survivor's Camp"
+        "name": "Survivor's Camp",
+	"preset": true,
+	"first": "act1town1"
     }
 }

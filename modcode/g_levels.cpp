@@ -63,11 +63,15 @@ void InitTileParseFields() {
 // LEVEL PARSING
 static unordered_map<const char*, jsonParseFunc> levelParseFields;
 void InitLevelParseFields() {
-#define NAME_PARSER [](cJSON* j, void* p) -> void { MapDatum* t = (MapDatum*)p; strcpy(t->name, cJSON_ToString(j)); }
-#define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapDatum* t = (MapDatum*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
-#define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapDatum* t = (MapDatum*)p; t->iLink[x] = cJSON_ToInteger(j); }
+#define NAME_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->name, cJSON_ToString(j)); }
+#define FIRST_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->entryPreset, cJSON_ToString(j)); }
+#define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
+#define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->iLink[x] = cJSON_ToInteger(j); }
+#define P_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->bIsPreset = cJSON_ToBoolean(j); }
 	levelParseFields["name"] = NAME_PARSER;
 	levelParseFields["level"] = LEVEL_PARSER;
+	levelParseFields["first"] = FIRST_PARSER;
+	levelParseFields["preset"] = P_PARSER;
 	levelParseFields["vis0"] = VIS_PARSER(0);
 	levelParseFields["vis1"] = VIS_PARSER(1);
 	levelParseFields["vis2"] = VIS_PARSER(2);
@@ -81,7 +85,30 @@ void InitLevelParseFields() {
 }
 
 Worldspace world;
-vector<MapDatum> vMapData;
+vector<MapFramework> vMapData;
+
+MapFramework* FindMapFrameworkByName(const char* name) {
+	for(auto it = vMapData.begin(); it != vMapData.end(); ++it) {
+		if(!stricmp(it->name, name)) {
+			return &(*it);
+		}
+	}
+	return NULL;
+}
+
+void BuildMapFromFramework(const MapFramework& crtMapFramework, Map& rtMap) {
+	// With a preset map, it's easy. Just add the entry preset to the map and it's good to go.
+	if(crtMapFramework.bIsPreset) {
+		rtMap.bIsPreset = true;
+		MP_AddToMap(crtMapFramework.entryPreset, rtMap);
+		return;
+	}
+
+}
+
+void InsertMapIntoWorldspace(Worldspace& rtWorldspace, const Map& crtMap) {
+
+}
 
 MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	// Load the tiles.
@@ -100,11 +127,11 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 
 	// Load the Levels.json
 	InitLevelParseFields();
-	JSON_ParseMultifile<MapDatum>("levels/Levels.json", levelParseFields, vMapData);
+	JSON_ParseMultifile<MapFramework>("levels/Levels.json", levelParseFields, vMapData);
 
-	// Finally, start loading the maps which are important.
-	/*** TEST ***/
-	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
+	// Load the presets.
+	MP_LoadTilePresets();
+
 }
 
 MapLoader::~MapLoader() {
@@ -116,6 +143,14 @@ MapLoader::~MapLoader() {
 MapLoader* maps;
 void InitLevels() {
 	maps = new MapLoader("levels/preset", "levels/tiles");
+
+	// Finally, start loading the maps which are important.
+	/*** TEST ***/
+	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
+	MapFramework* x = FindMapFrameworkByName("Survivor's Camp");
+	Map survivorCamp;
+	BuildMapFromFramework(*x, survivorCamp);
+	InsertMapIntoWorldspace(world, survivorCamp);
 }
 
 void ShutdownLevels() {
