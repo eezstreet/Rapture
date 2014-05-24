@@ -62,13 +62,29 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 		R_Printf("WARNING: material '%s' not found\n", material);
 		return NULL;
 	}
-	if(!found->second->bLoadedResources) {
-		// Then load them?
-		found->second->bLoadedResources = true;
-	}
 	return found->second;
 }
 
 Material::Material() {
 	bLoadedResources = false;
 }
+
+void Material::SendToRenderer(float x, float y) {
+	if(!bLoadedResources) {
+		LoadResources();
+	}
+}
+
+void Material::LoadResources() {
+	if(bLoadedResources) {
+		return;
+	}
+	bLoadedResources = true;
+
+}
+
+void Material::FreeResources() {
+	if(!bLoadedResources) {
+		return;
+	}
+	bLoadedResources = false;

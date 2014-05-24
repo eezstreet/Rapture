@@ -157,4 +157,8 @@ void ShutdownLevels() {
 
 void DrawBackground() {
 	auto tiles = world.qtTileTree->NodesAt(0, 0);
+	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
+		TileNode* tile = *it;
+		
+	}
 }
