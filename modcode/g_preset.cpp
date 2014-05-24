@@ -76,7 +76,7 @@ static void MP_LoadTilePreset(const string& path) {
 #endif // BIG_ENDIAN
 		pfd->entities = ents;
 	} else {
-		pfd->tileBlocks = NULL;
+		pfd->entities = NULL;
 	}
 	delete binaryFile;
 	trap->CloseFile(file);
@@ -106,8 +106,15 @@ void MP_AddToMap(const char* pfdName, Map& map) {
 		return;
 	}
 
+	const PresetFileData* pfd = MP_GetPreset(pfdName);
 	if(map.bIsPreset) {
-		// TODO: add to map
+		for(int i = 0; i < pfd->head.numTiles; i++) {
+			auto tile = pfd->tileBlocks[i];
+			TileNode s;
+			s.x = tile.x; s.y = tile.y;
+			s.ptTile = maps->FindTileByName(tile.lookup);
+			map.tiles.push_back(s);
+		}
 	} else {
 		// TODO: DRLG
 	}

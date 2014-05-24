@@ -39,6 +39,9 @@
     <ClCompile Include="..\modcode\g_shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\g_worldspace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\modcode\g_local.h">
@@ -48,6 +51,9 @@
       <Filter>Libraries\JSON</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\g_json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\QuadTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

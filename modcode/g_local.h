@@ -1,6 +1,7 @@
 #pragma once
 #include <sys_shared.h>
 #include "../json/cJSON.h"
+#include "QuadTree.h"
 
 extern gameImports_s* trap;
 #define R_Printf trap->printf
@@ -14,7 +15,7 @@ void eswap(unsigned int &x);
 
 // JSON parser structs
 typedef function<void (cJSON*, void*)> jsonParseFunc;
-bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, cJSON* rootNode, void* output);
+bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 
 // Generic Cache class
@@ -80,6 +81,21 @@ struct Tile {
 	}
 };
 
+// An entity is an object in the world, such as a monster
+class Entity : public QTreeNode<float> {
+
+};
+
+// A tilenode is a tile in the world
+class TileNode : public QTreeNode<unsigned int> {
+public:
+	Tile* ptTile;
+
+	TileNode() {
+		w = h = 1;
+	}
+};
+
 // Provides a framework for the Map to be built.
 struct MapFramework {
 	char name[MAX_HANDLE_STRING];
@@ -94,6 +110,8 @@ extern vector<MapFramework> vMapData;
 // Each map belongs to the worldspace, consuming a portion of it.
 struct Map {
 	bool bIsPreset;					// Is this map a preset level? (Y/N)
+	vector<TileNode> tiles;
+	vector<Entity> ents;
 };
 
 // g_preset.cpp
@@ -139,15 +157,6 @@ void MP_LoadTilePresets();
 PresetFileData* MP_GetPreset(const string& sName);
 void MP_AddToMap(const char* pfdName, Map& map);
 
-// The worldspace resembles an entire act's maps, all crammed into a gigantic grid
-class Worldspace {
-	map<coords_t, Tile*> tiles;
-
-	const Map* firstLink;
-};
-
-extern Worldspace world;
-
 // The map loader gets initialized by the game first, and then the worldspace grabs map data from it
 class MapLoader {
 private:
@@ -161,7 +170,32 @@ public:
 	MapLoader(const string& presetsPath, const string& tilePath);
 	void BeginLoad(unsigned int levelId);
 	~MapLoader();
-};
 
+	Tile* FindTileByName(const string& str) {
+		auto it = mTileResolver.find(str);
+		if(it == mTileResolver.end()) {
+			return NULL;
+		}
+		return &(*(it->second)); // HACK
+	}
+};
 void InitLevels();
 void ShutdownLevels();
+extern MapLoader* maps;
+
+// The worldspace resembles an entire act's maps, all crammed into a gigantic grid
+class Worldspace {
+	QuadTree(CEntTree, Entity, float);
+	QuadTree(CTileTree, TileNode, unsigned int);
+public:
+	/* TEMP */
+	CEntTree* qtEntTree;
+	CTileTree* qtTileTree;
+	/* END TEMP */
+
+	Worldspace();
+	~Worldspace();
+
+	void InsertInto(Map* theMap);
+};
+extern Worldspace world;

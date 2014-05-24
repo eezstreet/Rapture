@@ -1,6 +1,6 @@
 #include "g_local.h"
 
-bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, cJSON* rootNode, void* output) {
+bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output) {
 	cJSON* x = output;
 	if(!output) {
 		return false;
@@ -47,7 +47,7 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 		return false;
 	}
 	for(auto it = cJSON_GetFirstItem(root); it; it = cJSON_GetNextItem(it)) {
-		JSON_ParseFieldSet(it, parsers, root, output);
+		JSON_ParseFieldSet(root, parsers, output);
 	}
 	return true;
 }

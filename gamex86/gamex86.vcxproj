@@ -71,11 +71,13 @@
     <ClCompile Include="..\modcode\g_levels.cpp" />
     <ClCompile Include="..\modcode\g_preset.cpp" />
     <ClCompile Include="..\modcode\g_shared.cpp" />
+    <ClCompile Include="..\modcode\g_worldspace.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h" />
     <ClInclude Include="..\modcode\g_json.h" />
     <ClInclude Include="..\modcode\g_local.h" />
+    <ClInclude Include="..\modcode\QuadTree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

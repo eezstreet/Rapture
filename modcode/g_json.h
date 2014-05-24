@@ -23,7 +23,7 @@ bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, 
 	int i = 0;
 	for(auto it = cJSON_GetFirstItem(root); it; it = cJSON_GetNextItem(it), i++) {
 		T x;
-		JSON_ParseFieldSet(it, parsers, root, (void*)&x);
+		JSON_ParseFieldSet(it, parsers, (void*)&x);
 		out.push_back(x);
 	}
 	return true;

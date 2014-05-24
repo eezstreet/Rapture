@@ -21,6 +21,7 @@ void Game_Shutdown() {
 void Game_Load() {
 	trap->InitMaterials();
 	InitLevels();
+	iLoadingScreen = 0;
 }
 
 void Game_Frame() {

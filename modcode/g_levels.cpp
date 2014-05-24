@@ -106,10 +106,6 @@ void BuildMapFromFramework(const MapFramework& crtMapFramework, Map& rtMap) {
 
 }
 
-void InsertMapIntoWorldspace(Worldspace& rtWorldspace, const Map& crtMap) {
-
-}
-
 MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	// Load the tiles.
 	InitTileParseFields();
@@ -147,12 +143,18 @@ void InitLevels() {
 	// Finally, start loading the maps which are important.
 	/*** TEST ***/
 	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
+	R_Printf("building world...");
 	MapFramework* x = FindMapFrameworkByName("Survivor's Camp");
 	Map survivorCamp;
 	BuildMapFromFramework(*x, survivorCamp);
-	InsertMapIntoWorldspace(world, survivorCamp);
+	world.InsertInto(&survivorCamp);
+	R_Printf("done.");
 }
 
 void ShutdownLevels() {
 	delete maps;
+}
+
+void DrawBackground() {
+	auto tiles = world.qtTileTree->NodesAt(0, 0);
 }
