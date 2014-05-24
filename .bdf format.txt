@@ -1,0 +1,35 @@
+8 byte header "DRLG.BDF"
+2 byte file version
+---1: current revision
+64 bytes: preset file lookup
+10 bytes reserved
+4 bytes (size X)
+4 bytes (size Y)
+4 bytes: number of tiles (total)
+4 bytes: number of entities (total)
+/*4 bytes (flags):
+---1: indoor
+---2-256: reserved (weather-related)
+---512: DLRG w
+---1024: DLRG n
+---2048: DLRG e
+---4096: DLRG s
+---8192: DLRG special 1
+---16384: DLRG special 2
+---32768: DLRG special 3
+---65536: DLRG special 4
+---131072: DLRG powerup*/
+
+Tiles:
+--> 64 bytes (internal identifier)
+--> 4 bytes: x
+--> 4 bytes: y
+--> 1 byte: rendertype
+--> 1 byte: layer offset
+
+Entities:
+--> 64 bytes (ent name)
+--> 4 bytes (float): x
+--> 4 bytes (float): y
+--> 4 bytes: spawnflags
+--> 4 bytes: reserved
