@@ -1,6 +1,7 @@
 #pragma once
 #ifdef _WIN32
 #include <Windows.h>
+#include <Rpc.h>
 #endif
 #include <stdlib.h>
 #include <string>
@@ -54,6 +55,12 @@ struct gameImports_s {
 	void (*InitMaterials)();
 	void (*ShutdownMaterials)();
 	void* (*RegisterMaterial)(const char* name);
+	void (*RenderMaterial)(void* ptMaterial, float x, float y);
+
+	void (*CvarIntVal)(const char* cvarName, int* value);
+	void (*CvarStrVal)(const char* cvarName, char* value);
+	void (*CvarBoolVal)(const char* cvarName, bool* value);
+	void (*CvarValue)(const char* cvarName, float* value);
 };
 
 struct gameExports_s {

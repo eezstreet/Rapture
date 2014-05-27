@@ -35,6 +35,10 @@ void Game_Frame() {
 		Game_Load();
 		iLoadingScreen = 0;
 	}
+	else {
+		world.DrawBackground();
+		world.DrawEntities();
+	}
 }
 
 extern "C" {

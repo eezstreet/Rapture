@@ -136,6 +136,7 @@ MapLoader::~MapLoader() {
 	tileParseFields.clear();
 }
 
+static vector<Map> levels;
 MapLoader* maps;
 void InitLevels() {
 	maps = new MapLoader("levels/preset", "levels/tiles");
@@ -145,20 +146,15 @@ void InitLevels() {
 	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
 	R_Printf("building world...");
 	MapFramework* x = FindMapFrameworkByName("Survivor's Camp");
+	Player* play = new Player(3, 3);
 	Map survivorCamp;
 	BuildMapFromFramework(*x, survivorCamp);
-	world.InsertInto(&survivorCamp);
-	R_Printf("done.");
+	levels.push_back(survivorCamp);
+	world.InsertInto(&(*(levels.end()-1)));
+	world.SpawnEntity(play, true, true, true);
+	R_Printf("done.\n");
 }
 
 void ShutdownLevels() {
 	delete maps;
-}
-
-void DrawBackground() {
-	auto tiles = world.qtTileTree->NodesAt(0, 0);
-	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
-		TileNode* tile = *it;
-		
-	}
 }

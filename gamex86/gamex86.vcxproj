@@ -49,6 +49,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -71,7 +72,9 @@
     <ClCompile Include="..\modcode\g_levels.cpp" />
     <ClCompile Include="..\modcode\g_preset.cpp" />
     <ClCompile Include="..\modcode\g_shared.cpp" />
-    <ClCompile Include="..\modcode\g_worldspace.cpp" />
+    <ClCompile Include="..\modcode\Worldspace.cpp" />
+    <ClCompile Include="..\modcode\Player.cpp" />
+    <ClCompile Include="..\modcode\SpatialEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h" />

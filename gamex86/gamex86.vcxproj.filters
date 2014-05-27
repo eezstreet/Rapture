@@ -39,7 +39,13 @@
     <ClCompile Include="..\modcode\g_shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\modcode\g_worldspace.cpp">
+    <ClCompile Include="..\modcode\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\SpatialEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\Worldspace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

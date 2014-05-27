@@ -23,12 +23,16 @@ void HideConsole();
 class Material {
 private:
 	bool bLoadedResources; // Have we loaded resources? (images, etc)
+	bool bLoadedIncorrectly; // If we loaded, did we load correctly?
 	void LoadResources();
 	void FreeResources();
 
+	char name[64];
+	char resourceFile[64];
 	SDL_Surface *ptResource;
 public:
 	Material();
+	~Material();
 	void SendToRenderer(float x, float y);
 
 friend class MaterialHandler;

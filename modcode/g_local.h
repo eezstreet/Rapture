@@ -12,6 +12,7 @@ extern gameImports_s* trap;
 // g_shared.cpp
 void eswap(unsigned short &x);
 void eswap(unsigned int &x);
+string genuuid();
 
 // JSON parser structs
 typedef function<void (cJSON*, void*)> jsonParseFunc;
@@ -82,8 +83,37 @@ struct Tile {
 };
 
 // An entity is an object in the world, such as a monster
-class Entity : public QTreeNode<float> {
+class Entity;
+class SpatialEntity : public QTreeNode<float> {
+protected:
+	string uuid;
+public:
+	SpatialEntity(Entity* from);
+	SpatialEntity();
+friend struct Worldspace;
+};
 
+class Entity : public SpatialEntity {
+public:
+	virtual void render() = 0;
+	virtual void think() = 0;
+	virtual void spawn() = 0;
+};
+
+// Actors have visible representations, whereas regular entities do not.
+class Actor : public Entity {
+protected:
+	void* materialHandle;
+};
+
+// Players are...players.
+class Player : public Actor {
+	unsigned char playerNum;
+public:
+	virtual void render();
+	virtual void think();
+	virtual void spawn();
+	Player(float x, float y);
 };
 
 // A tilenode is a tile in the world
@@ -111,7 +141,7 @@ extern vector<MapFramework> vMapData;
 struct Map {
 	bool bIsPreset;					// Is this map a preset level? (Y/N)
 	vector<TileNode> tiles;
-	vector<Entity> ents;
+	vector<SpatialEntity> ents;
 };
 
 // g_preset.cpp
@@ -184,18 +214,33 @@ void ShutdownLevels();
 extern MapLoader* maps;
 
 // The worldspace resembles an entire act's maps, all crammed into a gigantic grid
-class Worldspace {
-	QuadTree(CEntTree, Entity, float);
-	QuadTree(CTileTree, TileNode, unsigned int);
+struct Worldspace {
 public:
-	/* TEMP */
-	CEntTree* qtEntTree;
-	CTileTree* qtTileTree;
-	/* END TEMP */
-
 	Worldspace();
 	~Worldspace();
+	QuadTree<SpatialEntity, float>* qtEntTree;
+	QuadTree<TileNode, unsigned int>* qtTileTree;
 
 	void InsertInto(Map* theMap);
+	void SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink, bool bShouldCollide);
+	void AddPlayer(Player* ptPlayer);
+	Player* GetFirstPlayer(); // temphack
+
+	void DrawBackground();
+	void DrawEntities();
+
+	static float WorldPlaceToScreenSpaceFX(float x, float y);
+	static float WorldPlaceToScreenSpaceFY(float x, float y);
+	static int WorldPlaceToScreenSpaceIX(int x, int y);
+	static int WorldPlaceToScreenSpaceIY(int x, int y);
+
+	float PlayerOffsetX();
+	float PlayerOffsetY();
+private:
+	unordered_map<string, Entity*> mRenderList;
+	unordered_map<string, Entity*> mThinkList;
+	unordered_map<string, Entity*> mCollideList;
+
+	vector<Player*> vPlayers;
 };
 extern Worldspace world;

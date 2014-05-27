@@ -193,6 +193,11 @@ void RaptureGame::CreateGameModule() {
 	imp.InitMaterials = RenderCode::InitMaterials;
 	imp.ShutdownMaterials = RenderCode::ShutdownMaterials;
 	imp.RegisterMaterial = RenderCode::RegisterMaterial;
+	imp.RenderMaterial = RenderCode::SendMaterialToRenderer;
+	imp.CvarBoolVal = CvarSystem::EXPORT_BoolValue;
+	imp.CvarIntVal = CvarSystem::EXPORT_IntValue;
+	imp.CvarStrVal = CvarSystem::EXPORT_StrValue;
+	imp.CvarValue = CvarSystem::EXPORT_Value;
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
 		return;

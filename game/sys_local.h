@@ -171,6 +171,11 @@ public:
 	static void ListCvars();
 
 	static bool ProcessCvarCommand(const string& sName, const vector<string>& VArguments);
+
+	static void EXPORT_IntValue(const char* name, int* value);
+	static void EXPORT_StrValue(const char* name, char* value);
+	static void EXPORT_BoolValue(const char* name, bool* value);
+	static void EXPORT_Value(const char* name, float* value);
 friend class Cvar;
 };
 

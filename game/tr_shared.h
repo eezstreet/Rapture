@@ -25,4 +25,5 @@ namespace RenderCode {
 	void InitMaterials();
 	void ShutdownMaterials();
 	void* RegisterMaterial(const char* name);
+	void SendMaterialToRenderer(void* ptMaterial, float x, float y);
 };

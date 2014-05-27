@@ -4,39 +4,42 @@
 MaterialHandler* mats = NULL;
 
 void MaterialHandler::LoadMaterial(const char* matfile) {
+	Material* mat = Zone::New<Material>(Zone::TAG_MATERIALS);
+	mat->bLoadedResources = false;
 	File* f = File::Open(matfile, "r");
 	if(!f) {
+		Zone::FastFree(mat, "materials");
 		return;
 	}
 	string contents = f->ReadPlaintext();
 	char error[1024];
 	cJSON* json = cJSON_ParsePooled(contents.c_str(), error, sizeof(error));
 	if(!json) {
+		Zone::FastFree(mat, "materials");
 		R_Printf("ERROR loading material %s: %s\n", matfile, error);
 		return;
 	}
 
-	char name[64];
 	cJSON* child = cJSON_GetObjectItem(json, "name");
 	if(!child) {
+		Zone::FastFree(mat, "materials");
 		R_Printf("WARNING: Material without name (%s)\n", matfile);
-		strcpy(name, matfile);
+		strcpy(mat->name, matfile);
 	}
 	else {
-		strcpy(name, cJSON_ToString(child));
+		strcpy(mat->name, cJSON_ToString(child));
 	}
 
-	// TODO: stage parsing
 	child = cJSON_GetObjectItem(json, "diffuseMap");
 	if(!child) {
-		R_Printf("WARNING: %s doesn't have a diffuse map!\n", name);
-		return;
+		Zone::FastFree(mat, "materials");
+		R_Printf("WARNING: %s doesn't have a diffuse map!\n", mat->name);
+	}
+	else {
+		strcpy(mat->resourceFile, cJSON_ToString(child));
 	}
 
-	// TODO: map fields to Material class
-	Material* mat = Zone::New<Material>(Zone::TAG_MATERIALS);
-	mat->bLoadedResources = false;
-	materials.insert(make_pair(name, mat));
+	materials.insert(make_pair(mat->name, mat));
 }
 
 MaterialHandler::MaterialHandler() {
@@ -67,24 +70,44 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 
 Material::Material() {
 	bLoadedResources = false;
+	bLoadedIncorrectly = false;
+}
+
+Material::~Material() {
+	if(bLoadedResources) {
+		FreeResources();
+	}
 }
 
 void Material::SendToRenderer(float x, float y) {
 	if(!bLoadedResources) {
 		LoadResources();
 	}
+	RenderCode::DrawImageAbsNoScaling((void*)ptResource, x, y);
 }
 
 void Material::LoadResources() {
-	if(bLoadedResources) {
+	if(bLoadedResources || bLoadedIncorrectly) {
+		// Don't bug us about this again, please.
 		return;
 	}
 	bLoadedResources = true;
-
+	SDL_Surface* temp = IMG_Load(File::GetFileSearchPath(resourceFile).c_str());
+	if(!temp) {
+		R_Printf("WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
+		bLoadedResources = false;
+		bLoadedIncorrectly = true;
+		return;
+	}
+	bLoadedIncorrectly = false;
+	ptResource = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
 }
 
 void Material::FreeResources() {
 	if(!bLoadedResources) {
 		return;
 	}
+	SDL_FreeSurface(ptResource);
 	bLoadedResources = false;
+	bLoadedIncorrectly = false;
+}

@@ -398,6 +398,78 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 	return true;
 }
 
+void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
+	if(!Cvar::Exists(name)) {
+		value = NULL;
+		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		return;
+	}
+	if(value == NULL) {
+		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::BoolValue\n");
+		return;
+	}
+	if(GetCvarType(name) != Cvar::CV_BOOLEAN) {
+		R_Printf("WARNING: cvar %s is not boolean type!\n", name);
+		return;
+	}
+	bool retVal = GetBooleanValue(name);
+	*value = retVal;
+}
+
+void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
+	if(!Cvar::Exists(name)) {
+		value = NULL;
+		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		return;
+	}
+	if(value == NULL) {
+		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::IntValue\n");
+		return;
+	}
+	if(GetCvarType(name) != Cvar::CV_INTEGER) {
+		R_Printf("WARNING: cvar %s is not integral type!\n", name);
+		return;
+	}
+	int retVal = GetIntegerValue(name);
+	*value = retVal;
+}
+
+void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
+	if(!Cvar::Exists(name)) {
+		value = NULL;
+		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		return;
+	}
+	if(value == NULL) {
+		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::StrValue\n");
+		return;
+	}
+	if(GetCvarType(name) != Cvar::CV_STRING) {
+		R_Printf("WARNING: cvar %s is not a string!\n", name);
+		return;
+	}
+	string retVal = GetStringValue(name);
+	strcpy(value, retVal.c_str());
+}
+
+void CvarSystem::EXPORT_Value(const char* name, float* value) {
+	if(!Cvar::Exists(name)) {
+		value = NULL;
+		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		return;
+	}
+	if(value == NULL) {
+		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::Value\n");
+		return;
+	}
+	if(GetCvarType(name) != Cvar::CV_FLOAT) {
+		R_Printf("WARNING: cvar %s is not floating point type!\n", name);
+		return;
+	}
+	float retVal = GetFloatValue(name);
+	*value = retVal;
+}
+
 bool CvarSystem::init = false;
 unordered_map<string, Cvar*> CvarSystem::cvars;
 unordered_map<string, CvarCacheObject*> CvarSystem::cache;

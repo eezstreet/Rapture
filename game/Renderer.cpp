@@ -29,7 +29,7 @@ namespace RenderCode {
 
 		// Debug cvars
 #ifdef _DEBUG
-		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, false);
+		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, true);
 #endif
 		//viewlog = Cvar::Get<bool>("viewlog", "Display the viewlog", Cvar::CVAR_ARCHIVE, false);
 	}
@@ -416,5 +416,10 @@ namespace RenderCode {
 
 	void* RegisterMaterial(const char* name) {
 		return (void*)mats->GetMaterial(name);
+	}
+
+	void SendMaterialToRenderer(void* ptMaterial, float x, float y) {
+		Material *X = reinterpret_cast<Material*>(ptMaterial);
+		X->SendToRenderer(x, y);
 	}
 };
