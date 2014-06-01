@@ -67,6 +67,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\json\cJSON.c" />
+    <ClCompile Include="..\modcode\cg_info.cpp" />
+    <ClCompile Include="..\modcode\cg_fps.cpp" />
     <ClCompile Include="..\modcode\g_json.cpp" />
     <ClCompile Include="..\modcode\g_main.cpp" />
     <ClCompile Include="..\modcode\g_levels.cpp" />

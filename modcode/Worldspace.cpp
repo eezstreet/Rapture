@@ -98,3 +98,11 @@ float Worldspace::PlayerOffsetY() {
 
 	return (screenHeight / 2) - (48.0 * ply->y) + (48.0 * ply->x);
 }
+
+float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y) {
+	return (x - (2 * y)) / 192; //(SX - 2 * SY) / 192
+}
+
+float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y) {
+	return (x + (2 * y)) / 192; //(SX + 2SY) / 192
+}

@@ -51,6 +51,7 @@ void UI::Update() {
 }
 
 void UI::Render() {
+	static Cvar* Debug_OnlyCreateSurface = Cvar::Get<bool>("Debug_OnlyCreateSurface", "debug", 0, false);
 	for_each(renderables.begin(), renderables.end(), [](WebView* wv) {
 		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
 		if(!bmp)

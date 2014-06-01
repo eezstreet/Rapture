@@ -117,6 +117,9 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	SDL_SetEventFilter(RaptureInputCallback, NULL);
 	InitInput();
 
+	// Load font
+	FontMan = new FontManager();
+
 	// Init UI
 	UI::Initialize();
 }
@@ -128,6 +131,7 @@ RaptureGame::~RaptureGame() {
 		delete game;
 	}
 
+	delete FontMan;
 	DeleteInput();
 	RenderCode::Exit();
 	CvarSystem::Destroy();
@@ -137,6 +141,7 @@ RaptureGame::~RaptureGame() {
 
 /* Run every frame */
 void RaptureGame::RunLoop() {
+
 	// Do input
 	Input->InputFrame();
 	UI::Update();
@@ -175,6 +180,7 @@ void RaptureGame::CreateGameModule() {
 	static gameImports_s imp;
 	imp.printf = R_Printf;
 	imp.error = R_Error;
+	imp.GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
 	imp.OpenFile = FS::EXPORT_OpenFile;
 	imp.CloseFile = FS::EXPORT_Close;
 	imp.GetFileSize = FS::EXPORT_GetFileSize;
@@ -198,11 +204,40 @@ void RaptureGame::CreateGameModule() {
 	imp.CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp.CvarStrVal = CvarSystem::EXPORT_StrValue;
 	imp.CvarValue = CvarSystem::EXPORT_Value;
+	// ugly code below
+	imp.RegisterCvarBool = reinterpret_cast<void*(*)(const string&, const string&, int, bool)>
+		(static_cast<Cvar*(*)(const string&, const string&, int, bool)>(CvarSystem::RegisterCvar));
+	imp.RegisterCvarFloat = reinterpret_cast<void*(*)(const string&, const string&, int, float)>
+		(static_cast<Cvar*(*)(const string&, const string&, int, float)>(CvarSystem::RegisterCvar));
+	imp.RegisterCvarInt = reinterpret_cast<void*(*)(const string&, const string&, int, int)>
+		(static_cast<Cvar*(*)(const string&, const string&, int, int)>(CvarSystem::RegisterCvar));
+	imp.RegisterCvarStr = reinterpret_cast<void*(*)(const string&, const string&, int, char*)>
+		(static_cast<Cvar*(*)(const string&, const string&, int, char*)>(CvarSystem::RegisterCvar));
+	// end ugly code
+	imp.RegisterFont = EXPORT_RegisterFont;
+	imp.RenderTextBlended = RenderCode::RenderTextBlended;
+	imp.RenderTextShaded = RenderCode::RenderTextShaded;
+	imp.RenderTextSolid = RenderCode::RenderTextSolid;
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
 		return;
 	}
 	trap->init();
+}
+
+/* Get the game module */
+GameModule* RaptureGame::GetGameModule() {
+	if(sys) {
+		return sys->game;
+	}
+	return NULL;
+}
+
+gameExports_s* RaptureGame::GetImport() {
+	if(sys) {
+		return sys->trap;
+	}
+	return NULL;
 }
 
 /* Some shared functions */

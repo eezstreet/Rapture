@@ -9,6 +9,18 @@ extern gameImports_s* trap;
 
 #define MAX_HANDLE_STRING	64
 
+// cg
+void RegisterMedia();
+void DrawViewportInfo();
+
+extern int currentMouseX;
+extern int currentMouseY;
+
+// cg_fps.cpp
+void InitFPS();
+void FPSFrame();
+float GetGameFPS();
+
 // g_shared.cpp
 void eswap(unsigned short &x);
 void eswap(unsigned int &x);
@@ -233,6 +245,8 @@ public:
 	static float WorldPlaceToScreenSpaceFY(float x, float y);
 	static int WorldPlaceToScreenSpaceIX(int x, int y);
 	static int WorldPlaceToScreenSpaceIY(int x, int y);
+	static float ScreenSpaceToWorldPlaceX(int x, int y);
+	static float ScreenSpaceToWorldPlaceY(int x, int y);
 
 	float PlayerOffsetX();
 	float PlayerOffsetY();

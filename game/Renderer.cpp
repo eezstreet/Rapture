@@ -62,7 +62,7 @@ namespace RenderCode {
 
 		viewlog->TestViewlogShow();
 
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
 		if(renderer == NULL) {
 			SDL_Quit();
 			return;
@@ -421,5 +421,46 @@ namespace RenderCode {
 	void SendMaterialToRenderer(void* ptMaterial, float x, float y) {
 		Material *X = reinterpret_cast<Material*>(ptMaterial);
 		X->SendToRenderer(x, y);
+	}
+
+	void RenderTextSolid(void* font, const char* text, int r, int g, int b) {
+		Font* trueFont = (Font*)font;
+		SDL_Color color;
+		color.r = r; color.g = g; color.b = b; color.a = 255;
+		SDL_Surface* surf = TTF_RenderText_Solid(trueFont->GetFont(), text, color);
+		if(surf == NULL) {
+			return;
+		}
+
+		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		SDL_FreeSurface(surf);
+	}
+
+	void RenderTextShaded(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
+		Font* trueFont = (Font*)font;
+		SDL_Color colorForeground, colorBackground;
+		colorBackground.r = br; colorBackground.g = bg; colorBackground.b = bb; colorBackground.a = 255;
+		colorForeground.r = fr; colorForeground.g = fg; colorForeground.b = fb; colorForeground.a = 255;
+		SDL_Surface* surf = TTF_RenderText_Shaded(trueFont->GetFont(), text, colorBackground, colorForeground);
+		if(surf == NULL) {
+			R_Printf("%s\n", SDL_GetError());
+			return;
+		}
+
+		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		SDL_FreeSurface(surf);
+	}
+
+	void RenderTextBlended(void* font, const char* text, int r, int g, int b) {
+		Font* trueFont = (Font*)font;
+		SDL_Color color;
+		color.r = r; color.g = g; color.b = b; color.a = 255;
+		SDL_Surface* surf = TTF_RenderText_Blended(trueFont->GetFont(), text, color);
+		if(surf == NULL) {
+			return;
+		}
+
+		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		SDL_FreeSurface(surf);
 	}
 };

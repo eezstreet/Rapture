@@ -26,4 +26,8 @@ namespace RenderCode {
 	void ShutdownMaterials();
 	void* RegisterMaterial(const char* name);
 	void SendMaterialToRenderer(void* ptMaterial, float x, float y);
+
+	void RenderTextSolid(void* font, const char* text, int r, int g, int b);
+	void RenderTextShaded(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
+	void RenderTextBlended(void* font, const char* text, int r, int g, int b);
 };

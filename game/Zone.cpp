@@ -11,6 +11,7 @@ namespace Zone {
 			"renderer",
 			"images",
 			"materials",
+			"font",
 			"custom",
 			"max"
 	};

@@ -31,9 +31,14 @@ const char* btoa(bool b);
 string stripextension(const string& str);
 
 struct gameImports_s {
+	// Logging
 	void (*printf)(const char* fmt, ...);
 	void (*error)(const char* fmt, ...);
 
+	// Time
+	int (*GetTicks)();
+
+	// File I/O
 	void* (*OpenFile)(const char* filename, const char* mode);
 	void (*CloseFile)(void* filehandle);
 	int (*ListFilesInDir)(const char* dir, vector<string>& in, const char* extension);
@@ -41,6 +46,7 @@ struct gameImports_s {
 	size_t (*ReadBinary)(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	size_t (*GetFileSize)(void* filehandle);
 	
+	// Images
 	void* (*RegisterImage)(const char* filename);
 	void (*DrawImage)(void* image, float xPct, float yPct, float wPct, float hPct);
 	void (*DrawImageAspectCorrection)(void* image, float xPct, float yPct, float wPct, float hPct);
@@ -52,21 +58,38 @@ struct gameImports_s {
 	void (*DrawImageAbsNoScaling)(void* image, int x, int y);
 	void (*DrawImageAbsClipped)(void* image, int sx, int sy, int sw, int sh, int ix, int iy, int iw, int ih);
 
+	// Font/text
+	void* (*RegisterFont)(const char* sFontFile, int iPointSize);
+	void (*RenderTextSolid)(void* font, const char* text, int r, int g, int b);
+	void (*RenderTextShaded)(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
+	void (*RenderTextBlended)(void* font, const char* text, int r, int g, int b);
+
+	// Materials
 	void (*InitMaterials)();
 	void (*ShutdownMaterials)();
 	void* (*RegisterMaterial)(const char* name);
 	void (*RenderMaterial)(void* ptMaterial, float x, float y);
 
+	// Cvars
 	void (*CvarIntVal)(const char* cvarName, int* value);
 	void (*CvarStrVal)(const char* cvarName, char* value);
 	void (*CvarBoolVal)(const char* cvarName, bool* value);
 	void (*CvarValue)(const char* cvarName, float* value);
+	void* (*RegisterCvarInt)(const string& cvarName, const string& description, int flags, int startingValue);
+	void* (*RegisterCvarFloat)(const string& cvarName, const string& description, int flags, float startingValue);
+	void* (*RegisterCvarBool)(const string& cvarName, const string& description, int flags, bool bStartingValue);
+	void* (*RegisterCvarStr)(const string& cvarName, const string& description, int flags, char* sStartingValue);
 };
 
 struct gameExports_s {
 	void (*init)();
 	void (*shutdown)();
 	void (*runactiveframe)();
+
+	void (*passmouseup)(int x, int y);
+	void (*passmousedown)(int x, int y);
+	void (*passmousemove)(int x, int y);
+
 };
 
 // sys_main.cpp

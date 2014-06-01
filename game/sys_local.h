@@ -3,6 +3,7 @@
 #include "tr_shared.h"
 #include "ui_shared.h"
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #define R_Error Sys_Error
 
@@ -37,6 +38,9 @@ public:
 	void RunLoop();
 
 	void CreateGameModule();
+
+	static GameModule* GetGameModule();
+	static gameExports_s* GetImport();
 };
 
 template<typename T>
@@ -188,6 +192,7 @@ namespace Zone {
 		TAG_RENDERER,
 		TAG_IMAGES,
 		TAG_MATERIALS,
+		TAG_FONT,
 		TAG_CUSTOM, // should only be used by mods
 		TAG_MAX,
 	};
@@ -348,6 +353,30 @@ extern InputManager *Input;
 void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
+
+/* FontManager.cpp */
+class Font {
+private:
+	TTF_Font* ptFont;
+
+	void LoadFont(const char* sFontFile, int iPointSize);
+public:
+	Font();
+	~Font();
+
+	TTF_Font* GetFont() { return ptFont; }
+friend class FontManager;
+};
+
+class FontManager {
+public:
+	FontManager();
+	~FontManager();
+
+	Font* RegisterFont(const char* sFontFile, int iPointSize);
+};
+extern FontManager* FontMan;
+void* EXPORT_RegisterFont(const char* sFontFile, int iPointSize);
 
 /* Viewlog.cpp */
 class Viewlog {

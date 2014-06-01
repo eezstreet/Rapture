@@ -8,6 +8,7 @@ static void* ptLoadScreenImage = NULL;
 
 void Game_Init() {
 	trap->printf("--- New Game ---\n");
+	InitFPS();
 	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
 	iLoadingScreen = 1;
 }
@@ -21,6 +22,13 @@ void Game_Shutdown() {
 void Game_Load() {
 	trap->InitMaterials();
 	InitLevels();
+
+	trap->RegisterCvarBool("cg_drawfps", "Draw FPS ingame?", 1, false);
+	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
+	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
+
+	RegisterMedia();
+
 	iLoadingScreen = 0;
 }
 
@@ -38,7 +46,19 @@ void Game_Frame() {
 	else {
 		world.DrawBackground();
 		world.DrawEntities();
+		DrawViewportInfo();
 	}
+}
+
+void Game_OnMouseUp(int x, int y) {
+}
+
+void Game_OnMouseDown(int x, int y) {
+}
+
+void Game_OnMouseMove(int x, int y) {
+	currentMouseX = x;
+	currentMouseY = y;
 }
 
 extern "C" {
@@ -48,6 +68,9 @@ extern "C" {
 		exportFns.init = Game_Init;
 		exportFns.shutdown = Game_Shutdown;
 		exportFns.runactiveframe = Game_Frame;
+		exportFns.passmouseup = Game_OnMouseUp;
+		exportFns.passmousedown = Game_OnMouseDown;
+		exportFns.passmousemove = Game_OnMouseMove;
 		return &exportFns;
 	}
 };

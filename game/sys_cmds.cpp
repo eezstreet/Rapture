@@ -78,9 +78,12 @@ void Cmd_Exec_f(vector<string>& args) {
 	p->Close();
 	Zone::FastFree(p, "files");
 
-	vector<string> lines = split(text, ';');
-	for(auto it = lines.begin(); it != lines.end(); ++it)
-		Cmd::ProcessCommand((*it).c_str());
+	if(text.length() > 0) {
+		vector<string> lines = split(text, ';');
+		for(auto it = lines.begin(); it != lines.end(); ++it) {
+			Cmd::ProcessCommand((*it).c_str());
+		}
+	}
 }
 
 void Cmd_Quit_f(vector<string>& args) {

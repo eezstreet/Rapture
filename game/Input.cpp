@@ -182,13 +182,23 @@ void InputManager::ExecuteBind(const string& bindStuff) {
 }
 
 void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y) {
-	if(state == SDL_PRESSED)
+	if(state == SDL_PRESSED) {
 		UI::MouseButtonEvent(buttonId, true);
-	else
+		if(RaptureGame::GetGameModule() != NULL) {
+			RaptureGame::GetImport()->passmousedown(x, y);
+		}
+	} else {
 		UI::MouseButtonEvent(buttonId, false);
+		if(RaptureGame::GetGameModule() != NULL) {
+			RaptureGame::GetImport()->passmouseup(x, y);
+		}
+	}
 }
 
 void InputManager::SendMouseMoveEvent(int x, int y) {
+	if(RaptureGame::GetGameModule() != NULL) {
+		RaptureGame::GetImport()->passmousemove(x, y);
+	}
 	UI::MouseMoveEvent(x, y);
 }
 
