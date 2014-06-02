@@ -18,6 +18,7 @@ namespace RenderCode {
 	static string screenshotName = "";
 
 	static SDL_Surface* renderSurf = NULL;
+	static SDL_Texture* renderTex = NULL;
 	static unordered_map<string, SDL_Surface*> images;
 
 	static void InitCvars() {
@@ -62,9 +63,19 @@ namespace RenderCode {
 
 		viewlog->TestViewlogShow();
 
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 		if(renderer == NULL) {
 			SDL_Quit();
+			return;
+		}
+
+		SDL_RendererInfo info;
+		SDL_GetRendererInfo(renderer, &info);
+		if(info.flags & SDL_RENDERER_SOFTWARE) {
+			R_Printf("WARNING: Using software renderer due to hardware fallback. Performance will suffer.\n");
+		}
+		if(!(info.flags & SDL_RENDERER_TARGETTEXTURE)) {
+			R_Error("ERROR: Renderer does not support render-to-texture. Game will not run.");
 			return;
 		}
 
@@ -75,6 +86,8 @@ namespace RenderCode {
 		}
 
 		renderSurf = SDL_CreateRGBSurface(0, r_width->Integer(), r_height->Integer(), 32,  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		renderTex = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, r_width->Integer(), r_height->Integer() );
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
 		int flags = IMG_INIT_JPG|IMG_INIT_PNG;
 		R_Printf("IMG_Init()\n");
@@ -88,6 +101,9 @@ namespace RenderCode {
 	}
 
 	void Exit(const bool bSilent) {
+		SDL_DestroyTexture(renderTex);
+		SDL_FreeSurface(renderSurf);
+
 		if(!bSilent) {
 			R_Printf("IMG_Quit()\n");
 		}
@@ -104,7 +120,6 @@ namespace RenderCode {
 	}
 
 	void BlankFrame() {
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 	}
 
@@ -135,7 +150,15 @@ namespace RenderCode {
 	}
 
 	void Display() {
-		SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, renderSurf);
+		/*void *pixels;
+		int pitch;
+		SDL_LockTexture(renderTex, NULL, &pixels, &pitch);
+		memcpy(pixels, renderSurf->pixels, renderSurf->pitch * renderSurf->h);
+		SDL_UnlockTexture(renderTex);
+		SDL_RenderCopy(renderer, renderTex, NULL, NULL);*/
+		SDL_RenderPresent(renderer);
+		//SDL_FillRect(renderSurf, NULL, 0x00000000);
+		/*SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, renderSurf);
 		SDL_RenderCopy(renderer, tex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 		SDL_FillRect(renderSurf, NULL, 0x00000000);
@@ -144,13 +167,25 @@ namespace RenderCode {
 			CreateScreenshot(screenshotName);
 			screenshotQueued = false;
 		}
-		SDL_DestroyTexture(tex);
+		SDL_DestroyTexture(tex);*/
 	}
 
 	void AddSurface(void* surf) {
 		SDL_Surface* sdlsurf = (SDL_Surface*)surf;
 		SDL_BlitSurface(sdlsurf, NULL, renderSurf, NULL);
 		SDL_FreeSurface(sdlsurf);
+	}
+
+	void BlendTexture(void* tex) {
+		SDL_Texture* text = (SDL_Texture*)tex;
+		//SDL_SetRenderTarget(renderer, renderTex);
+		SDL_SetTextureBlendMode(text, SDL_BLENDMODE_BLEND);
+		SDL_RenderCopy(renderer, text, NULL, NULL);
+		//SDL_SetRenderTarget(renderer, NULL);
+	}
+
+	void* GetRenderer() {
+		return (void*)renderer;
 	}
 
 	void QueueScreenshot(const string& fileName, const string& extension) {

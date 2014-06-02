@@ -9,6 +9,10 @@ static WebSession *sess = NULL;
 static bool bConsoleIsActive = false;
 
 static vector<WebView*> renderables;
+#define NUM_UI_VISIBLE	8
+static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
+static int lastActiveLayer;
+
 void AddRenderable(WebView* wv) {
 	renderables.push_back(wv);
 }
@@ -29,9 +33,15 @@ RightClickCallback rccb = NULL;
 /* UI Class */
 void UI::Initialize() {
 	R_Printf("UI::Initialize()\n");
+	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
+		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+	}
+	lastActiveLayer = 0;
+
+	R_Printf("Initializing Awesomium Webcore\n");
 	WebConfig x;
 	x.log_level = Awesomium::LogLevel::kLogLevel_Verbose;
-	R_Printf("Initializing Awesomium Webcore\n");
 	wc = WebCore::Initialize(x);
 	R_Printf("Creating web session\n");
 	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), WebPreferences());
@@ -42,6 +52,9 @@ void UI::Initialize() {
 }
 
 void UI::Shutdown() {
+	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
+		SDL_DestroyTexture(uiTextures[i]);
+	}
 	Console::DestroySingleton();
 	WebCore::Shutdown();
 }
@@ -51,13 +64,22 @@ void UI::Update() {
 }
 
 void UI::Render() {
-	static Cvar* Debug_OnlyCreateSurface = Cvar::Get<bool>("Debug_OnlyCreateSurface", "debug", 0, false);
+	lastActiveLayer = 0;
 	for_each(renderables.begin(), renderables.end(), [](WebView* wv) {
-		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
-		if(!bmp)
+		if(lastActiveLayer >= NUM_UI_VISIBLE) {
 			return;
-		SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-		RenderCode::AddSurface((void*)x);
+		}
+		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
+		SDL_Texture* tex = uiTextures[lastActiveLayer];
+		unsigned char* pixels;
+		int pitch;
+		SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch);
+		bmp->CopyTo(pixels, pitch, 4, false, false);
+		SDL_UnlockTexture(tex);
+		RenderCode::BlendTexture((void*)tex);
+		//SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+		//RenderCode::AddSurface((void*)x);
+		lastActiveLayer++;
 	});
 }
 

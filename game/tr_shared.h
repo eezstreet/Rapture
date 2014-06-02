@@ -9,6 +9,7 @@ namespace RenderCode {
 	void Display();
 	
 	void AddSurface(void* surf);
+	void BlendTexture(void* tex);
 	void QueueScreenshot(const string& fileName, const string& extension);
 
 	void* RegisterImage(const char* name);
@@ -30,4 +31,6 @@ namespace RenderCode {
 	void RenderTextSolid(void* font, const char* text, int r, int g, int b);
 	void RenderTextShaded(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
 	void RenderTextBlended(void* font, const char* text, int r, int g, int b);
+
+	void* GetRenderer();
 };
