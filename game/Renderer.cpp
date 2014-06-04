@@ -424,11 +424,12 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
-		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
 		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
+		SDL_FreeSurface(surf2);
 	}
 
 	void RenderTextShaded(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
@@ -445,11 +446,12 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
-		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
 		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
+		SDL_FreeSurface(surf2);
 	}
 
 	void RenderTextBlended(void* font, const char* text, int r, int g, int b) {
@@ -464,10 +466,11 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
-		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
 		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
+		SDL_FreeSurface(surf2);
 	}
 };
