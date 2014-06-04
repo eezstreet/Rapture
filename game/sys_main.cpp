@@ -214,6 +214,8 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RenderTextBlended = RenderCode::RenderTextBlended;
 	imp->RenderTextShaded = RenderCode::RenderTextShaded;
 	imp->RenderTextSolid = RenderCode::RenderTextSolid;
+	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
+	imp->KillStaticMenu = UI::KillStaticMenu;
 }
 
 /* Started a new game (probably from the menu) */
@@ -261,6 +263,9 @@ void R_Printf(const char *fmt, ...) {
 
 void NewGame() {
 	MainMenu::DestroySingleton();
+	if(Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
 	if(sys->game || sys->editor) {
 		// Have to exit from these first
 		return;
@@ -269,7 +274,9 @@ void NewGame() {
 }
 
 void StartEditor() {
-	Console::GetSingleton()->Hide();
+	if(Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
 	MainMenu::DestroySingleton();
 	if(sys->game || sys->editor) {
 		// Have to exit from these first

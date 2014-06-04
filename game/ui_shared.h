@@ -11,6 +11,9 @@ namespace UI {
 	void TextEvent(char* text);
 	void MouseButtonEvent(unsigned int buttonId, bool down);
 	void MouseMoveEvent(int x, int y);
+
+	void* RegisterStaticMenu(const char* menuPath);
+	void KillStaticMenu(void* menu);
 };
 
 void PushConsoleMessage(string message);

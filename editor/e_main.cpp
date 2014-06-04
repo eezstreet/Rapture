@@ -5,6 +5,8 @@ gameImports_s* trap;
 
 EditorMode_e eCurMode;
 
+static void* hotkeyDisplay;
+
 void Editor_Load() {
 	InitFPS();
 	InitDisplay();
@@ -14,6 +16,8 @@ void Editor_Load() {
 	trap->RegisterCvarBool("cg_drawfps", "Draw FPS ingame?", 0, true);
 
 	eCurMode = EMODE_TILES;
+
+	hotkeyDisplay = trap->RegisterStaticMenu("ui/editorhotkeys.html");
 }
 
 void Editor_Init() {
@@ -23,6 +27,7 @@ void Editor_Init() {
 
 void Editor_Shutdown() {
 	trap->printf("--- Editor Exit ---\n");
+	trap->KillStaticMenu(hotkeyDisplay);
 	trap->ShutdownMaterials();
 }
 

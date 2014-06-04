@@ -155,6 +155,33 @@ returningTable_t tbl_return [] = {
 	{ "END", NULL }
 };
 
+Menu::Menu() {
+}
+
+Menu::Menu(const char *menuName) {
+	R_Printf("Loading %s\n", menuName);
+	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
+	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
+	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
+	wView->SetTransparent(true);
+	while(wView->IsLoading())
+		wc->Update();
+	AddRenderable(wView);
+	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
+	wView->set_js_method_handler(this);
+	JSObject jObj = global.ToObject();
+	SetupBaseCommands(&jObj);
+}
+
+Menu::~Menu() {
+	if(!wView) {
+		return; // don't.
+	}
+	RemoveRenderable(wView);
+	wView->Destroy();
+	wView = NULL;
+}
+
 void Menu::SetupBaseCommands(JSObject* obj) {
 	int i;
 
@@ -186,3 +213,9 @@ pair<bool, JSValue> Menu::ExecuteBaseCommandWithReturn(const string& command, co
 	return make_pair(true, returnValue);
 }
 
+void Menu::OnMethodCall(WebView* caller, unsigned int remote_caller_id, const WebString& method_name, const JSArray& args) {
+}
+
+JSValue Menu::OnMethodCallWithReturnValue(WebView* caller, unsigned int remote_caller_id, const WebString& method_name, const JSArray& args) {
+	return JSValue(false);
+}

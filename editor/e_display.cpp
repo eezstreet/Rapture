@@ -8,22 +8,25 @@ static void* ptSegoe;
 static void DisplayDataTop() {
 	stringstream ss;
 	ss << PROGRAM_NAME PROGRAM_VERSION;
-	ss << "      ";
+	ss << "            ";
 	if(eCurMode == EMODE_TILES) {
 		ss << "TILE MODE";
 	} else {
 		ss << "ENTS MODE";
 	}
-	ss << "      ";
+	ss << "            ";
 
 	bool bDrawFPS;
 	trap->CvarBoolVal("cg_drawfps", &bDrawFPS);
 	if(bDrawFPS) {
 		ss << "FPS: ";
 		ss << GetGameFPS();
-		ss << "      ";
+		ss << "            ";
 	}
 	trap->RenderTextShaded(ptSegoe, ss.str().c_str(), 0, 0, 0, 255, 255, 255);
+}
+
+static void DisplayDataBottom() {
 }
 
 void DisplayData() {

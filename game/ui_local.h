@@ -18,11 +18,18 @@ public:
 	typedef Awesomium::JSValue (*menuReturning)(const Awesomium::JSArray&);
 
 	Awesomium::JSValue window;
+
+	Menu();
+	Menu(const char* menu);
+	~Menu();
 protected:
 	Awesomium::WebView* wView;
 	Awesomium::JSValue global;
 	unordered_map<string, menuNonReturning> m_pfNonReturning;
 	unordered_map<string, menuReturning> m_pfReturning;
+
+	void OnMethodCall(Awesomium::WebView* caller, unsigned int remote_caller_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args);
+	Awesomium::JSValue OnMethodCallWithReturnValue(Awesomium::WebView* caller, unsigned int remote_caller_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args);
 
 	bool ExecuteBaseCommand(const string& command, const Awesomium::JSArray& args);
 	pair<bool, Awesomium::JSValue> ExecuteBaseCommandWithReturn(const string& command, const Awesomium::JSArray& args);

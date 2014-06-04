@@ -6,8 +6,7 @@ using namespace Awesomium;
 WebCore *wc = NULL;
 static WebSession *sess = NULL;
 
-static bool bConsoleIsActive = false;
-
+vector<Menu*> vmMenus;
 static vector<WebView*> renderables;
 #define NUM_UI_VISIBLE	8
 static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
@@ -55,6 +54,11 @@ void UI::Shutdown() {
 	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
 		SDL_DestroyTexture(uiTextures[i]);
 	}
+	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
+		Menu* vmMenu = (*it);
+		delete vmMenu;
+	}
+	vmMenus.clear();
 	Console::DestroySingleton();
 	WebCore::Shutdown();
 }
@@ -234,11 +238,11 @@ void InjectAKeyboardEvent(Awesomium::WebKeyboardEvent e) {
 void UI::KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text) {
 	if(keysym.scancode == SDL_SCANCODE_GRAVE) {
 		if(bIsKeyDown) {
-			bConsoleIsActive = !bConsoleIsActive;
-			if(bConsoleIsActive)
+			if(!Console::GetSingleton()->IsOpen()) {
 				Console::GetSingleton()->Show();
-			else
+			} else {
 				Console::GetSingleton()->Hide();
+			}
 		}
 		return;
 	}
@@ -361,6 +365,22 @@ void UI::MouseMoveEvent(int x, int y) {
 	else {
 		for(auto it = renderables.begin(); it != renderables.end(); ++it) {
 			(*it)->InjectMouseMove(x,y);
+		}
+	}
+}
+
+void* UI::RegisterStaticMenu(const char* menuName) {
+	Menu* newMenu = new Menu(menuName);
+	vmMenus.push_back(newMenu);
+	return newMenu;
+}
+
+void UI::KillStaticMenu(void* menu) {
+	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
+		if((*it) == menu) {
+			Menu* ptMenu = (Menu*)menu;
+			delete ptMenu;
+			vmMenus.erase(it);
 		}
 	}
 }

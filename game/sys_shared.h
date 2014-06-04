@@ -60,6 +60,10 @@ struct gameImports_s {
 	void (*RenderTextShaded)(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
 	void (*RenderTextBlended)(void* font, const char* text, int r, int g, int b);
 
+	// UI
+	void* (*RegisterStaticMenu)(const char* sMenuFile);
+	void (*KillStaticMenu)(void* menu);
+
 	// Materials
 	void (*InitMaterials)();
 	void (*ShutdownMaterials)();

@@ -1,0 +1,76 @@
+<html>
+	<head>
+		<style>
+		body {
+			background-color:transparent;
+            margin: 0px;
+			padding: 0px;
+			height: 100%;
+		}
+		#body {
+			padding: 10px;
+			padding-bottom: 15%;
+		}
+		#container {
+			min-height: 100%;
+			position: relative;
+		}
+		#footer {
+			position: absolute;
+			bottom: 0px;
+			width: 100%;
+			height: 15%;
+		}
+		.hotkey {
+			background-color: #BA8282;
+			font-family: Terminal, System Bold, Consolas, Courier New;
+			color: black;
+			font-weight: bolder;
+			font-size: 70%;
+			padding: 2px;
+		}
+		ba {
+			color: white;
+		}
+		sk {
+			color: lime;
+		}
+		tk {
+			color: cyan;
+		}
+		uk {
+			color: blue;
+		}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div id="footer">
+				<table>
+				<tr>
+					<td class="hotkey"><ba>[</ba><sk>LMB</sk><ba>]</ba> Select</td>
+					<td class="hotkey"><ba>[</ba><sk>LMB^DRAG</sk><ba>]</ba> Select Group</td>
+					<td class="hotkey"><ba>[</ba><sk>RMB</sk><ba>]</ba> Select Material</td>
+					<td class="hotkey"><ba>[</ba><sk>SPACE</sk><ba>]</ba> Deselect</td>
+				</tr>
+				<tr>
+					<td class="hotkey"><ba>[</ba><tk>F1</tk><ba>]</ba> Toggle Floor 1</td>
+					<td class="hotkey"><ba>[</ba><tk>F2</tk><ba>]</ba> Toggle Floor 2</td>
+					<td class="hotkey"><ba>[</ba><tk>F3</tk><ba>]</ba> Toggle Floor 3</td>
+					<td class="hotkey"><ba>[</ba><tk>F4</tk><ba>]</ba> Toggle Wall 1</td>
+					<td class="hotkey"><ba>[</ba><tk>F5</tk><ba>]</ba> Toggle Wall 2</td>
+					<td class="hotkey"><ba>[</ba><tk>F6</tk><ba>]</ba> Toggle Wall 3</td>
+					<td class="hotkey"><ba>[</ba><tk>F7</tk><ba>]</ba> Toggle Shadow</td>
+					<td class="hotkey"><ba>[</ba><tk>F8</tk><ba>]</ba> Toggle Special</td>
+				</tr>
+				<tr>
+					<td class="hotkey"><ba>[</ba><uk>TAB</uk><ba>]</ba> Change Edit Mode</td>
+					<td class="hotkey"><ba>[</ba><uk>HOME</uk><ba>]</ba> Map Properties</td>
+					<td class="hotkey"><ba>[</ba><uk>PGUP</uk><ba>]</ba> Edit Levels.json</td>
+					<td class="hotkey"><ba>[</ba><uk>PGDN</uk><ba>]</ba> Edit preset</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
