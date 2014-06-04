@@ -8,7 +8,7 @@ float currentWorldspaceY = 0;
 void* ptConsolasFont;
 
 void RegisterMedia() {
-	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 14);
+	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 18);
 }
 
 void DrawViewportInfo() {

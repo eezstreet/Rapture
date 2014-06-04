@@ -29,7 +29,7 @@ private:
 
 	char name[64];
 	char resourceFile[64];
-	SDL_Surface *ptResource;
+	SDL_Texture *ptResource;
 public:
 	Material();
 	~Material();

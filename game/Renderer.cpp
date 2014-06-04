@@ -19,7 +19,10 @@ namespace RenderCode {
 
 	static SDL_Surface* renderSurf = NULL;
 	static SDL_Texture* renderTex = NULL;
-	static unordered_map<string, SDL_Surface*> images;
+	static unordered_map<string, SDL_Texture*> images;
+	static int textFieldCount = 0;
+#define MAX_TEXTRENDER 8
+	static SDL_Texture* textFields[MAX_TEXTRENDER];
 
 	static void InitCvars() {
 		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", Cvar::CVAR_ARCHIVE, false);
@@ -32,7 +35,6 @@ namespace RenderCode {
 #ifdef _DEBUG
 		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, true);
 #endif
-		//viewlog = Cvar::Get<bool>("viewlog", "Display the viewlog", Cvar::CVAR_ARCHIVE, false);
 	}
 
 	void Initialize() {
@@ -63,7 +65,7 @@ namespace RenderCode {
 
 		viewlog->TestViewlogShow();
 
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 		if(renderer == NULL) {
 			SDL_Quit();
 			return;
@@ -86,13 +88,20 @@ namespace RenderCode {
 		}
 
 		renderSurf = SDL_CreateRGBSurface(0, r_width->Integer(), r_height->Integer(), 32,  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-		renderTex = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, r_width->Integer(), r_height->Integer() );
+		renderTex = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, r_width->Integer(), r_height->Integer() );
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
 		int flags = IMG_INIT_JPG|IMG_INIT_PNG;
 		R_Printf("IMG_Init()\n");
 		if(IMG_Init(flags)&flags != flags) {
 			R_Printf("FAILED! %s\n", IMG_GetError());
+		}
+
+		SDL_SetRenderTarget(renderer, NULL);
+
+		R_Printf("Init font\n");
+		for(int i = 0; i < MAX_TEXTRENDER; i++) {
+			textFields[i] = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, r_width->Integer(), r_height->Integer() );
 		}
 	}
 
@@ -104,10 +113,18 @@ namespace RenderCode {
 		SDL_DestroyTexture(renderTex);
 		SDL_FreeSurface(renderSurf);
 
+		for(int i = 0; i < MAX_TEXTRENDER; i++) {
+			SDL_DestroyTexture(textFields[i]);
+		}
+
 		if(!bSilent) {
 			R_Printf("IMG_Quit()\n");
 		}
 		IMG_Quit();
+		for(auto it = images.begin(); it != images.end(); ++it) {
+			SDL_DestroyTexture(it->second);
+		}
+		images.clear();
 
 		if(!bSilent) {
 			R_Printf("gamma ramp down--\n");
@@ -121,6 +138,7 @@ namespace RenderCode {
 
 	void BlankFrame() {
 		SDL_RenderClear(renderer);
+		textFieldCount = 0;
 	}
 
 	static void CreateScreenshot(const string& filename) {
@@ -132,7 +150,7 @@ namespace RenderCode {
 			SDL_CreateRGBSurfaceFrom(pixels, s->w, s->h, s->format->BitsPerPixel, s->w * s->format->BytesPerPixel, s->format->Rmask, s->format->Gmask, s->format->Bmask, s->format->Amask),
 			SDL_PIXELFORMAT_RGB444, 0);
 
-		File* f = File::Open(filename, "wb+"); // this is pretty hack
+		File* f = File::Open(filename, "wb+");
 		f->WritePlaintext("blah");
 		f->Close();
 		const string path = File::GetFileSearchPath(filename);
@@ -150,24 +168,7 @@ namespace RenderCode {
 	}
 
 	void Display() {
-		/*void *pixels;
-		int pitch;
-		SDL_LockTexture(renderTex, NULL, &pixels, &pitch);
-		memcpy(pixels, renderSurf->pixels, renderSurf->pitch * renderSurf->h);
-		SDL_UnlockTexture(renderTex);
-		SDL_RenderCopy(renderer, renderTex, NULL, NULL);*/
 		SDL_RenderPresent(renderer);
-		//SDL_FillRect(renderSurf, NULL, 0x00000000);
-		/*SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, renderSurf);
-		SDL_RenderCopy(renderer, tex, NULL, NULL);
-		SDL_RenderPresent(renderer);
-		SDL_FillRect(renderSurf, NULL, 0x00000000);
-		if(screenshotQueued) {
-			// We have a screenshot command queued up, so we need to handle it.
-			CreateScreenshot(screenshotName);
-			screenshotQueued = false;
-		}
-		SDL_DestroyTexture(tex);*/
 	}
 
 	void AddSurface(void* surf) {
@@ -178,10 +179,9 @@ namespace RenderCode {
 
 	void BlendTexture(void* tex) {
 		SDL_Texture* text = (SDL_Texture*)tex;
-		//SDL_SetRenderTarget(renderer, renderTex);
+		SDL_SetRenderTarget(renderer, NULL);
 		SDL_SetTextureBlendMode(text, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopy(renderer, text, NULL, NULL);
-		//SDL_SetRenderTarget(renderer, NULL);
 	}
 
 	void* GetRenderer() {
@@ -253,6 +253,7 @@ namespace RenderCode {
 	void* RegisterImage(const char* name) {
 		SDL_Surface* temp;
 		SDL_Surface* perm;
+		SDL_Texture* text;
 
 		auto it = images.find(name);
 		if(it != images.end()) {
@@ -270,25 +271,32 @@ namespace RenderCode {
 		}
 
 		perm = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
-		return perm;
+		text = SDL_CreateTextureFromSurface(renderer, perm);
+
+		SDL_FreeSurface(temp);
+		SDL_FreeSurface(perm);
+		images[name] = text;
+		return text;
 	}
 
 #ifdef _DEBUG
 	void DebugImageDraw(SDL_Rect* rect) {
+		SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
 		SDL_RenderDrawLine(renderer, rect->x, rect->y, rect->x + rect->w, rect->y);
 		SDL_RenderDrawLine(renderer, rect->x, rect->y, rect->x, rect->y + rect->h);
 		SDL_RenderDrawLine(renderer, rect->x, rect->y + rect->h, rect->x + rect->w, rect->y + rect->h);
 		SDL_RenderDrawLine(renderer, rect->x + rect->w, rect->y, rect->x + rect->w, rect->y + rect->h);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	}
 #endif
 
-	void R_DrawImage(SDL_Surface* image, int x, int y, int w, int h) {
+	void R_DrawImage(SDL_Texture* image, int x, int y, int w, int h) {
 		if(!image) {
 			return;
 		}
 		SDL_Rect rect;
 		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
-		SDL_BlitScaled(image, &image->clip_rect, renderSurf, &rect);
+		SDL_RenderCopy(renderer, image, NULL, &rect);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
 			DebugImageDraw(&rect);
@@ -296,37 +304,11 @@ namespace RenderCode {
 #endif
 	}
 
-	void R_DrawImageAbs(SDL_Surface* image, int x, int y, int w, int h) {
+	void R_DrawImageClipped(SDL_Texture* image, SDL_Rect* spos, SDL_Rect* ipos) {
 		if(!image) {
 			return;
 		}
-		SDL_Rect rect;
-		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
-		SDL_BlitSurface(image, &image->clip_rect, renderSurf, &rect);
-#ifdef _DEBUG
-		if(r_imgdebug->Bool()) {
-			DebugImageDraw(&rect);
-		}
-#endif
-	}
-
-	void R_DrawImageClipped(SDL_Surface* image, SDL_Rect* spos, SDL_Rect* ipos) {
-		if(!image) {
-			return;
-		}
-		SDL_BlitScaled(image, ipos, renderSurf, spos);
-#ifdef _DEBUG
-		if(r_imgdebug->Bool()) {
-			DebugImageDraw(spos);
-		}
-#endif
-	}
-
-	void R_DrawImageClippedAbs(SDL_Surface* image, SDL_Rect* spos, SDL_Rect* ipos) {
-		if(!image) {
-			return;
-		}
-		SDL_BlitSurface(image, ipos, renderSurf, spos);
+		SDL_RenderCopy(renderer, image, ipos, spos);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
 			DebugImageDraw(spos);
@@ -338,8 +320,7 @@ namespace RenderCode {
 		if(!image) {
 			return;
 		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		// These IGNORE the blitting procedure which is pretty ugly, need to rewrite the renderer to use commands instead of surfs :<
+		SDL_Texture* img = reinterpret_cast<SDL_Texture*>(image);
 		SDL_Rect wreckt;
 		const int width = r_width->Integer();
 		const int height = r_height->Integer();
@@ -354,7 +335,7 @@ namespace RenderCode {
 		if(!image) {
 			return;
 		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		SDL_Texture* img = reinterpret_cast<SDL_Texture*>(image);
 		const float height = (float)r_height->Integer();
 		const float width = (float)(height/(float)r_width->Integer());
 		const float ycorrect = (float)(r_width->Integer()/height);
@@ -368,35 +349,24 @@ namespace RenderCode {
 		R_DrawImage(img, rect.x, rect.y, rect.w, rect.h);
 	}
 
-	void DrawImageNoScaling(void* image, float xPct, float yPct) {
-		if(!image) {
-			return;
-		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		const int x = (int)(r_width->Integer() * xPct)/100;
-		const int y = (int)(r_height->Integer() * yPct)/100;
-		const int w = img->w;
-		const int h = img->h;
-
-		R_DrawImageAbs(img, x, y, w, h);
-	}
-
 	void DrawImageClipped(void* image, float sxPct, float syPct, float swPct,
 		float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
 		if(!image) {
 			return;
 		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
+		SDL_Texture* img = reinterpret_cast<SDL_Texture*>(image);
 		const int sx = (int)(r_width->Integer() * sxPct)/100;
 		const int sy = (int)(r_height->Integer() * syPct)/100;
 		const int sw = (int)(r_width->Integer() * swPct)/100;
 		const int sh = (int)(r_height->Integer() * shPct)/100;
 		SDL_Rect screen;
 		screen.x = sx; screen.y = sy; screen.w = sw; screen.h = sh;
-		const int ix = (int)(img->w * ixPct)/100;
-		const int iy = (int)(img->h * iyPct)/100;
-		const int iw = (int)(img->w * iwPct)/100;
-		const int ih = (int)(img->h * ihPct)/100;
+		int iTexWidth, iTexHeight, iAccess, iFormat;
+		SDL_QueryTexture(img, (Uint32*)&iFormat, &iAccess, &iTexWidth, &iTexHeight);
+		const int ix = (int)(iTexWidth * ixPct)/100;
+		const int iy = (int)(iTexHeight * iyPct)/100;
+		const int iw = (int)(iTexWidth * iwPct)/100;
+		const int ih = (int)(iTexHeight * ihPct)/100;
 		SDL_Rect irect;
 		irect.x = ix; irect.y = iy; irect.w = iw; irect.h = ih;
 		R_DrawImageClipped(img, &screen, &irect);
@@ -406,37 +376,21 @@ namespace RenderCode {
 		if(!image) {
 			return;
 		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		R_DrawImage(img, x, y, w, h);
+		SDL_Texture* img = reinterpret_cast<SDL_Texture*>(image);
+		
+		if(w == 0 && h == 0) {
+			// Draw at image's width/height
+			Uint32 format;
+			int wx, hx, a;
+			SDL_QueryTexture(img, &format, &a, &wx, &hx);
+			R_DrawImage(img, x, y, wx, hx);
+		} else {
+			R_DrawImage(img, x, y, w, h);
+		}
 	}
 
-	void DrawImageAbsAspectCorrection(void* image, int x, int y, int w, int h) {
-		if(!image) {
-			return;
-		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		R_DrawImage(img, x * (float)((float)r_width->Integer()/(float)r_height->Integer()),
-			y, w * (float)(r_width->Integer() / (float)r_height->Integer()), h);
-	}
-
-	void DrawImageAbsNoScaling(void* image, int x, int y) {
-		if(!image) {
-			return;
-		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		R_DrawImageAbs(img, x, y, img->w, img->h);
-	}
-
-	void DrawImageAbsClipped(void* image, int sx, int sy, int sw, int sh, int ix, int iy, int iw, int ih) {
-		if(!image) {
-			return;
-		}
-		SDL_Surface* img = reinterpret_cast<SDL_Surface*>(image);
-		SDL_Rect screen;
-		screen.x = sx; screen.y = sy; screen.w = sw; screen.h = sw;
-		SDL_Rect imgc;
-		imgc.x = ix; imgc.y = iy; imgc.w = iw; imgc.h = ih;
-		R_DrawImageClippedAbs(img, &screen, &imgc);
+	void DrawImageAbs(void* image, int x, int y) {
+		DrawImageAbs(image, x, y, 0, 0);
 	}
 
 	void InitMaterials() {
@@ -467,7 +421,16 @@ namespace RenderCode {
 			return;
 		}
 
-		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		if(textFieldCount++ >= MAX_TEXTRENDER) {
+			return;
+		}
+		void* pixels;
+		int pitch;
+		SDL_LockTexture(textFields[textFieldCount], NULL, &pixels, &pitch);
+		memcpy(pixels, surf->pixels, surf->w * surf->pitch * surf->h);
+		SDL_UnlockTexture(textFields[textFieldCount]);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, NULL);
+		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
 		SDL_FreeSurface(surf);
 	}
 
@@ -482,7 +445,22 @@ namespace RenderCode {
 			return;
 		}
 
-		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		if(textFieldCount++ >= MAX_TEXTRENDER) {
+			return;
+		}
+		/*void* pixels;
+		int pitch;
+		SDL_SetTextureBlendMode(textFields[textFieldCount], SDL_BLENDMODE_BLEND);*/
+		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		/*SDL_LockTexture(textFields[textFieldCount], &surf->clip_rect, &pixels, &pitch);
+		memcpy(pixels, surf->pixels, surf->w * surf->format->BytesPerPixel * surf->h);
+		SDL_UnlockTexture(textFields[textFieldCount]);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], &surf->clip_rect, NULL);
+		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		SDL_FreeSurface(surf);*/
+		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 	}
 
@@ -495,7 +473,16 @@ namespace RenderCode {
 			return;
 		}
 
-		SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		if(textFieldCount++ >= MAX_TEXTRENDER) {
+			return;
+		}
+		void* pixels;
+		int pitch;
+		SDL_LockTexture(textFields[textFieldCount], NULL, &pixels, &pitch);
+		memcpy(pixels, surf->pixels, surf->w * surf->pitch * surf->h);
+		SDL_UnlockTexture(textFields[textFieldCount]);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, NULL);
+		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
 		SDL_FreeSurface(surf);
 	}
 };

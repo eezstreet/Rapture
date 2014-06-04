@@ -25,8 +25,7 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 		Zone::FastFree(mat, "materials");
 		R_Printf("WARNING: Material without name (%s)\n", matfile);
 		strcpy(mat->name, matfile);
-	}
-	else {
+	} else {
 		strcpy(mat->name, cJSON_ToString(child));
 	}
 
@@ -34,8 +33,7 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 	if(!child) {
 		Zone::FastFree(mat, "materials");
 		R_Printf("WARNING: %s doesn't have a diffuse map!\n", mat->name);
-	}
-	else {
+	} else {
 		strcpy(mat->resourceFile, cJSON_ToString(child));
 	}
 
@@ -83,7 +81,7 @@ void Material::SendToRenderer(float x, float y) {
 	if(!bLoadedResources) {
 		LoadResources();
 	}
-	RenderCode::DrawImageAbsNoScaling((void*)ptResource, x, y);
+	RenderCode::DrawImageAbs((void*)ptResource, x, y);
 }
 
 void Material::LoadResources() {
@@ -100,14 +98,16 @@ void Material::LoadResources() {
 		return;
 	}
 	bLoadedIncorrectly = false;
-	ptResource = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
+	ptResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
+	SDL_SetTextureBlendMode(ptResource, SDL_BLENDMODE_BLEND);
+	SDL_FreeSurface(temp);
 }
 
 void Material::FreeResources() {
 	if(!bLoadedResources) {
 		return;
 	}
-	SDL_FreeSurface(ptResource);
+	SDL_DestroyTexture(ptResource);
 	bLoadedResources = false;
 	bLoadedIncorrectly = false;
 }

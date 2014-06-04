@@ -146,13 +146,14 @@ void RaptureGame::RunLoop() {
 	Input->InputFrame();
 	UI::Update();
 
+	RenderCode::BlankFrame();
+
 	// Do gamecode
 	if(game) {
 		trap->runactiveframe();
 	}
 
 	// Do rendering
-	RenderCode::BlankFrame();
 	UI::Render();
 	RenderCode::Display();
 }
@@ -189,13 +190,9 @@ void RaptureGame::CreateGameModule() {
 	imp.ReadBinary = FS::EXPORT_ReadBinary;
 	imp.RegisterImage = RenderCode::RegisterImage;
 	imp.DrawImage = RenderCode::DrawImage;
+	imp.DrawImageAbs = static_cast<void(*)(void*, int, int, int, int)>(RenderCode::DrawImageAbs);
 	imp.DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
-	imp.DrawImageNoScaling = RenderCode::DrawImageNoScaling;
 	imp.DrawImageClipped = RenderCode::DrawImageClipped;
-	imp.DrawImageAbs = RenderCode::DrawImageAbs;
-	imp.DrawImageAbsAspectCorrection = RenderCode::DrawImageAbsAspectCorrection;
-	imp.DrawImageAbsNoScaling = RenderCode::DrawImageAbsNoScaling;
-	imp.DrawImageAbsClipped = RenderCode::DrawImageAbsClipped;
 	imp.InitMaterials = RenderCode::InitMaterials;
 	imp.ShutdownMaterials = RenderCode::ShutdownMaterials;
 	imp.RegisterMaterial = RenderCode::RegisterMaterial;
