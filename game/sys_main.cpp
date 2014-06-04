@@ -85,6 +85,7 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 /* RaptureGame class, this does all the heavy lifting */
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	game = NULL;
+	editor = NULL;
 
 	Sys_InitViewlog();
 
@@ -149,7 +150,7 @@ void RaptureGame::RunLoop() {
 	RenderCode::BlankFrame();
 
 	// Do gamecode
-	if(game) {
+	if(game || editor) {
 		trap->runactiveframe();
 	}
 
@@ -175,51 +176,58 @@ void RaptureGame::PassQuitEvent() {
 	bHasFinished = true;
 }
 
-/* Started a new game (probably from the menu) */
-void RaptureGame::CreateGameModule() {
-	game = new GameModule("gamex86");
-	static gameImports_s imp;
-	imp.printf = R_Printf;
-	imp.error = R_Error;
-	imp.GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
-	imp.OpenFile = FS::EXPORT_OpenFile;
-	imp.CloseFile = FS::EXPORT_Close;
-	imp.GetFileSize = FS::EXPORT_GetFileSize;
-	imp.ListFilesInDir = FS::EXPORT_ListFilesInDir;
-	imp.ReadPlaintext = FS::EXPORT_ReadPlaintext;
-	imp.ReadBinary = FS::EXPORT_ReadBinary;
-	imp.RegisterImage = RenderCode::RegisterImage;
-	imp.DrawImage = RenderCode::DrawImage;
-	imp.DrawImageAbs = static_cast<void(*)(void*, int, int, int, int)>(RenderCode::DrawImageAbs);
-	imp.DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
-	imp.DrawImageClipped = RenderCode::DrawImageClipped;
-	imp.InitMaterials = RenderCode::InitMaterials;
-	imp.ShutdownMaterials = RenderCode::ShutdownMaterials;
-	imp.RegisterMaterial = RenderCode::RegisterMaterial;
-	imp.RenderMaterial = RenderCode::SendMaterialToRenderer;
-	imp.CvarBoolVal = CvarSystem::EXPORT_BoolValue;
-	imp.CvarIntVal = CvarSystem::EXPORT_IntValue;
-	imp.CvarStrVal = CvarSystem::EXPORT_StrValue;
-	imp.CvarValue = CvarSystem::EXPORT_Value;
+/* Set up common exports which are used in both the game and the editor */
+void RaptureGame::AssignExports(gameImports_s *imp) {
+	imp->printf = R_Printf;
+	imp->error = R_Error;
+	imp->GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
+	imp->OpenFile = FS::EXPORT_OpenFile;
+	imp->CloseFile = FS::EXPORT_Close;
+	imp->GetFileSize = FS::EXPORT_GetFileSize;
+	imp->ListFilesInDir = FS::EXPORT_ListFilesInDir;
+	imp->ReadPlaintext = FS::EXPORT_ReadPlaintext;
+	imp->ReadBinary = FS::EXPORT_ReadBinary;
+	imp->RegisterImage = RenderCode::RegisterImage;
+	imp->DrawImage = RenderCode::DrawImage;
+	imp->DrawImageAbs = static_cast<void(*)(void*, int, int, int, int)>(RenderCode::DrawImageAbs);
+	imp->DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
+	imp->DrawImageClipped = RenderCode::DrawImageClipped;
+	imp->InitMaterials = RenderCode::InitMaterials;
+	imp->ShutdownMaterials = RenderCode::ShutdownMaterials;
+	imp->RegisterMaterial = RenderCode::RegisterMaterial;
+	imp->RenderMaterial = RenderCode::SendMaterialToRenderer;
+	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
+	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
+	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
+	imp->CvarValue = CvarSystem::EXPORT_Value;
 	// ugly code below
-	imp.RegisterCvarBool = reinterpret_cast<void*(*)(const string&, const string&, int, bool)>
+	imp->RegisterCvarBool = reinterpret_cast<void*(*)(const string&, const string&, int, bool)>
 		(static_cast<Cvar*(*)(const string&, const string&, int, bool)>(CvarSystem::RegisterCvar));
-	imp.RegisterCvarFloat = reinterpret_cast<void*(*)(const string&, const string&, int, float)>
+	imp->RegisterCvarFloat = reinterpret_cast<void*(*)(const string&, const string&, int, float)>
 		(static_cast<Cvar*(*)(const string&, const string&, int, float)>(CvarSystem::RegisterCvar));
-	imp.RegisterCvarInt = reinterpret_cast<void*(*)(const string&, const string&, int, int)>
+	imp->RegisterCvarInt = reinterpret_cast<void*(*)(const string&, const string&, int, int)>
 		(static_cast<Cvar*(*)(const string&, const string&, int, int)>(CvarSystem::RegisterCvar));
-	imp.RegisterCvarStr = reinterpret_cast<void*(*)(const string&, const string&, int, char*)>
+	imp->RegisterCvarStr = reinterpret_cast<void*(*)(const string&, const string&, int, char*)>
 		(static_cast<Cvar*(*)(const string&, const string&, int, char*)>(CvarSystem::RegisterCvar));
 	// end ugly code
-	imp.RegisterFont = EXPORT_RegisterFont;
-	imp.RenderTextBlended = RenderCode::RenderTextBlended;
-	imp.RenderTextShaded = RenderCode::RenderTextShaded;
-	imp.RenderTextSolid = RenderCode::RenderTextSolid;
+	imp->RegisterFont = EXPORT_RegisterFont;
+	imp->RenderTextBlended = RenderCode::RenderTextBlended;
+	imp->RenderTextShaded = RenderCode::RenderTextShaded;
+	imp->RenderTextSolid = RenderCode::RenderTextSolid;
+}
+
+/* Started a new game (probably from the menu) */
+GameModule* RaptureGame::CreateGameModule(const char* bundle) {
+	GameModule* game = new GameModule(bundle);
+	static gameImports_s imp;
+	AssignExports(&imp);
+	
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
-		return;
+		return NULL;
 	}
 	trap->init();
+	return game;
 }
 
 /* Get the game module */
@@ -253,5 +261,19 @@ void R_Printf(const char *fmt, ...) {
 
 void NewGame() {
 	MainMenu::DestroySingleton();
-	sys->CreateGameModule();
+	if(sys->game || sys->editor) {
+		// Have to exit from these first
+		return;
+	}
+	sys->game = sys->CreateGameModule("gamex86");
+}
+
+void StartEditor() {
+	Console::GetSingleton()->Hide();
+	MainMenu::DestroySingleton();
+	if(sys->game || sys->editor) {
+		// Have to exit from these first
+		return;
+	}
+	sys->editor = sys->CreateGameModule("editorx86");
 }

@@ -22,9 +22,13 @@ public:
 
 class RaptureGame {
 private:
-	GameModule*		game;
 	gameExports_s*	trap;
+
+	void AssignExports(gameImports_s* in);
 public:
+	GameModule*		game;
+	GameModule*		editor;
+
 	RaptureGame(int argc, char **argv);
 	~RaptureGame();
 
@@ -37,7 +41,7 @@ public:
 	bool bHasFinished;
 	void RunLoop();
 
-	void CreateGameModule();
+	GameModule* CreateGameModule(const char* bundle);
 
 	static GameModule* GetGameModule();
 	static gameExports_s* GetImport();

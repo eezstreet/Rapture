@@ -424,13 +424,10 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		void* pixels;
-		int pitch;
-		SDL_LockTexture(textFields[textFieldCount], NULL, &pixels, &pitch);
-		memcpy(pixels, surf->pixels, surf->w * surf->pitch * surf->h);
-		SDL_UnlockTexture(textFields[textFieldCount]);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, NULL);
-		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 	}
 
@@ -448,16 +445,7 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		/*void* pixels;
-		int pitch;
-		SDL_SetTextureBlendMode(textFields[textFieldCount], SDL_BLENDMODE_BLEND);*/
 		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
-		/*SDL_LockTexture(textFields[textFieldCount], &surf->clip_rect, &pixels, &pitch);
-		memcpy(pixels, surf->pixels, surf->w * surf->format->BytesPerPixel * surf->h);
-		SDL_UnlockTexture(textFields[textFieldCount]);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], &surf->clip_rect, NULL);
-		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
-		SDL_FreeSurface(surf);*/
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
 		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
 		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
@@ -476,13 +464,10 @@ namespace RenderCode {
 		if(textFieldCount++ >= MAX_TEXTRENDER) {
 			return;
 		}
-		void* pixels;
-		int pitch;
-		SDL_LockTexture(textFields[textFieldCount], NULL, &pixels, &pitch);
-		memcpy(pixels, surf->pixels, surf->w * surf->pitch * surf->h);
-		SDL_UnlockTexture(textFields[textFieldCount]);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, NULL);
-		//SDL_BlitSurface(surf, NULL, renderSurf, NULL);
+		surf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
+		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
+		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 	}
 };

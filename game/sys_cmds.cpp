@@ -132,8 +132,13 @@ void Cmd_ScreenshotPCX_f(vector<string>& args) {
 }
 
 extern void NewGame();
+extern void StartEditor();
 void Cmd_NewGameTest_f(vector<string>& args) {
 	NewGame();
+}
+
+void Cmd_Editor_f(vector<string>& args) {
+	StartEditor();
 }
 
 void Sys_InitCommands() {
@@ -153,4 +158,5 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("screenshotPCX", Cmd_ScreenshotPCX_f);
 
 	Cmd::AddCommand("newgametest", Cmd_NewGameTest_f);
+	Cmd::AddCommand("editor", Cmd_Editor_f);
 }
