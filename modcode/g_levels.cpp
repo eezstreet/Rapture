@@ -146,7 +146,7 @@ void InitLevels() {
 	// Savegame data isn't done yet, so let's just hardcode the Survivor's Camp as the starting area
 	R_Printf("building world...");
 	MapFramework* x = FindMapFrameworkByName("Survivor's Camp");
-	Player* play = new Player(3, 3);
+	Player* play = new Player(1, 3);
 	Map survivorCamp;
 	BuildMapFromFramework(*x, survivorCamp);
 	levels.push_back(survivorCamp);

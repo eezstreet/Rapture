@@ -100,9 +100,23 @@ float Worldspace::PlayerOffsetY() {
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y) {
-	return (x - (2 * y)) / 192; //(SX - 2 * SY) / 192
+	Player* ply = world.GetFirstPlayer();
+	float plyX = ply->x;
+	int screenWidth, screenHeight;
+
+	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("r_height", &screenHeight);
+
+	return (x/192.0f) - (y/96.0f) + plyX - (screenWidth/384.0f) + (screenHeight/192.0f) + 0.5;
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y) {
-	return (x + (2 * y)) / 192; //(SX + 2SY) / 192
+	Player* ply = world.GetFirstPlayer();
+	float plyY = ply->y;
+	int screenWidth, screenHeight;
+
+	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("r_height", &screenHeight);
+	
+	return (y/96.0f) + (x/192.0f) - (screenWidth/384.0f) + plyY - (screenHeight/192.0f) - 0.5;
 }

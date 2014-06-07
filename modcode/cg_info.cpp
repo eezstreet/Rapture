@@ -46,9 +46,9 @@ void DrawViewportInfo() {
 
 	if(drawWorldXY) {
 		ss << "World Space: ";
-		ss << Worldspace::ScreenSpaceToWorldPlaceX(currentMouseX, currentMouseY);
+		ss << (Worldspace::ScreenSpaceToWorldPlaceX(currentMouseX, currentMouseY));;
 		ss << "X / ";
-		ss << Worldspace::ScreenSpaceToWorldPlaceY(currentMouseX, currentMouseY);
+		ss << (Worldspace::ScreenSpaceToWorldPlaceY(currentMouseX, currentMouseY));
 		ss << "Y      ";
 	}
 	if(ss.str().length() > 0) {
