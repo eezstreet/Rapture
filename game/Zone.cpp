@@ -23,13 +23,23 @@ namespace Zone {
 			return NULL;
 		}
 
-		zone[tagNames[tag]].zoneInUse += iSize;
-		if(zone[tagNames[tag]].zoneInUse > zone[tagNames[tag]].peakUsage) {
-			zone[tagNames[tag]].peakUsage = zone[tagNames[tag]].zoneInUse;
+		return Allocate(iSize, tagNames[tag]);
+	}
+
+	// allocate some zone memory, but use the tag name (good for VM/mod)
+	void* MemoryManager::Allocate(int iSize, const string& tag) {
+		if(tag.length() <= 0) {
+			Sys_Error("Zone::Alloc passed zero-size tag string\n");
+			return NULL;
 		}
-		void *memory = malloc(iSize);
+
+		zone[tag].zoneInUse += iSize;
+		if(zone[tag].zoneInUse > zone[tag].peakUsage) {
+			zone[tag].peakUsage = zone[tag].zoneInUse;
+		}
+		void* memory = malloc(iSize);
 		ZoneChunk z(iSize, false);
-		zone[tagNames[tag]].zone[memory] = z;
+		zone[tag].zone[memory] = z;
 		return memory;
 	}
 
@@ -87,12 +97,19 @@ namespace Zone {
 				if(it->second.zoneInUse > it->second.peakUsage) {
 					it->second.peakUsage = it->second.zoneInUse;
 				}
-				memory = realloc(memory, iNewSize);
+				void* mem = realloc(memory, iNewSize);
+				if(!mem) {
+					throw false;
+				}
+				memory = mem;
 				it->second.zone[memory] = ZoneChunk(iNewSize, false);
 				return memory;
 			}
 			catch( out_of_range e ) {
 				continue;
+			}
+			catch( bool b ) {
+				break;
 			}
 		}
 		Sys_Error("Zone::Realloc: corrupt zone memory!");
@@ -104,27 +121,26 @@ namespace Zone {
 	}
 
 	MemoryManager::~MemoryManager() {
-		for(int i = TAG_NONE+1; i < TAG_MAX; i++) {
-			FreeAll(tagNames[i]);
+		for(auto it = zone.begin(); it != zone.end(); ++it) {
+			FreeAll(it->first);
 		}
 	}
 
 	void MemoryManager::PrintMemUsage() {
 		R_Printf("\n%-10s %20s %20s %20s %20s %20s %20s\n", "Tag", "Cur Usage (b)", "Cur Usage (KB)", "Cur Usage (MB)", "Peak Usage (b)", "Peak Usage (KB)", "Peak Usage (MB)");
 		R_Printf("%-10s %20s %20s %20s %20s %20s %20s\n", "-----", "-------------", "--------------", "--------------", "--------------", "---------------", "---------------");
-		for(int i = TAG_NONE+1; i < TAG_MAX; i++) {
-			string tag = tagNames[i];
-			R_Printf("%-10s %20i %20.2f %20.2f %20i %20.2f %20.2f\n", tag.c_str(), zone[tag].zoneInUse, 
-				(float)((double)zone[tag].zoneInUse/1024.0f), (float)((double)zone[tag].zoneInUse/1048576.0f),
-				zone[tag].peakUsage,
-				(float)((double)zone[tag].peakUsage/1024.0f), (float)((double)zone[tag].peakUsage/1048576.0f));
+		for(auto it = zone.begin(); it != zone.end(); ++it) {
+			R_Printf("%-10s %20i %20.2f %20.2f %20i %20.2f %20.2f\n", it->first.c_str(), it->second.zoneInUse, 
+				(float)((double)it->second.zoneInUse/1024.0f), (float)((double)it->second.zoneInUse/1048576.0f),
+				it->second.peakUsage,
+				(float)((double)it->second.peakUsage/1024.0f), (float)((double)it->second.peakUsage/1048576.0f));
 		}
 	}
 
 	// Functions which are accessed from the outside
 	void Init() {
 		mem = new MemoryManager();
-		for(int it = TAG_NONE; it != TAG_MAX; ++it)
+		for(int it = TAG_NONE; it != MAX_ENGINE_TAGS; ++it)
 			mem->CreateZoneTag(tagNames[it]);
 	}
 
@@ -134,6 +150,10 @@ namespace Zone {
 	}
 
 	void* Alloc(int iSize, zoneTags_e tag) {
+		return mem->Allocate(iSize, tag);
+	}
+
+	void* Alloc(int iSize, const string& tag) {
 		return mem->Allocate(iSize, tag);
 	}
 
@@ -155,5 +175,21 @@ namespace Zone {
 
 	void MemoryUsage() {
 		mem->PrintMemUsage();
+	}
+
+	void* VMAlloc(int iSize, const char* tag) {
+		return mem->Allocate(iSize, tag);
+	}
+
+	void VMFastFree(void* memory, const char* tag) {
+		FastFree(memory, tag);
+	}
+
+	void VMFreeAll(const char* tag) {
+		FreeAll(tag);
+	}
+
+	void NewTag(const char* tag) {
+		mem->CreateZoneTag(tag);
 	}
 }

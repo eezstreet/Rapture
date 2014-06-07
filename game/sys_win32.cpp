@@ -57,6 +57,10 @@ void Sys_SendToClipboard(string text) {
 		return;
 	}
 	HGLOBAL hMem =  GlobalAlloc(GMEM_MOVEABLE, text.length());
+	if(hMem == 0) {
+		R_Printf("Sys_SendToClipboard: couldn't GlobalAlloc (out of memory?)\n");
+		return;
+	}
 	memcpy(GlobalLock(hMem), text.c_str(), text.length());
 	GlobalUnlock(hMem);
 	OpenClipboard(0);

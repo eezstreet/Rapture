@@ -1,25 +1,35 @@
 #include "sys_shared.h"
 
 // string functions
-static vector<string>& split_x(const string& str, const char delim, vector<string>& elems) {
+vector<string>& split(const string& str, const char delim, vector<string>& elems) {
 	string itm;
 	stringstream ss(str);
-	while(getline(ss, itm, delim))
+	// Strip out \r
+	string s = "";
+	while(getline(ss, itm, '\r')) {
+		s += itm;
+	}
+	// ...and if our delimiter is not a newline, we need to strip that out too.
+	ss = stringstream(s);
+	if(delim != '\n') {
+		s = "";
+		while(getline(ss, itm, '\n')) {
+			s += itm;
+		}
+		ss = stringstream(s);
+	}
+	while(getline(ss, itm, delim)) {
 		elems.push_back(itm);
-	return elems;
-}
-
-vector<string>& split(const string& str, const char delim) {
-	vector<string> elems;
-	split_x(str, delim, elems);
+	}
 	return elems;
 }
 
 static vector<wstring>& split_x(const wstring& str, const wchar_t delim, vector<wstring>& elems) {
 	wstring itm;
 	wstringstream ss(str);
-	while(getline(ss, itm, delim))
+	while(getline(ss, itm, delim)) {
 		elems.push_back(itm);
+	}
 	return elems;
 }
 

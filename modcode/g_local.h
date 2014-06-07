@@ -20,6 +20,7 @@ extern int currentMouseY;
 void InitFPS();
 void FPSFrame();
 float GetGameFPS();
+unsigned int GetGameFrametime();
 
 // g_shared.cpp
 void eswap(unsigned short &x);
@@ -84,7 +85,7 @@ struct Tile {
 	unsigned short vismask;		// Mask of subtiles which block visibility
 
 	// Material
-	void* materialHandle;		// Pointer to material in memory
+	Material* materialHandle;	// Pointer to material in memory
 	bool bResourcesLoaded;		// Have the resources (images/shaders) been loaded?
 
 	Tile() {
@@ -115,7 +116,7 @@ public:
 // Actors have visible representations, whereas regular entities do not.
 class Actor : public Entity {
 protected:
-	void* materialHandle;
+	Material* materialHandle;
 };
 
 // Players are...players.

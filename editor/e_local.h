@@ -9,6 +9,7 @@ extern gameImports_s* trap;
 void InitFPS();
 void FPSFrame();
 float GetGameFPS();
+unsigned int GetGameFrametime();
 
 // e_display.cpp
 void InitDisplay();

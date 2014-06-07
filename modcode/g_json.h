@@ -6,7 +6,7 @@ bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, 
 		R_Printf("JSON_ParseMultifile: bad filename sent\n");
 		return false;
 	}
-	void* file = trap->OpenFile(filename, "rb");
+	File* file = trap->OpenFile(filename, "rb");
 	if(!file) {
 		R_Printf("JSON_ParseMultifile: could not open file %s\n", filename);
 		return false;

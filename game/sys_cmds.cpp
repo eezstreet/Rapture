@@ -40,7 +40,7 @@ void Cmd_Set_f(vector<string>& args) {
 			CvarSystem::SetIntegerValue(args[1], atoi(args[2].c_str()));
 			break;
 		case Cvar::CV_FLOAT:
-			CvarSystem::SetFloatValue(args[1], atof(args[2].c_str()));
+			CvarSystem::SetFloatValue(args[1], (float)atof(args[2].c_str()));
 			break;
 		case Cvar::CV_BOOLEAN:
 			CvarSystem::SetBooleanValue(args[1], atob(args[2].c_str()));
@@ -59,7 +59,7 @@ void Cmd_Seta_f(vector<string>& args) {
 
 	Cmd_Set_f(args);
 	int flags = CvarSystem::GetCvarFlags(args[1]);
-	flags = flags | Cvar::CVAR_ARCHIVE;
+	flags = flags | (1 << Cvar::CVAR_ARCHIVE);
 	CvarSystem::SetCvarFlags(args[1], flags);
 }
 
@@ -68,7 +68,7 @@ void Cmd_Exec_f(vector<string>& args) {
 		R_Printf("usage: exec <filename.cfg>\n");
 		return;
 	}
-	File* p = File::Open(args[1], "r");
+	File* p = File::Open(args[1], "rb+");
 	if(p == NULL) {
 		R_Printf("could not exec %s\n", args[1].c_str());
 		return;
@@ -79,9 +79,12 @@ void Cmd_Exec_f(vector<string>& args) {
 	Zone::FastFree(p, "files");
 
 	if(text.length() > 0) {
-		vector<string> lines = split(text, ';');
-		for(auto it = lines.begin(); it != lines.end(); ++it) {
-			Cmd::ProcessCommand((*it).c_str());
+		vector<string> lines;
+		split(text, ';', lines);
+		if(lines.size() > 0) {
+			for(auto it = lines.begin(); it != lines.end(); ++it) {
+				Cmd::ProcessCommand((*it).c_str());
+			}
 		}
 	}
 }

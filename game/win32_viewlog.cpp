@@ -35,7 +35,6 @@ WNDPROC		SysInputLineWndProc;
 
 static LRESULT CALLBACK ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	const char *cmdString;
 	static bool s_timePolarity;
 
 	switch (uMsg)
@@ -468,7 +467,7 @@ void Win32Viewlog::AppendText(const string& text) {
 };
 
 void Win32Viewlog::TestViewlogShow() {
-	cvViewlog = Cvar::Get<bool>("viewlog", "Displays the viewlog during normal ingame use", Cvar::CVAR_ARCHIVE, false);
+	cvViewlog = Cvar::Get<bool>("viewlog", "Displays the viewlog during normal ingame use", (1 << Cvar::CVAR_ARCHIVE), false);
 	if(!cvViewlog->Bool()) {
 		Hide();
 	}

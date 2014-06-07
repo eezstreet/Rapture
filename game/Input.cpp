@@ -165,11 +165,13 @@ void InputManager::InputFrame() {
 void InputManager::BindCommand(const string& keycodeArg, string commandArg) {
 	int i;
 	for(i = 0; i < SDL_SCANCODE_F19; i++) {
-		if(keycodeNames[i] == keycodeArg) // FIXME
+		if(keycodeNames[i] == keycodeArg) { // FIXME
 			break;
+		}
 	}
-	if(i >= SDL_SCANCODE_KP_EQUALS)
+	if(i >= SDL_SCANCODE_KP_EQUALS) {
 		i += 121; // HACK
+	}
 	SDL_Scancode sc = (SDL_Scancode)i;
 	binds[sc] = commandArg;
 }

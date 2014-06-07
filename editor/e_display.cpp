@@ -1,6 +1,6 @@
 #include "e_local.h"
 
-static void* ptSegoe;
+static Font* ptSegoe;
 
 #define PROGRAM_NAME "RaptureEdit "
 #define PROGRAM_VERSION "0.0.0"
@@ -16,17 +16,21 @@ static void DisplayDataTop() {
 	}
 	ss << "            ";
 
-	bool bDrawFPS;
-	trap->CvarBoolVal("cg_drawfps", &bDrawFPS);
-	if(bDrawFPS) {
-		ss << "FPS: ";
-		ss << GetGameFPS();
-		ss << "            ";
+	int iDrawFPS;
+	trap->CvarIntVal("cg_drawfps", &iDrawFPS);
+	if(iDrawFPS > 0) {
+		if(iDrawFPS == 1 || iDrawFPS == 3) {
+			ss << "FPS: ";
+			ss << GetGameFPS();
+			ss << "            ";
+		}
+		if(iDrawFPS == 2 || iDrawFPS == 3) {
+			ss << "ms: ";
+			ss << GetGameFrametime();
+			ss << "            ";
+		}
 	}
 	trap->RenderTextShaded(ptSegoe, ss.str().c_str(), 0, 0, 0, 255, 255, 255);
-}
-
-static void DisplayDataBottom() {
 }
 
 void DisplayData() {

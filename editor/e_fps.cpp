@@ -5,6 +5,7 @@ static unsigned int frametimes[FRAME_CAPTURE];
 static unsigned int framecount = 0;
 static unsigned int framelast = 0;
 static float fps;
+static unsigned int frametime = 0;
 
 void InitFPS() {
 	memset(frametimes, 0, sizeof(frametimes));
@@ -23,8 +24,7 @@ void FPSFrame() {
 	
 	if(framecount < FRAME_CAPTURE) {
 		count = framecount;
-	}
-	else {
+	} else {
 		count = FRAME_CAPTURE;
 	}
 
@@ -37,8 +37,14 @@ void FPSFrame() {
 
 	fps /= count;
 	fps = 1000 / fps;
+
+	frametime = frametimes[index];
 }
 
 float GetGameFPS() {
 	return fps;
+}
+
+unsigned int GetGameFrametime() {
+	return frametime;
 }

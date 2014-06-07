@@ -40,6 +40,14 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 	}
 }
 
+Font* Font::Register(const char* sFontFile, int iPointSize) {
+	if(!FontMan) {
+		R_Printf("Couldn't load %s (font manager not loaded)\n");
+		return NULL;
+	}
+	return FontMan->RegisterFont(sFontFile, iPointSize);
+}
+
 /* FontManager class */
 FontManager::FontManager() {
 	auto result = TTF_Init();

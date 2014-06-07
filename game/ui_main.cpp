@@ -40,7 +40,7 @@ void UI::Initialize() {
 
 	R_Printf("Initializing Awesomium Webcore\n");
 	WebConfig x;
-	x.log_level = Awesomium::LogLevel::kLogLevel_Verbose;
+	x.log_level = Awesomium::kLogLevel_Verbose;
 	wc = WebCore::Initialize(x);
 	R_Printf("Creating web session\n");
 	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), WebPreferences());
@@ -369,13 +369,13 @@ void UI::MouseMoveEvent(int x, int y) {
 	}
 }
 
-void* UI::RegisterStaticMenu(const char* menuName) {
+Menu* UI::RegisterStaticMenu(const char* menuName) {
 	Menu* newMenu = new Menu(menuName);
 	vmMenus.push_back(newMenu);
 	return newMenu;
 }
 
-void UI::KillStaticMenu(void* menu) {
+void UI::KillStaticMenu(Menu* menu) {
 	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
 		if((*it) == menu) {
 			Menu* ptMenu = (Menu*)menu;

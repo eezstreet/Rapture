@@ -25,20 +25,19 @@ namespace RenderCode {
 	static SDL_Texture* textFields[MAX_TEXTRENDER];
 
 	static void InitCvars() {
-		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", Cvar::CVAR_ARCHIVE, false);
-		r_width = Cvar::Get<int>("r_width", "Resolution: width", Cvar::CVAR_ARCHIVE, 1024);
-		r_height = Cvar::Get<int>("r_height", "Resolution: height", Cvar::CVAR_ARCHIVE, 768);
-		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", Cvar::CVAR_ARCHIVE | Cvar::CVAR_ROM, "Rapture");
-		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", Cvar::CVAR_ARCHIVE, 1.0f);
+		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", (1 << Cvar::CVAR_ARCHIVE), false);
+		r_width = Cvar::Get<int>("r_width", "Resolution: width", (1 << Cvar::CVAR_ARCHIVE), 1024);
+		r_height = Cvar::Get<int>("r_height", "Resolution: height", (1 << Cvar::CVAR_ARCHIVE), 768);
+		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", (1 << Cvar::CVAR_ARCHIVE) | (1 << Cvar::CVAR_ROM), "Rapture");
+		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", (1 << Cvar::CVAR_ARCHIVE), 1.0f);
 
 		// Debug cvars
 #ifdef _DEBUG
-		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, true);
+		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, false);
 #endif
 	}
 
 	void Initialize() {
-		R_Printf("Viewlog init\n");
 		Sys_InitViewlog();
 
 		R_Printf("Initializing renderer\n");
@@ -93,7 +92,7 @@ namespace RenderCode {
 
 		int flags = IMG_INIT_JPG|IMG_INIT_PNG;
 		R_Printf("IMG_Init()\n");
-		if(IMG_Init(flags)&flags != flags) {
+		if((IMG_Init(flags) & flags) != flags) {
 			R_Printf("FAILED! %s\n", IMG_GetError());
 		}
 
@@ -144,7 +143,7 @@ namespace RenderCode {
 	static void CreateScreenshot(const string& filename) {
 		SDL_Surface* s = SDL_GetWindowSurface(window);
 		unsigned int numPixels = s->w * s->h * s->format->BytesPerPixel;
-		unsigned char * pixels = new (nothrow) unsigned char[numPixels];
+		unsigned char * pixels = new unsigned char[numPixels];
 		SDL_RenderReadPixels(renderer, &s->clip_rect, s->format->format, pixels, s->w * s->format->BytesPerPixel);
 		SDL_Surface* screenshot = SDL_ConvertSurfaceFormat(
 			SDL_CreateRGBSurfaceFrom(pixels, s->w, s->h, s->format->BitsPerPixel, s->w * s->format->BytesPerPixel, s->format->Rmask, s->format->Gmask, s->format->Bmask, s->format->Amask),
@@ -162,12 +161,16 @@ namespace RenderCode {
 			R_Printf("Could not write %s\n", filename.c_str());
 		}
 
-		delete pixels;
+		delete[] pixels;
 		SDL_FreeSurface(s);
 		SDL_FreeSurface(screenshot);
 	}
 
 	void Display() {
+		if(screenshotQueued) {
+			CreateScreenshot(screenshotName);
+			screenshotQueued = false;
+		}
 		SDL_RenderPresent(renderer);
 	}
 
@@ -194,7 +197,6 @@ namespace RenderCode {
 			string formatter = "screenshots/screenshot%04i";
 			formatter.append(extension);
 			char* s = (char*)Zone::Alloc(formatter.size()+1, Zone::TAG_RENDERER);
-			int i = 0;
 			for(int i = 0; i <= 9999; i++) {
 				sprintf(s, formatter.c_str(), i);
 				if(!File::Open(s, "r")) {
@@ -250,14 +252,14 @@ namespace RenderCode {
 		return pathret;
 	}
 
-	void* RegisterImage(const char* name) {
+	Image* RegisterImage(const char* name) {
 		SDL_Surface* temp;
 		SDL_Surface* perm;
 		SDL_Texture* text;
 
 		auto it = images.find(name);
 		if(it != images.end()) {
-			return (void*)it->second;
+			return (Image*)it->second;
 		}
 
 		string path = ResolveImagePath(name);
@@ -267,7 +269,7 @@ namespace RenderCode {
 		
 		temp = IMG_Load(path.c_str());
 		if(temp == NULL) {
-			return temp;
+			return (Image*)temp;
 		}
 
 		perm = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
@@ -276,7 +278,7 @@ namespace RenderCode {
 		SDL_FreeSurface(temp);
 		SDL_FreeSurface(perm);
 		images[name] = text;
-		return text;
+		return (Image*)text;
 	}
 
 #ifdef _DEBUG
@@ -316,7 +318,7 @@ namespace RenderCode {
 #endif
 	}
 
-	void DrawImage(void* image, float xPct, float yPct, float wPct, float hPct) {
+	void DrawImage(Image* image, float xPct, float yPct, float wPct, float hPct) {
 		if(!image) {
 			return;
 		}
@@ -331,7 +333,7 @@ namespace RenderCode {
 		R_DrawImage(img, wreckt.x, wreckt.y, wreckt.w, wreckt.h);
 	}
 
-	void DrawImageAspectCorrection(void* image, float xPct, float yPct, float wPct, float hPct) {
+	void DrawImageAspectCorrection(Image* image, float xPct, float yPct, float wPct, float hPct) {
 		if(!image) {
 			return;
 		}
@@ -349,7 +351,7 @@ namespace RenderCode {
 		R_DrawImage(img, rect.x, rect.y, rect.w, rect.h);
 	}
 
-	void DrawImageClipped(void* image, float sxPct, float syPct, float swPct,
+	void DrawImageClipped(Image* image, float sxPct, float syPct, float swPct,
 		float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
 		if(!image) {
 			return;
@@ -372,7 +374,7 @@ namespace RenderCode {
 		R_DrawImageClipped(img, &screen, &irect);
 	}
 
-	void DrawImageAbs(void* image, int x, int y, int w, int h) {
+	void DrawImageAbs(Image* image, int x, int y, int w, int h) {
 		if(!image) {
 			return;
 		}
@@ -389,7 +391,7 @@ namespace RenderCode {
 		}
 	}
 
-	void DrawImageAbs(void* image, int x, int y) {
+	void DrawImageAbs(Image* image, int x, int y) {
 		DrawImageAbs(image, x, y, 0, 0);
 	}
 
@@ -403,20 +405,18 @@ namespace RenderCode {
 		delete mats;
 	}
 
-	void* RegisterMaterial(const char* name) {
-		return (void*)mats->GetMaterial(name);
+	Material* RegisterMaterial(const char* name) {
+		return mats->GetMaterial(name);
 	}
 
-	void SendMaterialToRenderer(void* ptMaterial, float x, float y) {
-		Material *X = reinterpret_cast<Material*>(ptMaterial);
-		X->SendToRenderer(x, y);
+	void SendMaterialToRenderer(Material* ptMaterial, int x, int y) {
+		ptMaterial->SendToRenderer(x, y);
 	}
 
-	void RenderTextSolid(void* font, const char* text, int r, int g, int b) {
-		Font* trueFont = (Font*)font;
+	void RenderTextSolid(Font* font, const char* text, int r, int g, int b) {
 		SDL_Color color;
 		color.r = r; color.g = g; color.b = b; color.a = 255;
-		SDL_Surface* surf = TTF_RenderText_Solid(trueFont->GetFont(), text, color);
+		SDL_Surface* surf = TTF_RenderText_Solid(font->GetFont(), text, color);
 		if(surf == NULL) {
 			return;
 		}
@@ -432,12 +432,11 @@ namespace RenderCode {
 		SDL_FreeSurface(surf2);
 	}
 
-	void RenderTextShaded(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
-		Font* trueFont = (Font*)font;
+	void RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
 		SDL_Color colorForeground, colorBackground;
 		colorBackground.r = br; colorBackground.g = bg; colorBackground.b = bb; colorBackground.a = 255;
 		colorForeground.r = fr; colorForeground.g = fg; colorForeground.b = fb; colorForeground.a = 255;
-		SDL_Surface* surf = TTF_RenderText_Shaded(trueFont->GetFont(), text, colorBackground, colorForeground);
+		SDL_Surface* surf = TTF_RenderText_Shaded(font->GetFont(), text, colorBackground, colorForeground);
 		if(surf == NULL) {
 			R_Printf("%s\n", SDL_GetError());
 			return;
@@ -454,11 +453,10 @@ namespace RenderCode {
 		SDL_FreeSurface(surf2);
 	}
 
-	void RenderTextBlended(void* font, const char* text, int r, int g, int b) {
-		Font* trueFont = (Font*)font;
+	void RenderTextBlended(Font* font, const char* text, int r, int g, int b) {
 		SDL_Color color;
 		color.r = r; color.g = g; color.b = b; color.a = 255;
-		SDL_Surface* surf = TTF_RenderText_Blended(trueFont->GetFont(), text, color);
+		SDL_Surface* surf = TTF_RenderText_Blended(font->GetFont(), text, color);
 		if(surf == NULL) {
 			return;
 		}

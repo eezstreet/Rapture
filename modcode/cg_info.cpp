@@ -5,28 +5,35 @@ int currentMouseY = 0;
 float currentWorldpsaceX = 0;
 float currentWorldspaceY = 0;
 
-void* ptConsolasFont;
+Font* ptConsolasFont;
 
 void RegisterMedia() {
 	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 18);
 }
 
 void DrawViewportInfo() {
-	bool drawFPS = false;
+	int drawFPS = 0;
 	bool drawXY = false;
 	bool drawWorldXY = false;
 	stringstream ss;
 
-	trap->CvarBoolVal("cg_drawfps", &drawFPS);
+	trap->CvarIntVal("cg_drawfps", &drawFPS);
 	trap->CvarBoolVal("cg_drawxy", &drawXY);
 	trap->CvarBoolVal("cg_drawworldxy", &drawWorldXY);
 
-	if(drawFPS) {
+	if(drawFPS >= 1) {
 		FPSFrame();
 
-		ss << "FPS: ";
-		ss << GetGameFPS();
-		ss << "      ";
+		if(drawFPS == 1 || drawFPS == 3) {
+			ss << "FPS: ";
+			ss << GetGameFPS();
+			ss << "      ";
+		}
+		if(drawFPS == 2 || drawFPS == 3) {
+			ss << "ms: ";
+			ss << GetGameFrametime();
+			ss << "      ";
+		}
 	}
 
 	if(drawXY) {

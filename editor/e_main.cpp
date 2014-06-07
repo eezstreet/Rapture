@@ -5,7 +5,7 @@ gameImports_s* trap;
 
 EditorMode_e eCurMode;
 
-static void* hotkeyDisplay;
+static Menu* hotkeyDisplay;
 
 void Editor_Load() {
 	InitFPS();
@@ -13,7 +13,7 @@ void Editor_Load() {
 
 	trap->InitMaterials();
 
-	trap->RegisterCvarBool("cg_drawfps", "Draw FPS ingame?", 0, true);
+	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame?", 0, 1);
 
 	eCurMode = EMODE_TILES;
 

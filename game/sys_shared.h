@@ -16,7 +16,11 @@
 #include <functional>
 using namespace std;
 
-vector<string>& split(const string& str, const char delim);
+#ifdef _WIN32
+#pragma warning(disable: 4996)
+#endif
+
+vector<string>& split(const string& str, const char delim, vector<string>& elems);
 vector<wstring>& split(const wstring& str, const wchar_t delim);
 bool atob(const string& str);
 bool atob(const char* str);
@@ -30,6 +34,14 @@ void stringreplace(string& fullString, const string& sequence, const string& rep
 const char* btoa(bool b);
 string stripextension(const string& str);
 
+// Export types
+class File;
+class Image;
+class Font;
+class Menu;
+class Material;
+class Cvar;
+
 struct gameImports_s {
 	// Logging
 	void (*printf)(const char* fmt, ...);
@@ -39,46 +51,54 @@ struct gameImports_s {
 	int (*GetTicks)();
 
 	// File I/O
-	void* (*OpenFile)(const char* filename, const char* mode);
-	void (*CloseFile)(void* filehandle);
+	File* (*OpenFile)(const char* filename, const char* mode);
+	void (*CloseFile)(File* filehandle);
 	int (*ListFilesInDir)(const char* dir, vector<string>& in, const char* extension);
-	string (*ReadPlaintext)(void* filehandle, size_t numChars);
-	size_t (*ReadBinary)(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-	size_t (*GetFileSize)(void* filehandle);
+	string (*ReadPlaintext)(File* filehandle, size_t numChars);
+	size_t (*ReadBinary)(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
+	size_t (*GetFileSize)(File* filehandle);
 	
 	// Images
-	void* (*RegisterImage)(const char* filename);
-	void (*DrawImage)(void* image, float xPct, float yPct, float wPct, float hPct);
-	void (*DrawImageAbs)(void* image, int x, int y, int w, int h);
-	void (*DrawImageAspectCorrection)(void* image, float xPct, float yPct, float wPct, float hPct);
-	void (*DrawImageClipped)(void* image, float sxPct, float syPct, float swPct, float shPct,
+	Image* (*RegisterImage)(const char* filename);
+	void (*DrawImage)(Image* image, float xPct, float yPct, float wPct, float hPct);
+	void (*DrawImageAbs)(Image* image, int x, int y, int w, int h);
+	void (*DrawImageAspectCorrection)(Image* image, float xPct, float yPct, float wPct, float hPct);
+	void (*DrawImageClipped)(Image* image, float sxPct, float syPct, float swPct, float shPct,
 		float ixPct, float iyPct, float iwPct, float ihPct);
 
 	// Font/text
-	void* (*RegisterFont)(const char* sFontFile, int iPointSize);
-	void (*RenderTextSolid)(void* font, const char* text, int r, int g, int b);
-	void (*RenderTextShaded)(void* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-	void (*RenderTextBlended)(void* font, const char* text, int r, int g, int b);
+	Font* (*RegisterFont)(const char* sFontFile, int iPointSize);
+	void (*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
+	void (*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
+	void (*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
 
 	// UI
-	void* (*RegisterStaticMenu)(const char* sMenuFile);
-	void (*KillStaticMenu)(void* menu);
+	Menu* (*RegisterStaticMenu)(const char* sMenuFile);
+	void (*KillStaticMenu)(Menu* menu);
 
 	// Materials
 	void (*InitMaterials)();
 	void (*ShutdownMaterials)();
-	void* (*RegisterMaterial)(const char* name);
-	void (*RenderMaterial)(void* ptMaterial, float x, float y);
+	Material* (*RegisterMaterial)(const char* name);
+	void (*RenderMaterial)(Material* ptMaterial, int x, int y);
 
 	// Cvars
 	void (*CvarIntVal)(const char* cvarName, int* value);
 	void (*CvarStrVal)(const char* cvarName, char* value);
 	void (*CvarBoolVal)(const char* cvarName, bool* value);
 	void (*CvarValue)(const char* cvarName, float* value);
-	void* (*RegisterCvarInt)(const string& cvarName, const string& description, int flags, int startingValue);
-	void* (*RegisterCvarFloat)(const string& cvarName, const string& description, int flags, float startingValue);
-	void* (*RegisterCvarBool)(const string& cvarName, const string& description, int flags, bool bStartingValue);
-	void* (*RegisterCvarStr)(const string& cvarName, const string& description, int flags, char* sStartingValue);
+	Cvar* (*RegisterCvarInt)(const string& cvarName, const string& description, int flags, int startingValue);
+	Cvar* (*RegisterCvarFloat)(const string& cvarName, const string& description, int flags, float startingValue);
+	Cvar* (*RegisterCvarBool)(const string& cvarName, const string& description, int flags, bool bStartingValue);
+	Cvar* (*RegisterCvarStr)(const string& cvarName, const string& description, int flags, char* sStartingValue);
+
+	// Zone memory
+	void* (*Zone_Alloc)(int iSize, const char* tag);
+	void (*Zone_NewTag)(const char* tag);
+	void (*Zone_Free)(void *memory);
+	void (*Zone_FastFree)(void* memory, const char* tag);
+	void (*Zone_FreeAll)(const char* tag);
+	void* (*Zone_Realloc)(void* memory, size_t iNewSize);
 };
 
 struct gameExports_s {

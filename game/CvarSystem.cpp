@@ -97,8 +97,9 @@ Cvar* CvarSystem::RegisterCvar(Cvar *cvar) {
 
 Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFlags, char* startValue) {
 	auto it = cvars.find(sName);
-	if(it != cvars.end())
+	if(it != cvars.end()) {
 		return it->second;
+	}
 
 	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
 	cvar->name = sName;
@@ -108,14 +109,14 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	auto it2 = cache.find(sName); // Check the cache.
 	if(it2 != cache.end()) {
 		// use from the cache
-		if(it2->second->archive)
-			cvar->flags = iFlags | Cvar::CVAR_ARCHIVE;
-		else
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+		} else {
 			cvar->flags = iFlags;
+		}
 		cvar->AssignHardValue((char*)it2->second->initvalue.c_str());
 		Cache_Free(sName);
-	}
-	else {
+	} else {
 		// register a new cvar altogether
 		cvar->flags = iFlags;
 		cvar->AssignHardValue(startValue);
@@ -127,8 +128,9 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 
 Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFlags, int startValue) {
 	auto it = cvars.find(sName);
-	if(it != cvars.end())
+	if(it != cvars.end()) {
 		return it->second;
+	}
 
 	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
 	cvar->name = sName;
@@ -138,14 +140,14 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	auto it2 = cache.find(sName); // Check the cache.
 	if(it2 != cache.end()) {
 		// use from the cache
-		if(it2->second->archive)
-			cvar->flags = iFlags | Cvar::CVAR_ARCHIVE;
-		else
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+		} else {
 			cvar->flags = iFlags;
+		}
 		cvar->AssignHardValue(atoi(it2->second->initvalue.c_str()));
 		Cache_Free(sName);
-	}
-	else {
+	} else {
 		// register a new cvar altogether
 		cvar->flags = iFlags;
 		cvar->AssignHardValue(startValue);
@@ -158,8 +160,9 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFlags, float startValue) {
 	// TODO: generalize most of this code into one func
 	auto it = cvars.find(sName);
-	if(it != cvars.end())
+	if(it != cvars.end()) {
 		return it->second;
+	}
 
 	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
 	cvar->name = sName;
@@ -169,14 +172,14 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	auto it2 = cache.find(sName); // Check the cache.
 	if(it2 != cache.end()) {
 		// use from the cache
-		if(it2->second->archive)
-			cvar->flags = iFlags | Cvar::CVAR_ARCHIVE;
-		else
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+		} else {
 			cvar->flags = iFlags;
+		}
 		cvar->AssignHardValue((float)atof(it2->second->initvalue.c_str()));
 		Cache_Free(sName);
-	}
-	else {
+	} else {
 		// register a new cvar altogether
 		cvar->flags = iFlags;
 		cvar->AssignHardValue(startValue);
@@ -187,8 +190,9 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 
 Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFlags, bool startValue) {
 	auto it = cvars.find(sName);
-	if(it != cvars.end())
+	if(it != cvars.end()) {
 		return it->second;
+	}
 	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
 	cvar->name = sName;
 	cvar->description = sDesc;
@@ -198,14 +202,14 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	auto it2 = cache.find(sName); // Check the cache.
 	if(it2 != cache.end()) {
 		// use from the cache
-		if(it2->second->archive)
-			cvar->flags = iFlags | Cvar::CVAR_ARCHIVE;
-		else
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+		} else {
 			cvar->flags = iFlags;
+		}
 		cvar->AssignHardValue(atob(it2->second->initvalue));
 		Cache_Free(sName);
-	}
-	else {
+	} else {
 		// register a new cvar altogether
 		cvar->flags = iFlags;
 		cvar->AssignHardValue(startValue);
@@ -256,7 +260,7 @@ void CvarSystem::ArchiveCvars() {
 		return; // also should not happen
 	for(auto it = cvars.begin(); it != cvars.end(); ++it) {
 		Cvar* cv = it->second;
-		if(cv->flags & Cvar::CVAR_ARCHIVE) {
+		if(cv->flags & (1 << Cvar::CVAR_ARCHIVE)) {
 			stringstream ss;
 			ss << "seta " << cv->name << " ";
 			switch(cv->type) {
@@ -391,7 +395,7 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 				break;
 			case Cvar::CV_STRING:
 			default:
-				cvar->SetValue(VArguments[1].c_str());
+				cvar->SetValue((char*)VArguments[1].c_str());
 				break;
 		}
 	}

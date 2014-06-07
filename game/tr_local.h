@@ -33,7 +33,7 @@ private:
 public:
 	Material();
 	~Material();
-	void SendToRenderer(float x, float y);
+	void SendToRenderer(int x, int y);
 
 friend class MaterialHandler;
 };

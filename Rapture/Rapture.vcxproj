@@ -43,6 +43,11 @@
     <IntDir>C:\Rapture\$(Configuration)\</IntDir>
     <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>C:\Rapture\Gamedata\</OutDir>
+    <IntDir>C:\Rapture\$(Configuration)\</IntDir>
+    <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -63,11 +68,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../SDL_image/include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

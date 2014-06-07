@@ -42,7 +42,7 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 
 MaterialHandler::MaterialHandler() {
 	vector<string> matFiles;
-	int numFiles = FS::EXPORT_ListFilesInDir("materials/", matFiles, ".json");
+	int numFiles = FileSystem::EXPORT_ListFilesInDir("materials/", matFiles, ".json");
 	if(numFiles == 0) {
 		R_Printf("WARNING: no materials loaded\n");
 		return;
@@ -77,11 +77,11 @@ Material::~Material() {
 	}
 }
 
-void Material::SendToRenderer(float x, float y) {
+void Material::SendToRenderer(int x, int y) {
 	if(!bLoadedResources) {
 		LoadResources();
 	}
-	RenderCode::DrawImageAbs((void*)ptResource, x, y);
+	RenderCode::DrawImageAbs((Image*)ptResource, x, y);
 }
 
 void Material::LoadResources() {

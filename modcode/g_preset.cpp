@@ -8,7 +8,7 @@ static void MP_LoadTilePreset(const string& path) {
 	}
 
 	PresetFileData* pfd = (PresetFileData*)malloc(sizeof(PresetFileData));
-	void* file = trap->OpenFile(path.c_str(), "rb");
+	File* file = trap->OpenFile(path.c_str(), "rb");
 	if(!file) {
 		R_Error("Directory failure in levels/preset: %s", path.c_str());
 		free(pfd);
@@ -48,12 +48,6 @@ static void MP_LoadTilePreset(const string& path) {
 	size_t entSize = sizeof(*pfd->entities)*pfd->head.numEntities;
 	unsigned char* binaryFile = new unsigned char[tileSize + entSize];	// FIXME: RAII compliant pls
 	trap->ReadBinary(file, binaryFile, tileSize + entSize, true);
-
-	/*if(trap->GetFileSize(file)-sizeof(pfd->head) < tileSize + entSize) {
-		R_Printf("WARNING: BDF file (%s) is incomplete!\n", path.c_str());
-		delete binaryFile;
-		return;
-	}*/
 
 	if(pfd->head.numTiles > 0) {
 		PresetFileData::LoadedTile* tiles = new PresetFileData::LoadedTile[pfd->head.numTiles];

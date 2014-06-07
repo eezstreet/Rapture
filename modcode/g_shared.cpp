@@ -19,6 +19,8 @@ string genuuid() {
 	string s((char*)str);
 	
 	RpcStringFree(&str);
+#else
+	string s = "Currently not coded for Linux";
 #endif
 
 	return s;

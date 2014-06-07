@@ -10,6 +10,9 @@
 typedef void* ptModule;
 typedef void* ptModuleFunction;
 
+//
+// sys_main.cpp
+//
 class GameModule {
 	// modcode that gets loaded via shared objects
 private:
@@ -46,6 +49,10 @@ public:
 	static GameModule* GetGameModule();
 	static gameExports_s* GetImport();
 };
+
+//
+// CvarSystem.cpp
+//
 
 template<typename T>
 struct CvarValueSet {
@@ -102,10 +109,10 @@ public:
 	string GetName() { return name; }
 	string GetDescription() { return description; }
 
-	void SetValue(char* value) { if(type != CV_STRING) return; s.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %s\n", name.c_str(), value); }
-	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %i\n", name.c_str(), value); }
-	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %f\n", name.c_str(), value); }
-	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & CVAR_ANNOUNCE) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
+	void SetValue(char* value) { if(type != CV_STRING) return; s.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
+	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %i\n", name.c_str(), value); }
+	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %f\n", name.c_str(), value); }
+	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
 	inline char* String() { return s.currentVal; }
 	inline int Integer() { return i.currentVal; }
 	inline float Value() { return v.currentVal; }
@@ -188,6 +195,11 @@ friend class Cvar;
 };
 
 /* Memory */
+
+//
+// Zone.cpp
+//
+
 namespace Zone {
 	enum zoneTags_e {
 		TAG_NONE,
@@ -198,7 +210,7 @@ namespace Zone {
 		TAG_MATERIALS,
 		TAG_FONT,
 		TAG_CUSTOM, // should only be used by mods
-		TAG_MAX,
+		MAX_ENGINE_TAGS // last of the engine tags, but we can add more for vms
 	};
 
 	extern string tagNames[];
@@ -225,6 +237,7 @@ namespace Zone {
 		unordered_map<string, ZoneTag> zone;
 	public:
 		void* Allocate(int iSize, zoneTags_e tag);
+		void* Allocate(int iSize, const string& tag);
 		void Free(void* memory);
 		void FastFree(void* memory, const string& tag);
 		void FreeAll(const string& tag);
@@ -253,14 +266,23 @@ namespace Zone {
 	void Shutdown();
 
 	void* Alloc(int iSize, zoneTags_e tag);
+	void* Alloc(int iSize, const string& tag);
+	void* VMAlloc(int iSize, const char* tag)/* { return Alloc(iSize, tag); }*/ ;
 	void  Free(void* memory);
 	void  FastFree(void *memory, const string& tag);
+	void  VMFastFree(void* memory, const char* tag)/* { FastFree(memory, tag); }*/ ;
 	void  FreeAll(const string& tag);
+	void  VMFreeAll(const char* tag)/* { FreeAll(tag); }*/ ;
 	void* Realloc(void *memory, size_t iNewSize);
+	void  NewTag(const char* tag)/* { mem->CreateZoneTag(tag); }*/ ;
 	template<typename T>
 	T* New(zoneTags_e tag) { return mem->AllocClass<T>(tag); }
 	void MemoryUsage();
 };
+
+//
+// Hunk.cpp
+//
 
 namespace Hunk {
 	class MemoryManager {
@@ -273,7 +295,11 @@ namespace Hunk {
 	void Shutdown();
 };
 
-/* Filesystem */
+
+//
+// FileSystem.cpp
+//
+
 class File {
 	FILE* handle;
 	string searchpath;
@@ -295,35 +321,46 @@ public:
 friend class File;
 };
 
-namespace FS {
-	class FileSystem {
-		vector<string> searchpaths;
-		unordered_map<string, File*> files;
-		void RecursivelyTouch(const string& path);
-	public:
-		void AddSearchPath(const string& searchpath) { string s = searchpath; stringreplace(s, "\\", "/"); searchpaths.push_back(s); }
-		inline void AddCoreSearchPath(const string& basepath, const string& core) { AddSearchPath(basepath + '/' + core); }
-		void CreateModSearchPaths(const string& basepath, const string& modlist);
-		FileSystem();
-		~FileSystem();
-		inline vector<string>& GetSearchPaths() { return searchpaths; }
-		void PrintSearchPaths();
-		static int ListFiles(const string& dir, vector<string>& in, const string& extension="");
-	friend class File;
-	};
+class FileSystem {
+	///////////////
+	// Class Properties
+	// and methods
+	///////////////
+private:
+	vector<string> searchpaths;
+	unordered_map<string, File*> files;
+	void RecursivelyTouch(const string& path);
 
-	void Init();
-	void Shutdown();
+public:
+	void AddSearchPath(const string& searchpath) { string s = searchpath; stringreplace(s, "\\", "/"); searchpaths.push_back(s); }
+	inline void AddCoreSearchPath(const string& basepath, const string& core) { AddSearchPath(basepath + '/' + core); }
+	void CreateModSearchPaths(const string& basepath, const string& modlist);
+	FileSystem();
+	~FileSystem();
+	inline vector<string>& GetSearchPaths() { return searchpaths; }
+	void PrintSearchPaths();
+	static int ListFiles(const string& dir, vector<string>& in, const string& extension="");
 
-	void* EXPORT_OpenFile(const char* filename, const char* mode);
-	void EXPORT_Close(void* filehandle);
-	int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char *extension);
-	size_t EXPORT_ReadBinary(void* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-	string EXPORT_ReadPlaintext(void* filehandle, size_t numChars);
-	size_t EXPORT_GetFileSize(void* filehandle);
+	////////////
+	// Static Methods
+	////////////
+	static void Init();
+	static void Shutdown();
+
+	static File* EXPORT_OpenFile(const char* filename, const char* mode);
+	static void EXPORT_Close(File* filehandle);
+	static int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char *extension);
+	static size_t EXPORT_ReadBinary(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
+	static string EXPORT_ReadPlaintext(File* filehandle, size_t numChars);
+	static size_t EXPORT_GetFileSize(File* filehandle);
+
+friend class File;
 };
 
-/* CmdSystem.cpp */
+//
+// CmdSystem.cpp
+//
+
 namespace Cmd {
 	void ProcessCommand(const char *cmd);
 	void AddCommand(const string& cmdName, conCmd_t cmd);
@@ -334,7 +371,11 @@ namespace Cmd {
 	string TabComplete(const string& input);
 };
 
-/* Input.cpp */
+
+//
+// Input.cpp
+//
+
 class InputManager {
 private:
 	map<SDL_Scancode, string> binds;
@@ -358,7 +399,11 @@ void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
 
-/* FontManager.cpp */
+
+//
+// FontManager.cpp
+//
+
 class Font {
 private:
 	TTF_Font* ptFont;
@@ -369,6 +414,8 @@ public:
 	~Font();
 
 	TTF_Font* GetFont() { return ptFont; }
+
+	static Font* Register(const char* sFontFile, int iPointSize);
 friend class FontManager;
 };
 
@@ -380,9 +427,11 @@ public:
 	Font* RegisterFont(const char* sFontFile, int iPointSize);
 };
 extern FontManager* FontMan;
-void* EXPORT_RegisterFont(const char* sFontFile, int iPointSize);
 
-/* Viewlog.cpp */
+
+//
+// Viewlog (shared)
+//
 class Viewlog {
 protected:
 	Cvar* cvViewlog;
@@ -400,10 +449,17 @@ void Sys_InitViewlog();
 
 void setGameQuitting(const bool b);
 
+
+//
 // sys_cmds.cpp
+//
+
 void Sys_InitCommands();
 
+
+//
 // sys_<platform>.cpp
+//
 char* Sys_FS_GetHomepath();
 char* Sys_FS_GetBasepath();
 string Sys_GetClipboardContents();

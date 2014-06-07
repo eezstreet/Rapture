@@ -119,9 +119,12 @@ void Console::BlankConsole() {
 
 void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_caller_id, 
 	const Awesomium::WebString& method_name, const Awesomium::JSArray& args) {
+	JSArray jsFuncArgs;
+
 	// Handle base commands
-	if(ExecuteBaseCommand(ToString(method_name), args))
+	if(ExecuteBaseCommand(ToString(method_name), args)) {
 		return;
+	}
 	// Execute custom commands for the console class
 	if(method_name == WSLit("sendToClipboard")) {
 		size_t strLength = args[0].ToString().length();
@@ -131,11 +134,11 @@ void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_calle
 		wView->Copy();
 
 		// Deselect the text
-		if(!window.IsObject())
+		if(!window.IsObject()) {
 			return;
+		}
 
-		JSArray args;
-		window.ToObject().Invoke(WSLit("UNIX_DeselectAll"), args);
+		window.ToObject().Invoke(WSLit("UNIX_DeselectAll"), jsFuncArgs);
 	}
 	else if(method_name == WSLit("sendConsoleCommand")) {
 		WebString buffer = args[0].ToString();
@@ -171,9 +174,8 @@ void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_calle
 		string value = ToString(theArgument.ToString());
 		string tabCompletion = Cmd::TabComplete(value);
 
-		JSArray args;
-		args.Push(WSLit(tabCompletion.c_str()));
-		window.ToObject().Invoke(WSLit("InputBufferUpdated"), args);
+		jsFuncArgs.Push(WSLit(tabCompletion.c_str()));
+		window.ToObject().Invoke(WSLit("InputBufferUpdated"), jsFuncArgs);
 	}
 }
 

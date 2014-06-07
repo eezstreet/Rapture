@@ -4,7 +4,7 @@ gameImports_s* trap;
 
 static gameExports_s exportFns;
 static int iLoadingScreen = 0;
-static void* ptLoadScreenImage = NULL;
+static Image* ptLoadScreenImage = NULL;
 
 void Game_Init() {
 	trap->printf("--- New Game ---\n");
@@ -23,7 +23,7 @@ void Game_Load() {
 	trap->InitMaterials();
 	InitLevels();
 
-	trap->RegisterCvarBool("cg_drawfps", "Draw FPS ingame?", 1, false);
+	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame?", 1, 0);
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
 

@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 		while(!sys->bHasFinished)
 			sys->RunLoop();
 	}
-	catch(const bool error) {
+	catch(const bool) {
 		while((sys && !sys->bHasFinished) || (!bStartupQuit)) {
 #ifdef _WIN32
 			MSG        msg;
@@ -99,7 +99,7 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	CvarSystem::Initialize();
 
 	// Init filesystem
-	FS::Init();
+	FileSystem::Init();
 
 	// Read from the config
 	Cmd::ProcessCommand("exec raptureconfig.cfg");
@@ -136,7 +136,7 @@ RaptureGame::~RaptureGame() {
 	DeleteInput();
 	RenderCode::Exit();
 	CvarSystem::Destroy();
-	FS::Shutdown();
+	FileSystem::Shutdown();
 	Zone::Shutdown();
 }
 
@@ -166,9 +166,11 @@ void RaptureGame::HandleCommandline(int argc, char** argv) {
 	for(int i = 1; i < argc; i++) {
 		ss += argv[i];
 	}
-	vector<string> s = split(ss, '+');
-	for(auto it = s.begin(); it != s.end(); ++it)
+	vector<string> s;
+	split(ss, '+', s);
+	for(auto it = s.begin(); it != s.end(); ++it) {
 		Cmd::ProcessCommand(it->c_str());
+	}
 }
 
 /* Quit the game. */
@@ -181,15 +183,15 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->printf = R_Printf;
 	imp->error = R_Error;
 	imp->GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
-	imp->OpenFile = FS::EXPORT_OpenFile;
-	imp->CloseFile = FS::EXPORT_Close;
-	imp->GetFileSize = FS::EXPORT_GetFileSize;
-	imp->ListFilesInDir = FS::EXPORT_ListFilesInDir;
-	imp->ReadPlaintext = FS::EXPORT_ReadPlaintext;
-	imp->ReadBinary = FS::EXPORT_ReadBinary;
+	imp->OpenFile = FileSystem::EXPORT_OpenFile;
+	imp->CloseFile = FileSystem::EXPORT_Close;
+	imp->GetFileSize = FileSystem::EXPORT_GetFileSize;
+	imp->ListFilesInDir = FileSystem::EXPORT_ListFilesInDir;
+	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
+	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
 	imp->RegisterImage = RenderCode::RegisterImage;
 	imp->DrawImage = RenderCode::DrawImage;
-	imp->DrawImageAbs = static_cast<void(*)(void*, int, int, int, int)>(RenderCode::DrawImageAbs);
+	imp->DrawImageAbs = static_cast<void(*)(Image*, int, int, int, int)>(RenderCode::DrawImageAbs);
 	imp->DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
 	imp->DrawImageClipped = RenderCode::DrawImageClipped;
 	imp->InitMaterials = RenderCode::InitMaterials;
@@ -200,22 +202,22 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
 	imp->CvarValue = CvarSystem::EXPORT_Value;
-	// ugly code below
-	imp->RegisterCvarBool = reinterpret_cast<void*(*)(const string&, const string&, int, bool)>
-		(static_cast<Cvar*(*)(const string&, const string&, int, bool)>(CvarSystem::RegisterCvar));
-	imp->RegisterCvarFloat = reinterpret_cast<void*(*)(const string&, const string&, int, float)>
-		(static_cast<Cvar*(*)(const string&, const string&, int, float)>(CvarSystem::RegisterCvar));
-	imp->RegisterCvarInt = reinterpret_cast<void*(*)(const string&, const string&, int, int)>
-		(static_cast<Cvar*(*)(const string&, const string&, int, int)>(CvarSystem::RegisterCvar));
-	imp->RegisterCvarStr = reinterpret_cast<void*(*)(const string&, const string&, int, char*)>
-		(static_cast<Cvar*(*)(const string&, const string&, int, char*)>(CvarSystem::RegisterCvar));
-	// end ugly code
-	imp->RegisterFont = EXPORT_RegisterFont;
+	imp->RegisterCvarBool = static_cast<Cvar*(*)(const string&, const string&, int, bool)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarFloat = static_cast<Cvar*(*)(const string&, const string&, int, float)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarInt = static_cast<Cvar*(*)(const string&, const string&, int, int)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarStr = static_cast<Cvar*(*)(const string&, const string&, int, char*)>(CvarSystem::RegisterCvar);
+	imp->RegisterFont = Font::Register;
 	imp->RenderTextBlended = RenderCode::RenderTextBlended;
 	imp->RenderTextShaded = RenderCode::RenderTextShaded;
 	imp->RenderTextSolid = RenderCode::RenderTextSolid;
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
+	imp->Zone_Alloc = Zone::VMAlloc;
+	imp->Zone_FastFree = Zone::VMFastFree;
+	imp->Zone_Free = Zone::Free;
+	imp->Zone_FreeAll = Zone::VMFreeAll;
+	imp->Zone_NewTag = Zone::NewTag;
+	imp->Zone_Realloc = Zone::Realloc;
 }
 
 /* Started a new game (probably from the menu) */

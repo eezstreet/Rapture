@@ -43,8 +43,8 @@ namespace Cmd {
 		vector<string> arguments = Tokenize(cmd);
 		auto it = cmdlist.find(arguments[0]);
 		if(it != cmdlist.end()) {
-			auto cmd = (*it).second;
-			cmd(arguments);
+			auto command = (*it).second;
+			command(arguments);
 			return;
 		}
 		else if(CvarSystem::ProcessCvarCommand(arguments[0], arguments)) {
@@ -144,6 +144,12 @@ namespace Cmd {
 					i++;
 				retVal.push_back(str.substr(quoteStart, i));
 				lastSplit = i;
+			}
+		}
+		for(auto it = retVal.begin(); it != retVal.end(); ++it) {
+			// Make sure we don't have any entries with pure whitespace
+			if((*it).find_first_not_of(' ') == string::npos) {
+				retVal.erase(it);
 			}
 		}
 		retVal.push_back(str.substr(lastSplit));
