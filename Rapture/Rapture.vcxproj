@@ -86,6 +86,7 @@
     <ClCompile Include="..\game\CvarSystem.cpp" />
     <ClCompile Include="..\game\FileSystem.cpp" />
     <ClCompile Include="..\game\FontManager.cpp" />
+    <ClCompile Include="..\game\FrameCapper.cpp" />
     <ClCompile Include="..\game\GameModule.cpp" />
     <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="..\game\sys_cmds.cpp" />
     <ClCompile Include="..\game\sys_main.cpp" />
     <ClCompile Include="..\game\sys_win32.cpp" />
+    <ClCompile Include="..\game\Timer.cpp" />
     <ClCompile Include="..\game\ui_main.cpp" />
     <ClCompile Include="..\game\win32_viewlog.cpp" />
     <ClCompile Include="..\game\Zone.cpp" />

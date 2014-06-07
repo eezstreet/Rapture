@@ -1,5 +1,4 @@
 #include "sys_local.h"
-#include <SDL.h>
 
 /* main game initialization */
 
@@ -11,8 +10,12 @@ void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFi
 int main(int argc, char** argv) {
 	try {
 		sys = new RaptureGame(argc, argv);
-		while(!sys->bHasFinished)
+		FrameCapper fc;
+		while(!sys->bHasFinished) {
+			fc.StartFrame();
 			sys->RunLoop();
+			fc.EndFrame();
+		}
 	}
 	catch(const bool) {
 		while((sys && !sys->bHasFinished) || (!bStartupQuit)) {

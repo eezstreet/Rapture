@@ -430,6 +430,48 @@ extern FontManager* FontMan;
 
 
 //
+// Timer.cpp
+//
+class Timer {
+protected:
+	unsigned long ulStartTicks;
+	unsigned long ulPausedTicks;
+
+	bool bIsStarted;
+	bool bIsPaused;
+
+	string sTimerName;
+public:
+	Timer();
+	Timer(const string& sName);
+
+	void Start();
+	void Stop();
+	void Pause();
+	void Unpause();
+
+	unsigned long GetTicks();
+
+	bool IsStarted() { return bIsStarted; };
+	bool IsPaused() { return bIsPaused; };
+};
+
+
+//
+// FrameCapper.cpp
+//
+class FrameCapper {
+protected:
+	Timer capTimer;
+	Cvar* capCvar;
+public:
+	void StartFrame();
+	void EndFrame();
+	FrameCapper();
+};
+
+
+//
 // Viewlog (shared)
 //
 class Viewlog {
