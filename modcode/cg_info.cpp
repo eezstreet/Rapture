@@ -22,8 +22,6 @@ void DrawViewportInfo() {
 	trap->CvarBoolVal("cg_drawworldxy", &drawWorldXY);
 
 	if(drawFPS >= 1) {
-		FPSFrame();
-
 		if(drawFPS == 1 || drawFPS == 3) {
 			ss << "FPS: ";
 			ss << GetGameFPS();

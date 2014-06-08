@@ -44,6 +44,7 @@ void Game_Frame() {
 		iLoadingScreen = 0;
 	}
 	else {
+		FPSFrame();
 		world.DrawBackground();
 		world.DrawEntities();
 		DrawViewportInfo();
@@ -52,12 +53,16 @@ void Game_Frame() {
 
 void Game_OnMouseUp(int x, int y) {
 	Player* ply = world.GetFirstPlayer();
-	ply->MouseUpEvent(x, y);
+	if(ply != NULL) {
+		ply->MouseUpEvent(x, y);
+	}
 }
 
 void Game_OnMouseDown(int x, int y) {
 	Player* ply = world.GetFirstPlayer();
-	ply->MouseDownEvent(x, y);
+	if(ply != NULL) {
+		ply->MouseDownEvent(x, y);
+	}
 }
 
 void Game_OnMouseMove(int x, int y) {
@@ -65,7 +70,9 @@ void Game_OnMouseMove(int x, int y) {
 	currentMouseY = y;
 
 	Player* ply = world.GetFirstPlayer();
-	ply->MouseMoveEvent(x, y);
+	if(ply != NULL) {
+		ply->MouseMoveEvent(x, y);
+	}
 }
 
 extern "C" {

@@ -62,7 +62,10 @@ void Worldspace::AddPlayer(Player* ptPlayer) {
 }
 
 Player* Worldspace::GetFirstPlayer() {
-	return vPlayers.front();
+	if(vPlayers.size() > 0) {
+		return vPlayers.front();
+	}
+	return NULL;
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFX(float x, float y) {

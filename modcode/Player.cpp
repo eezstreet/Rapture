@@ -1,7 +1,7 @@
 #include "g_local.h"
 #include "RVector.h"
 
-const static float speed = 0.02;
+const static float speed = 0.003;
 static RVec2<float> dir(0,0);
 static RVec2<float> dest(0,0);
 static bool bShouldWeBeMoving = false;
@@ -16,12 +16,12 @@ Player::Player(float _x, float _y) {
 
 void Player::think() {
 	RVec2<float> origin(x, y);
-	if(bShouldWeBeMoving && origin.Within(dest, 0.025)) {
+	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.025)) {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
-		x += dir.GetX() * speed;
-		y += dir.GetY() * speed;
+		x += dir.GetX() * speed * GetGameFrametime();
+		y += dir.GetY() * speed * GetGameFrametime();
 	}
 	render();
 }
@@ -58,15 +58,16 @@ void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
 void Player::MouseMoveEvent(int sx, int sy) {
 	// Change direction
 	if(bMouseDown && bShouldWeBeMoving) {
-		MoveToScreenspace(sx, sy, true);
+		MoveToScreenspace(sx, sy, false);
 	}
 }
 
 void Player::MouseDownEvent(int sx, int sy) {
-	MoveToScreenspace(sx, sy, true);
+	MoveToScreenspace(sx, sy, false);
 	bMouseDown = true;
 }
 
 void Player::MouseUpEvent(int sx, int sy) {
 	bMouseDown = false;
+	bDoWeHaveADestination = true;
 }
