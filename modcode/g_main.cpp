@@ -51,16 +51,21 @@ void Game_Frame() {
 }
 
 void Game_OnMouseUp(int x, int y) {
+	Player* ply = world.GetFirstPlayer();
+	ply->MouseUpEvent(x, y);
 }
 
 void Game_OnMouseDown(int x, int y) {
 	Player* ply = world.GetFirstPlayer();
-	ply->ClickEvent(x, y);
+	ply->MouseDownEvent(x, y);
 }
 
 void Game_OnMouseMove(int x, int y) {
 	currentMouseX = x;
 	currentMouseY = y;
+
+	Player* ply = world.GetFirstPlayer();
+	ply->MouseMoveEvent(x, y);
 }
 
 extern "C" {

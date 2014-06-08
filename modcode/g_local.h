@@ -122,13 +122,16 @@ protected:
 // Players are...players.
 class Player : public Actor {
 	unsigned char playerNum;
+	void MoveToScreenspace(int sx, int sy, bool bStopAtDestination);
 public:
 	virtual void render();
 	virtual void think();
 	virtual void spawn();
 	Player(float x, float y);
 
-	void ClickEvent(int sX, int sY);
+	void MouseUpEvent(int sX, int sY);
+	void MouseDownEvent(int sX, int sY);
+	void MouseMoveEvent(int sX, int sY);
 };
 
 // A tilenode is a tile in the world

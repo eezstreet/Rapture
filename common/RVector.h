@@ -58,7 +58,7 @@ public:
 
 	bool Within(const RVec2<T>& other, const T distance) {
 		if((tComponents[0] < (other.tComponents[0] + distance) &&
-			tComponents[0] > (other.tComponents[0] - distance)) ||
+			tComponents[0] > (other.tComponents[0] - distance)) &&
 			(tComponents[1] < (other.tComponents[1] + distance) &&
 			tComponents[1] > (other.tComponents[1] - distance))) {
 				return true;
