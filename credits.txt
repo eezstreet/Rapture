@@ -1,4 +1,36 @@
-xsn
-Xycaleth
-SmileTheory
+Direct Assistance:
+Cat / deepy
+Didz / dionrhys
+ensiform
+kingpin
+Necrolis
 redsaurus
+Scooper
+SmileTheory
+Raz0r
+Xycaleth
+
+Libraries:
+BobaFett (cJSON)
+Awesomium LLC
+SDL Community
+
+Snippets:
+LazyFoo'
+Various StackOverflow posters
+Necrolis
+khrona
+xsn
+
+Websites:
+cplusplus.com
+W3C
+cppreference.com
+
+Inspiration:
+John Carmack / id software
+Blizzard Entertainment
+The Phrozen Keep
+xsngine
+
+If you have helped me and don't see your name on here, please don't hesitate to contact me!
