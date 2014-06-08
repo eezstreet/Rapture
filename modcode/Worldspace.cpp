@@ -5,8 +5,8 @@
 #define WORLDSPACE_LOG2		/*15*/		2
 
 Worldspace::Worldspace() {
-	qtTileTree = new QuadTree<TileNode, unsigned int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2);
-	qtEntTree = new QuadTree<SpatialEntity, float>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2 + 2);
+	qtTileTree = new QuadTree<TileNode, unsigned int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
+	qtEntTree = new QuadTree<SpatialEntity, float>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2 + 2, NULL);
 };
 
 Worldspace::~Worldspace() {
@@ -34,7 +34,7 @@ void Worldspace::SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink,
 	if(bShouldCollide) {
 		mCollideList[s->uuid] = ent;
 	}
-	qtEntTree->AddNode(s);
+	ent->ptContainingTree = qtEntTree->AddNode(s);
 	ent->spawn();
 }
 
@@ -57,6 +57,18 @@ void Worldspace::DrawEntities() {
 	}
 }
 
+void Worldspace::UpdateEntities() {
+	for(auto it = vActorsMoved.begin(); it != vActorsMoved.end(); ++it) {
+		auto ptActor = *it;
+		if(ptActor->ptContainingTree == qtEntTree->ContainingTree(ptActor->pX, ptActor->pY)) {
+			continue;
+		}
+		ptActor->ptContainingTree->RemoveNode(ptActor);
+		qtEntTree->AddNode(ptActor);
+	}
+	vActorsMoved.clear();
+}
+
 void Worldspace::AddPlayer(Player* ptPlayer) {
 	vPlayers.push_back(ptPlayer);
 }
@@ -66,6 +78,10 @@ Player* Worldspace::GetFirstPlayer() {
 		return vPlayers.front();
 	}
 	return NULL;
+}
+
+void Worldspace::ActorMoved(Actor* ptActor) {
+	vActorsMoved.push_back(ptActor);
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFX(float x, float y) {

@@ -20,8 +20,10 @@ void Player::think() {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
+		pX = x; pY = y;
 		x += dir.GetX() * speed * GetGameFrametime();
 		y += dir.GetY() * speed * GetGameFrametime();
+		world.ActorMoved(this);
 	}
 	render();
 }

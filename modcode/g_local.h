@@ -108,6 +108,7 @@ friend struct Worldspace;
 
 class Entity : public SpatialEntity {
 public:
+	QuadTree<SpatialEntity, float>* ptContainingTree;
 	virtual void render() = 0;
 	virtual void think() = 0;
 	virtual void spawn() = 0;
@@ -115,8 +116,13 @@ public:
 
 // Actors have visible representations, whereas regular entities do not.
 class Actor : public Entity {
+public:
+	float GetPreviousX() const { return pX; }
+	float GetPreviousY() const { return pY; }
 protected:
 	Material* materialHandle;
+	float pX, pY;
+friend struct Worldspace;
 };
 
 // Players are...players.
@@ -256,11 +262,15 @@ public:
 
 	float PlayerOffsetX();
 	float PlayerOffsetY();
+
+	void UpdateEntities();
+	void ActorMoved(Actor* ptActor);
 private:
 	unordered_map<string, Entity*> mRenderList;
 	unordered_map<string, Entity*> mThinkList;
 	unordered_map<string, Entity*> mCollideList;
 
 	vector<Player*> vPlayers;
+	vector<Actor*> vActorsMoved;
 };
 extern Worldspace world;

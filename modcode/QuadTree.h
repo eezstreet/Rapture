@@ -25,22 +25,24 @@ private:
 	QuadTree<C, U>*		NE;
 	QuadTree<C, U>*		SW;
 	QuadTree<C, U>*		SE;
+	QuadTree<C, U>*		parent;
 public:
-	QuadTree(unsigned int x1, unsigned int y1, unsigned int w1, unsigned int h1, unsigned d1, unsigned m1) :
+	QuadTree(unsigned int x1, unsigned int y1, unsigned int w1, unsigned int h1, unsigned d1, unsigned m1, QuadTree<C, U>* ptParent) :
 		x(x1),
 		y(y1),
 		w(w1),
 		h(h1),
 		depth(d1),
-		maxDepth(m1) {
+		maxDepth(m1),
+		parent(ptParent) {
 			if(depth == maxDepth) {
 				return;
 			}
 
-			NW = new QuadTree<C, U>(x, y, w / (U)2, h / (U)2, depth+1, maxDepth);
-			NE = new QuadTree<C, U>(x + w / (U)2, y, w / (U)2, h / (U)2, depth+1, maxDepth);
-			SW = new QuadTree<C, U>(x, y + h / (U)2, w / (U)2, h / (U)2, depth+1, maxDepth);
-			SE = new QuadTree<C, U>(x + w / (U)2, y + h / (U)2, w / (U)2, h / (U)2, depth+1, maxDepth);
+			NW = new QuadTree<C, U>(x, y, w / (U)2, h / (U)2, depth+1, maxDepth, this);
+			NE = new QuadTree<C, U>(x + w / (U)2, y, w / (U)2, h / (U)2, depth+1, maxDepth, this);
+			SW = new QuadTree<C, U>(x, y + h / (U)2, w / (U)2, h / (U)2, depth+1, maxDepth, this);
+			SE = new QuadTree<C, U>(x + w / (U)2, y + h / (U)2, w / (U)2, h / (U)2, depth+1, maxDepth, this);
 	}
 
 	~QuadTree() {
@@ -65,28 +67,64 @@ public:
 					node->y + node->h > child->y + child->h);
 	}
 
-	void AddNode(C* node) {
+	QuadTree<C, U>* AddNode(C* node) {
 		if(depth == maxDepth) {
 			nodes.push_back(node);
-			return;
+			return this;
 		}
 
 		if(Contains(NW, node)) {
-			NW->AddNode(node);
-			return;
+			return NW->AddNode(node);
 		} else if(Contains(NE, node)) {
-			NE->AddNode(node);
-			return;
+			return NE->AddNode(node);
 		} else if(Contains(SW, node)) {
-			SW->AddNode(node);
-			return;
+			return SW->AddNode(node);
 		} else if(Contains(SE, node)) {
-			SE->AddNode(node);
-			return;
+			return SE->AddNode(node);
 		}
 		if(Contains(this, node)) {
 			nodes.push_back(node);
 		}
+
+		return this;
+	}
+
+	void RemoveNode(C* node) {
+		auto foundNode = find(nodes.begin(), nodes.end(), node);
+		bool bDoesntContainNode = foundNode == nodes.end();
+		if(bDoesntContainNode) {
+			if(depth != maxDepth) {
+				NW->RemoveNode(node);
+				NE->RemoveNode(node);
+				SW->RemoveNode(node);
+				SE->RemoveNode(node);
+			}
+		}
+		else {
+			nodes.erase(foundNode);
+		}
+	}
+
+	QuadTree<C, U>* ContainingTree(const U posX, const U posY) {
+		if(depth == maxDepth) {
+			return this;
+		}
+
+		if(posX > w + w / (U) 2 && posY < y + h) {
+			if(posY > y + h / (U)2 && posY < y + h) {
+				return SE->ContainingTree(posX, posY);
+			} else if(posY > y && posY <= y + h / (U)2) {
+				return NE->ContainingTree(posX, posY);
+			}
+		} else if(posX > x && posX <= x + w / (U)2) {
+			if(posY > y + h / (U)2 && posY < y + h) {
+				return SW->ContainingTree(posX, posY);
+			} else if(posY > y && posY <= y + h / (U)2) {
+				return NW->ContainingTree(posX, posY);
+			}
+		}
+
+		return this;
 	}
 
 	vector<C*> NodesAt(const U posX, const U posY) {

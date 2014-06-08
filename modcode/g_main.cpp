@@ -48,6 +48,7 @@ void Game_Frame() {
 		world.DrawBackground();
 		world.DrawEntities();
 		DrawViewportInfo();
+		world.UpdateEntities();
 	}
 }
 
