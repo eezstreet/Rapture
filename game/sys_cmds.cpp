@@ -134,6 +134,15 @@ void Cmd_ScreenshotPCX_f(vector<string>& args) {
 	}
 }
 
+void Cmd_Echo_f(vector<string>& args) {
+	string text = "";
+	for(auto it = args.begin()+1; it != args.end(); ++it) {
+		text += *it;
+		text += " ";
+	}
+	R_Printf("%s\n", text.c_str());
+}
+
 extern void NewGame();
 extern void StartEditor();
 void Cmd_NewGameTest_f(vector<string>& args) {
@@ -153,6 +162,7 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("cmdlist", Cmd_Cmdlist_f);
 	Cmd::AddCommand("cvarlist", Cmd_Cvarlist_f);
 	Cmd::AddCommand("zoneinfo", Cmd_Zoneinfo_f);
+	Cmd::AddCommand("echo", Cmd_Echo_f);
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);
