@@ -50,7 +50,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;../game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../game;../common</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -90,6 +90,7 @@
     <ClCompile Include="..\modcode\SpatialEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\RVector.h" />
     <ClInclude Include="..\json\cJSON.h" />
     <ClInclude Include="..\modcode\g_json.h" />
     <ClInclude Include="..\modcode\g_local.h" />

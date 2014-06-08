@@ -140,9 +140,13 @@ namespace Cmd {
 				lastSplit = i+1;
 			} else if(c == '\"') {
 				size_t quoteStart = ++i;
-				while(i < str.length() && str[i] != '\"')
+				if(quoteStart >= str.length() || str.find_first_of('\"', quoteStart) == string::npos) {
+					continue;
+				}
+				while(i < str.length() && str[i] != '\"') {
 					i++;
-				retVal.push_back(str.substr(quoteStart, i));
+				}
+				retVal.push_back(str.substr(quoteStart, i-quoteStart));
 				lastSplit = i;
 			}
 		}

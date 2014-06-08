@@ -52,7 +52,7 @@ void Worldspace::DrawEntities() {
 		auto spatialEnt = *it;
 		auto ent = mRenderList.find(spatialEnt->uuid);
 		if(ent != mRenderList.end()) {
-			ent->second->render();
+			ent->second->think();
 		}
 	}
 }

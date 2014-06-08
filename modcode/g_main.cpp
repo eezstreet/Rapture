@@ -23,7 +23,7 @@ void Game_Load() {
 	trap->InitMaterials();
 	InitLevels();
 
-	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame?", 1, 0);
+	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame? (1 = FPS, 2 = MS, 3 = both)", 1, 0);
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
 
@@ -54,6 +54,8 @@ void Game_OnMouseUp(int x, int y) {
 }
 
 void Game_OnMouseDown(int x, int y) {
+	Player* ply = world.GetFirstPlayer();
+	ply->ClickEvent(x, y);
 }
 
 void Game_OnMouseMove(int x, int y) {

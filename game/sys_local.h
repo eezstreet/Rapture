@@ -62,6 +62,17 @@ struct CvarValueSet {
 	void AssignBoth(T value) { defaultVal = currentVal = value; }
 };
 
+template<>
+struct CvarValueSet<char*> {
+	char defaultVal[64];
+	char currentVal[64];
+
+	void AssignBoth(char* value) { 
+		strcpy(defaultVal, value);
+		strcpy(currentVal, value);
+	}
+};
+
 class Cvar {
 	string name;
 	string description;
@@ -109,7 +120,7 @@ public:
 	string GetName() { return name; }
 	string GetDescription() { return description; }
 
-	void SetValue(char* value) { if(type != CV_STRING) return; s.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
+	void SetValue(char* value) { if(type != CV_STRING) return; strcpy(s.currentVal, value); if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
 	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %i\n", name.c_str(), value); }
 	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %f\n", name.c_str(), value); }
 	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
@@ -173,7 +184,7 @@ public:
 	static void SetCvarFlags(const string& sName, int flags) { cvars[sName]->flags = flags; }
 	static Cvar::cvarType_e GetCvarType(const string& sName) { return cvars[sName]->type; }
 
-	static void SetStringValue(const string &sName, char* newValue) { cvars[sName]->s.currentVal = newValue; }
+	static void SetStringValue(const string &sName, char* newValue) { strcpy(cvars[sName]->s.currentVal, newValue); }
 	static void SetIntegerValue(const string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
 	static void SetFloatValue(const string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; }
 	static void SetBooleanValue(const string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; }

@@ -127,6 +127,8 @@ public:
 	virtual void think();
 	virtual void spawn();
 	Player(float x, float y);
+
+	void ClickEvent(int sX, int sY);
 };
 
 // A tilenode is a tile in the world

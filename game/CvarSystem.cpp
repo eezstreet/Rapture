@@ -50,7 +50,7 @@ Cvar::~Cvar() {
 
 Cvar& Cvar::operator= (char* str) {
 	if(type != CV_STRING) return *this;
-	s.currentVal = str;
+	strcpy(s.currentVal, str);
 	return *this;
 }
 
@@ -277,7 +277,7 @@ void CvarSystem::ArchiveCvars() {
 					ss << '\"' << cv->s.currentVal << '\"';
 					break;
 			}
-			ss << '\n';
+			ss << ";\r\n";
 			ff->WritePlaintext(ss.str());
 		}
 	}
