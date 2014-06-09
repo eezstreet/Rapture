@@ -109,6 +109,7 @@ friend struct Worldspace;
 class Entity : public SpatialEntity {
 public:
 	QuadTree<SpatialEntity, float>* ptContainingTree;
+	SpatialEntity* ptSpatialEntity;
 	virtual void render() = 0;
 	virtual void think() = 0;
 	virtual void spawn() = 0;
@@ -250,8 +251,8 @@ public:
 	void AddPlayer(Player* ptPlayer);
 	Player* GetFirstPlayer(); // temphack
 
-	void DrawBackground();
-	void DrawEntities();
+	void Run();
+	void Render();
 
 	static float WorldPlaceToScreenSpaceFX(float x, float y);
 	static float WorldPlaceToScreenSpaceFY(float x, float y);

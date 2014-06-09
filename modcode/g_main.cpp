@@ -45,8 +45,8 @@ void Game_Frame() {
 	}
 	else {
 		FPSFrame();
-		world.DrawBackground();
-		world.DrawEntities();
+		world.Run();
+		world.Render();
 		DrawViewportInfo();
 		world.UpdateEntities();
 	}

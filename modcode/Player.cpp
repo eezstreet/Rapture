@@ -16,16 +16,21 @@ Player::Player(float _x, float _y) {
 
 void Player::think() {
 	RVec2<float> origin(x, y);
+	pX = x;
+	pY = y;
+
 	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.025)) {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
-		pX = x; pY = y;
-		x += dir.GetX() * speed * GetGameFrametime();
-		y += dir.GetY() * speed * GetGameFrametime();
-		world.ActorMoved(this);
+		// TODO: run collision detection
+		RVec2<float> nextFramePosition((dir.GetX() * speed * GetGameFrametime())+x, (dir.GetY() * speed * GetGameFrametime())+y);
+		if(nextFramePosition.GetX() >= 0 && nextFramePosition.GetY() >= 0) {
+			x = nextFramePosition.GetX();
+			y = nextFramePosition.GetY();
+			world.ActorMoved(this);
+		}
 	}
-	render();
 }
 
 void Player::spawn() {

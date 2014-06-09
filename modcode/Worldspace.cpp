@@ -35,23 +35,106 @@ void Worldspace::SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink,
 		mCollideList[s->uuid] = ent;
 	}
 	ent->ptContainingTree = qtEntTree->AddNode(s);
+	ent->ptSpatialEntity = s;
 	ent->spawn();
 }
 
-void Worldspace::DrawBackground() {
+void Worldspace::Render() {
+	struct RenderObject {
+		union {
+			SpatialEntity* entData;
+			TileNode* tileData;
+		};
+		bool bIsTile;
+	};
+	vector<RenderObject> sortedObjects;
+	auto ents = qtEntTree->NodesAt(1, 1); // FIXME
 	auto tiles = qtTileTree->NodesAt(1, 1);
-	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
-		TileNode* tile = *it;
-		trap->RenderMaterial(tile->ptTile->materialHandle, WorldPlaceToScreenSpaceIX(tile->x, tile->y) + PlayerOffsetX(), WorldPlaceToScreenSpaceIY(tile->x, tile->y) + PlayerOffsetY());
-	}
-}
 
-void Worldspace::DrawEntities() {
-	auto ents = qtEntTree->NodesAt(1, 1);
+	// Chuck entities into the list of stuff that needs sorted
 	for(auto it = ents.begin(); it != ents.end(); ++it) {
 		auto spatialEnt = *it;
 		auto ent = mRenderList.find(spatialEnt->uuid);
 		if(ent != mRenderList.end()) {
+			RenderObject obj;
+			obj.bIsTile = false;
+			obj.entData = spatialEnt;
+			sortedObjects.push_back(obj);
+		}
+	}
+
+	// Now chuck tiles into the pot too
+	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
+		TileNode* tile = *it;
+		RenderObject obj;
+		obj.bIsTile = true;
+		obj.tileData = tile;
+		sortedObjects.push_back(obj);
+	}
+
+	// Now we need to sort the stuff that's being rendered.
+	sort(sortedObjects.begin(), sortedObjects.end(), [](RenderObject a, RenderObject b) -> bool {
+		if(a.bIsTile) {
+			TileNode* aT = a.tileData;
+			int aY = WorldPlaceToScreenSpaceIY(aT->x, aT->y);
+			if(b.bIsTile) {
+				TileNode* bT = b.tileData;
+				int bY = WorldPlaceToScreenSpaceIY(bT->x, bT->y);
+				if(aY - 96 < bY - 96) {
+					return true;
+				}
+			} else {
+				SpatialEntity* bE = b.entData;
+				int bY = WorldPlaceToScreenSpaceFY(bE->x, bE->y);
+				if(aY - 96 < bY) {
+					return true;
+				}
+			}
+		} else {
+			SpatialEntity* aE = a.entData;
+			int aY = WorldPlaceToScreenSpaceFY(aE->x, aE->y);
+			if(b.bIsTile) {
+				TileNode* bT = b.tileData;
+				int bY = WorldPlaceToScreenSpaceIY(bT->x, bT->y);
+				if(aY < bY - 96) {
+					return true;
+				}
+			} else {
+				SpatialEntity* bE = b.entData;
+				int bY = WorldPlaceToScreenSpaceFY(bE->x, bE->y);
+				if(aY < bY) {
+					return true;
+				}
+			}
+		}
+		return false;
+	});
+
+	// Lastly we need to render the actual stuff
+	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
+		RenderObject obj = *it;
+		if(obj.bIsTile) {
+			// For tiles, we just render a material
+			TileNode* tile = obj.tileData;
+			trap->RenderMaterial(tile->ptTile->materialHandle, WorldPlaceToScreenSpaceIX(tile->x, tile->y) + PlayerOffsetX(),
+				WorldPlaceToScreenSpaceIY(tile->x, tile->y) + PlayerOffsetY());
+		} else {
+			// Each entity has its own render function, so call that
+			auto ent = mRenderList.find(obj.entData->uuid);
+			if(ent != mRenderList.end()) {
+				ent->second->render();
+			}
+		}
+	}
+}
+
+void Worldspace::Run() {
+	// Run entity think functions
+	auto ents = qtEntTree->NodesAt(1, 1); // FIXME
+	for(auto it = ents.begin(); it != ents.end(); ++it) {
+		auto spatialEnt = *it;
+		auto ent = mThinkList.find(spatialEnt->uuid);
+		if(ent != mThinkList.end()) {
 			ent->second->think();
 		}
 	}
@@ -61,6 +144,10 @@ void Worldspace::UpdateEntities() {
 	for(auto it = vActorsMoved.begin(); it != vActorsMoved.end(); ++it) {
 		auto ptActor = *it;
 		if(ptActor->ptContainingTree == qtEntTree->ContainingTree(ptActor->pX, ptActor->pY)) {
+			// Even if it's still in the same tree, we need to update the
+			// coordinates in that tree (otherwise depth etc get fucked up)
+			ptActor->ptSpatialEntity->x = ptActor->x;
+			ptActor->ptSpatialEntity->y = ptActor->y;
 			continue;
 		}
 		ptActor->ptContainingTree->RemoveNode(ptActor);

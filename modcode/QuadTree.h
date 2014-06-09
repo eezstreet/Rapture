@@ -126,6 +126,20 @@ public:
 
 		return this;
 	}
+#if 0
+	vector<C*> NodesIn(const U posX, const U posY, const U width, const U height) {
+		if(depth == maxDepth) {
+			return nodes;
+		}
+
+		vector<C*> returnNodes, childReturnNodes;
+		if(!nodes.empty()) {
+			returnNodes = nodes;
+		}
+		// TODO: eliminate code reuse below
+		// TODO: finish
+	}
+#endif
 
 	vector<C*> NodesAt(const U posX, const U posY) {
 		if(depth == maxDepth) {
