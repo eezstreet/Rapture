@@ -290,3 +290,20 @@ void StartEditor() {
 	}
 	sys->editor = sys->CreateGameModule("editorx86");
 }
+
+void ReturnToMain() {
+	if(Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
+	if(sys->game) {
+		sys->trap->shutdown();
+		delete sys->game;
+		sys->game = NULL;
+	} else if(sys->editor) {
+		sys->trap->shutdown();
+		delete sys->editor;
+		sys->editor = NULL;
+	}
+	R_Printf("creating main menu webview\n");
+	MainMenu::GetSingleton();
+}

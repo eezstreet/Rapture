@@ -38,6 +38,7 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 		ptFont = NULL;
 		return;
 	}
+	file->Close();
 }
 
 Font* Font::Register(const char* sFontFile, int iPointSize) {

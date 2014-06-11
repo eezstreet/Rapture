@@ -60,6 +60,7 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 	}
 
 	materials.insert(make_pair(mat->name, mat));
+	f->Close();
 }
 
 MaterialHandler::MaterialHandler() {

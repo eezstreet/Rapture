@@ -79,6 +79,14 @@ ptModule Sys_LoadLibrary(string name) {
 	return hLib;
 }
 
+void Sys_FreeLibrary(ptModule module) {
+	if(!module) {
+		R_Printf("attempted to free library which doesn't exist!\n");
+		return;
+	}
+	FreeLibrary((HMODULE)module);
+}
+
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name) {
 	return (ptModuleFunction)GetProcAddress((HMODULE)module, name.c_str());
 }

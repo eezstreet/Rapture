@@ -95,6 +95,11 @@ void Cmd_Quit_f(vector<string>& args) {
 	SDL_PushEvent(&e);
 }
 
+extern void ReturnToMain();
+void Cmd_MainMenu_f(vector<string>& args) {
+	ReturnToMain();
+}
+
 void Cmd_Cmdlist_f(vector<string>& args) {
 	Cmd::ListCommands();
 }
@@ -172,4 +177,5 @@ void Sys_InitCommands() {
 
 	Cmd::AddCommand("newgametest", Cmd_NewGameTest_f);
 	Cmd::AddCommand("editor", Cmd_Editor_f);
+	Cmd::AddCommand("mainmenu", Cmd_MainMenu_f);
 }

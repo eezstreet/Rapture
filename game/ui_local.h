@@ -42,7 +42,7 @@ protected:
 	static T* singleton;
 public:
 	static T* GetSingleton() { if(!singleton) return singleton = new T(); return singleton; }
-	static void DestroySingleton() { if(!singleton) return; delete singleton; }
+	static void DestroySingleton() { if(!singleton) return; delete singleton; singleton = NULL; }
 	static bool SingletonExists() { return (singleton != NULL); }
 };
 

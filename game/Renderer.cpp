@@ -410,10 +410,16 @@ namespace RenderCode {
 	}
 
 	void SendMaterialToRenderer(Material* ptMaterial, int x, int y) {
+		if(!ptMaterial) {
+			return;
+		}
 		ptMaterial->SendToRenderer(x, y);
 	}
 
 	void SendMaterialToRendererTrans(Material* ptMaterial, int x, int y) {
+		if(!ptMaterial) {
+			return;
+		}
 		ptMaterial->SendToRendererTransparency(x, y);
 	}
 

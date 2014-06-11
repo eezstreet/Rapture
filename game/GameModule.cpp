@@ -8,6 +8,7 @@ GameModule::GameModule(string module) {
 }
 
 GameModule::~GameModule() {
+	Sys_FreeLibrary(ptModuleHandle);
 }
 
 typedef gameExports_s* (*refapi_t)(gameImports_s*);

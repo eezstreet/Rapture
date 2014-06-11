@@ -25,12 +25,11 @@ public:
 
 class RaptureGame {
 private:
-	gameExports_s*	trap;
-
 	void AssignExports(gameImports_s* in);
 public:
 	GameModule*		game;
 	GameModule*		editor;
+	gameExports_s*	trap;
 
 	RaptureGame(int argc, char **argv);
 	~RaptureGame();
@@ -519,6 +518,7 @@ string Sys_GetClipboardContents();
 void Sys_SendToClipboard(string text);
 void Sys_FS_MakeDirectory(const char* path);
 ptModule Sys_LoadLibrary(string name);
+void Sys_FreeLibrary(ptModule module);
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
