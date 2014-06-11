@@ -88,10 +88,17 @@ struct Tile {
 	Material* materialHandle;	// Pointer to material in memory
 	bool bResourcesLoaded;		// Have the resources (images/shaders) been loaded?
 
+	// Depth
+	bool bAutoTrans;
+	float fAutoTransX;
+	float fAutoTransY;
+	float fDepthScoreOffset;
+
 	Tile() {
 		name[0] = lowmask = highmask = lightmask = vismask = '\0';
+		fAutoTransX = fAutoTransY = fDepthScoreOffset = 0.0f;
 		materialHandle = NULL;
-		bResourcesLoaded = false;
+		bResourcesLoaded = bAutoTrans = false;
 	}
 };
 
@@ -145,6 +152,7 @@ public:
 class TileNode : public QTreeNode<unsigned int> {
 public:
 	Tile* ptTile;
+	tileRenderType_e rt;
 
 	TileNode() {
 		w = h = 1;

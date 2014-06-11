@@ -413,6 +413,10 @@ namespace RenderCode {
 		ptMaterial->SendToRenderer(x, y);
 	}
 
+	void SendMaterialToRendererTrans(Material* ptMaterial, int x, int y) {
+		ptMaterial->SendToRendererTransparency(x, y);
+	}
+
 	void RenderTextSolid(Font* font, const char* text, int r, int g, int b) {
 		SDL_Color color;
 		color.r = r; color.g = g; color.b = b; color.a = 255;

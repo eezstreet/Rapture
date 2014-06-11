@@ -45,6 +45,7 @@ void Worldspace::Render() {
 			SpatialEntity* entData;
 			TileNode* tileData;
 		};
+		float fDepthScore;
 		bool bIsTile;
 	};
 	vector<RenderObject> sortedObjects;
@@ -59,6 +60,7 @@ void Worldspace::Render() {
 			RenderObject obj;
 			obj.bIsTile = false;
 			obj.entData = spatialEnt;
+			obj.fDepthScore = 10 * WorldPlaceToScreenSpaceFY(ent->second->x, ent->second->y);
 			sortedObjects.push_back(obj);
 		}
 	}
@@ -69,12 +71,16 @@ void Worldspace::Render() {
 		RenderObject obj;
 		obj.bIsTile = true;
 		obj.tileData = tile;
+		obj.fDepthScore = 10 * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - 96 - tile->ptTile->fDepthScoreOffset);
 		sortedObjects.push_back(obj);
 	}
 
 	// Now we need to sort the stuff that's being rendered.
 	sort(sortedObjects.begin(), sortedObjects.end(), [](RenderObject a, RenderObject b) -> bool {
-		if(a.bIsTile) {
+		if(a.fDepthScore < b.fDepthScore) {
+			return true;
+		}
+		/*if(a.bIsTile) {
 			TileNode* aT = a.tileData;
 			int aY = WorldPlaceToScreenSpaceIY(aT->x, aT->y);
 			if(b.bIsTile) {
@@ -86,6 +92,9 @@ void Worldspace::Render() {
 			} else {
 				SpatialEntity* bE = b.entData;
 				int bY = WorldPlaceToScreenSpaceFY(bE->x, bE->y);
+				if(aT->rt > TRT_FLOOR3) {
+					return false;
+				}
 				if(aY - 96 < bY) {
 					return true;
 				}
@@ -96,6 +105,9 @@ void Worldspace::Render() {
 			if(b.bIsTile) {
 				TileNode* bT = b.tileData;
 				int bY = WorldPlaceToScreenSpaceIY(bT->x, bT->y);
+				if(bT->rt > TRT_FLOOR3) {
+					return false;
+				}
 				if(aY < bY - 96) {
 					return true;
 				}
@@ -106,22 +118,39 @@ void Worldspace::Render() {
 					return true;
 				}
 			}
-		}
+		}*/
 		return false;
 	});
 
+	auto player = GetFirstPlayer();
+	bool bHaveWeRenderedPlayer = false;
 	// Lastly we need to render the actual stuff
 	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
 		RenderObject obj = *it;
 		if(obj.bIsTile) {
-			// For tiles, we just render a material
 			TileNode* tile = obj.tileData;
-			trap->RenderMaterial(tile->ptTile->materialHandle, WorldPlaceToScreenSpaceIX(tile->x, tile->y) + PlayerOffsetX(),
-				WorldPlaceToScreenSpaceIY(tile->x, tile->y) + PlayerOffsetY());
+			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + PlayerOffsetX();
+			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + PlayerOffsetY();
+			if(bHaveWeRenderedPlayer) {
+				// Does this tile use autotrans?
+				if(tile->ptTile->bAutoTrans) {
+					if(player->y < tile->y &&
+						player->y > tile->y - tile->ptTile->fAutoTransY &&
+						player->x > tile->x &&
+						player->x < tile->x - tile->ptTile->fAutoTransX) {
+							trap->RenderMaterialTrans(tile->ptTile->materialHandle, renderX, renderY);
+							continue;
+					}
+				}
+			}
+			trap->RenderMaterial(tile->ptTile->materialHandle, renderX, renderY);
 		} else {
 			// Each entity has its own render function, so call that
 			auto ent = mRenderList.find(obj.entData->uuid);
 			if(ent != mRenderList.end()) {
+				if(ent->second->uuid == player->uuid) {
+					bHaveWeRenderedPlayer = true;
+				}
 				ent->second->render();
 			}
 		}

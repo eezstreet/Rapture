@@ -81,6 +81,7 @@ struct gameImports_s {
 	void (*ShutdownMaterials)();
 	Material* (*RegisterMaterial)(const char* name);
 	void (*RenderMaterial)(Material* ptMaterial, int x, int y);
+	void (*RenderMaterialTrans)(Material* ptMaterial, int x, int y);
 
 	// Cvars
 	void (*CvarIntVal)(const char* cvarName, int* value);

@@ -201,6 +201,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->ShutdownMaterials = RenderCode::ShutdownMaterials;
 	imp->RegisterMaterial = RenderCode::RegisterMaterial;
 	imp->RenderMaterial = RenderCode::SendMaterialToRenderer;
+	imp->RenderMaterialTrans = RenderCode::SendMaterialToRendererTrans;
 	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;

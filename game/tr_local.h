@@ -24,16 +24,22 @@ class Material {
 private:
 	bool bLoadedResources; // Have we loaded resources? (images, etc)
 	bool bLoadedIncorrectly; // If we loaded, did we load correctly?
+	bool bHasTransparencyMap; // Does it have a transparency map?
 	void LoadResources();
 	void FreeResources();
 
+	int xOffset, yOffset;
+
 	char name[64];
 	char resourceFile[64];
+	char transResourceFile[64];
 	SDL_Texture *ptResource;
+	SDL_Texture *ptTransResource;
 public:
 	Material();
 	~Material();
 	void SendToRenderer(int x, int y);
+	void SendToRendererTransparency(int x, int y);
 
 friend class MaterialHandler;
 };

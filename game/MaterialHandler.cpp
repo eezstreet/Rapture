@@ -37,6 +37,28 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 		strcpy(mat->resourceFile, cJSON_ToString(child));
 	}
 
+	child = cJSON_GetObjectItem(json, "transMap");
+	if(!child) {
+		mat->bHasTransparencyMap = false;
+	} else {
+		strcpy(mat->transResourceFile, cJSON_ToString(child));
+		mat->bHasTransparencyMap = true;
+	}
+
+	child = cJSON_GetObjectItem(json, "xOffset");
+	if(!child) {
+		mat->xOffset = 0;
+	} else {
+		mat->xOffset = cJSON_ToInteger(child);
+	}
+
+	child = cJSON_GetObjectItem(json, "yOffset");
+	if(!child) {
+		mat->yOffset = 0;
+	} else {
+		mat->yOffset = cJSON_ToInteger(child);
+	}
+
 	materials.insert(make_pair(mat->name, mat));
 }
 
@@ -69,6 +91,7 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 Material::Material() {
 	bLoadedResources = false;
 	bLoadedIncorrectly = false;
+	bHasTransparencyMap = false;
 }
 
 Material::~Material() {
@@ -81,7 +104,19 @@ void Material::SendToRenderer(int x, int y) {
 	if(!bLoadedResources) {
 		LoadResources();
 	}
-	RenderCode::DrawImageAbs((Image*)ptResource, x, y);
+	RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+}
+
+void Material::SendToRendererTransparency(int x, int y) {
+	// Similar to SendToRenderer, but use a transparency map if one is available
+	if(!bLoadedResources) {
+		LoadResources();
+	}
+	if(bHasTransparencyMap) {
+		RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
+	} else {
+		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+	}
 }
 
 void Material::LoadResources() {
@@ -90,6 +125,7 @@ void Material::LoadResources() {
 		return;
 	}
 	bLoadedResources = true;
+	// Load diffuse map
 	SDL_Surface* temp = IMG_Load(File::GetFileSearchPath(resourceFile).c_str());
 	if(!temp) {
 		R_Printf("WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
@@ -101,6 +137,18 @@ void Material::LoadResources() {
 	ptResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
 	SDL_SetTextureBlendMode(ptResource, SDL_BLENDMODE_BLEND);
 	SDL_FreeSurface(temp);
+
+	if(bHasTransparencyMap) {
+		temp = IMG_Load(File::GetFileSearchPath(transResourceFile).c_str());
+		if(!temp) {
+			R_Printf("WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
+			bHasTransparencyMap = false;
+		} else {
+			ptTransResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
+			SDL_SetTextureBlendMode(ptTransResource, SDL_BLENDMODE_BLEND);
+			SDL_FreeSurface(temp);
+		}
+	}
 }
 
 void Material::FreeResources() {

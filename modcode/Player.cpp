@@ -19,7 +19,7 @@ void Player::think() {
 	pX = x;
 	pY = y;
 
-	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.025)) {
+	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.035)) {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {

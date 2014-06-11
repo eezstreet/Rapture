@@ -107,6 +107,11 @@ void MP_AddToMap(const char* pfdName, Map& map) {
 			TileNode s;
 			s.x = tile.x; s.y = tile.y;
 			s.ptTile = maps->FindTileByName(tile.lookup);
+			s.rt = (tileRenderType_e)tile.rt;
+			if(s.ptTile == NULL) {
+				R_Printf("Cannot find tile %s\n", tile.lookup);
+				return;
+			}
 			map.tiles.push_back(s);
 		}
 	} else {

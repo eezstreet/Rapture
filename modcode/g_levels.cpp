@@ -29,9 +29,25 @@ void ParseSubtile(cJSON* json, void* ptTile, int tileNum) {
 	}
 }
 
+void ParseAutoTrans(cJSON* j, void* p) {
+	Tile* t = (Tile*)p;
+	vector<string> values;
+	string hax = cJSON_ToString(j);
+
+	split(hax.c_str(), 'x', values);
+	if(values.size() != 2) {
+		R_Printf("WARNING: malformed autotrans field (%s)\n", hax.c_str());
+		return;
+	}
+	t->bAutoTrans = true;
+	t->fAutoTransX = atof(values.at(0).c_str());
+	t->fAutoTransY = atof(values.at(1).c_str());
+}
+
 void InitTileParseFields() {
 #define SUBTILE_PARSER(x) [](cJSON* j, void* p) -> void { ParseSubtile(j, p, x); }
 #define INT_PARSER(x) [](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; t->##x## = cJSON_ToInteger(j); }
+#define FLOAT_PARSER(x) [](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; t->##x## = cJSON_ToNumber(j); }
 #define NAME_PARSER [](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; strcpy(t->name, cJSON_ToString(j)); }
 #define MAT_PARSER \
 	[](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; t->materialHandle = trap->RegisterMaterial(cJSON_ToString(j)); }
@@ -58,6 +74,8 @@ void InitTileParseFields() {
 	tileParseFields["vismask"] = INT_PARSER(vismask);
 	tileParseFields["name"] = NAME_PARSER;
 	tileParseFields["material"] = MAT_PARSER;
+	tileParseFields["autotrans"] = ParseAutoTrans;
+	tileParseFields["depthoffset"] = FLOAT_PARSER(fDepthScoreOffset);
 }
 
 // LEVEL PARSING
@@ -118,7 +136,9 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 		Tile t;
 		JSON_ParseFile((char*)it->c_str(), tileParseFields, &t);
 		vTiles.push_back(t);
-		mTileResolver.insert(make_pair(t.name, vTiles.end()-1));
+	}
+	for(auto it = vTiles.begin(); it != vTiles.end(); ++it) {
+		mTileResolver[it->name] = it;
 	}
 
 	// Load the Levels.json
