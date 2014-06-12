@@ -29,19 +29,18 @@ void ParseSubtile(cJSON* json, void* ptTile, int tileNum) {
 	}
 }
 
-void ParseAutoTrans(cJSON* j, void* p) {
+void AutoTransParser(cJSON* j, void* p) {
 	Tile* t = (Tile*)p;
-	vector<string> values;
-	string hax = cJSON_ToString(j);
-
-	split(hax.c_str(), 'x', values);
-	if(values.size() != 2) {
-		R_Printf("WARNING: malformed autotrans field (%s)\n", hax.c_str());
-		return;
-	}
 	t->bAutoTrans = true;
-	t->fAutoTransX = atof(values.at(0).c_str());
-	t->fAutoTransY = atof(values.at(1).c_str());
+
+	cJSON* node = cJSON_GetObjectItem(j, "x");
+	t->iAutoTransX = cJSON_ToInteger(node);
+	node = cJSON_GetObjectItem(j, "y");
+	t->iAutoTransY = cJSON_ToInteger(node);
+	node = cJSON_GetObjectItem(j, "w");
+	t->iAutoTransW = cJSON_ToInteger(node);
+	node = cJSON_GetObjectItem(j, "h");
+	t->iAutoTransH = cJSON_ToInteger(node);
 }
 
 void InitTileParseFields() {
@@ -74,8 +73,8 @@ void InitTileParseFields() {
 	tileParseFields["vismask"] = INT_PARSER(vismask);
 	tileParseFields["name"] = NAME_PARSER;
 	tileParseFields["material"] = MAT_PARSER;
-	tileParseFields["autotrans"] = ParseAutoTrans;
 	tileParseFields["depthoffset"] = FLOAT_PARSER(fDepthScoreOffset);
+	tileParseFields["autotrans"] = AutoTransParser;
 }
 
 // LEVEL PARSING

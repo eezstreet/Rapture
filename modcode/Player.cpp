@@ -25,11 +25,51 @@ void Player::think() {
 	else if(bShouldWeBeMoving) {
 		// TODO: run collision detection
 		RVec2<float> nextFramePosition((dir.GetX() * speed * GetGameFrametime())+x, (dir.GetY() * speed * GetGameFrametime())+y);
-		if(nextFramePosition.GetX() >= 0 && nextFramePosition.GetY() >= 0) {
-			x = nextFramePosition.GetX();
-			y = nextFramePosition.GetY();
-			world.ActorMoved(this);
+		if(nextFramePosition.GetX() < 0 && nextFramePosition.GetY() < 0) {
+			// No moving into negative coords
+			bShouldWeBeMoving = false;
+			return;
 		}
+
+		int bottomedOutX = (int)floor(nextFramePosition.GetX());
+		int bottomedOutY = (int)floor(nextFramePosition.GetY());
+		int bottomedOutSubtileX = (int)floor((nextFramePosition.GetX()-bottomedOutX)*4);
+		int bottomedOutSubtileY = (int)floor((nextFramePosition.GetY()-bottomedOutY)*4);
+		auto nodes = world.qtTileTree->NodesAt(bottomedOutX+1, bottomedOutY+1);
+		if(nodes.size() <= 0) {
+			// No nodes in this sector = no movement
+			bShouldWeBeMoving = false;
+			return;
+		}
+		
+		bool bDoWeHaveNodeHere = false;
+		vector<TileNode*> nodesOnThis;
+		for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+			auto node = (*it);
+			if(node->x == bottomedOutX && node->y == bottomedOutY) {
+				nodesOnThis.push_back(node);
+			}
+		}
+		if(nodesOnThis.size() <= 0) {
+			// No tiles here? NO CAN PASS.
+			bShouldWeBeMoving = false;
+			return;
+		}
+		for(auto it = nodesOnThis.begin(); it != nodesOnThis.end(); ++it) {
+			auto node = (*it);
+			if(node->ptTile->lowmask == 0) {
+				// No mask = no worries
+				continue;
+			}
+			if(node->ptTile->lowmask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY)) {
+				// Does this subtile specifically block movement? Don't allow it.
+				bShouldWeBeMoving = false;
+				return;
+			}
+		}
+		x = nextFramePosition.GetX();
+		y = nextFramePosition.GetY();
+		world.ActorMoved(this);
 	}
 }
 

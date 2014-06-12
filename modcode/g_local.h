@@ -90,13 +90,13 @@ struct Tile {
 
 	// Depth
 	bool bAutoTrans;
-	float fAutoTransX;
-	float fAutoTransY;
+	int iAutoTransX, iAutoTransY, iAutoTransW, iAutoTransH;
 	float fDepthScoreOffset;
 
 	Tile() {
 		name[0] = lowmask = highmask = lightmask = vismask = '\0';
-		fAutoTransX = fAutoTransY = fDepthScoreOffset = 0.0f;
+		fDepthScoreOffset = 0.0f;
+		iAutoTransX = iAutoTransY = iAutoTransW = iAutoTransH = 0;
 		materialHandle = NULL;
 		bResourcesLoaded = bAutoTrans = false;
 	}

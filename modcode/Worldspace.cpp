@@ -2,7 +2,7 @@
 #include "QuadTree.h"
 
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
-#define WORLDSPACE_LOG2		/*15*/		2
+#define WORLDSPACE_LOG2		/*15*/		4
 
 Worldspace::Worldspace() {
 	qtTileTree = new QuadTree<TileNode, unsigned int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
@@ -51,6 +51,13 @@ void Worldspace::Render() {
 	vector<RenderObject> sortedObjects;
 	auto ents = qtEntTree->NodesAt(1, 1); // FIXME
 	auto tiles = qtTileTree->NodesAt(1, 1);
+	int screenWidth, screenHeight;
+
+	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("r_height", &screenHeight);
+
+	screenWidth /= 2;
+	screenHeight /= 2;
 
 	// Chuck entities into the list of stuff that needs sorted
 	for(auto it = ents.begin(); it != ents.end(); ++it) {
@@ -80,45 +87,6 @@ void Worldspace::Render() {
 		if(a.fDepthScore < b.fDepthScore) {
 			return true;
 		}
-		/*if(a.bIsTile) {
-			TileNode* aT = a.tileData;
-			int aY = WorldPlaceToScreenSpaceIY(aT->x, aT->y);
-			if(b.bIsTile) {
-				TileNode* bT = b.tileData;
-				int bY = WorldPlaceToScreenSpaceIY(bT->x, bT->y);
-				if(aY - 96 < bY - 96) {
-					return true;
-				}
-			} else {
-				SpatialEntity* bE = b.entData;
-				int bY = WorldPlaceToScreenSpaceFY(bE->x, bE->y);
-				if(aT->rt > TRT_FLOOR3) {
-					return false;
-				}
-				if(aY - 96 < bY) {
-					return true;
-				}
-			}
-		} else {
-			SpatialEntity* aE = a.entData;
-			int aY = WorldPlaceToScreenSpaceFY(aE->x, aE->y);
-			if(b.bIsTile) {
-				TileNode* bT = b.tileData;
-				int bY = WorldPlaceToScreenSpaceIY(bT->x, bT->y);
-				if(bT->rt > TRT_FLOOR3) {
-					return false;
-				}
-				if(aY < bY - 96) {
-					return true;
-				}
-			} else {
-				SpatialEntity* bE = b.entData;
-				int bY = WorldPlaceToScreenSpaceFY(bE->x, bE->y);
-				if(aY < bY) {
-					return true;
-				}
-			}
-		}*/
 		return false;
 	});
 
@@ -134,10 +102,10 @@ void Worldspace::Render() {
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
-					if(player->y < tile->y &&
-						player->y > tile->y - tile->ptTile->fAutoTransY &&
-						player->x > tile->x &&
-						player->x < tile->x - tile->ptTile->fAutoTransX) {
+					if(screenWidth > renderX + tile->ptTile->iAutoTransX
+						&& screenWidth < renderX + tile->ptTile->iAutoTransX + tile->ptTile->iAutoTransW
+						&& screenHeight > renderY + tile->ptTile->iAutoTransY
+						&& screenHeight < renderY + tile->ptTile->iAutoTransY + tile->ptTile->iAutoTransH) {
 							trap->RenderMaterialTrans(tile->ptTile->materialHandle, renderX, renderY);
 							continue;
 					}
