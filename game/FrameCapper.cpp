@@ -16,7 +16,7 @@ void FrameCapper::EndFrame() {
 	if(ulFrameTicks < ulCap) {
 		SDL_Delay( ulCap - ulFrameTicks );
 	}
-	if(ulFrameTicks >= ulHitchWarning) {
+	if(ulFrameTicks >= ulHitchWarning && ulHitchWarning > 0) {
 		R_Printf("hitch warning: %i ms frame time\n", ulFrameTicks);
 	}
 }

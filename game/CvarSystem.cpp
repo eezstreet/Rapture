@@ -382,8 +382,7 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 				R_Printf("%s is \"%s\", default: \"%s\"\n", sName.c_str(), cvar->String(), cvar->DefaultString());
 				break;
 		}
-	}
-	else {
+	} else {
 		switch(cvar->GetType()) {
 			case Cvar::CV_BOOLEAN:
 				cvar->SetValue(atob(VArguments[1]));
