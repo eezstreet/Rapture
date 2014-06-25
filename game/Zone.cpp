@@ -105,10 +105,10 @@ namespace Zone {
 				it->second.zone[memory] = ZoneChunk(iNewSize, false);
 				return memory;
 			}
-			catch( out_of_range e ) {
+			catch( out_of_range ) {
 				continue;
 			}
-			catch( bool b ) {
+			catch( bool ) {
 				break;
 			}
 		}

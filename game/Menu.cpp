@@ -182,6 +182,13 @@ Menu::~Menu() {
 	wView = NULL;
 }
 
+void Menu::RunJavaScript(const char* sJS) {
+	if(!wView) {
+		return;
+	}
+	wView->ExecuteJavascript(WSLit(sJS), WSLit(""));
+}
+
 void Menu::SetupBaseCommands(JSObject* obj) {
 	int i;
 

@@ -87,6 +87,14 @@ void UI::Render() {
 	});
 }
 
+void UI::RunJavaScript(Menu* ptMenu, const char* sJS) {
+	if(!ptMenu) {
+		return;
+	}
+	R_Printf("Executing JavaScript: %s\n", sJS);
+	ptMenu->RunJavaScript(sJS);
+}
+
 /* Input */
 // Based on https://gist.github.com/khrona/3239125
 // Modified heavily to support SDL2 and my system
@@ -376,11 +384,15 @@ Menu* UI::RegisterStaticMenu(const char* menuName) {
 }
 
 void UI::KillStaticMenu(Menu* menu) {
+	if(vmMenus.empty()) {
+		return;
+	}
 	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
 		if((*it) == menu) {
 			Menu* ptMenu = (Menu*)menu;
 			delete ptMenu;
 			vmMenus.erase(it);
+			return;
 		}
 	}
 }

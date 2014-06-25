@@ -92,7 +92,7 @@ void towstring(const string& in, wstring& out) {
 }
 
 // http://stackoverflow.com/questions/874134/find-if-string-endswith-another-string-in-c
-bool checkExtension (string const &fullString, string const &ending)
+bool checkExtension (const string &fullString, const string &ending)
 {
 	if (fullString.length() >= ending.length()) {
 		return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));

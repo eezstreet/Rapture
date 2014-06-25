@@ -67,8 +67,8 @@ struct CvarValueSet<char*> {
 	char currentVal[64];
 
 	void AssignBoth(char* value) { 
-		strcpy(defaultVal, value);
-		strcpy(currentVal, value);
+		strncpy(defaultVal, value, sizeof(defaultVal));
+		strncpy(currentVal, value, sizeof(currentVal));
 	}
 };
 
@@ -119,7 +119,7 @@ public:
 	string GetName() { return name; }
 	string GetDescription() { return description; }
 
-	void SetValue(char* value) { if(type != CV_STRING) return; strcpy(s.currentVal, value); if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
+	void SetValue(char* value) { if(type != CV_STRING) return; strncpy(s.currentVal, value, sizeof(s.currentVal)); if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
 	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %i\n", name.c_str(), value); }
 	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %f\n", name.c_str(), value); }
 	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
@@ -349,7 +349,8 @@ public:
 	~FileSystem();
 	inline vector<string>& GetSearchPaths() { return searchpaths; }
 	void PrintSearchPaths();
-	static int ListFiles(const string& dir, vector<string>& in, const string& extension="");
+	static char** ListFiles(const string& dir, const char* extension, int* iNumFiles);
+	static void FreeFileList(char** ptFileList, int iNumItems);
 
 	////////////
 	// Static Methods
@@ -359,7 +360,7 @@ public:
 
 	static File* EXPORT_OpenFile(const char* filename, const char* mode);
 	static void EXPORT_Close(File* filehandle);
-	static int EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char *extension);
+	static char** EXPORT_ListFilesInDir(const char* filename, const char* ext, int *iNumFiles);
 	static size_t EXPORT_ReadBinary(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	static string EXPORT_ReadPlaintext(File* filehandle, size_t numChars);
 	static size_t EXPORT_GetFileSize(File* filehandle);
@@ -474,6 +475,7 @@ class FrameCapper {
 protected:
 	Timer capTimer;
 	Cvar* capCvar;
+	Cvar* hitchWarningCvar;
 public:
 	void StartFrame();
 	void EndFrame();

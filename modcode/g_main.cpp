@@ -15,6 +15,7 @@ void Game_Init() {
 
 void Game_Shutdown() {
 	trap->printf("--- Quit Game ---\n");
+	ShutdownHUD();
 	ShutdownLevels();
 	trap->ShutdownMaterials();
 }
@@ -28,6 +29,7 @@ void Game_Load() {
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
 
 	RegisterMedia();
+	InitHUD();
 
 	iLoadingScreen = 0;
 }

@@ -50,7 +50,7 @@ Cvar::~Cvar() {
 
 Cvar& Cvar::operator= (char* str) {
 	if(type != CV_STRING) return *this;
-	strcpy(s.currentVal, str);
+	strncpy(s.currentVal, str, sizeof(s.currentVal));
 	return *this;
 }
 

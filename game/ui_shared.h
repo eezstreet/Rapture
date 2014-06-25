@@ -14,6 +14,7 @@ namespace UI {
 
 	Menu* RegisterStaticMenu(const char* menuPath);
 	void KillStaticMenu(Menu* menu);
+	void RunJavaScript(Menu* menu, const char* sJS);
 };
 
 void PushConsoleMessage(string message);

@@ -83,7 +83,7 @@ void InitLevelParseFields() {
 #define NAME_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->name, cJSON_ToString(j)); }
 #define FIRST_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->entryPreset, cJSON_ToString(j)); }
 #define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
-#define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->iLink[x] = cJSON_ToInteger(j); }
+#define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->sLink[x] = cJSON_ToString(j); }
 #define P_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->bIsPreset = cJSON_ToBoolean(j); }
 	levelParseFields["name"] = NAME_PARSER;
 	levelParseFields["level"] = LEVEL_PARSER;
@@ -97,8 +97,6 @@ void InitLevelParseFields() {
 	levelParseFields["vis5"] = VIS_PARSER(5);
 	levelParseFields["vis6"] = VIS_PARSER(6);
 	levelParseFields["vis7"] = VIS_PARSER(7);
-	levelParseFields["vis8"] = VIS_PARSER(8);
-	levelParseFields["vis9"] = VIS_PARSER(9);
 }
 
 Worldspace world;
@@ -113,27 +111,47 @@ MapFramework* FindMapFrameworkByName(const char* name) {
 	return NULL;
 }
 
+unordered_map<string, bool> mHaveWeAlreadyBuilt;
+static vector<Map> levels;
+
 void BuildMapFromFramework(const MapFramework& crtMapFramework, Map& rtMap) {
+	if(mHaveWeAlreadyBuilt.find(crtMapFramework.name) != mHaveWeAlreadyBuilt.end()) {
+		return; // We've already built this map. Don't build it again.
+	}
+	mHaveWeAlreadyBuilt[crtMapFramework.name] = true;
+
 	// With a preset map, it's easy. Just add the entry preset to the map and it's good to go.
 	if(crtMapFramework.bIsPreset) {
 		rtMap.bIsPreset = true;
 		MP_AddToMap(crtMapFramework.entryPreset, rtMap);
-		return;
+	} else {
+		// DRLG generation
 	}
 
+	for(int i = 0; i < 8; i++) {
+		// Create any maps which we link to
+		if(crtMapFramework.sLink[i].length() > 0) {
+			MapFramework* ptFramework = FindMapFrameworkByName(crtMapFramework.sLink[i].c_str());
+			if(ptFramework != NULL) {
+				Map tehMap;
+				BuildMapFromFramework(*ptFramework, tehMap);
+				levels.push_back(tehMap);
+			}
+		}
+	}
 }
 
-MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
+MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
 	// Load the tiles.
 	InitTileParseFields();
-	vector<string> paths;
-	int numFiles = trap->ListFilesInDir(tilePath.c_str(), paths, ".json");
+	int numFiles = 0; 
+	char** paths = trap->ListFilesInDir(tilePath, ".json", &numFiles);
 	if(numFiles <= 0) {
 		R_Error("MapLoader could not load tiles (missing?)");
 	}
-	for(auto it = paths.begin(); it != paths.end(); ++it) {
+	for(int i = 0; i < numFiles; i++) {
 		Tile t;
-		JSON_ParseFile((char*)it->c_str(), tileParseFields, &t);
+		JSON_ParseFile(paths[i], tileParseFields, &t);
 		vTiles.push_back(t);
 	}
 	for(auto it = vTiles.begin(); it != vTiles.end(); ++it) {
@@ -147,6 +165,7 @@ MapLoader::MapLoader(const string& presetsPath, const string& tilePath) {
 	// Load the presets.
 	MP_LoadTilePresets();
 
+	trap->FreeFileList(paths, numFiles);
 }
 
 MapLoader::~MapLoader() {
@@ -155,7 +174,6 @@ MapLoader::~MapLoader() {
 	tileParseFields.clear();
 }
 
-static vector<Map> levels;
 MapLoader* maps;
 void InitLevels() {
 	maps = new MapLoader("levels/preset", "levels/tiles");
@@ -169,7 +187,9 @@ void InitLevels() {
 	Map survivorCamp;
 	BuildMapFromFramework(*x, survivorCamp);
 	levels.push_back(survivorCamp);
-	world.InsertInto(&(*(levels.end()-1)));
+	for(auto it = levels.begin(); it != levels.end(); ++it) {
+		world.InsertInto(&(*it));
+	}
 	world.SpawnEntity(play, true, true, true);
 	R_Printf("done.\n");
 }

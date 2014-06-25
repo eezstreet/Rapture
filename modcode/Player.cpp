@@ -23,7 +23,6 @@ void Player::think() {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
-		// TODO: run collision detection
 		RVec2<float> nextFramePosition((dir.GetX() * speed * GetGameFrametime())+x, (dir.GetY() * speed * GetGameFrametime())+y);
 		if(nextFramePosition.GetX() < 0 && nextFramePosition.GetY() < 0) {
 			// No moving into negative coords

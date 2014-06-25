@@ -53,12 +53,22 @@ void FileSystem::PrintSearchPaths() {
 	});
 }
 
-int FileSystem::ListFiles(const string& dir, vector<string>& in, const string& extension) {
+// Make sure to free mem after this call!
+char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNumFiles) {
 	DIR* xdir;
 	struct dirent *ent;
-	int numFiles = 0;
 	string fixedDir;
-	if(dir.at(dir.length()-1) == '\\' || dir.at(dir.length()-1) == '/') {
+	vector<string> fileNames;
+
+	if(!iNumFiles) {
+		return NULL;
+	}
+	*iNumFiles = 0;
+	if(strlen(extension) <= 0) {
+		return NULL;
+	}
+
+	if(dir.back() == '\\' || dir.back() == '/') {
 		fixedDir = dir;
 	} else {
 		fixedDir = dir + '/';
@@ -68,17 +78,46 @@ int FileSystem::ListFiles(const string& dir, vector<string>& in, const string& e
 		string compString = *it + '/' + dir; // hm, this'll be searchpath + search dir
 		if((xdir = opendir(compString.c_str())) != NULL) {
 			// loop through all files
-			while((ent = readdir(xdir)) != NULL) {
-				string fName = ent->d_name;
-				if(extension.length() != 0 && !checkExtension(fName, extension))
+			while(1) {
+				ent = readdir(xdir);
+				if(ent == NULL) {
+					break;
+				}
+				if(!checkExtension(ent->d_name, extension)) {
 					continue;
-				in.push_back(fixedDir + fName);
-				numFiles++;
+				}
+				stringstream fName;
+				fName << fixedDir << ent->d_name;
+				fName << '\0';
+				fileNames.push_back(fName.str());
+				(*iNumFiles)++;
 			}
 			closedir(xdir);
 		}
 	}
-	return numFiles;
+
+	if(*iNumFiles == 0) {
+		return NULL;
+	}
+
+	char** ptStrList = (char**)Zone::Alloc(sizeof(char*) * (*iNumFiles), Zone::TAG_FILES);
+	int i = 0;
+	for(auto it = fileNames.begin(); it != fileNames.end(); ++it) {
+		ptStrList[i] = (char*)Zone::Alloc(it->length(), Zone::TAG_FILES);
+		strcpy(ptStrList[i], it->c_str());
+		i++;
+	}
+	return ptStrList;
+}
+
+void FileSystem::FreeFileList(char** ptFileList, int iNumItems) {
+	if(ptFileList == NULL) {
+		return;
+	}
+	for(int i = 0; i < iNumItems; i++) {
+		Zone::FastFree(ptFileList[i], "files");
+	}
+	Zone::FastFree(ptFileList, "files");
 }
 
 void FileSystem::RecursivelyTouch(const string& path) {
@@ -99,8 +138,8 @@ void FileSystem::EXPORT_Close(File* filehandle) {
 	filehandle->Close();
 }
 
-int FileSystem::EXPORT_ListFilesInDir(const char* filename, vector<string>& in, const char* ext) {
-	return fs->ListFiles(filename, in, ext);
+char** FileSystem::EXPORT_ListFilesInDir(const char* filename, const char* ext, int *iNumFiles) {
+	return fs->ListFiles(filename, ext, iNumFiles);
 }
 
 string FileSystem::EXPORT_ReadPlaintext(File* f, size_t numChars) {

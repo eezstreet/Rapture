@@ -190,6 +190,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->CloseFile = FileSystem::EXPORT_Close;
 	imp->GetFileSize = FileSystem::EXPORT_GetFileSize;
 	imp->ListFilesInDir = FileSystem::EXPORT_ListFilesInDir;
+	imp->FreeFileList = FileSystem::FreeFileList;
 	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
 	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
 	imp->RegisterImage = RenderCode::RegisterImage;
@@ -216,6 +217,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RenderTextSolid = RenderCode::RenderTextSolid;
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
+	imp->RunJavaScript = UI::RunJavaScript;
 	imp->Zone_Alloc = Zone::VMAlloc;
 	imp->Zone_FastFree = Zone::VMFastFree;
 	imp->Zone_Free = Zone::Free;

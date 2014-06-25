@@ -19,6 +19,8 @@ public:
 
 	Awesomium::JSValue window;
 
+	void RunJavaScript(const char* sJS);
+
 	Menu();
 	Menu(const char* menu);
 	~Menu();

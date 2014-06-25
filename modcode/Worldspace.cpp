@@ -2,7 +2,7 @@
 #include "QuadTree.h"
 
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
-#define WORLDSPACE_LOG2		/*15*/		4
+#define WORLDSPACE_LOG2		/*15*/		2
 
 Worldspace::Worldspace() {
 	qtTileTree = new QuadTree<TileNode, unsigned int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
@@ -97,8 +97,8 @@ void Worldspace::Render() {
 		RenderObject obj = *it;
 		if(obj.bIsTile) {
 			TileNode* tile = obj.tileData;
-			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + PlayerOffsetX();
-			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + PlayerOffsetY();
+			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + floor(PlayerOffsetX());
+			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + floor(PlayerOffsetY());
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
@@ -170,6 +170,7 @@ void Worldspace::ActorMoved(Actor* ptActor) {
 
 float Worldspace::WorldPlaceToScreenSpaceFX(float x, float y) {
 	return (96.0 * x) + (96.0 * y);
+		
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFY(float x, float y) {

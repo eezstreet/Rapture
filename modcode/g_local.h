@@ -22,6 +22,14 @@ void FPSFrame();
 float GetGameFPS();
 unsigned int GetGameFrametime();
 
+// cg_hud.cpp
+void InitHUD();
+void ShutdownHUD();
+void HUD_EnterArea(const char* areaName);
+void HUD_DrawLabel(const char* labelText);
+void HUD_HideLabels();
+
+
 // g_shared.cpp
 void eswap(unsigned short &x);
 void eswap(unsigned int &x);
@@ -148,6 +156,24 @@ public:
 	void MouseMoveEvent(int sX, int sY);
 };
 
+// Other entities..
+class info_player_start : public Entity {
+private:
+	bool bVis0;
+	bool bVis1;
+	bool bVis2;
+	bool bVis3;
+	bool bVis4;
+	bool bVis5;
+	bool bVis6;
+	bool bVis7;
+
+public:
+	virtual void render() { }
+	virtual void think();
+	virtual void spawn();
+};
+
 // A tilenode is a tile in the world
 class TileNode : public QTreeNode<unsigned int> {
 public:
@@ -164,7 +190,7 @@ struct MapFramework {
 	char name[MAX_HANDLE_STRING];
 	bool bIsPreset;
 	int nDungeonLevel;
-	int iLink[MAX_MAP_LINKS];
+	string sLink[MAX_MAP_LINKS];
 
 	char entryPreset[MAX_HANDLE_STRING];
 };
@@ -172,6 +198,7 @@ extern vector<MapFramework> vMapData;
 
 // Each map belongs to the worldspace, consuming a portion of it.
 struct Map {
+	char name[MAX_HANDLE_STRING];
 	bool bIsPreset;					// Is this map a preset level? (Y/N)
 	vector<TileNode> tiles;
 	vector<SpatialEntity> ents;
@@ -184,13 +211,13 @@ struct PresetFileData {
 		char header[8];				// 'DRLG.BDF'
 		unsigned short version;		// 1 - current version
 		char lookup[MAX_HANDLE_STRING];
-		unsigned int reserved1;		// Not used.
-		unsigned int reserved2;		// Not used.
+		unsigned long reserved1;		// Not used.
+		unsigned long reserved2;		// Not used.
 		unsigned short reserved3;	// Not used.
-		unsigned int sizeX;
-		unsigned int sizeY;
-		unsigned int numTiles;
-		unsigned int numEntities;
+		unsigned long sizeX;
+		unsigned long sizeY;
+		unsigned long numTiles;
+		unsigned long numEntities;
 	};
 	PFDHeader head;
 
@@ -230,7 +257,7 @@ private:
 
 	void LoadTile(void* file, const char* filename);
 public:
-	MapLoader(const string& presetsPath, const string& tilePath);
+	MapLoader(const char* presetsPath, const char* tilePath);
 	void BeginLoad(unsigned int levelId);
 	~MapLoader();
 

@@ -29,7 +29,7 @@ string hexstring(const int address);
 typedef void (__cdecl *conCmd_t)(vector<string>& args);
 void tostring(const wstring& in, string& out);
 void towstring(const string& in, wstring& out);
-bool checkExtension (string const &fullString, string const &ending);
+bool checkExtension (const string &fullString, const string &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
 const char* btoa(bool b);
 string stripextension(const string& str);
@@ -53,7 +53,8 @@ struct gameImports_s {
 	// File I/O
 	File* (*OpenFile)(const char* filename, const char* mode);
 	void (*CloseFile)(File* filehandle);
-	int (*ListFilesInDir)(const char* dir, vector<string>& in, const char* extension);
+	char** (*ListFilesInDir)(const char* dir, const char* extension, int* iNumFiles);
+	void (*FreeFileList)(char** ptFileList, int iNumFiles);
 	string (*ReadPlaintext)(File* filehandle, size_t numChars);
 	size_t (*ReadBinary)(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	size_t (*GetFileSize)(File* filehandle);
@@ -75,6 +76,7 @@ struct gameImports_s {
 	// UI
 	Menu* (*RegisterStaticMenu)(const char* sMenuFile);
 	void (*KillStaticMenu)(Menu* menu);
+	void (*RunJavaScript)(Menu* menu, const char* sJS);
 
 	// Materials
 	void (*InitMaterials)();

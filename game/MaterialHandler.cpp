@@ -64,15 +64,16 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 }
 
 MaterialHandler::MaterialHandler() {
-	vector<string> matFiles;
-	int numFiles = FileSystem::EXPORT_ListFilesInDir("materials/", matFiles, ".json");
+	int numFiles = 0;
+	char** matFiles = FileSystem::EXPORT_ListFilesInDir("materials/", ".json", &numFiles);
 	if(numFiles == 0) {
 		R_Printf("WARNING: no materials loaded\n");
 		return;
 	}
-	for(auto it = matFiles.begin(); it != matFiles.end(); ++it) {
-		LoadMaterial(it->c_str());
+	for(int i = 0; i < numFiles; i++) {
+		LoadMaterial(matFiles[i]);
 	}
+	FileSystem::FreeFileList(matFiles, numFiles);
 	R_Printf("Loaded %i materials\n", numFiles);
 }
 

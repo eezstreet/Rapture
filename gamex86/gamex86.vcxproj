@@ -50,7 +50,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;../game;../common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../game;../common;../modcode</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -77,8 +77,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\game\entities\info_player_start.cpp" />
+    <ClCompile Include="..\game\g_warp.cpp" />
     <ClCompile Include="..\game\r_shared.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
+    <ClCompile Include="..\modcode\cg_hud.cpp" />
     <ClCompile Include="..\modcode\cg_info.cpp" />
     <ClCompile Include="..\modcode\cg_fps.cpp" />
     <ClCompile Include="..\modcode\g_json.cpp" />
@@ -92,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RVector.h" />
+    <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\json\cJSON.h" />
     <ClInclude Include="..\modcode\g_json.h" />
     <ClInclude Include="..\modcode\g_local.h" />

@@ -19,6 +19,9 @@
     <Filter Include="Libraries\JSON">
       <UniqueIdentifier>{3b2f6654-df3c-4409-9dad-c31980642313}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\entities">
+      <UniqueIdentifier>{0c608705-d3ce-45c1-b7da-08f3fe031a6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\modcode\g_main.cpp">
@@ -57,6 +60,15 @@
     <ClCompile Include="..\game\r_shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\cg_hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\entities\info_player_start.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\g_warp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\modcode\g_local.h">
@@ -72,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\RVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\sys_shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

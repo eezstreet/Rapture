@@ -8,6 +8,11 @@ static void MP_LoadTilePreset(const string& path) {
 	}
 
 	PresetFileData* pfd = (PresetFileData*)malloc(sizeof(PresetFileData));
+	if(!pfd) {
+		R_Error("Out of memory.");
+		return;
+	}
+
 	File* file = trap->OpenFile(path.c_str(), "rb");
 	if(!file) {
 		R_Error("Directory failure in levels/preset: %s", path.c_str());
@@ -15,11 +20,19 @@ static void MP_LoadTilePreset(const string& path) {
 		return; // ? shouldn't happen
 	}
 
+	if(trap->GetFileSize(file) <= 0) {
+		R_Printf("WARNING: BDF file (%s) is empty!\n", path.c_str());
+		trap->CloseFile(file);
+		free(pfd);
+		return;
+	}
+
 	// Take care of the (constant) header
 	trap->ReadBinary(file, (unsigned char*)&pfd->head, sizeof(pfd->head), false);
 	if(strnicmp(pfd->head.header, "DRLG.BDF", sizeof(pfd->head.header))) {
 		R_Printf("WARNING: BDF file (%s) contains invalid header! (found: \"%s\", expected \"DRLG.BDF\")\n",
 			path.c_str(), pfd->head.header);
+		trap->CloseFile(file);
 		free(pfd);
 		return;
 	}
@@ -27,12 +40,13 @@ static void MP_LoadTilePreset(const string& path) {
 	if(pfd->head.version != 1) { // TODO: use proper compare
 		R_Printf("WARNING: BDF file (%s) uses invalid version number! (%i)\n",
 			path.c_str(), pfd->head.version);
+		trap->CloseFile(file);
 		free(pfd);
 		return;
 	}
 	R_Printf("DEBUG: Loading BDF (%s): %s\n", path.c_str(), pfd->head.lookup);
 
-#ifndef BIG_ENDIAN
+#ifdef BIG_ENDIAN
 	// read: i'm an idiot.
 	eswap(pfd->head.numEntities);
 	eswap(pfd->head.numTiles);
@@ -42,6 +56,14 @@ static void MP_LoadTilePreset(const string& path) {
 	eswap(pfd->head.sizeX);
 	eswap(pfd->head.sizeY);
 #endif // BIG_ENDIAN
+
+	if(pfd->head.numTiles == 0 && pfd->head.numEntities == 0) {
+		// Don't try to alloc zero memory..
+		R_Printf("WARNING: no entities or tiles in %s..not loading\n", path.c_str());
+		trap->CloseFile(file);
+		free(pfd);
+		return;
+	}
 
 	size_t fileSize = sizeof(pfd->head);
 	size_t tileSize = sizeof(*pfd->tileBlocks)*pfd->head.numTiles;
@@ -72,7 +94,7 @@ static void MP_LoadTilePreset(const string& path) {
 	} else {
 		pfd->entities = NULL;
 	}
-	delete binaryFile;
+	delete[] binaryFile;
 	trap->CloseFile(file);
 
 	presets[pfd->head.lookup] = pfd;
@@ -80,18 +102,19 @@ static void MP_LoadTilePreset(const string& path) {
 }
 
 void MP_LoadTilePresets() {
-	vector<string> paths;
-	int numFiles = trap->ListFilesInDir("levels/preset", paths, ".bdf");
-	if(paths.size() <= 0) {
+	int numFiles = 0;
+	char** paths = trap->ListFilesInDir("levels/preset", ".bdf", &numFiles);
+	if(numFiles <= 0) {
 		R_Error("Could not load presets in levels/preset (none?)");
 		return;
 	}
 
-	for(auto it = paths.begin(); it != paths.end(); ++it) {
-		MP_LoadTilePreset(*it);
+	for(int i = 0; i < numFiles; i++) {
+		MP_LoadTilePreset(paths[i]);
 	}
 
-	R_Printf("Loaded %i presets\n", paths.size());
+	R_Printf("Loaded %i presets\n", numFiles);
+	trap->FreeFileList(paths, numFiles);
 }
 
 void MP_AddToMap(const char* pfdName, Map& map) {
@@ -101,6 +124,10 @@ void MP_AddToMap(const char* pfdName, Map& map) {
 	}
 
 	const PresetFileData* pfd = MP_GetPreset(pfdName);
+	if(!pfd) {
+		R_Printf("WARNING: Couldn't find pfd: %s\n", pfdName);
+		return;
+	}
 	if(map.bIsPreset) {
 		for(int i = 0; i < pfd->head.numTiles; i++) {
 			auto tile = pfd->tileBlocks[i];

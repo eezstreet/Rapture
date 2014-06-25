@@ -9,6 +9,10 @@ void eswap(unsigned int &x) {
 	x = (x>>24) | ((x<<8) & 0x00FF0000) | ((x>>8) & 0x0000FF00) | (x<<24);
 }
 
+void eswap(unsigned long &x) {
+	
+}
+
 string genuuid() {
 #ifdef _WIN32
 	UUID uuid;
