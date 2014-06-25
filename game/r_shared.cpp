@@ -41,9 +41,7 @@ vector<wstring>& split(const wstring& str, const wchar_t delim) {
 
 bool atob(const string& str) {
 	bool b;
-	istringstream(str) >> b;
-	if(!b)
-		istringstream(str) >> boolalpha >> b;
+	istringstream(str) >> boolalpha >> b;
 	return b;
 }
 
