@@ -5,6 +5,9 @@ gameImports_s* trap;
 
 EditorMode_e eCurMode;
 
+static string fileName = "Untitled.bdf";
+const string& GetFileName() { return fileName; }
+
 static Menu* hotkeyDisplay;
 
 void Editor_Load() {

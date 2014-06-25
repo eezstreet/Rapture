@@ -30,6 +30,9 @@ static void DisplayDataTop() {
 			ss << "            ";
 		}
 	}
+
+	ss << GetFileName();
+	ss << "            ";
 	trap->RenderTextShaded(ptSegoe, ss.str().c_str(), 0, 0, 0, 255, 255, 255);
 }
 
