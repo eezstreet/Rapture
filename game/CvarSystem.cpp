@@ -362,6 +362,7 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 
 	Cvar* cvar = cv->second;
 	if(VArguments.size() == 1) {
+		R_Printf("%s\n", cvar->description.c_str());
 		switch(cvar->GetType()) {
 			case Cvar::CV_BOOLEAN:
 				{
