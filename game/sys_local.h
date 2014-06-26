@@ -73,14 +73,6 @@ struct CvarValueSet<char*> {
 };
 
 class Cvar {
-	string name;
-	string description;
-	union {
-		CvarValueSet<char*> s;
-		CvarValueSet<int> i;
-		CvarValueSet<float> v;
-		CvarValueSet<bool> b;
-	};
 public:
 	enum cvarType_e {
 		CV_STRING,
@@ -94,12 +86,27 @@ public:
 		CVAR_ANNOUNCE,
 	};
 private:
+	string name;
+	string description;
+	union {
+		CvarValueSet<char*> s;
+		CvarValueSet<int> i;
+		CvarValueSet<float> v;
+		CvarValueSet<bool> b;
+	};
+	union {
+		void (*ptsChangeCallback)(char *to);
+		void (*ptiChangeCallback)(int to);
+		void (*ptfChangeCallback)(float to);
+		void (*ptbChangeCallback)(bool to);
+	};
+
 	cvarType_e type;
 	int flags;
-	void AssignHardValue(char* value) { s.AssignBoth(value); }
-	void AssignHardValue(int value) { i.AssignBoth(value); }
-	void AssignHardValue(float value) { v.AssignBoth(value); }
-	void AssignHardValue(bool value) { b.AssignBoth(value); }
+	void AssignHardValue(char* value);
+	void AssignHardValue(int value);
+	void AssignHardValue(float value);
+	void AssignHardValue(bool value);
 	bool registered;
 public:
 	Cvar(Cvar&& other);
@@ -114,15 +121,15 @@ public:
 	Cvar& operator= (float value);
 	Cvar& operator= (bool value);
 
-	cvarType_e GetType() { return type; }
-	int GetFlags() { return flags; }
-	string GetName() { return name; }
-	string GetDescription() { return description; }
+	inline cvarType_e GetType() { return type; }
+	inline int GetFlags() { return flags; }
+	inline string GetName() { return name; }
+	inline string GetDescription() { return description; }
 
-	void SetValue(char* value) { if(type != CV_STRING) return; strncpy(s.currentVal, value, sizeof(s.currentVal)); if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), value); }
-	void SetValue(int value) { if(type != CV_INTEGER) return; i.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %i\n", name.c_str(), value); }
-	void SetValue(float value) { if(type != CV_FLOAT) return; v.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %f\n", name.c_str(), value); }
-	void SetValue(bool value) { if(type != CV_BOOLEAN) return; b.currentVal = value; if(flags & (1 << CVAR_ANNOUNCE)) R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); }
+	void SetValue(char* value);
+	void SetValue(int value);
+	void SetValue(float value);
+	void SetValue(bool value);
 	inline char* String() { return s.currentVal; }
 	inline int Integer() { return i.currentVal; }
 	inline float Value() { return v.currentVal; }
@@ -132,15 +139,19 @@ public:
 	inline float DefaultValue() { return v.defaultVal; }
 	inline bool DefaultBool() { return b.defaultVal; }
 
+	void AddCallback(void* function);
+
 	template<typename T>
 	static Cvar* Get(const string& sName, const string& sDesc, int iFlags, T startValue) {
 		try {
 			auto it = CvarSystem::cvars.find(sName);
-			if(it == CvarSystem::cvars.end())
+			if(it == CvarSystem::cvars.end()) {
 				throw out_of_range("not registered");
+			}
 			Cvar* cv = it->second;
-			if(!cv->registered)
+			if(!cv->registered) {
 				throw out_of_range("not registered");
+			}
 			return cv;
 		}
 		catch( out_of_range e ) {
