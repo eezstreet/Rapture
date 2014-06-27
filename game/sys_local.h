@@ -140,6 +140,7 @@ public:
 	inline bool DefaultBool() { return b.defaultVal; }
 
 	void AddCallback(void* function);
+	void RunCallback();
 
 	template<typename T>
 	static Cvar* Get(const string& sName, const string& sDesc, int iFlags, T startValue) {
@@ -194,10 +195,10 @@ public:
 	static void SetCvarFlags(const string& sName, int flags) { cvars[sName]->flags = flags; }
 	static Cvar::cvarType_e GetCvarType(const string& sName) { return cvars[sName]->type; }
 
-	static void SetStringValue(const string &sName, char* newValue) { strcpy(cvars[sName]->s.currentVal, newValue); }
-	static void SetIntegerValue(const string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; }
-	static void SetFloatValue(const string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; }
-	static void SetBooleanValue(const string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; }
+	static void SetStringValue(const string &sName, char* newValue) { strcpy(cvars[sName]->s.currentVal, newValue); cvars[sName]->RunCallback(); }
+	static void SetIntegerValue(const string &sName, int newValue) { cvars[sName]->i.currentVal = newValue; cvars[sName]->RunCallback(); }
+	static void SetFloatValue(const string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; cvars[sName]->RunCallback(); }
+	static void SetBooleanValue(const string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; cvars[sName]->RunCallback(); }
 
 	static string GetStringValue(const string& sName);
 	static int GetIntegerValue(const string& sName);

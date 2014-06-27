@@ -5,6 +5,7 @@
 namespace RenderCode {
 	void Initialize();
 	void Exit(const bool bSilent = false);
+	void Restart();
 	void BlankFrame();
 	void Display();
 	

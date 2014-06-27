@@ -7,6 +7,7 @@ namespace UI {
 	void Render();
 	void Shutdown();
 	void Update();
+	void Restart();
 	void KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text);
 	void TextEvent(char* text);
 	void MouseButtonEvent(unsigned int buttonId, bool down);

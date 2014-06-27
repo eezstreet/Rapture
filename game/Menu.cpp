@@ -111,7 +111,7 @@ void EXPORT_setCvarInteger(const JSArray& args) {
 void EXPORT_setCvarFloat(const JSArray& args) {
 	if(!CvarSet_IsValid(args))
 		return;
-	if(!args[1].IsDouble()) {
+	if(!args[1].IsNumber()) {
 		R_Printf("JS warning: setCvarFloat: second arg is not float\n");
 		return;
 	}
@@ -126,6 +126,10 @@ void EXPORT_setCvarBoolean(const JSArray& args) {
 		return;
 	}
 	CvarSystem::SetBooleanValue(ToString(args[0].ToString()), args[1].ToBoolean());
+}
+
+void EXPORT_echo(const JSArray& args) {
+	R_Printf(ToString(args[0].ToString()).c_str());
 }
 
 /* End function definitions */
@@ -144,6 +148,7 @@ nonReturningTable_t tbl_nonreturn [] = {
 	{ "setCvarInteger", EXPORT_setCvarInteger },
 	{ "setCvarFloat", EXPORT_setCvarFloat },
 	{ "setCvarBoolean", EXPORT_setCvarBoolean },
+	{ "echo", EXPORT_echo },
 	{ "END", NULL }
 };
 

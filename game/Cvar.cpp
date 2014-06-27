@@ -254,8 +254,7 @@ void Cvar::SetValue(char* value) {
 	strncpy(s.currentVal, value, sizeof(s.currentVal)); 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
 		R_Printf("%s changed to %s\n", name.c_str(), value); 
-	if(ptsChangeCallback)
-		ptsChangeCallback(value);
+	RunCallback();
 }
 
 void Cvar::SetValue(int value) { 
@@ -263,8 +262,7 @@ void Cvar::SetValue(int value) {
 	i.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
 		R_Printf("%s changed to %i\n", name.c_str(), value); 
-	if(ptiChangeCallback)
-		ptiChangeCallback(value);
+	RunCallback();
 }
 
 void Cvar::SetValue(float value) { 
@@ -272,8 +270,7 @@ void Cvar::SetValue(float value) {
 	v.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
 		R_Printf("%s changed to %f\n", name.c_str(), value); 
-	if(ptfChangeCallback)
-		ptfChangeCallback(value);
+	RunCallback();
 }
 
 void Cvar::SetValue(bool value) { 
@@ -281,8 +278,7 @@ void Cvar::SetValue(bool value) {
 	b.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
 		R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); 
-	if(ptbChangeCallback)
-		ptbChangeCallback(value);
+	RunCallback();
 }
 
 void Cvar::AddCallback(void* function) {
@@ -299,6 +295,32 @@ void Cvar::AddCallback(void* function) {
 			break;
 		case CV_BOOLEAN:
 			ptbChangeCallback = (void(*)(bool))function;
+			break;
+	}
+}
+
+void Cvar::RunCallback() {
+	switch(type) {
+		default:
+		case CV_STRING:
+			if(ptsChangeCallback) {
+				ptsChangeCallback(s.currentVal);
+			}
+			break;
+		case CV_INTEGER:
+			if(ptiChangeCallback) {
+				ptiChangeCallback(i.currentVal);
+			}
+			break;
+		case CV_FLOAT:
+			if(ptfChangeCallback) {
+				ptfChangeCallback(v.currentVal);
+			}
+			break;
+		case CV_BOOLEAN:
+			if(ptbChangeCallback) {
+				ptbChangeCallback(b.currentVal);
+			}
 			break;
 	}
 }

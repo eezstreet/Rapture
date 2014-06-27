@@ -148,6 +148,10 @@ void Cmd_Echo_f(vector<string>& args) {
 	R_Printf("%s\n", text.c_str());
 }
 
+void Cmd_VidRestart_f(vector<string>& args) {
+	RenderCode::Restart();
+}
+
 extern void NewGame();
 extern void StartEditor();
 void Cmd_NewGameTest_f(vector<string>& args) {
@@ -168,6 +172,8 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("cvarlist", Cmd_Cvarlist_f);
 	Cmd::AddCommand("zoneinfo", Cmd_Zoneinfo_f);
 	Cmd::AddCommand("echo", Cmd_Echo_f);
+
+	Cmd::AddCommand("vid_restart", Cmd_VidRestart_f);
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);

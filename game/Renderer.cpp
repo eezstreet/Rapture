@@ -5,6 +5,7 @@ Cvar* r_width = NULL;
 Cvar* r_height = NULL;
 Cvar* r_windowtitle = NULL;
 Cvar* r_gamma = NULL;
+Cvar* r_filter = NULL;
 
 #ifdef _DEBUG
 Cvar* r_imgdebug = NULL;
@@ -24,17 +25,31 @@ namespace RenderCode {
 #define MAX_TEXTRENDER 8
 	static SDL_Texture* textFields[MAX_TEXTRENDER];
 
+	static void GammaCallback(float newValue) {
+		unsigned short ramp[256];
+		SDL_CalculateGammaRamp(newValue, ramp);
+		SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
+	}
+
+	static void WindowTitleCallback(char* newValue) {
+		SDL_SetWindowTitle(window, newValue);
+	}
+
 	static void InitCvars() {
 		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", (1 << Cvar::CVAR_ARCHIVE), false);
 		r_width = Cvar::Get<int>("r_width", "Resolution: width", (1 << Cvar::CVAR_ARCHIVE), 1024);
 		r_height = Cvar::Get<int>("r_height", "Resolution: height", (1 << Cvar::CVAR_ARCHIVE), 768);
 		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", (1 << Cvar::CVAR_ARCHIVE) | (1 << Cvar::CVAR_ROM), "Rapture");
 		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", (1 << Cvar::CVAR_ARCHIVE), 1.0f);
+		r_filter = Cvar::Get<int>("r_filter", "Filter quality. 0 = nearest pixel sampling, 1 = linear filtering, 2 = anisotropic filtering", (1 << Cvar::CVAR_ARCHIVE), 1);
 
 		// Debug cvars
 #ifdef _DEBUG
 		r_imgdebug = Cvar::Get<bool>("r_imgdebug", "Draw lines around image bounds", 0, false);
 #endif
+
+		r_gamma->AddCallback((void*)GammaCallback);
+		r_windowtitle->AddCallback((void*)WindowTitleCallback);
 	}
 
 	void Initialize() {
@@ -80,11 +95,13 @@ namespace RenderCode {
 			return;
 		}
 
-		if(r_gamma->Value() != 1.0f) {
-			unsigned short ramp[256];
-			SDL_CalculateGammaRamp(r_gamma->Value(), ramp);
-			SDL_SetWindowGammaRamp(window, ramp, ramp, ramp);
-		}
+		// Anisotropic filtering
+		string s = "" + r_filter->Integer();
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, s.c_str());
+		SDL_RenderSetLogicalSize(renderer, r_width->Integer(), r_height->Integer());
+
+		// Adjust the gamma.
+		r_gamma->RunCallback();
 
 		renderSurf = SDL_CreateRGBSurface(0, r_width->Integer(), r_height->Integer(), 32,  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 		renderTex = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, r_width->Integer(), r_height->Integer() );
@@ -105,7 +122,18 @@ namespace RenderCode {
 	}
 
 	void Restart() {
-		// TODO
+		// This doesn't actually restart the renderer at all, we just change fullscreen mode and resolution
+		string sFilterHint = "" + r_filter->Integer();
+
+		r_gamma->RunCallback();
+
+		SDL_SetWindowFullscreen(window, (r_fullscreen->Bool() ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
+		SDL_SetWindowSize(window, r_width->Integer(), r_height->Integer());
+
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sFilterHint.c_str());
+		SDL_RenderSetLogicalSize(renderer, r_width->Integer(), r_height->Integer());
+
+		UI::Restart();
 	}
 
 	void Exit(const bool bSilent) {

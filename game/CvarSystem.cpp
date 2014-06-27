@@ -46,7 +46,7 @@ void CvarSystem::ArchiveCvars() {
 			ss << "seta " << cv->name << " ";
 			switch(cv->type) {
 				case Cvar::CV_BOOLEAN:
-					ss << cv->b.currentVal;
+					ss << btoa(cv->b.currentVal);
 					break;
 				case Cvar::CV_FLOAT:
 					ss << cv->v.currentVal;

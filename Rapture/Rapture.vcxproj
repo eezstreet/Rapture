@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClCompile Include="..\game\CmdSystem.cpp" />
     <ClCompile Include="..\game\Console.cpp" />
+    <ClCompile Include="..\game\Cvar.cpp" />
     <ClCompile Include="..\game\CvarSystem.cpp" />
     <ClCompile Include="..\game\FileSystem.cpp" />
     <ClCompile Include="..\game\FontManager.cpp" />

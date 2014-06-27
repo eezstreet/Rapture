@@ -85,10 +85,20 @@ int RaptureInputCallback(void *notUsed, SDL_Event* e) {
 	return 1;
 }
 
+// Print SDL version number
+void Sys_PrintSDLVersion() {
+	SDL_version ver;
+	SDL_VERSION(&ver);
+
+	R_Printf("using SDL %u.%u.%u\n", ver.major, ver.minor, ver.patch);
+}
+
 /* RaptureGame class, this does all the heavy lifting */
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	game = NULL;
 	editor = NULL;
+
+	Sys_PrintSDLVersion();
 
 	Sys_InitViewlog();
 

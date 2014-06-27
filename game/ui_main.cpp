@@ -67,6 +67,14 @@ void UI::Update() {
 	wc->Update();
 }
 
+void UI::Restart() {
+	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
+		SDL_DestroyTexture(uiTextures[i]);
+		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
+			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+	}
+}
+
 void UI::Render() {
 	lastActiveLayer = 0;
 	for_each(renderables.begin(), renderables.end(), [](WebView* wv) {
@@ -77,7 +85,10 @@ void UI::Render() {
 		SDL_Texture* tex = uiTextures[lastActiveLayer];
 		unsigned char* pixels;
 		int pitch;
-		SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch);
+		if(SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch) < 0) {
+			R_Printf("Failed to lock texture: %s\n", SDL_GetError());
+			return;
+		}
 		bmp->CopyTo(pixels, pitch, 4, false, false);
 		SDL_UnlockTexture(tex);
 		RenderCode::BlendTexture((void*)tex);

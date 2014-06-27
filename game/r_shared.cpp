@@ -47,6 +47,13 @@ bool atob(const string& str) {
 
 bool atob(const char* str) {
 	bool b;
+	if(strlen(str) == 0) {
+		return false;
+	} else if(str[0] == '1') {
+		return true;
+	} else if(str[1] == '0') {
+		return false;
+	}
 	istringstream(str) >> b;
 	if(!b)
 		istringstream(str) >> boolalpha >> b;
