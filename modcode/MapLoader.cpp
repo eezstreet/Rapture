@@ -26,6 +26,8 @@ void InitLevelParseFields() {
 	levelParseFields["sizeX"] = INT_PARSER(iSizeX);
 	levelParseFields["sizeY"] = INT_PARSER(iSizeY);
 	levelParseFields["act"] = INT_PARSER(iAct);
+#undef NAME_PARSER
+#undef INT_PARSER
 }
 
 

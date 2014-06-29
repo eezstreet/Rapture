@@ -85,7 +85,8 @@ struct Tile {
 	float fDepthScoreOffset;
 
 	Tile() {
-		name[0] = lowmask = highmask = lightmask = vismask = '\0';
+		name[0] = '\0';
+		lowmask = highmask = lightmask = vismask = 0;
 		fDepthScoreOffset = 0.0f;
 		iAutoTransX = iAutoTransY = iAutoTransW = iAutoTransH = 0;
 		materialHandle = NULL;
@@ -231,7 +232,7 @@ struct Map : public QTreeNode<int> {
 
 	Map(int _x, int _y, int _w, int _h, int act, int depth) :
 	qtTileTree(QuadTree<TileNode, int>(_x, _y, _w, _h, 0, depth, NULL)),
-	qtEntTree(QuadTree<Entity, float>(_x, _y, _w, _h, 0, depth+1, NULL)) {
+	qtEntTree(QuadTree<Entity, float>((float)_x, (float)_y, (float)_w, (float)_h, 0, depth+1, NULL)) {
 		x = _x;
 		y = _y;
 		w = _w;

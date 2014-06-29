@@ -1,7 +1,7 @@
 #include "g_local.h"
 #include "RVector.h"
 
-const static float speed = 0.003;
+const static float speed = 0.003f;
 static RVec2<float> dir(0,0);
 static RVec2<float> dest(0,0);
 static bool bShouldWeBeMoving = false;
@@ -19,7 +19,7 @@ void Player::think() {
 	pX = x;
 	pY = y;
 
-	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.035)) {
+	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.035f)) {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {

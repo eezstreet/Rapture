@@ -4,11 +4,11 @@ float fCameraOffsetX = 0.0f;
 float fCameraOffsetY = 0.0f;
 
 float WorldPlaceToScreenSpaceFX(float x, float y) {
-	return (96.0 * x) + (96.0 * y);
+	return (96.0f * x) + (96.0f * y);
 }
 
 float WorldPlaceToScreenSpaceFY(float x, float y) {
-	return (48.0 * y) - (48.0 * x);
+	return (48.0f * y) - (48.0f * x);
 }
 
 int WorldPlaceToScreenSpaceIX(int x, int y) {
@@ -24,7 +24,7 @@ float CameraOffsetX() {
 
 	trap->CvarIntVal("r_width", &screenWidth);
 
-	return (screenWidth / 2) - (96.0 * fCameraOffsetX) - (96.0 * fCameraOffsetY);
+	return (screenWidth / 2) - (96.0f * fCameraOffsetX) - (96.0f * fCameraOffsetY);
 }
 
 float CameraOffsetY() {
@@ -32,5 +32,5 @@ float CameraOffsetY() {
 
 	trap->CvarIntVal("r_height", &screenHeight);
 
-	return (screenHeight / 2) - (48.0 * fCameraOffsetY) + (48.0 * fCameraOffsetX);
+	return (screenHeight / 2) - (48.0f * fCameraOffsetY) + (48.0f * fCameraOffsetX);
 }

@@ -27,7 +27,7 @@ private:
 	QuadTree<C, U>*		SE;
 	QuadTree<C, U>*		parent;
 public:
-	QuadTree(unsigned int x1, unsigned int y1, unsigned int w1, unsigned int h1, unsigned d1, unsigned m1, QuadTree<C, U>* ptParent) :
+	QuadTree(U x1, U y1, U w1, U h1, unsigned d1, unsigned m1, QuadTree<C, U>* ptParent) :
 		x(x1),
 		y(y1),
 		w(w1),

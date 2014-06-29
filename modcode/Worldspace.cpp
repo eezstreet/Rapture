@@ -39,7 +39,7 @@ void Worldspace::Render() {
 		bool bIsTile;
 	};
 	vector<RenderObject> sortedObjects;
-	auto maps = qtMapTree->NodesAt(GetFirstPlayer()->x,GetFirstPlayer()->y);
+	auto maps = qtMapTree->NodesAt(GetFirstPlayer()->x, GetFirstPlayer()->y);
 	if(maps.size() <= 0) {
 		return;
 	}
@@ -88,7 +88,7 @@ void Worldspace::Render() {
 		RenderObject obj;
 		obj.bIsTile = true;
 		obj.tileData = tile;
-		obj.fDepthScore = 10 * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - 96 - tile->ptTile->fDepthScoreOffset);
+		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - 96.0f - tile->ptTile->fDepthScoreOffset);
 		sortedObjects.push_back(obj);
 	}
 
@@ -106,8 +106,8 @@ void Worldspace::Render() {
 		RenderObject obj = *it;
 		if(obj.bIsTile) {
 			TileNode* tile = obj.tileData;
-			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + floor(PlayerOffsetX(player));
-			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + floor(PlayerOffsetY(player));
+			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + (int)floor(PlayerOffsetX(player));
+			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + (int)floor(PlayerOffsetY(player));
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
@@ -206,12 +206,12 @@ void Worldspace::ActorMoved(Actor* ptActor) {
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFX(float x, float y) {
-	return (96.0 * x) + (96.0 * y);
+	return (96.0f * x) + (96.0f * y);
 		
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFY(float x, float y) {
-	return (48.0 * y) - (48.0 * x);
+	return (48.0f * y) - (48.0f * x);
 }
 
 int Worldspace::WorldPlaceToScreenSpaceIX(int x, int y) {
@@ -227,7 +227,7 @@ float Worldspace::PlayerOffsetX(Player* ptPlayer) {
 
 	trap->CvarIntVal("r_width", &screenWidth);
 
-	return (screenWidth / 2) - (96.0 * ptPlayer->x) - (96.0 * ptPlayer->y);
+	return (screenWidth / 2.0f) - (96.0f * ptPlayer->x) - (96.0f * ptPlayer->y);
 }
 
 float Worldspace::PlayerOffsetY(Player* ptPlayer) {
@@ -235,7 +235,7 @@ float Worldspace::PlayerOffsetY(Player* ptPlayer) {
 
 	trap->CvarIntVal("r_height", &screenHeight);
 
-	return (screenHeight / 2) - (48.0 * ptPlayer->y) + (48.0 * ptPlayer->x);
+	return (screenHeight / 2.0f) - (48.0f * ptPlayer->y) + (48.0f * ptPlayer->x);
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer) {
@@ -245,7 +245,7 @@ float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer) {
 	trap->CvarIntVal("r_width", &screenWidth);
 	trap->CvarIntVal("r_height", &screenHeight);
 
-	return (x/192.0f) - (y/96.0f) + plyX - (screenWidth/384.0f) + (screenHeight/192.0f) + 0.5;
+	return (x/192.0f) - (y/96.0f) + plyX - (screenWidth/384.0f) + (screenHeight/192.0f) + 0.5f;
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer) {
@@ -255,5 +255,5 @@ float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer) {
 	trap->CvarIntVal("r_width", &screenWidth);
 	trap->CvarIntVal("r_height", &screenHeight);
 	
-	return (y/96.0f) + (x/192.0f) - (screenWidth/384.0f) + plyY - (screenHeight/192.0f) - 0.5;
+	return (y/96.0f) + (x/192.0f) - (screenWidth/384.0f) + plyY - (screenHeight/192.0f) - 0.5f;
 }
