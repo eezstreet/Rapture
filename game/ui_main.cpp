@@ -254,8 +254,9 @@ void InjectAKeyboardEvent(Awesomium::WebKeyboardEvent e) {
 			(*it)->InjectKeyboardEvent(e);
 }
 
+static int lastKeyboard = 0;
 void UI::KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text) {
-	if(keysym.scancode == SDL_SCANCODE_GRAVE) {
+	if(keysym.scancode == SDL_SCANCODE_GRAVE && lastKeyboard < SDL_GetTicks()-200) {
 		if(bIsKeyDown) {
 			if(!Console::GetSingleton()->IsOpen()) {
 				Console::GetSingleton()->Show();
@@ -263,6 +264,7 @@ void UI::KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text) {
 				Console::GetSingleton()->Hide();
 			}
 		}
+		lastKeyboard = SDL_GetTicks();
 		return;
 	}
 
