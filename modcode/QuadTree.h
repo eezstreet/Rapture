@@ -110,7 +110,7 @@ public:
 			return this;
 		}
 
-		if(posX > w + w / (U) 2 && posY < y + h) {
+		if(posX > x + w / (U) 2 && posY < y + h) {
 			if(posY > y + h / (U)2 && posY < y + h) {
 				return SE->ContainingTree(posX, posY);
 			} else if(posY > y && posY <= y + h / (U)2) {
@@ -126,20 +126,38 @@ public:
 
 		return this;
 	}
-#if 0
-	vector<C*> NodesIn(const U posX, const U posY, const U width, const U height) {
-		if(depth == maxDepth) {
-			return nodes;
-		}
 
-		vector<C*> returnNodes, childReturnNodes;
-		if(!nodes.empty()) {
-			returnNodes = nodes;
+	vector<C*> NodesIn(const U posX, const U posY, const U posW, const U posH) {
+		vector<C*> returnNodes;
+		for(auto it = nodes.begin(); it != nodes.end(); it++) {
+			if((*it)->x >= posX && (*it)->x <= (posX + posW) &&
+				(*it)->y >= posY && (*it)->y <= (posY + posH)) {
+					returnNodes.push_back(*it);
+			}
 		}
-		// TODO: eliminate code reuse below
-		// TODO: finish
+		if(depth != maxDepth) {
+			vector<C*> nwNodes = NW->NodesIn(posX, posY, posW, posH);
+			if(nwNodes.size() > 0) {
+				returnNodes.insert(returnNodes.end(), nwNodes.begin(), nwNodes.end());
+			}
+
+			vector<C*> neNodes = NE->NodesIn(posX, posY, posW, posH);
+			if(neNodes.size() > 0) {
+				returnNodes.insert(returnNodes.end(), neNodes.begin(), neNodes.end());
+			}
+
+			vector<C*> swNodes = SW->NodesIn(posX, posY, posW, posH);
+			if(swNodes.size() > 0) {
+				returnNodes.insert(returnNodes.end(), swNodes.begin(), swNodes.end());
+			}
+
+			vector<C*> seNodes = SE->NodesIn(posX, posY, posW, posH);
+			if(seNodes.size() > 0) {
+				returnNodes.insert(returnNodes.end(), seNodes.begin(), seNodes.end());
+			}
+		}
+		return returnNodes;
 	}
-#endif
 
 	vector<C*> NodesAt(const U posX, const U posY) {
 		if(depth == maxDepth) {

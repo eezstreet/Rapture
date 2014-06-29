@@ -143,7 +143,7 @@ void processfile(const char* file) {
 		numEnts = cJSON_GetArraySize(ents);
 		for(int i = 0; i < numEnts; i++) {
 			bdfEntInfo_t ent;
-			cJSON* arr = cJSON_GetArrayItem(tiles, i);
+			cJSON* arr = cJSON_GetArrayItem(ents, i);
 			cJSON* json;
 
 			json = cJSON_GetObjectItem(arr, "lookup");

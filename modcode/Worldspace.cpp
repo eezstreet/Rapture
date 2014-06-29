@@ -5,52 +5,60 @@
 #define WORLDSPACE_LOG2		/*15*/		2
 
 Worldspace::Worldspace() {
-	qtTileTree = new QuadTree<TileNode, unsigned int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
-	qtEntTree = new QuadTree<SpatialEntity, float>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2 + 2, NULL);
+	qtMapTree = new QuadTree<Map, int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
 };
 
 Worldspace::~Worldspace() {
-	delete qtTileTree;
-	delete qtEntTree;
+	delete qtMapTree;
 };
 
 void Worldspace::InsertInto(Map* theMap) {
-	for(auto it = theMap->tiles.begin(); it != theMap->tiles.end(); ++it) {
-		qtTileTree->AddNode(&(*it));
-	}
-	for(auto it = theMap->ents.begin(); it != theMap->ents.end(); ++it) {
-		qtEntTree->AddNode(&(*it));
-	}
+	qtMapTree->AddNode(theMap);
 };
 
 void Worldspace::SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink, bool bShouldCollide) {
-	SpatialEntity *s = new SpatialEntity(ent);
 	if(bShouldRender) {
-		mRenderList[s->uuid] = ent;
+		mRenderList[ent->uuid] = ent;
 	}
 	if(bShouldThink) {
-		mThinkList[s->uuid] = ent;
+		mThinkList[ent->uuid] = ent;
 	}
 	if(bShouldCollide) {
-		mCollideList[s->uuid] = ent;
+		mCollideList[ent->uuid] = ent;
 	}
-	ent->ptContainingTree = qtEntTree->AddNode(s);
-	ent->ptSpatialEntity = s;
 	ent->spawn();
 }
 
 void Worldspace::Render() {
 	struct RenderObject {
 		union {
-			SpatialEntity* entData;
+			Entity* entData;
 			TileNode* tileData;
 		};
 		float fDepthScore;
 		bool bIsTile;
 	};
 	vector<RenderObject> sortedObjects;
-	auto ents = qtEntTree->NodesAt(1, 1); // FIXME
-	auto tiles = qtTileTree->NodesAt(1, 1);
+	auto maps = qtMapTree->NodesAt(GetFirstPlayer()->x,GetFirstPlayer()->y);
+	if(maps.size() <= 0) {
+		return;
+	}
+	// Determine which map we're on
+	auto player = GetFirstPlayer();
+	Map* theMap = nullptr;
+	if(player == nullptr) {
+		return;
+	}
+	for(auto it = maps.begin(); it != maps.end(); ++it) {
+		auto thisMap = *it;
+		if(player->x >= thisMap->x && player->x < thisMap->x + thisMap->w &&
+			player->y >= thisMap->y && player->y < thisMap->y + thisMap->h) {
+				theMap = thisMap;
+		}
+	}
+	if(theMap == nullptr) {
+		return;
+	}
 	int screenWidth, screenHeight;
 
 	trap->CvarIntVal("r_width", &screenWidth);
@@ -59,21 +67,23 @@ void Worldspace::Render() {
 	screenWidth /= 2;
 	screenHeight /= 2;
 
+	auto mapTiles = theMap->qtTileTree.NodesAt(player->x, player->y);
+	auto mapEnts = theMap->qtEntTree.NodesAt(player->x, player->y);
 	// Chuck entities into the list of stuff that needs sorted
-	for(auto it = ents.begin(); it != ents.end(); ++it) {
-		auto spatialEnt = *it;
-		auto ent = mRenderList.find(spatialEnt->uuid);
-		if(ent != mRenderList.end()) {
+	for(auto it = mapEnts.begin(); it != mapEnts.end(); ++it) {
+		auto ent = *it;
+		auto foundEnt = mRenderList.find(ent->uuid);
+		if(foundEnt != mRenderList.end()) {
 			RenderObject obj;
 			obj.bIsTile = false;
-			obj.entData = spatialEnt;
-			obj.fDepthScore = 10 * WorldPlaceToScreenSpaceFY(ent->second->x, ent->second->y);
+			obj.entData = ent;
+			obj.fDepthScore = 10 * WorldPlaceToScreenSpaceFY(foundEnt->second->x, foundEnt->second->y);
 			sortedObjects.push_back(obj);
 		}
 	}
 
 	// Now chuck tiles into the pot too
-	for(auto it = tiles.begin(); it != tiles.end(); ++it) {
+	for(auto it = mapTiles.begin(); it != mapTiles.end(); ++it) {
 		TileNode* tile = *it;
 		RenderObject obj;
 		obj.bIsTile = true;
@@ -90,15 +100,14 @@ void Worldspace::Render() {
 		return false;
 	});
 
-	auto player = GetFirstPlayer();
 	bool bHaveWeRenderedPlayer = false;
 	// Lastly we need to render the actual stuff
 	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
 		RenderObject obj = *it;
 		if(obj.bIsTile) {
 			TileNode* tile = obj.tileData;
-			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + floor(PlayerOffsetX());
-			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + floor(PlayerOffsetY());
+			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + floor(PlayerOffsetX(player));
+			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + floor(PlayerOffsetY(player));
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
@@ -127,7 +136,23 @@ void Worldspace::Render() {
 
 void Worldspace::Run() {
 	// Run entity think functions
-	auto ents = qtEntTree->NodesAt(1, 1); // FIXME
+	auto player = GetFirstPlayer();
+	if(player == nullptr) {
+		return;
+	}
+	auto maps = qtMapTree->NodesAt(player->x, player->y); // FIXME
+	if(maps.size() <= 0) {
+		return;
+	}
+	Map* theMap = nullptr;
+	for(auto it = maps.begin(); it != maps.end(); ++it) {
+		auto thisMap = *it;
+		if(player->x >= thisMap->x && player->x < thisMap->x + thisMap->w &&
+			player->y >= thisMap->y && player->y < thisMap->y + thisMap->h) {
+				theMap = thisMap;
+		}
+	}
+	auto ents = theMap->qtEntTree.NodesAt(player->x, player->y); // FIXME
 	for(auto it = ents.begin(); it != ents.end(); ++it) {
 		auto spatialEnt = *it;
 		auto ent = mThinkList.find(spatialEnt->uuid);
@@ -135,20 +160,32 @@ void Worldspace::Run() {
 			ent->second->think();
 		}
 	}
+	UpdateEntities();
 }
 
 void Worldspace::UpdateEntities() {
+	// FIXME
 	for(auto it = vActorsMoved.begin(); it != vActorsMoved.end(); ++it) {
 		auto ptActor = *it;
-		if(ptActor->ptContainingTree == qtEntTree->ContainingTree(ptActor->pX, ptActor->pY)) {
-			// Even if it's still in the same tree, we need to update the
-			// coordinates in that tree (otherwise depth etc get fucked up)
-			ptActor->ptSpatialEntity->x = ptActor->x;
-			ptActor->ptSpatialEntity->y = ptActor->y;
+		auto containingMap = qtMapTree->NodesAt(ptActor->x, ptActor->y);
+		Map* theMap = nullptr;
+		for(auto it = containingMap.begin(); it != containingMap.end(); ++it) {
+			if(ptActor->x >= (*it)->x && ptActor->x < (*it)->x + (*it)->w &&
+				ptActor->y >= (*it)->y && ptActor->y < (*it)->y + (*it)->h) {
+					theMap = *it;
+			}
+		}
+		if(theMap == nullptr) {
 			continue;
 		}
-		ptActor->ptContainingTree->RemoveNode(ptActor);
-		qtEntTree->AddNode(ptActor);
+
+		auto containingTree = theMap->qtEntTree.ContainingTree(ptActor->x, ptActor->y);
+		if(containingTree != ptActor->ptContainingTree) {
+			// The tree that we've physically moved on is no longer the same, so we need to update it
+			ptActor->ptContainingTree->RemoveNode(ptActor);
+			containingTree->AddNode(ptActor);
+			ptActor->ptContainingTree = containingTree;
+		}
 	}
 	vActorsMoved.clear();
 }
@@ -185,27 +222,24 @@ int Worldspace::WorldPlaceToScreenSpaceIY(int x, int y) {
 	return (48 * y) - (48 * x);
 }
 
-float Worldspace::PlayerOffsetX() {
+float Worldspace::PlayerOffsetX(Player* ptPlayer) {
 	int screenWidth = 0;
-	Player* ply = GetFirstPlayer();
 
 	trap->CvarIntVal("r_width", &screenWidth);
 
-	return (screenWidth / 2) - (96.0 * ply->x) - (96.0 * ply->y);
+	return (screenWidth / 2) - (96.0 * ptPlayer->x) - (96.0 * ptPlayer->y);
 }
 
-float Worldspace::PlayerOffsetY() {
+float Worldspace::PlayerOffsetY(Player* ptPlayer) {
 	int screenHeight = 0;
-	Player* ply = GetFirstPlayer();
 
 	trap->CvarIntVal("r_height", &screenHeight);
 
-	return (screenHeight / 2) - (48.0 * ply->y) + (48.0 * ply->x);
+	return (screenHeight / 2) - (48.0 * ptPlayer->y) + (48.0 * ptPlayer->x);
 }
 
-float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y) {
-	Player* ply = world.GetFirstPlayer();
-	float plyX = ply->x;
+float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer) {
+	float plyX = ptPlayer->x;
 	int screenWidth, screenHeight;
 
 	trap->CvarIntVal("r_width", &screenWidth);
@@ -214,9 +248,8 @@ float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y) {
 	return (x/192.0f) - (y/96.0f) + plyX - (screenWidth/384.0f) + (screenHeight/192.0f) + 0.5;
 }
 
-float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y) {
-	Player* ply = world.GetFirstPlayer();
-	float plyY = ply->y;
+float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer) {
+	float plyY = ptPlayer->y;
 	int screenWidth, screenHeight;
 
 	trap->CvarIntVal("r_width", &screenWidth);

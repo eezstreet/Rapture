@@ -24,8 +24,8 @@ void Player::think() {
 	}
 	else if(bShouldWeBeMoving) {
 		RVec2<float> nextFramePosition((dir.GetX() * speed * GetGameFrametime())+x, (dir.GetY() * speed * GetGameFrametime())+y);
-		if(nextFramePosition.GetX() < 0 && nextFramePosition.GetY() < 0) {
-			// No moving into negative coords
+		if(nextFramePosition.GetX() <= 0 || nextFramePosition.GetY() <= 0) {
+			// No moving into negative/zero coords
 			bShouldWeBeMoving = false;
 			return;
 		}
@@ -34,7 +34,15 @@ void Player::think() {
 		int bottomedOutY = (int)floor(nextFramePosition.GetY());
 		int bottomedOutSubtileX = (int)floor((nextFramePosition.GetX()-bottomedOutX)*4);
 		int bottomedOutSubtileY = (int)floor((nextFramePosition.GetY()-bottomedOutY)*4);
-		auto nodes = world.qtTileTree->NodesAt(bottomedOutX+1, bottomedOutY+1);
+
+		if(bottomedOutX <= 0 || bottomedOutY <= 0) {
+			// can sometimes happen
+			bShouldWeBeMoving = false;
+			return;
+		}
+		
+		Worldspace* ptWorld = ptDungeonManager->GetWorld(iAct);
+		auto nodes = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesAt(bottomedOutX, bottomedOutY);
 		if(nodes.size() <= 0) {
 			// No nodes in this sector = no movement
 			bShouldWeBeMoving = false;
@@ -68,13 +76,16 @@ void Player::think() {
 		}
 		x = nextFramePosition.GetX();
 		y = nextFramePosition.GetY();
-		world.ActorMoved(this);
+		ptWorld->ActorMoved(this);
 	}
 }
 
 void Player::spawn() {
+	Worldspace* ptWorld = ptDungeonManager->GetWorld(this->iAct);
 	materialHandle = trap->RegisterMaterial("TestCharacter");
-	world.AddPlayer(this);
+	pX = x;
+	pY = y;
+	ptWorld->AddPlayer(this);
 }
 
 void Player::render() {
@@ -88,8 +99,8 @@ void Player::render() {
 }
 
 void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
-	float clickedX = Worldspace::ScreenSpaceToWorldPlaceX(sx, sy);
-	float clickedY = Worldspace::ScreenSpaceToWorldPlaceY(sx, sy);
+	float clickedX = Worldspace::ScreenSpaceToWorldPlaceX(sx, sy, this);
+	float clickedY = Worldspace::ScreenSpaceToWorldPlaceY(sx, sy, this);
 
 	RVec2<float> origin(x, y);
 	RVec2<float> destination(clickedX, clickedY);
@@ -102,7 +113,7 @@ void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
 }
 
 void Player::MouseMoveEvent(int sx, int sy) {
-	// Change direction
+	// If we're moving, we need to update our position
 	if(bMouseDown && bShouldWeBeMoving) {
 		MoveToScreenspace(sx, sy, false);
 	}
@@ -116,4 +127,20 @@ void Player::MouseDownEvent(int sx, int sy) {
 void Player::MouseUpEvent(int sx, int sy) {
 	bMouseDown = false;
 	bDoWeHaveADestination = true;
+}
+
+Entity* Player::spawnme(float x, float y, int spawnflags, int act) {
+	Player* ent = new Player(x, y);
+	ent->x = x;
+	ent->y = y;
+	ent->spawnflags = spawnflags;
+	ent->uuid = genuuid();
+	ent->classname = "Player";
+
+	ent->bShouldWeCollide = true;
+	ent->bShouldWeRender = true;
+	ent->bShouldWeThink = true;
+	ent->iAct = act;
+
+	return ent;
 }

@@ -78,20 +78,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game\entities\info_player_start.cpp" />
-    <ClCompile Include="..\game\g_warp.cpp" />
     <ClCompile Include="..\game\r_shared.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\modcode\cg_hud.cpp" />
     <ClCompile Include="..\modcode\cg_info.cpp" />
     <ClCompile Include="..\modcode\cg_fps.cpp" />
+    <ClCompile Include="..\modcode\DungeonManager.cpp" />
     <ClCompile Include="..\modcode\g_json.cpp" />
     <ClCompile Include="..\modcode\g_main.cpp" />
-    <ClCompile Include="..\modcode\g_levels.cpp" />
-    <ClCompile Include="..\modcode\g_preset.cpp" />
     <ClCompile Include="..\modcode\g_shared.cpp" />
+    <ClCompile Include="..\modcode\Map.cpp" />
+    <ClCompile Include="..\modcode\MapLoader.cpp" />
     <ClCompile Include="..\modcode\Worldspace.cpp" />
     <ClCompile Include="..\modcode\Player.cpp" />
-    <ClCompile Include="..\modcode\SpatialEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RVector.h" />

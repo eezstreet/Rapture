@@ -29,39 +29,16 @@ void HUD_EnterArea(const char* areaName);
 void HUD_DrawLabel(const char* labelText);
 void HUD_HideLabels();
 
-
 // g_shared.cpp
 void eswap(unsigned short &x);
 void eswap(unsigned int &x);
 string genuuid();
 
+
 // JSON parser structs
 typedef function<void (cJSON*, void*)> jsonParseFunc;
 bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
-
-// Generic Cache class
-template<class T>
-class Cache {
-private:
-	size_t elementsAllocated;
-	size_t elementsUsed;
-	T* cache;
-
-	vector<int> ivInUse;
-public:
-	void Flush(bool bFlushInUseOnly = false);
-	void Insert(T* element, bool bInUse = false);
-	T* GetElement(const int at) { if(at >= elementsUsed) return NULL; return &cache[at] }
-	Cache(const string& zoneTag);
-};
-
-// Shader element types
-enum ShaderMapType_e {
-	SMT_DIFFUSE,
-	SMT_SPECULAR,
-	SMT_NORMAL
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -70,6 +47,13 @@ enum ShaderMapType_e {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MAX_MAP_LINKS	8
 typedef signed int coords_t[2];
+
+/////////////////////
+//
+//  Tiles
+//
+/////////////////////
+
 enum tileRenderType_e {
 	TRT_FLOOR1,
 	TRT_FLOOR2,
@@ -81,7 +65,6 @@ enum tileRenderType_e {
 	TRT_SPECIAL
 };
 
-// Each tile is placed onto a map. The tiles contain 16 subtiles
 struct Tile {
 	// Basic info
 	char name[MAX_HANDLE_STRING];
@@ -110,24 +93,45 @@ struct Tile {
 	}
 };
 
-// An entity is an object in the world, such as a monster
-class Entity;
-class SpatialEntity : public QTreeNode<float> {
-protected:
-	string uuid;
+class TileNode : public QTreeNode<unsigned int> {
 public:
-	SpatialEntity(Entity* from);
-	SpatialEntity();
-friend struct Worldspace;
+	Tile* ptTile;
+	tileRenderType_e rt;
+
+	TileNode() {
+		w = h = 1;
+	}
 };
 
-class Entity : public SpatialEntity {
+
+/////////////////////
+//
+//  Entities
+//	An entity is an object in the
+//	world, such as a monster or a player.
+//	These entities may also be objects
+//	without AI, such as chests.
+//
+/////////////////////
+
+class Entity : public QTreeNode<float> {
+protected:
+	string uuid;
+	int spawnflags;
 public:
-	QuadTree<SpatialEntity, float>* ptContainingTree;
-	SpatialEntity* ptSpatialEntity;
 	virtual void render() = 0;
 	virtual void think() = 0;
 	virtual void spawn() = 0;
+	unsigned int iAct;
+
+	bool bShouldWeRender;
+	bool bShouldWeThink;
+	bool bShouldWeCollide;
+
+	int GetSpawnflags() { return spawnflags; }
+	string classname;
+	QuadTree<Entity, float>* ptContainingTree;
+friend struct Worldspace;
 };
 
 // Actors have visible representations, whereas regular entities do not.
@@ -154,38 +158,42 @@ public:
 	void MouseUpEvent(int sX, int sY);
 	void MouseDownEvent(int sX, int sY);
 	void MouseMoveEvent(int sX, int sY);
+
+	static Entity* spawnme(float x, float y, int spawnflags, int act);
 };
 
 // Other entities..
 class info_player_start : public Entity {
-private:
-	bool bVis0;
-	bool bVis1;
-	bool bVis2;
-	bool bVis3;
-	bool bVis4;
-	bool bVis5;
-	bool bVis6;
-	bool bVis7;
-
 public:
+	enum {
+		SPAWNFLAG_VIS0 = 1,
+		SPAWNFLAG_VIS1 = 2,
+		SPAWNFLAG_VIS2 = 4,
+		SPAWNFLAG_VIS3 = 8,
+		SPAWNFLAG_VIS4 = 16,
+		SPAWNFLAG_VIS5 = 32,
+		SPAWNFLAG_VIS6 = 64,
+		SPAWNFLAG_VIS7 = 128,
+		SPAWNFLAG_PORTAL = 256,
+		SPAWNFLAG_PLAYSPAWN = 512
+	};
+
 	virtual void render() { }
 	virtual void think();
 	virtual void spawn();
+
+	static Entity* spawnme(float x, float y, int spawnflags, int act);
 };
 
-// A tilenode is a tile in the world
-class TileNode : public QTreeNode<unsigned int> {
-public:
-	Tile* ptTile;
-	tileRenderType_e rt;
+/////////////////////
+//
+//  MapFramework
+//	Each map has its own MapFramework.
+//	These serve as the ground rules for
+//	the map to be generated
+//
+/////////////////////
 
-	TileNode() {
-		w = h = 1;
-	}
-};
-
-// Provides a framework for the Map to be built.
 struct MapFramework {
 	char name[MAX_HANDLE_STRING];
 	bool bIsPreset;
@@ -193,18 +201,62 @@ struct MapFramework {
 	string sLink[MAX_MAP_LINKS];
 
 	char entryPreset[MAX_HANDLE_STRING];
+	
+	int iWorldspaceX;
+	int iWorldspaceY;
+	int iSizeX;
+	int iSizeY;
+	int iAct;
 };
-extern vector<MapFramework> vMapData;
 
-// Each map belongs to the worldspace, consuming a portion of it.
-struct Map {
+
+/////////////////////
+//
+//  Map
+//	Each level is a "map". They
+//	can be either randomly generated
+//	or entirely preset, based on their
+//	framework.
+//
+/////////////////////
+
+struct Map : public QTreeNode<int> {
 	char name[MAX_HANDLE_STRING];
 	bool bIsPreset;					// Is this map a preset level? (Y/N)
-	vector<TileNode> tiles;
-	vector<SpatialEntity> ents;
+
+	int iAct;
+
+	QuadTree<TileNode, int> qtTileTree;
+	QuadTree<Entity, float> qtEntTree;
+
+	Map(int _x, int _y, int _w, int _h, int act, int depth) :
+	qtTileTree(QuadTree<TileNode, int>(_x, _y, _w, _h, 0, depth, NULL)),
+	qtEntTree(QuadTree<Entity, float>(_x, _y, _w, _h, 0, depth+1, NULL)) {
+		x = _x;
+		y = _y;
+		w = _w;
+		h = _h;
+		iAct = act;
+	}
+
+	// Just to shut the compiler up:
+	Map() :
+	qtTileTree(QuadTree<TileNode, int>(0, 0, 0, 0, 0, 0, nullptr)),
+		qtEntTree(QuadTree<Entity, float>(0, 0, 0, 0, 0, 0, nullptr)) {};
+
+	vector<Entity*> FindEntities(const string& classname);
 };
 
-// g_preset.cpp
+
+/////////////////////
+//
+//  PFD
+//	The PFDs get loaded from .bdf files
+//	and these in turn get put onto the map
+//	in various locations
+//
+/////////////////////
+
 struct PresetFileData {
 	// Header data
 	struct PFDHeader {
@@ -243,43 +295,58 @@ struct PresetFileData {
 	};
 	LoadedEntity* entities;
 };
-void MP_LoadTilePresets();
-PresetFileData* MP_GetPreset(const string& sName);
-void MP_AddToMap(const char* pfdName, Map& map);
 
-// The map loader gets initialized by the game first, and then the worldspace grabs map data from it
+
+/////////////////////
+//
+//  MapLoader
+//	The MapLoader is responsible for loading
+//	tiles, PFDs, etc. and keeping them for use
+//	in the dungeon manager.
+//
+/////////////////////
+
 class MapLoader {
 private:
+	// Tile/map loading
 	vector<Tile> vTiles;
+	vector<MapFramework> vMapData;
 	unordered_map<string, vector<Tile>::iterator> mTileResolver;
-	vector<Map> vMaps;
 	unordered_map<string, vector<Map>::iterator> mMapResolver;
 
 	void LoadTile(void* file, const char* filename);
+	
+	// Preset loading
+	unordered_map<string, PresetFileData*> mPfd;
+	void LoadPresets();
+	void LoadPreset(const string& path);
 public:
 	MapLoader(const char* presetsPath, const char* tilePath);
-	void BeginLoad(unsigned int levelId);
 	~MapLoader();
 
-	Tile* FindTileByName(const string& str) {
-		auto it = mTileResolver.find(str);
-		if(it == mTileResolver.end()) {
-			return NULL;
-		}
-		return &(*(it->second)); // HACK
-	}
-};
-void InitLevels();
-void ShutdownLevels();
-extern MapLoader* maps;
+	// Map loading
+	MapFramework* FindMapFrameworkByName(const char* name);
 
-// The worldspace resembles an entire act's maps, all crammed into a gigantic grid
+	// Tile loading
+	Tile* FindTileByName(const string& str);
+
+	// Preset loading
+	PresetFileData* FindPresetByName(const string& str);
+};
+
+
+/////////////////////
+//
+//  Worldspace
+//	The worldspace contains everything for one whole act.
+//
+/////////////////////
+
 struct Worldspace {
 public:
 	Worldspace();
 	~Worldspace();
-	QuadTree<SpatialEntity, float>* qtEntTree;
-	QuadTree<TileNode, unsigned int>* qtTileTree;
+	QuadTree<Map, int>* qtMapTree;
 
 	void InsertInto(Map* theMap);
 	void SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink, bool bShouldCollide);
@@ -293,11 +360,11 @@ public:
 	static float WorldPlaceToScreenSpaceFY(float x, float y);
 	static int WorldPlaceToScreenSpaceIX(int x, int y);
 	static int WorldPlaceToScreenSpaceIY(int x, int y);
-	static float ScreenSpaceToWorldPlaceX(int x, int y);
-	static float ScreenSpaceToWorldPlaceY(int x, int y);
+	static float ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer);
+	static float ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer);
 
-	float PlayerOffsetX();
-	float PlayerOffsetY();
+	float PlayerOffsetX(Player* ptPlayer);
+	float PlayerOffsetY(Player* ptPlayer);
 
 	void UpdateEntities();
 	void ActorMoved(Actor* ptActor);
@@ -309,4 +376,41 @@ private:
 	vector<Player*> vPlayers;
 	vector<Actor*> vActorsMoved;
 };
-extern Worldspace world;
+
+/////////////////////
+//
+//	DungeonManager
+//	The dungeon manager is responsible for the logic
+//	behind dungeon building. This includes random
+//	generation.
+//
+/////////////////////
+
+#define NUM_ACTS	4
+class DungeonManager {
+private:
+	typedef Entity* (*spawnFunc_t)(float x, float y, int spawnflags, int act);
+
+	MapLoader* ptMapLoader;
+	Worldspace wActs[NUM_ACTS];
+
+	unordered_map<string, Map*> mHaveWeAlreadyBuilt;
+	vector<Map> vMaps[NUM_ACTS];
+
+	void Construct(const MapFramework* ptFramework);
+	void PresetGeneration(const MapFramework* ptFramework, Map& in);
+	
+	unordered_map<string, spawnFunc_t> mSpawnFuncs;
+	Entity* GenerateEntity(const char* entName, float x, float y, int spawnflags, int act);
+public:
+	DungeonManager();
+	~DungeonManager();
+
+	void StartBuild(const string& sDungeonName);
+	Worldspace* GetWorld(unsigned int iAct);
+
+	void SpawnPlayer(const string& sDungeonName);
+	Map* FindProperMap(int iAct, float x, float y);
+	Map* FindProperMap(int iAct, int x, int y);
+};
+extern DungeonManager* ptDungeonManager;

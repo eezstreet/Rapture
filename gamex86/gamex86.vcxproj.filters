@@ -30,22 +30,13 @@
     <ClCompile Include="..\json\cJSON.c">
       <Filter>Libraries\JSON</Filter>
     </ClCompile>
-    <ClCompile Include="..\modcode\g_levels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\modcode\g_json.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\modcode\g_preset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\modcode\g_shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\modcode\Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\modcode\SpatialEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\modcode\Worldspace.cpp">
@@ -66,7 +57,13 @@
     <ClCompile Include="..\game\entities\info_player_start.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\g_warp.cpp">
+    <ClCompile Include="..\modcode\DungeonManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\MapLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

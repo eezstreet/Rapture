@@ -13,7 +13,7 @@ static bool WarpThink() {
 
 	bMouseIsOnWarp = false;
 
-	auto tiles = world.qtTileTree->NodesAt(mouseX, mouseY);
+	auto tiles = world.qtTileTree->NodesAt(mouseX != 0 ? mouseX : 1, mouseY != 0 ? mouseY : 1);
 	if(tiles.size() <= 0) {
 		// No tiles on our cursor's sector
 		return false;
@@ -73,9 +73,11 @@ void WarpFrame() {
 			HUD_HideLabels();
 		}
 	} else {
-		if(!bHaveWeNotifiedHUD && ptMap != NULL) {
-			// Tell HUD UI to start drawing label
-			HUD_DrawLabel(ptMap->name);
+		if(!bHaveWeNotifiedHUD) {
+			// Figure out the map we're looking for
+			if(ptMap != NULL) {
+				HUD_DrawLabel(ptMap->name);
+			}
 		}
 	}
 }

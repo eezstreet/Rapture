@@ -16,13 +16,12 @@ void Game_Init() {
 void Game_Shutdown() {
 	trap->printf("--- Quit Game ---\n");
 	ShutdownHUD();
-	ShutdownLevels();
 	trap->ShutdownMaterials();
+	delete ptDungeonManager;
 }
 
 void Game_Load() {
 	trap->InitMaterials();
-	InitLevels();
 
 	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame? (1 = FPS, 2 = MS, 3 = both)", 1, 0);
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
@@ -30,6 +29,10 @@ void Game_Load() {
 
 	RegisterMedia();
 	InitHUD();
+
+	ptDungeonManager = new DungeonManager();
+	ptDungeonManager->StartBuild("Survivor's Camp");
+	ptDungeonManager->SpawnPlayer("Survivor's Camp");
 
 	iLoadingScreen = 0;
 }
@@ -47,24 +50,27 @@ void Game_Frame() {
 	}
 	else {
 		FPSFrame();
-		world.Run();
-		world.Render();
+		ptDungeonManager->GetWorld(0)->Run(); // FIXME
+		ptDungeonManager->GetWorld(0)->Render(); // FIXME
 		DrawViewportInfo();
-		world.UpdateEntities();
 	}
 }
 
 void Game_OnMouseUp(int x, int y) {
-	Player* ply = world.GetFirstPlayer();
-	if(ply != NULL) {
-		ply->MouseUpEvent(x, y);
+	if(iLoadingScreen == 0) {
+		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
+		if(ply != NULL) {
+			ply->MouseUpEvent(x, y);
+		}
 	}
 }
 
 void Game_OnMouseDown(int x, int y) {
-	Player* ply = world.GetFirstPlayer();
-	if(ply != NULL) {
-		ply->MouseDownEvent(x, y);
+	if(iLoadingScreen == 0) {
+		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
+		if(ply != NULL) {
+			ply->MouseDownEvent(x, y);
+		}
 	}
 }
 
@@ -72,9 +78,11 @@ void Game_OnMouseMove(int x, int y) {
 	currentMouseX = x;
 	currentMouseY = y;
 
-	Player* ply = world.GetFirstPlayer();
-	if(ply != NULL) {
-		ply->MouseMoveEvent(x, y);
+	if(iLoadingScreen == 0) {
+		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
+		if(ply != NULL) {
+			ply->MouseMoveEvent(x, y);
+		}
 	}
 }
 

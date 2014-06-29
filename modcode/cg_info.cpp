@@ -5,6 +5,8 @@ int currentMouseY = 0;
 float currentWorldpsaceX = 0;
 float currentWorldspaceY = 0;
 
+const int ourPlayerNum = 0; // FIXME
+
 Font* ptConsolasFont;
 
 void RegisterMedia() {
@@ -44,9 +46,9 @@ void DrawViewportInfo() {
 
 	if(drawWorldXY) {
 		ss << "World Space: ";
-		ss << (Worldspace::ScreenSpaceToWorldPlaceX(currentMouseX, currentMouseY));;
+		ss << (Worldspace::ScreenSpaceToWorldPlaceX(currentMouseX, currentMouseY, ptDungeonManager->GetWorld(0)->GetFirstPlayer()));
 		ss << "X / ";
-		ss << (Worldspace::ScreenSpaceToWorldPlaceY(currentMouseX, currentMouseY));
+		ss << (Worldspace::ScreenSpaceToWorldPlaceY(currentMouseX, currentMouseY, ptDungeonManager->GetWorld(0)->GetFirstPlayer()));
 		ss << "Y      ";
 	}
 	if(ss.str().length() > 0) {
