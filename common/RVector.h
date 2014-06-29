@@ -3,6 +3,8 @@
 template <typename T>
 class RVec2 {
 public:
+	T tComponents[2];
+
 	RVec2() {
 		RVec2((T)0);
 	}
@@ -46,14 +48,6 @@ public:
 	void Multiply(const RVec2<T>& other) {
 		tComponents[0] *= other.tComponents[0];
 		tComponents[1] *= other.tComponents[1];
-	}
-
-	T GetX() {
-		return tComponents[0];
-	}
-
-	T GetY() {
-		return tComponents[1];
 	}
 
 	bool Within(const RVec2<T>& other, const T distance) {
@@ -103,6 +97,4 @@ public:
 		result *= right;
 		return result;
 	}
-private:
-	T tComponents[2];
 };

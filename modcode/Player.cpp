@@ -23,17 +23,17 @@ void Player::think() {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
-		RVec2<float> nextFramePosition((dir.GetX() * speed * GetGameFrametime())+x, (dir.GetY() * speed * GetGameFrametime())+y);
-		if(nextFramePosition.GetX() <= 0 || nextFramePosition.GetY() <= 0) {
+		RVec2<float> nextFramePosition((dir.tComponents[0] * speed * GetGameFrametime())+x, (dir.tComponents[1] * speed * GetGameFrametime())+y);
+		if(nextFramePosition.tComponents[0] <= 0 || nextFramePosition.tComponents[1] <= 0) {
 			// No moving into negative/zero coords
 			bShouldWeBeMoving = false;
 			return;
 		}
 
-		int bottomedOutX = (int)floor(nextFramePosition.GetX());
-		int bottomedOutY = (int)floor(nextFramePosition.GetY());
-		int bottomedOutSubtileX = (int)floor((nextFramePosition.GetX()-bottomedOutX)*4);
-		int bottomedOutSubtileY = (int)floor((nextFramePosition.GetY()-bottomedOutY)*4);
+		int bottomedOutX = (int)floor(nextFramePosition.tComponents[0]);
+		int bottomedOutY = (int)floor(nextFramePosition.tComponents[1]);
+		int bottomedOutSubtileX = (int)floor((nextFramePosition.tComponents[0]-bottomedOutX)*4);
+		int bottomedOutSubtileY = (int)floor((nextFramePosition.tComponents[1]-bottomedOutY)*4);
 
 		if(bottomedOutX <= 0 || bottomedOutY <= 0) {
 			// can sometimes happen
@@ -74,8 +74,8 @@ void Player::think() {
 				return;
 			}
 		}
-		x = nextFramePosition.GetX();
-		y = nextFramePosition.GetY();
+		x = nextFramePosition.tComponents[0];
+		y = nextFramePosition.tComponents[1];
 		ptWorld->ActorMoved(this);
 	}
 }
