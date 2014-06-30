@@ -94,6 +94,13 @@ void DungeonManager::Construct(const MapFramework* ptFramework) {
 	Map *theMap = new Map(ptFramework->iWorldspaceX, ptFramework->iWorldspaceY,
 		ptFramework->iSizeX, ptFramework->iSizeY, ptFramework->iAct, 1);
 	strcpy(theMap->name, ptFramework->name);
+	for(int i = 0; i < MAX_MAP_LINKS; i++) {
+		if(ptFramework->sLink[i].length() > 0) {
+			strcpy(theMap->links[i], ptFramework->sLink[i].c_str());
+		} else {
+			theMap->links[i][0] = '\0';
+		}
+	}
 	mHaveWeAlreadyBuilt[ptFramework->name] = theMap; // stops infinite recursion below
 
 	// Dungeon generation
@@ -181,4 +188,57 @@ Map* DungeonManager::FindProperMap(int iAct, float x, float y) {
 
 Map* DungeonManager::FindProperMap(int iAct, int x, int y) {
 	return FindProperMap(iAct, (float)x, (float)y);
+}
+
+string DungeonManager::FindNextMapStr(int iAct, int iPlayerNum, int iVisNumber) {
+	Player* ply = wActs[iAct].GetFirstPlayer();	// FIXME
+	Map* ourMap = FindProperMap(iAct, ply->x, ply->y);
+	MapFramework* nextMap = ptMapLoader->FindMapFrameworkByName(ourMap->links[iVisNumber]);
+	if(!nextMap) {
+		return "";
+	}
+	return nextMap->toName;
+}
+
+void DungeonManager::MovePlayerToVis(int iAct, int iPlayerNum, int iVisNumber) {
+	Player* ply = wActs[iAct].GetFirstPlayer();
+	Map* ourMap = FindProperMap(iAct, ply->x, ply->y);
+	MapFramework* ptNextFrame = ptMapLoader->FindMapFrameworkByName(ourMap->links[iVisNumber]);
+	if(!ptNextFrame) {
+		// Don't move us to the next vis if we can't find the framework for it!
+		return;
+	}
+	int iNextVis = -1;
+	for(int i = 0; i < MAX_MAP_LINKS; i++) {
+		if(!stricmp(ptNextFrame->sLink[i].c_str(), ourMap->name)) {
+			iNextVis = i;
+			break;
+		}
+	}
+	if(iNextVis == -1) {
+		// This is somewhat of a stupid mechanics restriction, but don't allow us to go into maps
+		// which don't link back to us. This prevents the player from getting stuck in zones.
+		return;
+	}
+
+	Map* nextMap = FindProperMap(iAct, ptNextFrame->iWorldspaceX + (ptNextFrame->iSizeX / 2), 
+		ptNextFrame->iWorldspaceY + (ptNextFrame->iSizeY / 2));
+	if(!nextMap) {
+		// Cannot proceed if we can't find the next map...
+		return;
+	}
+
+	vector<Entity*> vSpawnPoints = nextMap->FindEntities("info_player_start");
+	Entity* ptSpawn = nullptr;
+	for(auto it = vSpawnPoints.begin(); it != vSpawnPoints.end(); ++it) {
+		if((*it)->GetSpawnflags() & (1 << iNextVis)) {
+			ptSpawn = *it;
+		}
+	}
+	if(ptSpawn == nullptr) {
+		// FIXME: maybe throw an error? Couldn't find a spawn point?
+		return;
+	}
+
+	ply->SignalZoneChange(ptSpawn->x, ptSpawn->y, nextMap->name);
 }

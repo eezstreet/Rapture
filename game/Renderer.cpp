@@ -11,6 +11,9 @@ Cvar* r_filter = NULL;
 Cvar* r_imgdebug = NULL;
 #endif
 
+static int fadeTime = 0;
+static int initialFadeTime = 0;
+
 namespace RenderCode {
 
 	static SDL_Window *window;
@@ -326,6 +329,17 @@ namespace RenderCode {
 		}
 		SDL_Rect rect;
 		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
+
+		// Handle fade to black
+		Uint32 time = SDL_GetTicks();
+		if(fadeTime > time) {
+			int color = 255-((fadeTime-time)/((float)initialFadeTime-fadeTime)*-255);
+			SDL_SetTextureColorMod(image, color, color, color);
+		} else {
+			SDL_SetTextureColorMod(image, 255, 255, 255);
+		}
+
+		// Copy the texture
 		SDL_RenderCopy(renderer, image, NULL, &rect);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
@@ -338,6 +352,16 @@ namespace RenderCode {
 		if(!image) {
 			return;
 		}
+
+		// Handle fade to black
+		Uint32 time = SDL_GetTicks();
+		if(fadeTime > time) {
+			int color = 255-((fadeTime-time)/((float)initialFadeTime-fadeTime)*-255);
+			SDL_SetTextureColorMod(image, color, color, color);
+		} else {
+			SDL_SetTextureColorMod(image, 255, 255, 255);
+		}
+
 		SDL_RenderCopy(renderer, image, ipos, spos);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
@@ -508,5 +532,11 @@ namespace RenderCode {
 		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 		SDL_FreeSurface(surf2);
+	}
+
+
+	void FadeFromBlack(int ms) {
+		initialFadeTime = SDL_GetTicks();
+		fadeTime = initialFadeTime + ms;
 	}
 };

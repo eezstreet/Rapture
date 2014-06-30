@@ -102,7 +102,7 @@ void UI::RunJavaScript(Menu* ptMenu, const char* sJS) {
 	if(!ptMenu) {
 		return;
 	}
-	R_Printf("Executing JavaScript: %s\n", sJS);
+	//R_Printf("Executing JavaScript: %s\n", sJS);
 	ptMenu->RunJavaScript(sJS);
 }
 

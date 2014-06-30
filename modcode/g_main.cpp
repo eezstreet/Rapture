@@ -53,6 +53,7 @@ void Game_Frame() {
 		ptDungeonManager->GetWorld(0)->Run(); // FIXME
 		ptDungeonManager->GetWorld(0)->Render(); // FIXME
 		DrawViewportInfo();
+		HUD_Frame();
 	}
 }
 

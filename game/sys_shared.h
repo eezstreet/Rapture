@@ -102,6 +102,9 @@ struct gameImports_s {
 	void (*Zone_FastFree)(void* memory, const char* tag);
 	void (*Zone_FreeAll)(const char* tag);
 	void* (*Zone_Realloc)(void* memory, size_t iNewSize);
+
+	// Global effects
+	void (*FadeFromBlack)(int time);
 };
 
 struct gameExports_s {

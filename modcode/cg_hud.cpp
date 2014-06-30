@@ -2,6 +2,8 @@
 
 static Menu* cg_HUD = NULL;
 
+extern int visTouching;
+
 void InitHUD() {
 	R_Printf("InitHUD()\n");
 	cg_HUD = trap->RegisterStaticMenu("ui/hud.html");
@@ -31,4 +33,18 @@ void HUD_DrawLabel(const char* labelText) {
 
 void HUD_HideLabels() {
 	trap->RunJavaScript(cg_HUD, "stopLabelDraw();");
+}
+
+static int previousVis = -1;
+void HUD_Frame() {
+	if(visTouching != previousVis) {
+		if(visTouching == -1) {
+			// Stop drawing labels
+			HUD_HideLabels();
+		} else {
+			// Should probably draw label text??
+			HUD_DrawLabel(ptDungeonManager->FindNextMapStr(0, 0, visTouching).c_str());
+		}
+		previousVis = visTouching;
+	}
 }

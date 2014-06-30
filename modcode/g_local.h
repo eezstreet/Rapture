@@ -28,6 +28,7 @@ void ShutdownHUD();
 void HUD_EnterArea(const char* areaName);
 void HUD_DrawLabel(const char* labelText);
 void HUD_HideLabels();
+void HUD_Frame();
 
 // g_shared.cpp
 void eswap(unsigned short &x);
@@ -46,7 +47,30 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MAX_MAP_LINKS	8
-typedef signed int coords_t[2];
+
+/////////////////////
+//
+//  Warp
+//	Warps help to define areas where we should
+//	transfer to different levels, ie, levels of
+//	a sewer can be transversed through a manhole
+//	or something else.
+//
+/////////////////////
+
+struct Warp {
+private:
+	bool bLoadedMaterials;
+public:
+	Material* ptDownMaterial;	// Base material
+	Material* ptHighMaterial;	// Material which shows when highlighted
+	char sDownMaterial[64];
+	char sHighMaterial[64];
+	char sName[64];
+
+	int x, y, w, h;
+friend class MapLoader;
+};
 
 /////////////////////
 //
@@ -84,13 +108,18 @@ struct Tile {
 	int iAutoTransX, iAutoTransY, iAutoTransW, iAutoTransH;
 	float fDepthScoreOffset;
 
+	// Warp information
+	bool bWarpTile;
+	vector<Warp>::iterator ptiWarp;
+	char sWarp[MAX_HANDLE_STRING];
+
 	Tile() {
 		name[0] = '\0';
 		lowmask = highmask = lightmask = vismask = 0;
 		fDepthScoreOffset = 0.0f;
 		iAutoTransX = iAutoTransY = iAutoTransW = iAutoTransH = 0;
 		materialHandle = NULL;
-		bResourcesLoaded = bAutoTrans = false;
+		bResourcesLoaded = bAutoTrans = bWarpTile = false;
 	}
 };
 
@@ -160,6 +189,8 @@ public:
 	void MouseDownEvent(int sX, int sY);
 	void MouseMoveEvent(int sX, int sY);
 
+	void SignalZoneChange(int nX, int nY, const char* newZone);
+
 	static Entity* spawnme(float x, float y, int spawnflags, int act);
 };
 
@@ -197,6 +228,7 @@ public:
 
 struct MapFramework {
 	char name[MAX_HANDLE_STRING];
+	char toName[MAX_HANDLE_STRING];
 	bool bIsPreset;
 	int nDungeonLevel;
 	string sLink[MAX_MAP_LINKS];
@@ -246,6 +278,8 @@ struct Map : public QTreeNode<int> {
 		qtEntTree(QuadTree<Entity, float>(0, 0, 0, 0, 0, 0, nullptr)) {};
 
 	vector<Entity*> FindEntities(const string& classname);
+
+	char links[MAX_MAP_LINKS][MAX_HANDLE_STRING];
 };
 
 
@@ -297,7 +331,6 @@ struct PresetFileData {
 	LoadedEntity* entities;
 };
 
-
 /////////////////////
 //
 //  MapLoader
@@ -312,14 +345,16 @@ private:
 	// Tile/map loading
 	vector<Tile> vTiles;
 	vector<MapFramework> vMapData;
+	vector<Warp> vWarpData;
 	unordered_map<string, vector<Tile>::iterator> mTileResolver;
 	unordered_map<string, vector<Map>::iterator> mMapResolver;
+	unordered_map<string, vector<Warp>::iterator> mWarpResolver;
 
 	void LoadTile(void* file, const char* filename);
 	
 	// Preset loading
 	unordered_map<string, PresetFileData*> mPfd;
-	void LoadPresets();
+	void LoadPresets(const char* path);
 	void LoadPreset(const string& path);
 public:
 	MapLoader(const char* presetsPath, const char* tilePath);
@@ -411,7 +446,10 @@ public:
 	Worldspace* GetWorld(unsigned int iAct);
 
 	void SpawnPlayer(const string& sDungeonName);
+	void MovePlayerToVis(int iAct, int iPlayerNum, int iNextVis);
+
 	Map* FindProperMap(int iAct, float x, float y);
 	Map* FindProperMap(int iAct, int x, int y);
+	string FindNextMapStr(int iAct, int iPlayerNum, int nextVis);
 };
 extern DungeonManager* ptDungeonManager;

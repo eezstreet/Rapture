@@ -7,6 +7,9 @@ static RVec2<float> dest(0,0);
 static bool bShouldWeBeMoving = false;
 static bool bDoWeHaveADestination = false;
 static bool bMouseDown = false;
+static int iMovingToVis = -1;
+
+extern int visTouching;
 
 Player::Player(float _x, float _y) {
 	this->x = _x;	// being weird
@@ -64,9 +67,15 @@ void Player::think() {
 		}
 		for(auto it = nodesOnThis.begin(); it != nodesOnThis.end(); ++it) {
 			auto node = (*it);
-			if(node->ptTile->lowmask == 0) {
+			if(node->ptTile->lowmask == 0 && node->ptTile->vismask == 0) {
 				// No mask = no worries
 				continue;
+			}
+			if(iMovingToVis != -1) {
+				if(node->ptTile->vismask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY)) {
+					ptDungeonManager->MovePlayerToVis(iAct, playerNum, iMovingToVis);
+					return;
+				}
 			}
 			if(node->ptTile->lowmask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY)) {
 				// Does this subtile specifically block movement? Don't allow it.
@@ -120,6 +129,7 @@ void Player::MouseMoveEvent(int sx, int sy) {
 }
 
 void Player::MouseDownEvent(int sx, int sy) {
+	iMovingToVis = visTouching;
 	MoveToScreenspace(sx, sy, false);
 	bMouseDown = true;
 }
@@ -143,4 +153,14 @@ Entity* Player::spawnme(float x, float y, int spawnflags, int act) {
 	ent->iAct = act;
 
 	return ent;
+}
+
+void Player::SignalZoneChange(int nX, int nY, const char* newZone) {
+	Worldspace* ptWorld = ptDungeonManager->GetWorld(this->iAct);
+	trap->FadeFromBlack(500);
+	x = nX;
+	y = nY;
+	bShouldWeBeMoving = bDoWeHaveADestination = false;
+	HUD_EnterArea(newZone);
+	ptWorld->ActorMoved(this);
 }

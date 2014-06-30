@@ -32,4 +32,5 @@ namespace RenderCode {
 	void RenderTextBlended(Font* font, const char* text, int r, int g, int b);
 
 	void* GetRenderer();
+	void FadeFromBlack(int ms);
 };

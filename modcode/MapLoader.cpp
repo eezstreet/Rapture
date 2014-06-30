@@ -9,7 +9,9 @@ void InitLevelParseFields() {
 #define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->sLink[x] = cJSON_ToString(j); }
 #define P_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->bIsPreset = cJSON_ToBoolean(j); }
 #define INT_PARSER(x) [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->##x## = cJSON_ToInteger(j); }
+#define TO_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->toName, cJSON_ToString(j)); }
 	levelParseFields["name"] = NAME_PARSER;
+	levelParseFields["toName"] = TO_PARSER;
 	levelParseFields["level"] = LEVEL_PARSER;
 	levelParseFields["first"] = FIRST_PARSER;
 	levelParseFields["preset"] = P_PARSER;
@@ -30,6 +32,23 @@ void InitLevelParseFields() {
 #undef INT_PARSER
 }
 
+// WARP PARSING
+static unordered_map<const char*, jsonParseFunc> warpParseFields;
+void InitWarpParseFields() {
+#define NAME_PARSER [](cJSON* j, void* p) -> void { Warp* t = (Warp*)p; strcpy(t->sName, cJSON_ToString(j)); };
+#define HIGH_PARSER [](cJSON* j, void* p) -> void { Warp* t = (Warp*)p; strcpy(t->sHighMaterial, cJSON_ToString(j)); t->ptHighMaterial = trap->RegisterMaterial(t->sHighMaterial); };
+#define DOWN_PARSER [](cJSON* j, void* p) -> void { Warp* t = (Warp*)p; strcpy(t->sDownMaterial, cJSON_ToString(j)); t->ptDownMaterial = trap->RegisterMaterial(t->sDownMaterial); };
+#define INT_PARSER(x) [](cJSON* j, void* p) -> void { Warp* t = (Warp*)p; t->##x## = cJSON_ToInteger(j); }
+	warpParseFields["name"] = NAME_PARSER;
+	warpParseFields["baseMaterial"] = DOWN_PARSER;
+	warpParseFields["highMaterial"] = HIGH_PARSER;
+	warpParseFields["x"] = INT_PARSER(x);
+	warpParseFields["y"] = INT_PARSER(y);
+	warpParseFields["w"] = INT_PARSER(w);
+	warpParseFields["h"] = INT_PARSER(h);
+#undef INT_PARSER
+#undef NAME_PARSER
+}
 
 // TILE PARSING
 static unordered_map<const char*, jsonParseFunc> tileParseFields;
@@ -81,6 +100,7 @@ void InitTileParseFields() {
 #define NAME_PARSER [](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; strcpy(t->name, cJSON_ToString(j)); }
 #define MAT_PARSER \
 	[](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; t->materialHandle = trap->RegisterMaterial(cJSON_ToString(j)); }
+#define WARP_PARSER [](cJSON* j, void* p) -> void { Tile* t = (Tile*)p; strcpy(t->sWarp, cJSON_ToString(j)); t->bWarpTile = true; }
 
 	tileParseFields["subtile0"] = SUBTILE_PARSER(0);
 	tileParseFields["subtile1"] = SUBTILE_PARSER(1);
@@ -103,9 +123,10 @@ void InitTileParseFields() {
 	tileParseFields["lightmask"] = INT_PARSER(lightmask);
 	tileParseFields["vismask"] = INT_PARSER(vismask);
 	tileParseFields["name"] = NAME_PARSER;
-	tileParseFields["material"] = MAT_PARSER;
+	tileParseFields["material"] = MAT_PARSER; // FIXME: load this stuff dynamially!
 	tileParseFields["depthoffset"] = FLOAT_PARSER(fDepthScoreOffset);
 	tileParseFields["autotrans"] = AutoTransParser;
+	tileParseFields["warp"] = WARP_PARSER;
 }
 #undef NAME_PARSER
 #undef INT_PARSER
@@ -209,9 +230,9 @@ void MapLoader::LoadPreset(const string& path) {
 	R_Printf("DEBUG: Loaded %s\n", pfd->head.lookup);
 }
 
-void MapLoader::LoadPresets() {
+void MapLoader::LoadPresets(const char* path) {
 	int numFiles = 0;
-	char** paths = trap->ListFilesInDir("levels/preset", ".bdf", &numFiles);
+	char** paths = trap->ListFilesInDir(path, ".bdf", &numFiles);
 	if(numFiles <= 0) {
 		R_Error("Could not load presets in levels/preset (none?)");
 		return;
@@ -229,6 +250,13 @@ void MapLoader::LoadPresets() {
 }
 
 MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
+	// Load warps. We'll need this info for tiles.
+	InitWarpParseFields();
+	JSON_ParseMultifile<Warp>("levels/LevelWarp.json", warpParseFields, vWarpData);
+	for(auto it = vWarpData.begin(); it != vWarpData.end(); ++it) {
+		mWarpResolver[it->sName] = it;
+	}
+
 	// Load the tiles.
 	InitTileParseFields();
 	int numFiles = 0; 
@@ -242,6 +270,13 @@ MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
 		vTiles.push_back(t);
 	}
 	for(auto it = vTiles.begin(); it != vTiles.end(); ++it) {
+		if(it->bWarpTile) {
+			// One extra step...we need to set up the linkage of the warp tile
+			auto found = mWarpResolver.find(it->sWarp);
+			if(found != mWarpResolver.end()) {
+				it->ptiWarp = found->second;
+			}
+		}
 		mTileResolver[it->name] = it;
 	}
 
@@ -250,7 +285,7 @@ MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
 	JSON_ParseMultifile<MapFramework>("levels/Levels.json", levelParseFields, vMapData);
 
 	// Load presets.
-	LoadPresets();
+	LoadPresets(presetsPath);
 
 	trap->FreeFileList(paths, numFiles);
 }

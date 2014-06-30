@@ -234,6 +234,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->Zone_FreeAll = Zone::VMFreeAll;
 	imp->Zone_NewTag = Zone::NewTag;
 	imp->Zone_Realloc = Zone::Realloc;
+	imp->FadeFromBlack = RenderCode::FadeFromBlack;
 }
 
 /* Started a new game (probably from the menu) */

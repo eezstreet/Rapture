@@ -4,6 +4,8 @@
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
 #define WORLDSPACE_LOG2		/*15*/		2
 
+int visTouching = -1;
+
 Worldspace::Worldspace() {
 	qtMapTree = new QuadTree<Map, int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
 };
@@ -83,6 +85,11 @@ void Worldspace::Render() {
 	}
 
 	// Now chuck tiles into the pot too
+	struct VisInfo_t {
+		int x, y;
+		int whichVis;
+	};
+	vector<VisInfo_t> vis;
 	for(auto it = mapTiles.begin(); it != mapTiles.end(); ++it) {
 		TileNode* tile = *it;
 		RenderObject obj;
@@ -90,6 +97,17 @@ void Worldspace::Render() {
 		obj.tileData = tile;
 		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - 96.0f - tile->ptTile->fDepthScoreOffset);
 		sortedObjects.push_back(obj);
+
+		if(tile->ptTile->name[0] == 'V' && tile->ptTile->name[1] == 'I' && tile->ptTile->name[2] == 'S') {
+			if(tile->ptTile->name[3] >= '0' && tile->ptTile->name[3] <= '7') {
+				// A vis tile. Let's do this..
+				VisInfo_t visData;
+				visData.x = tile->x;
+				visData.y = tile->y;
+				visData.whichVis = tile->ptTile->name[3] - '0';
+				vis.push_back(visData);
+			}
+		}
 	}
 
 	// Now we need to sort the stuff that's being rendered.
@@ -101,6 +119,7 @@ void Worldspace::Render() {
 	});
 
 	bool bHaveWeRenderedPlayer = false;
+	visTouching = -1;
 	// Lastly we need to render the actual stuff
 	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
 		RenderObject obj = *it;
@@ -119,6 +138,28 @@ void Worldspace::Render() {
 							continue;
 					}
 				}
+			}
+			if(tile->ptTile->bWarpTile) {
+				// Special logic for warp tiles
+				bool bHaveWeAlreadyRendered = false;
+				for(auto it = vis.begin(); it != vis.end(); ++it) {
+					if(it->x == tile->x && it->y == tile->y) {
+						if(currentMouseX >= renderX + tile->ptTile->ptiWarp->x &&
+							currentMouseY >= renderY + tile->ptTile->ptiWarp->y &&
+							currentMouseX < renderX + tile->ptTile->ptiWarp->x + tile->ptTile->ptiWarp->w &&
+							currentMouseY < renderY + tile->ptTile->ptiWarp->y + tile->ptTile->ptiWarp->h) {
+								visTouching = it->whichVis;
+								trap->RenderMaterial(tile->ptTile->ptiWarp->ptHighMaterial, renderX, renderY);
+								bHaveWeAlreadyRendered = true;
+								break;
+						}
+					}
+				}
+				if(bHaveWeAlreadyRendered) {
+					continue;
+				}
+				trap->RenderMaterial(tile->ptTile->ptiWarp->ptDownMaterial, renderX, renderY);
+				continue;
 			}
 			trap->RenderMaterial(tile->ptTile->materialHandle, renderX, renderY);
 		} else {
