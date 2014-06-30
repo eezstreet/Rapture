@@ -1,4 +1,4 @@
-#include "g_local.h"
+#include "Map.h"
 
 vector<Entity*> Map::FindEntities(const string& classname) {
 	vector<Entity*> returnValue;

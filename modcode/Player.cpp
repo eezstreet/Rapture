@@ -1,5 +1,8 @@
-#include "g_local.h"
+#include "Player.h"
 #include "RVector.h"
+#include "Local.h"
+#include "DungeonManager.h"
+#include "Client.h"
 
 const static float speed = 0.003f;
 static RVec2<float> dir(0,0);
@@ -26,7 +29,7 @@ void Player::think() {
 		bShouldWeBeMoving = false;
 	}
 	else if(bShouldWeBeMoving) {
-		RVec2<float> nextFramePosition((dir.tComponents[0] * speed * GetGameFrametime())+x, (dir.tComponents[1] * speed * GetGameFrametime())+y);
+		RVec2<float> nextFramePosition((dir.tComponents[0] * speed * thisClient->GetFrametime())+x, (dir.tComponents[1] * speed * thisClient->GetFrametime())+y);
 		if(nextFramePosition.tComponents[0] <= 0 || nextFramePosition.tComponents[1] <= 0) {
 			// No moving into negative/zero coords
 			bShouldWeBeMoving = false;
@@ -161,6 +164,7 @@ void Player::SignalZoneChange(int nX, int nY, const char* newZone) {
 	x = nX;
 	y = nY;
 	bShouldWeBeMoving = bDoWeHaveADestination = false;
-	HUD_EnterArea(newZone);
+	// networking FIXME
+	thisClient->EnteredArea(newZone);
 	ptWorld->ActorMoved(this);
 }

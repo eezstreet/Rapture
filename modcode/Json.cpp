@@ -1,4 +1,4 @@
-#include "g_local.h"
+#include "Json.h"
 
 bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output) {
 	cJSON* x = output;

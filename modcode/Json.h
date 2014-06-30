@@ -1,4 +1,11 @@
-#include "g_local.h"
+#pragma once
+#include "Local.h"
+#include "../json/cJSON.h"
+
+// JSON parser structs
+typedef function<void (cJSON*, void*)> jsonParseFunc;
+bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
+bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFunc>& parsers, void* output);
 
 template <class T>
 bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, jsonParseFunc>& parsers, vector<T>& out) {

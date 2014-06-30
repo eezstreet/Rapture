@@ -1,4 +1,4 @@
-#include "g_local.h"
+#include "info_player_start.h"
 
 #define SPAWNFLAG_VIS0				1
 #define SPAWNFLAG_VIS1				2

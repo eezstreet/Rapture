@@ -1,5 +1,5 @@
-#include "g_local.h"
-#include "QuadTree.h"
+#include "Worldspace.h"
+#include "DungeonManager.h"
 
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
 #define WORLDSPACE_LOG2		/*15*/		2
@@ -31,7 +31,7 @@ void Worldspace::SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink,
 	ent->spawn();
 }
 
-void Worldspace::Render() {
+void Worldspace::Render(Client* ptClient) {
 	struct RenderObject {
 		union {
 			Entity* entData;
@@ -41,20 +41,20 @@ void Worldspace::Render() {
 		bool bIsTile;
 	};
 	vector<RenderObject> sortedObjects;
-	auto maps = qtMapTree->NodesAt(GetFirstPlayer()->x, GetFirstPlayer()->y);
+	Player* ptPlayer = ptClient->ptPlayer;
+	if(ptPlayer == nullptr) {
+		return;
+	}
+	auto maps = qtMapTree->NodesAt(ptPlayer->x, ptPlayer->y);
 	if(maps.size() <= 0) {
 		return;
 	}
 	// Determine which map we're on
-	auto player = GetFirstPlayer();
 	Map* theMap = nullptr;
-	if(player == nullptr) {
-		return;
-	}
 	for(auto it = maps.begin(); it != maps.end(); ++it) {
 		auto thisMap = *it;
-		if(player->x >= thisMap->x && player->x < thisMap->x + thisMap->w &&
-			player->y >= thisMap->y && player->y < thisMap->y + thisMap->h) {
+		if(ptPlayer->x >= thisMap->x && ptPlayer->x < thisMap->x + thisMap->w &&
+			ptPlayer->y >= thisMap->y && ptPlayer->y < thisMap->y + thisMap->h) {
 				theMap = thisMap;
 		}
 	}
@@ -69,8 +69,8 @@ void Worldspace::Render() {
 	screenWidth /= 2;
 	screenHeight /= 2;
 
-	auto mapTiles = theMap->qtTileTree.NodesAt(player->x, player->y);
-	auto mapEnts = theMap->qtEntTree.NodesAt(player->x, player->y);
+	auto mapTiles = theMap->qtTileTree.NodesAt(ptPlayer->x, ptPlayer->y);
+	auto mapEnts = theMap->qtEntTree.NodesAt(ptPlayer->x, ptPlayer->y);
 	// Chuck entities into the list of stuff that needs sorted
 	for(auto it = mapEnts.begin(); it != mapEnts.end(); ++it) {
 		auto ent = *it;
@@ -118,15 +118,15 @@ void Worldspace::Render() {
 		return false;
 	});
 
-	bool bHaveWeRenderedPlayer = false;
 	visTouching = -1;
+	bool bHaveWeRenderedPlayer = false;
 	// Lastly we need to render the actual stuff
 	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
 		RenderObject obj = *it;
 		if(obj.bIsTile) {
 			TileNode* tile = obj.tileData;
-			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + (int)floor(PlayerOffsetX(player));
-			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + (int)floor(PlayerOffsetY(player));
+			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + (int)floor(PlayerOffsetX(ptPlayer));
+			int renderY = WorldPlaceToScreenSpaceIY(tile->x, tile->y) + (int)floor(PlayerOffsetY(ptPlayer));
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
@@ -144,10 +144,16 @@ void Worldspace::Render() {
 				bool bHaveWeAlreadyRendered = false;
 				for(auto it = vis.begin(); it != vis.end(); ++it) {
 					if(it->x == tile->x && it->y == tile->y) {
-						if(currentMouseX >= renderX + tile->ptTile->ptiWarp->x &&
-							currentMouseY >= renderY + tile->ptTile->ptiWarp->y &&
-							currentMouseX < renderX + tile->ptTile->ptiWarp->x + tile->ptTile->ptiWarp->w &&
-							currentMouseY < renderY + tile->ptTile->ptiWarp->y + tile->ptTile->ptiWarp->h) {
+						if(ptClient->cursorX >= renderX + tile->ptTile->ptiWarp->x &&
+							ptClient->cursorY >= renderY + tile->ptTile->ptiWarp->y &&
+							ptClient->cursorX < renderX + tile->ptTile->ptiWarp->x + tile->ptTile->ptiWarp->w &&
+							ptClient->cursorY < renderY + tile->ptTile->ptiWarp->y + tile->ptTile->ptiWarp->h) {
+								if(visTouching != it->whichVis) {
+									// Tell us to start drawing a label here
+									string nextMapStr = ptDungeonManager->FindNextMapStr(ptPlayer->iAct, ptPlayer->playerNum, it->whichVis);
+									ptClient->StartLabelDraw(nextMapStr.c_str());
+								}
+								ptClient->bShouldDrawLabels = true;
 								visTouching = it->whichVis;
 								trap->RenderMaterial(tile->ptTile->ptiWarp->ptHighMaterial, renderX, renderY);
 								bHaveWeAlreadyRendered = true;
@@ -166,7 +172,7 @@ void Worldspace::Render() {
 			// Each entity has its own render function, so call that
 			auto ent = mRenderList.find(obj.entData->uuid);
 			if(ent != mRenderList.end()) {
-				if(ent->second->uuid == player->uuid) {
+				if(ent->second->uuid == ptPlayer->uuid) {
 					bHaveWeRenderedPlayer = true;
 				}
 				ent->second->render();

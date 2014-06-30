@@ -1,4 +1,5 @@
-#include "g_local.h"
+#include "Local.h"
+#include "DungeonManager.h"
 
 gameImports_s* trap;
 
@@ -8,15 +9,14 @@ static Image* ptLoadScreenImage = NULL;
 
 void Game_Init() {
 	trap->printf("--- New Game ---\n");
-	InitFPS();
 	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
 	iLoadingScreen = 1;
 }
 
 void Game_Shutdown() {
 	trap->printf("--- Quit Game ---\n");
-	ShutdownHUD();
 	trap->ShutdownMaterials();
+	delete thisClient;
 	delete ptDungeonManager;
 }
 
@@ -27,8 +27,7 @@ void Game_Load() {
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
 
-	RegisterMedia();
-	InitHUD();
+	thisClient = new Client();
 
 	ptDungeonManager = new DungeonManager();
 	ptDungeonManager->StartBuild("Survivor's Camp");
@@ -49,41 +48,29 @@ void Game_Frame() {
 		iLoadingScreen = 0;
 	}
 	else {
-		FPSFrame();
-		ptDungeonManager->GetWorld(0)->Run(); // FIXME
-		ptDungeonManager->GetWorld(0)->Render(); // FIXME
-		DrawViewportInfo();
-		HUD_Frame();
+		// In a multiplayer game, we would be looping through all 4 acts and running GetWorld()->Run,
+		// but since we're only concerned about singleplayer, we're going to focus on the one that
+		// our client is on
+		ptDungeonManager->GetWorld(thisClient->ptPlayer->iAct)->Run();	// Server frame
+		thisClient->Frame();											// Client frame
 	}
 }
 
 void Game_OnMouseUp(int x, int y) {
 	if(iLoadingScreen == 0) {
-		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
-		if(ply != NULL) {
-			ply->MouseUpEvent(x, y);
-		}
+		thisClient->PassMouseUp(x, y);
 	}
 }
 
 void Game_OnMouseDown(int x, int y) {
 	if(iLoadingScreen == 0) {
-		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
-		if(ply != NULL) {
-			ply->MouseDownEvent(x, y);
-		}
+		thisClient->PassMouseDown(x, y);
 	}
 }
 
 void Game_OnMouseMove(int x, int y) {
-	currentMouseX = x;
-	currentMouseY = y;
-
 	if(iLoadingScreen == 0) {
-		Player* ply = ptDungeonManager->GetWorld(0)->GetFirstPlayer();
-		if(ply != NULL) {
-			ply->MouseMoveEvent(x, y);
-		}
+		thisClient->PassMouseMove(x, y);
 	}
 }
 

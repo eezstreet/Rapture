@@ -1,4 +1,8 @@
-#include "g_local.h"
+#include "DungeonManager.h"
+#include "MapLoader.h"
+#include "PresetFileData.h"
+
+#include "entities\info_player_start.h"
 
 DungeonManager* ptDungeonManager;
 
@@ -166,9 +170,14 @@ void DungeonManager::SpawnPlayer(const string& sDungeonName) {
 
 	// Generate a player entity, spawn it, and alert the world that there's a new player in the game.
 	Entity* playerEnt = GenerateEntity("Player", ent->x, ent->y, 0, theMap->second->iAct);
+	Player* ptPlayer = (Player*)playerEnt;
 	wActs[theMap->second->iAct].SpawnEntity(playerEnt, playerEnt->bShouldWeRender, playerEnt->bShouldWeThink, playerEnt->bShouldWeCollide);
-	wActs[theMap->second->iAct].AddPlayer((Player*)playerEnt);
+	wActs[theMap->second->iAct].AddPlayer(ptPlayer);
 	playerEnt->ptContainingTree = theMap->second->qtEntTree.AddNode(playerEnt);
+
+	// networking FIXME
+	thisClient->ptPlayer = ptPlayer;
+	ptPlayer->SignalZoneChange(ent->x, ent->y, sDungeonName.c_str());
 }
 
 Map* DungeonManager::FindProperMap(int iAct, float x, float y) {
