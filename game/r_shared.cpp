@@ -46,18 +46,19 @@ bool atob(const string& str) {
 }
 
 bool atob(const char* str) {
-	bool b;
 	if(strlen(str) == 0) {
 		return false;
-	} else if(str[0] == '1') {
-		return true;
-	} else if(str[1] == '0') {
+	} else if(stricmp(str, "false") == 0) {
 		return false;
+	} else if(stricmp(str, "true") == 0) {
+		return true;
+	} else if(str[0] == '0') {
+		return false;
+	} else if(str[1] == '1') {
+		return true;
+	} else {
+		return true;
 	}
-	istringstream(str) >> b;
-	if(!b)
-		istringstream(str) >> boolalpha >> b;
-	return b;
 }
 
 const char* btoa(bool b) {
