@@ -192,6 +192,7 @@ void RaptureGame::PassQuitEvent() {
 }
 
 /* Set up common exports which are used in both the game and the editor */
+extern bool IsConsoleOpen();
 void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->printf = R_Printf;
 	imp->error = R_Error;
@@ -228,6 +229,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
 	imp->RunJavaScript = UI::RunJavaScript;
+	imp->IsConsoleOpen = IsConsoleOpen;
 	imp->Zone_Alloc = Zone::VMAlloc;
 	imp->Zone_FastFree = Zone::VMFastFree;
 	imp->Zone_Free = Zone::Free;

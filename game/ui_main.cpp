@@ -25,6 +25,10 @@ void RemoveRenderable(WebView* wv) {
 	}
 }
 
+bool IsConsoleOpen() {
+	return Console::GetSingleton()->IsOpen();
+}
+
 WebView* currentFocus = NULL; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
 
 RightClickCallback rccb = NULL;

@@ -125,7 +125,9 @@ void Client::EnteredArea(const char* sArea) {
 void Client::PassMouseDown(int x, int y) {
 	cursorX = x;
 	cursorY = y;
-	ptPlayer->MouseDownEvent(x, y);
+	if(!trap->IsConsoleOpen()) {
+		ptPlayer->MouseDownEvent(x, y);
+	}
 }
 
 void Client::PassMouseUp(int x, int y) {
@@ -137,5 +139,7 @@ void Client::PassMouseUp(int x, int y) {
 void Client::PassMouseMove(int x, int y) {
 	cursorX = x;
 	cursorY = y;
-	ptPlayer->MouseMoveEvent(x, y);
+	if(!trap->IsConsoleOpen()) {
+		ptPlayer->MouseMoveEvent(x, y);
+	}
 }

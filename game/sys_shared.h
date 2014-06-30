@@ -77,6 +77,7 @@ struct gameImports_s {
 	Menu* (*RegisterStaticMenu)(const char* sMenuFile);
 	void (*KillStaticMenu)(Menu* menu);
 	void (*RunJavaScript)(Menu* menu, const char* sJS);
+	bool (*IsConsoleOpen)();
 
 	// Materials
 	void (*InitMaterials)();

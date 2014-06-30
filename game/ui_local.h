@@ -104,3 +104,5 @@ public:
 
 typedef void (*RightClickCallback)(void); // HACK
 extern RightClickCallback rccb;
+
+bool IsConsoleOpen();
