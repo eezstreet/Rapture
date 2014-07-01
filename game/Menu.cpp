@@ -226,8 +226,15 @@ pair<bool, JSValue> Menu::ExecuteBaseCommandWithReturn(const string& command, co
 }
 
 void Menu::OnMethodCall(WebView* caller, unsigned int remote_caller_id, const WebString& method_name, const JSArray& args) {
+	if(ExecuteBaseCommand(ToString(method_name), args)) {
+		return;
+	}
 }
 
 JSValue Menu::OnMethodCallWithReturnValue(WebView* caller, unsigned int remote_caller_id, const WebString& method_name, const JSArray& args) {
+	pair<bool, JSValue> method = ExecuteBaseCommandWithReturn(ToString(method_name), args);
+	if(method.first) {
+		return method.second;
+	}
 	return JSValue(false);
 }

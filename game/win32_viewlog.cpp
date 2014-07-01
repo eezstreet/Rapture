@@ -486,7 +486,6 @@ void Sys_PassToViewlog(const char* text) {
 ** Sys_InitViewlog
 */
 void Sys_InitViewlog() {
-	ShowWindow( GetConsoleWindow(), SW_HIDE );
 	viewlog = new Win32Viewlog();
 	viewlog->Show();
 }

@@ -183,11 +183,14 @@ InputManager::InputManager() {
 void InputManager::ExecuteBind(const string& bindStuff) {
 }
 
+bool bVMInputBlocked = false;
 void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y) {
 	if(state == SDL_PRESSED) {
 		UI::MouseButtonEvent(buttonId, true);
 		if(RaptureGame::GetGameModule() != NULL) {
-			RaptureGame::GetImport()->passmousedown(x, y);
+			if(!bVMInputBlocked) {
+				RaptureGame::GetImport()->passmousedown(x, y);
+			}
 		}
 	} else {
 		UI::MouseButtonEvent(buttonId, false);

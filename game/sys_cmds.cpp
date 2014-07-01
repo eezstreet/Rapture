@@ -152,6 +152,11 @@ void Cmd_VidRestart_f(vector<string>& args) {
 	RenderCode::Restart();
 }
 
+extern bool bVMInputBlocked;
+void Cmd_BlockVMInput_f(vector<string>& args) {
+	bVMInputBlocked = !bVMInputBlocked;
+}
+
 extern void NewGame();
 extern void StartEditor();
 void Cmd_NewGameTest_f(vector<string>& args) {
@@ -172,8 +177,10 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("cvarlist", Cmd_Cvarlist_f);
 	Cmd::AddCommand("zoneinfo", Cmd_Zoneinfo_f);
 	Cmd::AddCommand("echo", Cmd_Echo_f);
+	Cmd::AddCommand("blockvminput", Cmd_BlockVMInput_f);
 
 	Cmd::AddCommand("vid_restart", Cmd_VidRestart_f);
+	Cmd::AddCommand("video_restart", Cmd_VidRestart_f);
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);

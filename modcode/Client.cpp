@@ -21,6 +21,7 @@ Client::Client() {
 }
 
 Client::~Client() {
+	trap->KillStaticMenu(ptHUD);
 }
 
 void Client::RunFPS() {

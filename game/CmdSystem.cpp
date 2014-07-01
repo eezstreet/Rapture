@@ -38,9 +38,11 @@ namespace Cmd {
 		}
 	}
 
+	string sLastTriedToComplete = "";
 	void ProcessCommand(const char *cmd) {
 		// in the future, mods will add more to this list
 		vector<string> arguments = Tokenize(cmd);
+		sLastTriedToComplete = "";
 		auto it = cmdlist.find(arguments[0]);
 		if(it != cmdlist.end()) {
 			auto command = (*it).second;
@@ -66,62 +68,42 @@ namespace Cmd {
 	}
 
 	string TabComplete(const string& input) {
-		// TODO: perform exorcism
-		string returnValue = input;
-		vector<string> potentialVictims;
+		bool bSimple = false;
+		string useToCompare = input;
+		if(sLastTriedToComplete.length() <= 0) {
+			// Since we haven't tried to complete anything recently, we need to use simple mode
+			bSimple = true;
+		}
 
-		static vector<string> lastVictimSet;
-		static unsigned int lastVictim = -1;
+		if(input.compare(0, sLastTriedToComplete.length(), sLastTriedToComplete) != 0) {
+			// We last tried to complete with a simpler input, so follow the same train
+			bSimple = true;
+		}
 
-		// Loop through commands first, and then cvars.
-		for(auto it = cmdlist.begin(); it != cmdlist.end(); ++it) {
-			if(!it->first.compare(0, input.length(), input)) {
-				// Valid input, so okay
-				potentialVictims.push_back(it->first);
+		if(!bSimple) {
+			useToCompare = sLastTriedToComplete;
+		}
+
+		vector<string> vFoundElements;
+		for(auto it = cmdlist.begin(); it != cmdlist.end(); it++) {
+			if(it->first.compare(0, useToCompare.length(), useToCompare) == 0) {
+				vFoundElements.push_back(it->first);
 			}
 		}
 
-		bool bFoundCommand = false;
-		for(string s = CvarSystem::GetFirstCvar(bFoundCommand); bFoundCommand; s = CvarSystem::GetNextCvar(s, bFoundCommand)) {
-			if(!s.compare(0, input.length(), input)) {
-				potentialVictims.push_back(s);
+		bool bFoundCommand = true;
+		for(auto it = CvarSystem::GetFirstCvar(bFoundCommand); bFoundCommand; it = CvarSystem::GetNextCvar(it, bFoundCommand)) {
+			if(it.compare(0, useToCompare.length(), useToCompare) == 0) {
+				vFoundElements.push_back(it);
 			}
 		}
 
-		// Sort out our victims and choose the most worthy of the flock (evil laughter is heard)
-		sort(potentialVictims.begin(), potentialVictims.end());
-
-		if(lastVictimSet == potentialVictims && potentialVictims.size() > 1) {
-			// Our last victim set is the same as the one now, let's autocomplete
-			lastVictim++;
-			if(lastVictim >= potentialVictims.size()) {
-				lastVictim = 0;
-			}
-		}
-		else {
-			lastVictim = -1;
-		}
-
-		if(potentialVictims.size() == 1) {
-			// Don't print a list, just complete it for us automatically, no more nonsense.
-			returnValue = potentialVictims[0];
-		}
-		else if(potentialVictims.size() == 0) {
+		if(vFoundElements.size() <= 0) {
 			R_Printf("No commands found.\n");
-		}
-		else if(lastVictim != -1) {
-			returnValue = potentialVictims[lastVictim];
-		}
-		else {
-			R_Printf("\n");
-			for(auto it = potentialVictims.begin(); it != potentialVictims.end(); ++it) {
-				R_Printf("%s\n", it->c_str()); // TODO: special handling of cvars (show their current value)
-			}
-			R_Printf("\n");
+			return input;
 		}
 
-		lastVictimSet = potentialVictims;
-		return returnValue;
+		sLastTriedToComplete = input;
 	}
 
 	// This uses a standard quote-token system.
@@ -150,10 +132,29 @@ namespace Cmd {
 				lastSplit = i;
 			}
 		}
-		for(auto it = retVal.begin(); it != retVal.end(); ++it) {
+		if(retVal.size() >= 128) {
+			R_Printf("Command too large to process.\n");
+			vector<string> returnValue;
+			returnValue.push_back(str);
+			return returnValue;
+		}
+		if(retVal.size() <= 0) {
+			retVal.push_back(str);
+			return retVal;
+		}
+		for(auto it = retVal.begin(); it != retVal.end();) {
 			// Make sure we don't have any entries with pure whitespace
-			if((*it).find_first_not_of(' ') == string::npos) {
-				retVal.erase(it);
+			if(retVal.size() <= 0) {
+				break;
+			}
+			else if(it->size() <= 0) {
+				it = retVal.erase(it);
+			}
+			else if((*it).find_first_not_of(' ') == string::npos) {
+				it = retVal.erase(it);
+			}
+			else {
+				++it;
 			}
 		}
 		retVal.push_back(str.substr(lastSplit));
