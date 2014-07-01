@@ -64,13 +64,17 @@ void Game_OnMouseUp(int x, int y) {
 
 void Game_OnMouseDown(int x, int y) {
 	if(iLoadingScreen == 0) {
-		thisClient->PassMouseDown(x, y);
+		if(!trap->IsConsoleOpen()) {
+			thisClient->PassMouseDown(x, y);
+		}
 	}
 }
 
 void Game_OnMouseMove(int x, int y) {
 	if(iLoadingScreen == 0) {
-		thisClient->PassMouseMove(x, y);
+		if(!trap->IsConsoleOpen()) {
+			thisClient->PassMouseMove(x, y);
+		}
 	}
 }
 
