@@ -79,6 +79,7 @@
   <ItemGroup>
     <ClCompile Include="..\game\r_shared.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
+    <ClCompile Include="..\modcode\Actor.cpp" />
     <ClCompile Include="..\modcode\Client.cpp" />
     <ClCompile Include="..\modcode\DungeonManager.cpp" />
     <ClCompile Include="..\modcode\entities\info_player_start.cpp" />

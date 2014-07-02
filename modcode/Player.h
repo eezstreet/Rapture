@@ -16,6 +16,7 @@ public:
 	void MouseMoveEvent(int sX, int sY);
 
 	void SignalZoneChange(int nX, int nY, const char* newZone);
+	void MoveToNextVis();
 
 	static Entity* spawnme(float x, float y, int spawnflags, int act);
 	unsigned char playerNum;

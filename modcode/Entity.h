@@ -16,6 +16,7 @@ class Entity : public QTreeNode<float> {
 protected:
 	string uuid;
 	int spawnflags;
+	Material* materialHandle;
 public:
 	virtual void render() = 0;
 	virtual void think() = 0;
