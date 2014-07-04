@@ -20,6 +20,8 @@ namespace RenderCode {
 	void DrawImageAspectCorrection(Image* image, float xPct, float yPct, float wPct, float hPct);
 	void DrawImageClipped(Image* image, float sxPct, float syPct, float swPct,
 		float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+	void DrawImageAbsClipped(Image* image, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+	void DrawImageAbsClipped(Image* image, int sX, int sY, int iX, int iY, int iW, int iH);
 
 	void InitMaterials();
 	void ShutdownMaterials();

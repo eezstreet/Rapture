@@ -66,6 +66,12 @@
     <ClCompile Include="..\modcode\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\Container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\entities\contain_chest.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h">
@@ -124,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="..\game\Client.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\Container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\entities\contain_chest.h">
+      <Filter>Header Files\entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -447,6 +447,27 @@ namespace RenderCode {
 		DrawImageAbs(image, x, y, 0, 0);
 	}
 
+	void DrawImageAbsClipped(Image* image, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH) {
+		if(!image) {
+			return;
+		}
+		if(sW == 0 && sH == 0) {
+			// Use image data
+			sW = iW;
+			sH = iH;
+		}
+		SDL_Texture* img = reinterpret_cast<SDL_Texture*>(image);
+		SDL_Rect imgRect, scnRect;
+		imgRect.x = iX; imgRect.y = iY; imgRect.w = iW; imgRect.h = iH;
+		scnRect.x = sX; scnRect.y = sY; scnRect.w = sW; scnRect.h = sH;
+		
+		R_DrawImageClipped(img, &scnRect, &imgRect);
+	}
+
+	void DrawImageAbsClipped(Image* image, int sX, int sY, int iX, int iY, int iW, int iH) {
+		DrawImageAbsClipped(image, sX, sY, 0, 0, iX, iY, iW, iH);
+	}
+
 	void InitMaterials() {
 		R_Printf("Initializing materials..\n");
 		mats = new MaterialHandler();

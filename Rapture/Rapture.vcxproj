@@ -81,6 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\game\AnimationManager.cpp" />
     <ClCompile Include="..\game\CmdSystem.cpp" />
     <ClCompile Include="..\game\Console.cpp" />
     <ClCompile Include="..\game\Cvar.cpp" />
@@ -92,10 +93,12 @@
     <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
+    <ClCompile Include="..\game\Material.cpp" />
     <ClCompile Include="..\game\MaterialHandler.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
     <ClCompile Include="..\game\r_shared.cpp" />
+    <ClCompile Include="..\game\Sequence.cpp" />
     <ClCompile Include="..\game\sys_cmds.cpp" />
     <ClCompile Include="..\game\sys_main.cpp" />
     <ClCompile Include="..\game\sys_win32.cpp" />

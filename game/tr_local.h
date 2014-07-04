@@ -17,6 +17,38 @@ void DestroyConsole();
 void ShowConsole();
 void HideConsole();
 
+// AnimationHandler.cpp
+// Materials may or may not have an animation assigned to them.
+struct Sequence {
+	char name[64];
+	bool bLoop;
+	int rowNum;
+	int frameCount;
+	int fps;
+	bool bInitial;
+
+	void Parse(void* in);
+};
+
+struct SequenceData {
+	int rowheight;
+	int framesize;
+};
+
+class AnimationManager {
+private:
+	unordered_map<string, Sequence>* ptSequences;
+	int lastFrameTime;
+	SequenceData sdSeqData;
+public:
+	string sCurrentSequence;
+	int iCurrentFrame;
+	int iLongestSequence;
+	AnimationManager(const string& sSequence, unordered_map<string, Sequence>* ptSequenceSet, int longestSequence, SequenceData sData);
+	void PushFrame();
+	void DrawActiveFrame(SDL_Texture* in, SDL_Rect* pos);
+};
+
 // MaterialHandler.cpp
 // Anything that exists in the world uses a Material.
 // Images and the like do not use Materials since they do not exist in the world.
@@ -35,6 +67,10 @@ private:
 	char transResourceFile[64];
 	SDL_Texture *ptResource;
 	SDL_Texture *ptTransResource;
+
+	int iNumSequences;
+	unordered_map<string, Sequence> mSequences;
+	AnimationManager* ptAnims;
 public:
 	Material();
 	~Material();

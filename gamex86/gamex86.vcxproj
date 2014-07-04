@@ -81,7 +81,9 @@
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\modcode\Actor.cpp" />
     <ClCompile Include="..\modcode\Client.cpp" />
+    <ClCompile Include="..\modcode\Container.cpp" />
     <ClCompile Include="..\modcode\DungeonManager.cpp" />
+    <ClCompile Include="..\modcode\entities\contain_chest.cpp" />
     <ClCompile Include="..\modcode\entities\info_player_start.cpp" />
     <ClCompile Include="..\modcode\Json.cpp" />
     <ClCompile Include="..\modcode\Main.cpp" />
@@ -97,7 +99,9 @@
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\json\cJSON.h" />
     <ClInclude Include="..\modcode\Actor.h" />
+    <ClInclude Include="..\modcode\Container.h" />
     <ClInclude Include="..\modcode\DungeonManager.h" />
+    <ClInclude Include="..\modcode\entities\contain_chest.h" />
     <ClInclude Include="..\modcode\entities\info_player_start.h" />
     <ClInclude Include="..\modcode\Entity.h" />
     <ClInclude Include="..\modcode\Json.h" />

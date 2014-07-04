@@ -6,6 +6,7 @@ MaterialHandler* mats = NULL;
 void MaterialHandler::LoadMaterial(const char* matfile) {
 	Material* mat = Zone::New<Material>(Zone::TAG_MATERIALS);
 	mat->bLoadedResources = false;
+	mat->ptAnims = nullptr;
 	File* f = File::Open(matfile, "r");
 	if(!f) {
 		Zone::FastFree(mat, "materials");
@@ -59,6 +60,42 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 		mat->yOffset = cJSON_ToInteger(child);
 	}
 
+	child = cJSON_GetObjectItem(json, "sequences");
+	if(!child) {
+		mat->iNumSequences = 0;
+	} else {
+		int longestSequence = 0;
+		mat->iNumSequences = cJSON_GetArraySize(child);
+		string sStartingSequence = "";
+		for(int i = 0; i < mat->iNumSequences; i++) {
+			Sequence seq;
+			seq.Parse(cJSON_GetArrayItem(child, i));
+			if(seq.bInitial) {
+				sStartingSequence = seq.name;
+			}
+			if(seq.frameCount > longestSequence) {
+				longestSequence = seq.frameCount;
+			}
+			mat->mSequences[seq.name] = seq;
+		}
+		if(sStartingSequence.length() <= 0) {
+			R_Error("%s: no starting sequence (one sequence needs \"initial\" to be true)", matfile);
+			return;
+		}
+		// Parse the sequencedata
+		SequenceData sData;
+		cJSON* seqData = cJSON_GetObjectItem(json, "sequenceData");
+		if(!seqData) {
+			R_Error("%s has sequences but no sequenceData!\n", matfile);
+			return;
+		}
+
+		sData.rowheight = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "rowheight"), 0);
+		sData.framesize = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "framesize"), 0);
+
+		mat->ptAnims = new AnimationManager(sStartingSequence, &mat->mSequences, longestSequence, sData);
+	}
+
 	materials.insert(make_pair(mat->name, mat));
 	f->Close();
 }
@@ -88,76 +125,4 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 		return NULL;
 	}
 	return found->second;
-}
-
-Material::Material() {
-	bLoadedResources = false;
-	bLoadedIncorrectly = false;
-	bHasTransparencyMap = false;
-}
-
-Material::~Material() {
-	if(bLoadedResources) {
-		FreeResources();
-	}
-}
-
-void Material::SendToRenderer(int x, int y) {
-	if(!bLoadedResources) {
-		LoadResources();
-	}
-	RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
-}
-
-void Material::SendToRendererTransparency(int x, int y) {
-	// Similar to SendToRenderer, but use a transparency map if one is available
-	if(!bLoadedResources) {
-		LoadResources();
-	}
-	if(bHasTransparencyMap) {
-		RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
-	} else {
-		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
-	}
-}
-
-void Material::LoadResources() {
-	if(bLoadedResources || bLoadedIncorrectly) {
-		// Don't bug us about this again, please.
-		return;
-	}
-	bLoadedResources = true;
-	// Load diffuse map
-	SDL_Surface* temp = IMG_Load(File::GetFileSearchPath(resourceFile).c_str());
-	if(!temp) {
-		R_Printf("WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
-		bLoadedResources = false;
-		bLoadedIncorrectly = true;
-		return;
-	}
-	bLoadedIncorrectly = false;
-	ptResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-	SDL_SetTextureBlendMode(ptResource, SDL_BLENDMODE_BLEND);
-	SDL_FreeSurface(temp);
-
-	if(bHasTransparencyMap) {
-		temp = IMG_Load(File::GetFileSearchPath(transResourceFile).c_str());
-		if(!temp) {
-			R_Printf("WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
-			bHasTransparencyMap = false;
-		} else {
-			ptTransResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-			SDL_SetTextureBlendMode(ptTransResource, SDL_BLENDMODE_BLEND);
-			SDL_FreeSurface(temp);
-		}
-	}
-}
-
-void Material::FreeResources() {
-	if(!bLoadedResources) {
-		return;
-	}
-	SDL_DestroyTexture(ptResource);
-	bLoadedResources = false;
-	bLoadedIncorrectly = false;
 }
