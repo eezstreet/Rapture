@@ -21,6 +21,8 @@ public:
 	virtual void render() { }
 	virtual void think();
 	virtual void spawn();
+	virtual void interact(Entity* interacter) { }
+	virtual bool mouseover() { return false; }
 
 	static Entity* spawnme(float x, float y, int spawnflags, int act);
 };

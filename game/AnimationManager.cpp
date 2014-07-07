@@ -1,12 +1,14 @@
 #include "tr_local.h"
 
-AnimationManager::AnimationManager(const string& sSequence, unordered_map<string, Sequence>* ptSequenceSet, int longestSequence, SequenceData sData) :
+unordered_map<string, AnimationManager*> AnimationManager::mAnimInstances;
+
+AnimationManager::AnimationManager(unordered_map<string, Sequence>* ptSequenceSet, SequenceData* _ptSeqData) :
 ptSequences(ptSequenceSet),
-sCurrentSequence(sSequence),
-iLongestSequence(longestSequence),
 iCurrentFrame(0),
 lastFrameTime(0),
-sdSeqData(sData) {
+ptSeqData(_ptSeqData)
+{
+	sCurrentSequence = ptSeqData->startingSequence;
 	if(ptSequenceSet == nullptr) {
 		// I'm pretty sure this is impossible, but doesn't hurt to check
 		R_Error("AnimationManager::AnimationManager: null ptSequenceSet");
@@ -24,7 +26,7 @@ void AnimationManager::PushFrame() {
 		return;
 	}
 	// Advance the frame
-	if(++iCurrentFrame >= seq->second.frameCount) {
+	if(++iCurrentFrame >= seq->second.frameCount && seq->second.bLoop) {
 		iCurrentFrame = 0;
 	}
 }
@@ -37,6 +39,85 @@ void AnimationManager::DrawActiveFrame(SDL_Texture* in, SDL_Rect* pos) {
 	}
 
 	RenderCode::DrawImageAbsClipped((Image*)in, pos->x, pos->y, 
-		iCurrentFrame * sdSeqData.framesize, seq->second.rowNum * sdSeqData.rowheight,
-		sdSeqData.framesize, sdSeqData.rowheight);
+		iCurrentFrame * ptSeqData->framesize, seq->second.rowNum * ptSeqData->rowheight,
+		ptSeqData->framesize, ptSeqData->rowheight);
+}
+
+void AnimationManager::DrawAnimated(Material* ptMaterial, int x, int y, bool bTransMap) {
+	SDL_Texture* ptTexture;
+	PushFrame();
+	if(!ptMaterial->bLoadedResources) {
+		ptMaterial->LoadResources();
+	}
+
+	if(bTransMap) {
+		ptTexture = ptMaterial->ptTransResource;
+	} else {
+		ptTexture = ptMaterial->ptResource;
+	}
+	if(!ptTexture) {
+		return;
+	}
+
+	SDL_Rect pos; pos.x = x; pos.y = y;
+	DrawActiveFrame(ptTexture, &pos);
+}
+
+bool AnimationManager::Finished() {
+	auto it = (*ptSequences)[sCurrentSequence];
+	if(it.bLoop) {
+		return false;
+	} else if(iCurrentFrame >= it.frameCount) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void AnimationManager::SetSequence(const char* sSequence) {
+	auto it = ptSequences->find(sSequence);
+	if(it == ptSequences->end()) {
+		R_Printf("WARNING: bad sequence change (got: %s)\n", sSequence);
+		return;
+	}
+	sCurrentSequence = sSequence;
+	iCurrentFrame = 0;
+}
+
+const char* AnimationManager::GetCurrentSequence() {
+	return sCurrentSequence.c_str();
+}
+
+AnimationManager* AnimationManager::GetAnimInstance(const char* sRef, const char* sMaterial) {
+	auto it = mAnimInstances.find(sRef);
+	if(it != mAnimInstances.end()) {
+		return it->second;
+	}
+	Material* ptMat = mats->GetMaterial(sMaterial);
+	if(ptMat == nullptr) {
+		R_Printf("AnimationManager::GetAnimInstance: couldn't find material '%s'\n", sMaterial);
+		return nullptr;
+	}
+	AnimationManager* ptManager = new AnimationManager(&ptMat->mSequences, &ptMat->sd);
+	mAnimInstances[sRef] = ptManager;
+	return ptManager;
+}
+
+void AnimationManager::KillAnimInstance(const char* sRef) {
+	auto it = mAnimInstances.find(sRef);
+	if(it == mAnimInstances.end()) {
+		R_Printf("WARNING: cannot kill anim instance %s due to missing ref\n", sRef);
+		return;
+	}
+	delete it->second;
+}
+
+void AnimationManager::ShutdownAnims() {
+	for(auto it = mAnimInstances.begin(); it != mAnimInstances.end(); ++it) {
+		delete it->second;
+	}
+}
+
+void AnimationManager::Animate() {
+	// FIXME: remove
 }

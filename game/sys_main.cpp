@@ -237,6 +237,11 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->Zone_NewTag = Zone::NewTag;
 	imp->Zone_Realloc = Zone::Realloc;
 	imp->FadeFromBlack = RenderCode::FadeFromBlack;
+	imp->AnimateMaterial = RenderCode::AnimateMaterial;
+	imp->GetAnimation = RenderCode::GetAnimation;
+	imp->AnimationFinished = RenderCode::AnimationFinished;
+	imp->SetAnimSequence = RenderCode::SetAnimSequence;
+	imp->GetAnimSequence = RenderCode::GetAnimSequence;
 }
 
 /* Started a new game (probably from the menu) */

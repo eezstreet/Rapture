@@ -3,6 +3,10 @@
 #include "DungeonManager.h"
 #include "RVector.h"
 
+void Actor::SetDestinationEnt(Entity* ptEntity) {
+	ptDestinationEnt = ptEntity;
+}
+
 extern int iMovingToVis;
 bool Actor::Move() {
 	switch(pathfinding) {
@@ -68,6 +72,28 @@ bool Actor::Move_NoPathfinding() {
 			return true;
 		}
 	}
+
+	// At this point, we should be allowed to move. We now need to check if there's any entities in our path.
+	auto vEntList = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtEntTree.NodesAt(bottomedOutX, bottomedOutY);
+	if(vEntList.size() > 0) {
+		for(auto it = vEntList.begin(); it != vEntList.end(); ++it) {
+			Entity* ent = *it;
+			if(!ent->bShouldWeCollide) {
+				continue;
+			}
+			if(ent->w == 0 || ent->h == 0) {
+				continue;
+			}
+			if(ent->x <= nextFramePosition.tComponents[0] && ent->x + ent->w >= nextFramePosition.tComponents[0] &&
+				ent->y <= nextFramePosition.tComponents[1] && ent->y + ent->h >= nextFramePosition.tComponents[1]) {
+				if(ptDestinationEnt == ent) {
+					ent->interact(this);
+				}
+				return true;
+			}
+		}
+	}
+
 	x = nextFramePosition.tComponents[0];
 	y = nextFramePosition.tComponents[1];
 	ptWorld->ActorMoved(this);

@@ -140,6 +140,8 @@ namespace RenderCode {
 	}
 
 	void Exit(const bool bSilent) {
+		AnimationManager::ShutdownAnims();
+
 		SDL_DestroyTexture(renderTex);
 		SDL_FreeSurface(renderSurf);
 
@@ -198,6 +200,7 @@ namespace RenderCode {
 	}
 
 	void Display() {
+		AnimationManager::Animate();
 		if(screenshotQueued) {
 			CreateScreenshot(screenshotName);
 			screenshotQueued = false;
@@ -559,5 +562,28 @@ namespace RenderCode {
 	void FadeFromBlack(int ms) {
 		initialFadeTime = SDL_GetTicks();
 		fadeTime = initialFadeTime + ms;
+	}
+
+	void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency) {
+		if(!ptAnims || !ptMaterial) {
+			return;
+		}
+		ptAnims->DrawAnimated(ptMaterial, x, y, bTransparency);
+	}
+
+	AnimationManager* GetAnimation(const char* sUUID, const char* sMaterial) {
+		return AnimationManager::GetAnimInstance(sUUID, sMaterial);
+	}
+
+	bool AnimationFinished(AnimationManager* ptAnims) {
+		return ptAnims->Finished();
+	}
+
+	void SetAnimSequence(AnimationManager* ptAnims, const char* sSequence) {
+		ptAnims->SetSequence(sSequence);
+	}
+
+	const char* GetAnimSequence(AnimationManager* ptAnims) {
+		return ptAnims->GetCurrentSequence();
 	}
 };

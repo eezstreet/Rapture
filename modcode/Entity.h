@@ -17,10 +17,15 @@ protected:
 	string uuid;
 	int spawnflags;
 	Material* materialHandle;
+	AnimationManager* ptAnims;
+	bool bIsHighlighted;
+	int iDepthScoreOffset;
 public:
 	virtual void render() = 0;
 	virtual void think() = 0;
 	virtual void spawn() = 0;
+	virtual void interact(Entity* interacter) = 0;
+	virtual bool mouseover() = 0;
 	unsigned int iAct;
 
 	bool bShouldWeRender;
@@ -30,5 +35,9 @@ public:
 	int GetSpawnflags() { return spawnflags; }
 	string classname;
 	QuadTree<Entity, float>* ptContainingTree;
+
+	Entity() {
+		iDepthScoreOffset = 0; // This needs to be always 0 (unless specified) otherwise bad things happen
+	}
 friend struct Worldspace;
 };

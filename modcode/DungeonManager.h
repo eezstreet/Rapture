@@ -1,6 +1,7 @@
 #pragma once
 #include "Worldspace.h"
 #include "MapFramework.h"
+#include "Entity.h"
 
 /////////////////////
 //
@@ -40,5 +41,7 @@ public:
 	Map* FindProperMap(int iAct, float x, float y);
 	Map* FindProperMap(int iAct, int x, int y);
 	string FindNextMapStr(int iAct, int iPlayerNum, int nextVis);
+
+	vector<Entity*> GetEntsAt(float x, float y, int act);
 };
 extern DungeonManager* ptDungeonManager;

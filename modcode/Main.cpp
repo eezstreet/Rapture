@@ -51,6 +51,7 @@ void Game_Frame() {
 		// In a multiplayer game, we would be looping through all 4 acts and running GetWorld()->Run,
 		// but since we're only concerned about singleplayer, we're going to focus on the one that
 		// our client is on
+		thisClient->Preframe();											// Preframe. We need to keep client/server synchronized
 		ptDungeonManager->GetWorld(thisClient->ptPlayer->iAct)->Run();	// Server frame
 		thisClient->Frame();											// Client frame
 	}

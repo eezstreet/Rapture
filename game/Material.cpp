@@ -10,52 +10,26 @@ Material::~Material() {
 	if(bLoadedResources) {
 		FreeResources();
 	}
-	if(ptAnims) {
-		delete ptAnims;
-	}
 }
 
 void Material::SendToRenderer(int x, int y) {
-	if(ptAnims) {
-		// Increment animation frame
-		ptAnims->PushFrame();
-	}
 	if(!bLoadedResources) {
 		LoadResources();
 	}
 
-	if(ptAnims) {
-		SDL_Rect img; img.x = x; img.y = y;
-		ptAnims->DrawActiveFrame(ptResource, &img);
-	} else {
-		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
-	}
+	RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
 }
 
 void Material::SendToRendererTransparency(int x, int y) {
 	// Similar to SendToRenderer, but use a transparency map if one is available
-	if(ptAnims) {
-		// Increment animation frame
-		ptAnims->PushFrame();
-	}
 	if(!bLoadedResources) {
 		LoadResources();
 	}
 
 	if(bHasTransparencyMap) {
-		if(!ptAnims) {
-			RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
-		} else {
-			SDL_Rect img; img.x = x; img.y = y;
-			ptAnims->DrawActiveFrame(ptTransResource, &img);
-		}
+		RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
 	} else {
-		if(!ptAnims) {
-			RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
-		} else {
-			SDL_Rect img; img.x = x; img.y = y;
-			ptAnims->DrawActiveFrame(ptResource, &img);
-		}
+		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
 	}
 }
 

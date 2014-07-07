@@ -128,14 +128,14 @@
     <ClInclude Include="..\modcode\Local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\modcode\Container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\entities\contain_chest.h">
       <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\Client.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,16 +14,16 @@ void Sequence::Parse(void* in) {
 	}
 
 	node = cJSON_GetObjectItem(root, "row");
-	rowNum = cJSON_ToIntegerOpt(root, 0);
+	rowNum = cJSON_ToIntegerOpt(node, 0);
 
 	node = cJSON_GetObjectItem(root, "fps");
-	fps = cJSON_ToIntegerOpt(root, 20);
+	fps = cJSON_ToIntegerOpt(node, 20);
 
 	node = cJSON_GetObjectItem(root, "initial");
 	bInitial = cJSON_ToBooleanOpt(node, false);
 
 	node = cJSON_GetObjectItem(root, "numframes");
-	frameCount = cJSON_ToIntegerOpt(root, 1);
+	frameCount = cJSON_ToIntegerOpt(node, 1);
 
 	node = cJSON_GetObjectItem(root, "loop");
 	bLoop = cJSON_ToBooleanOpt(node, true);

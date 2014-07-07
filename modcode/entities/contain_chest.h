@@ -7,6 +7,8 @@ public:
 	virtual void render();
 	virtual void think();
 	virtual void spawn();
+	virtual void interact(Entity* interacter);
+	virtual bool mouseover();
 
 	virtual void Open();
 

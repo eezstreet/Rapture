@@ -18,6 +18,7 @@ Client::Client() {
 	ptHUD = trap->RegisterStaticMenu("ui/hud.html");
 	bShouldDrawLabels = false;
 	bStoppedDrawingLabels = false;
+	bEntDrawingLabels = false;
 }
 
 Client::~Client() {
@@ -94,8 +95,26 @@ void Client::DrawViewportInfo() {
 	}
 }
 
+void Client::Preframe() {
+	bEntDrawingLabels = false;
+	ptFocusEnt = nullptr;
+}
+
 void Client::Frame() {
-	bShouldDrawLabels = false;
+	vector<Entity*> vEnts = ptDungeonManager->GetEntsAt(Worldspace::ScreenSpaceToWorldPlaceX(cursorX, cursorY, ptPlayer),
+		Worldspace::ScreenSpaceToWorldPlaceY(cursorX, cursorY, ptPlayer), ptPlayer->iAct);
+	if(vEnts.empty()) {
+		bShouldDrawLabels = false;
+	} else {
+		for(auto it = vEnts.begin(); it != vEnts.end(); ++it) {
+			Entity* ent = (*it);
+			if(ent->mouseover()) {
+				bShouldDrawLabels = true;
+				break;
+			}
+		}
+	}
+
 	RunFPS();
 	DrawViewportInfo();
 
@@ -128,6 +147,9 @@ void Client::PassMouseDown(int x, int y) {
 	cursorY = y;
 	if(!trap->IsConsoleOpen()) {
 		ptPlayer->MouseDownEvent(x, y);
+		if(ptFocusEnt) {
+			ptPlayer->SetDestinationEnt(ptFocusEnt);
+		}
 	}
 }
 

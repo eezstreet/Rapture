@@ -35,4 +35,10 @@ namespace RenderCode {
 
 	void* GetRenderer();
 	void FadeFromBlack(int ms);
+
+	void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
+	AnimationManager* GetAnimation(const char *sUUID, const char* sMaterial);
+	bool AnimationFinished(AnimationManager* ptAnim);
+	void SetAnimSequence(AnimationManager* ptAnims, const char* sSequence);
+	const char* GetAnimSequence(AnimationManager* ptAnims);
 };

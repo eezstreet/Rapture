@@ -24,6 +24,7 @@ public:
 	~Client();
 
 	void Frame();
+	void Preframe();
 	unsigned int GetFrametime() { return frametime; }
 
 	void HideLabels();
@@ -31,6 +32,8 @@ public:
 	void EnteredArea(const char* area);
 	bool bShouldDrawLabels;
 	bool bStoppedDrawingLabels;
+	bool bEntDrawingLabels; // An entity told us to draw labels, so draw it, damn it.
+	Entity* ptFocusEnt;
 
 	void PassMouseUp(int x, int y);
 	void PassMouseDown(int x, int y);

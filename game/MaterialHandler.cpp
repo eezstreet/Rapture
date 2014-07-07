@@ -6,7 +6,6 @@ MaterialHandler* mats = NULL;
 void MaterialHandler::LoadMaterial(const char* matfile) {
 	Material* mat = Zone::New<Material>(Zone::TAG_MATERIALS);
 	mat->bLoadedResources = false;
-	mat->ptAnims = nullptr;
 	File* f = File::Open(matfile, "r");
 	if(!f) {
 		Zone::FastFree(mat, "materials");
@@ -83,17 +82,16 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 			return;
 		}
 		// Parse the sequencedata
-		SequenceData sData;
 		cJSON* seqData = cJSON_GetObjectItem(json, "sequenceData");
 		if(!seqData) {
 			R_Error("%s has sequences but no sequenceData!\n", matfile);
 			return;
 		}
 
-		sData.rowheight = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "rowheight"), 0);
-		sData.framesize = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "framesize"), 0);
-
-		mat->ptAnims = new AnimationManager(sStartingSequence, &mat->mSequences, longestSequence, sData);
+		mat->sd.rowheight = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "rowheight"), 0);
+		mat->sd.framesize = cJSON_ToIntegerOpt(cJSON_GetObjectItem(seqData, "framesize"), 0);
+		mat->sd.longestSequence = longestSequence;
+		strncpy(mat->sd.startingSequence, sStartingSequence.c_str(), sizeof(mat->sd.startingSequence));
 	}
 
 	materials.insert(make_pair(mat->name, mat));

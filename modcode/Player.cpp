@@ -27,6 +27,9 @@ void Player::think() {
 
 	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.035f)) {
 		bShouldWeBeMoving = false;
+		if(ptDestinationEnt != nullptr) {
+			ptDestinationEnt->interact(this);
+		}
 	}
 
 	if(bShouldWeBeMoving) {
@@ -53,6 +56,13 @@ void Player::render() {
 	trap->RenderMaterial(materialHandle, (screenWidth / 2) - 32, (screenHeight / 2) - 64);
 }
 
+void Player::interact(Entity* interacter) {
+}
+
+bool Player::mouseover() {
+	return false;
+}
+
 void Player::MoveToNextVis() {
 	ptDungeonManager->MovePlayerToVis(iAct, playerNum, iMovingToVis);
 }
@@ -69,6 +79,7 @@ void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
 
 	if(origin.Within(dest, 0.25f)) {
 		bShouldWeBeMoving = false;
+		// FIXME: use whatever is in our crosshair
 		return;
 	}
 
@@ -84,6 +95,7 @@ void Player::MouseMoveEvent(int sx, int sy) {
 }
 
 void Player::MouseDownEvent(int sx, int sy) {
+	ptDestinationEnt = nullptr;
 	iMovingToVis = visTouching;
 	MoveToScreenspace(sx, sy, false);
 	bMouseDown = true;

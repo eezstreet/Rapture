@@ -9,6 +9,8 @@ public:
 	virtual void render();
 	virtual void think();
 	virtual void spawn();
+	virtual void interact(Entity* interacter);
+	virtual bool mouseover();
 	Player(float x, float y);
 
 	void MouseUpEvent(int sX, int sY);

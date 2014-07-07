@@ -3,6 +3,7 @@
 #include "PresetFileData.h"
 
 #include "entities\info_player_start.h"
+#include "entities\contain_chest.h"
 
 DungeonManager* ptDungeonManager;
 
@@ -14,6 +15,7 @@ DungeonManager::DungeonManager() {
 
 	DEF_SPAWN_FUNC(info_player_start);
 	DEF_SPAWN_FUNC(Player);
+	DEF_SPAWN_FUNC(contain_chest);
 
 	trap->Zone_NewTag("tiles");
 }
@@ -76,6 +78,10 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 		auto loadedEnt = pfd->entities[i];
 		// Spawn an instance of the entity by calling its ::spawnme function
 		Entity* ent = GenerateEntity(loadedEnt.lookup, loadedEnt.x + ptFramework->iWorldspaceX, loadedEnt.y + ptFramework->iWorldspaceY, loadedEnt.spawnflags, ptFramework->iAct);
+		if(!ent) {
+			R_Printf("%s does not have a spawn function\n", loadedEnt.lookup);
+			continue;
+		}
 		// Actually call its spawn() function
 		wActs[ptFramework->iAct].SpawnEntity(ent, ent->bShouldWeRender, ent->bShouldWeThink, ent->bShouldWeCollide);
 		// Lastly, put it in the map that it belongs in
@@ -250,4 +256,33 @@ void DungeonManager::MovePlayerToVis(int iAct, int iPlayerNum, int iVisNumber) {
 	}
 
 	ply->SignalZoneChange(ptSpawn->x, ptSpawn->y, nextMap->name);
+}
+
+vector<Entity*> DungeonManager::GetEntsAt(float x, float y, int act) {
+	Worldspace* ptWorld = GetWorld(act);
+	auto maps = ptWorld->qtMapTree->NodesAt(x, y);
+	vector<Map*> vDesiredMaps;
+	vector<Entity*> vRetVal;
+
+	for(auto it = maps.begin(); it != maps.end(); it++) {
+		Map* ptMap = *it;
+		if(ptMap->x <= x && ptMap->x + ptMap->w >= x &&
+			ptMap->y <= y && ptMap->y + ptMap->h >= y) {
+				vDesiredMaps.push_back(ptMap);
+		}
+	}
+	if(vDesiredMaps.empty()) {
+		return vRetVal;
+	}
+	for(auto it = vDesiredMaps.begin(); it != vDesiredMaps.end(); ++it) {
+		Map* ptMap = *it;
+		auto entsAt = ptMap->qtEntTree.NodesAt(x, y);
+		for(auto it2 = entsAt.begin(); it2 != entsAt.end(); ++it2) {
+			Entity* ptEnt = *it2;
+			if(x >= ptEnt->x && x <= ptEnt->x + ptEnt->w && y >= ptEnt->y && y <= ptEnt->y + ptEnt->h) {
+				vRetVal.push_back(ptEnt);
+			}
+		}
+	}
+	return vRetVal;
 }

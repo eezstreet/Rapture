@@ -41,6 +41,7 @@ class Font;
 class Menu;
 class Material;
 class Cvar;
+class AnimationManager;
 
 struct gameImports_s {
 	// Logging
@@ -85,6 +86,13 @@ struct gameImports_s {
 	Material* (*RegisterMaterial)(const char* name);
 	void (*RenderMaterial)(Material* ptMaterial, int x, int y);
 	void (*RenderMaterialTrans)(Material* ptMaterial, int x, int y);
+
+	// Animation
+	AnimationManager* (*GetAnimation)(const char* sUUID, const char* sMaterial);
+	void (*AnimateMaterial)(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
+	bool (*AnimationFinished)(AnimationManager* ptAnims);
+	void (*SetAnimSequence)(AnimationManager* ptAnims, const char* sSequence);
+	const char* (*GetAnimSequence)(AnimationManager* ptAnims);
 
 	// Cvars
 	void (*CvarIntVal)(const char* cvarName, int* value);

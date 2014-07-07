@@ -12,6 +12,8 @@ public:
 	};
 	float GetPreviousX() const { return pX; }
 	float GetPreviousY() const { return pY; }
+
+	void SetDestinationEnt(Entity* ptEntity);
 protected:
 	float pX, pY;
 	float fSpeed;
@@ -22,6 +24,8 @@ protected:
 	bool Move();
 
 	RVec2<float> dir;
+
+	Entity* ptDestinationEnt;
 private:
 	bool Move_NoPathfinding();
 	bool Move_AStarPathfinding();

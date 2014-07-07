@@ -31,22 +31,33 @@ struct Sequence {
 };
 
 struct SequenceData {
+	char startingSequence[64];
 	int rowheight;
 	int framesize;
+	int longestSequence;
 };
 
 class AnimationManager {
 private:
+	static unordered_map<string, AnimationManager*> mAnimInstances;
 	unordered_map<string, Sequence>* ptSequences;
 	int lastFrameTime;
-	SequenceData sdSeqData;
+	SequenceData* ptSeqData;
 public:
+	static AnimationManager* GetAnimInstance(const char* sRef, const char* sMaterial);
+	static void KillAnimInstance(const char* sRef);
+	static void ShutdownAnims();
+	static void Animate();
+
 	string sCurrentSequence;
 	int iCurrentFrame;
-	int iLongestSequence;
-	AnimationManager(const string& sSequence, unordered_map<string, Sequence>* ptSequenceSet, int longestSequence, SequenceData sData);
+	AnimationManager(unordered_map<string, Sequence>* ptSequenceSet, SequenceData* ptSeqData);
 	void PushFrame();
 	void DrawActiveFrame(SDL_Texture* in, SDL_Rect* pos);
+	void DrawAnimated(Material* ptMaterial, int x, int y, bool bTransparentMap);
+	bool Finished();
+	void SetSequence(const char* sSequence);
+	const char* GetCurrentSequence();
 };
 
 // MaterialHandler.cpp
@@ -70,13 +81,13 @@ private:
 
 	int iNumSequences;
 	unordered_map<string, Sequence> mSequences;
-	AnimationManager* ptAnims;
+	SequenceData sd;
 public:
 	Material();
 	~Material();
 	void SendToRenderer(int x, int y);
 	void SendToRendererTransparency(int x, int y);
-
+friend class AnimationManager;
 friend class MaterialHandler;
 };
 
