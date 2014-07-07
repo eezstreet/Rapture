@@ -8,7 +8,7 @@ static RVec2<float> dest(0,0);
 static bool bShouldWeBeMoving = false;
 static bool bDoWeHaveADestination = false;
 static bool bMouseDown = false;
-static int iMovingToVis = -1;
+int iMovingToVis = -1;
 
 extern int visTouching;
 

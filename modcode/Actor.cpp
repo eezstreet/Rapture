@@ -36,7 +36,7 @@ bool Actor::Move_NoPathfinding() {
 		return true;
 	}
 		
-	auto nodes = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesAt(bottomedOutX, bottomedOutY);
+	auto nodes = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesIn(bottomedOutX, bottomedOutY, 2, 2);
 	if(nodes.size() <= 0) {
 		// No nodes in this sector = no movement
 		return true;
@@ -61,7 +61,7 @@ bool Actor::Move_NoPathfinding() {
 			continue;
 		}
 		if(bIsPlayer) {
-			if(node->ptTile->vismask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY)) {
+			if(node->ptTile->vismask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY) && iMovingToVis != -1) {
 				Player* ptPlayer = (Player*)this;
 				ptPlayer->MoveToNextVis();
 				return false;
