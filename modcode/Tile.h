@@ -56,7 +56,7 @@ struct Tile {
 	}
 };
 
-class TileNode : public QTreeNode<unsigned int> {
+class TileNode : public QTreeNode<signed int> {
 public:
 	Tile* ptTile;
 	tileRenderType_e rt;

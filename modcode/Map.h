@@ -22,7 +22,7 @@ struct Map : public QTreeNode<int> {
 
 	int iAct;
 
-	QuadTree<TileNode, int> qtTileTree;
+	QuadTree<TileNode, signed int> qtTileTree;
 	QuadTree<Entity, float> qtEntTree;
 
 	Map(int _x, int _y, int _w, int _h, int act, int depth) :

@@ -130,9 +130,12 @@ public:
 	vector<C*> NodesIn(const U posX, const U posY, const U posW, const U posH) {
 		vector<C*> returnNodes;
 		for(auto it = nodes.begin(); it != nodes.end(); it++) {
-			if((*it)->x >= posX && (*it)->x <= (posX + posW) &&
-				(*it)->y >= posY && (*it)->y <= (posY + posH)) {
-					returnNodes.push_back(*it);
+			auto node = *it;
+			const U posAbsX = posX + posW;
+			const U posAbsY = posY + posH;
+			if(node->x >= posX && node->x <= posAbsX &&
+				node->y >= posY && node->y <= posAbsY) {
+					returnNodes.push_back(node);
 			}
 		}
 		if(depth != maxDepth) {

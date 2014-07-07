@@ -66,11 +66,13 @@ void Worldspace::Render(Client* ptClient) {
 	trap->CvarIntVal("r_width", &screenWidth);
 	trap->CvarIntVal("r_height", &screenHeight);
 
-	screenWidth /= 2;
-	screenHeight /= 2;
-
-	auto mapTiles = theMap->qtTileTree.NodesAt(ptPlayer->x, ptPlayer->y);
-	auto mapEnts = theMap->qtEntTree.NodesAt(ptPlayer->x, ptPlayer->y);
+	// mega ultra hack
+	float fBoundsX = Worldspace::ScreenSpaceToWorldPlaceX(-192, screenWidth + 192, ptClient->ptPlayer);
+	float fBoundsY = Worldspace::ScreenSpaceToWorldPlaceY(-192, -192, ptClient->ptPlayer);
+	float fBoundsW = Worldspace::ScreenSpaceToWorldPlaceX(screenWidth + 192, -192, ptClient->ptPlayer) - fBoundsX;
+	float fBoundsH = Worldspace::ScreenSpaceToWorldPlaceY(screenWidth + 192, screenHeight + 192, ptClient->ptPlayer) - fBoundsY;
+	auto mapTiles = theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
+	auto mapEnts = theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
 	// Chuck entities into the list of stuff that needs sorted
 	for(auto it = mapEnts.begin(); it != mapEnts.end(); ++it) {
 		auto ent = *it;
@@ -130,10 +132,12 @@ void Worldspace::Render(Client* ptClient) {
 			if(bHaveWeRenderedPlayer) {
 				// Does this tile use autotrans?
 				if(tile->ptTile->bAutoTrans) {
-					if(screenWidth > renderX + tile->ptTile->iAutoTransX
-						&& screenWidth < renderX + tile->ptTile->iAutoTransX + tile->ptTile->iAutoTransW
-						&& screenHeight > renderY + tile->ptTile->iAutoTransY
-						&& screenHeight < renderY + tile->ptTile->iAutoTransY + tile->ptTile->iAutoTransH) {
+					int halfWidth = screenWidth / 2;
+					int halfHeight = screenHeight / 2;
+					if(halfWidth > renderX + tile->ptTile->iAutoTransX
+						&& halfWidth < renderX + tile->ptTile->iAutoTransX + tile->ptTile->iAutoTransW
+						&& halfHeight > renderY + tile->ptTile->iAutoTransY
+						&& halfHeight < renderY + tile->ptTile->iAutoTransY + tile->ptTile->iAutoTransH) {
 							trap->RenderMaterialTrans(tile->ptTile->materialHandle, renderX, renderY);
 							continue;
 					}
