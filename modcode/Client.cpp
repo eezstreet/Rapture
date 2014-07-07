@@ -116,12 +116,13 @@ void Client::Frame() {
 	}
 
 	RunFPS();
-	DrawViewportInfo();
 
 	ptDungeonManager->GetWorld(ptPlayer->iAct)->Render(this);
 	if(!bShouldDrawLabels && !bStoppedDrawingLabels) {
 		HideLabels();
 	}
+
+	DrawViewportInfo();
 }
 
 void Client::HideLabels() {
