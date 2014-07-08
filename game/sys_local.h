@@ -200,10 +200,10 @@ public:
 	static void SetFloatValue(const string &sName, float newValue) { cvars[sName]->v.currentVal = newValue; cvars[sName]->RunCallback(); }
 	static void SetBooleanValue(const string &sName, bool newValue) { cvars[sName]->b.currentVal = newValue; cvars[sName]->RunCallback(); }
 
-	static string GetStringValue(const string& sName);
-	static int GetIntegerValue(const string& sName);
-	static float GetFloatValue(const string& sName);
-	static bool GetBooleanValue(const string& sName);
+	static string GetStringValue(const char* sName);
+	static int GetIntegerValue(const char* sName);
+	static float GetFloatValue(const char* sName);
+	static bool GetBooleanValue(const char* sName);
 
 	static void ListCvars();
 

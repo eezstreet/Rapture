@@ -43,6 +43,9 @@ public:
 	int cursorX;
 	int cursorY;
 
+	int screenWidth;
+	int screenHeight;
+
 	Player* ptPlayer;
 };
 

@@ -66,7 +66,7 @@ void CvarSystem::ArchiveCvars() {
 	Zone::FastFree(ff, "files");
 }
 
-string CvarSystem::GetStringValue(const string& sName) {
+string CvarSystem::GetStringValue(const char* sName) {
 	if(!Cvar::Exists(sName)) { // use cache
 		return ""; // FIXME
 	}
@@ -75,7 +75,7 @@ string CvarSystem::GetStringValue(const string& sName) {
 	}
 }
 
-int CvarSystem::GetIntegerValue(const string& sName) {
+int CvarSystem::GetIntegerValue(const char* sName) {
 	if(!Cvar::Exists(sName)) { // use cache
 		return 0; // FIXME
 	}
@@ -84,7 +84,7 @@ int CvarSystem::GetIntegerValue(const string& sName) {
 	}
 }
 
-float CvarSystem::GetFloatValue(const string& sName) {
+float CvarSystem::GetFloatValue(const char* sName) {
 	if(!Cvar::Exists(sName)) {
 		return 0.0f; // FIXME
 	}
@@ -93,7 +93,7 @@ float CvarSystem::GetFloatValue(const string& sName) {
 	}
 }
 
-bool CvarSystem::GetBooleanValue(const string& sName) {
+bool CvarSystem::GetBooleanValue(const char* sName) {
 	if(!Cvar::Exists(sName)) {
 		return false; // FIXME
 	}

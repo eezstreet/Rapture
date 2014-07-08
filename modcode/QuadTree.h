@@ -196,6 +196,57 @@ public:
 		return returnNodes;
 	}
 
+	void NodesIn(const U posX, const U posY, const U posW, const U posH, vector<C*>& in) {
+		for(auto it = nodes.begin(); it != nodes.end(); it++) {
+			auto node = *it;
+			const U posAbsX = posX + posW;
+			const U posAbsY = posY + posH;
+			if(node->x >= posX && node->x <= posAbsX &&
+				node->y >= posY && node->y <= posAbsY) {
+					in.push_back(node);
+			}
+		}
+		if(depth != maxDepth) {
+			NW->NodesIn(posX, posY, posW, posH, in);
+			NE->NodesIn(posX, posY, posW, posH, in);
+			SW->NodesIn(posX, posY, posW, posH, in);
+			SE->NodesIn(posX, posY, posW, posH, in);
+		}
+	}
+
+	C* PreciseNodeAt(const U posX, const U posY) {
+		C* tempNode = nullptr;
+		if(depth == maxDepth) {
+ifuckinghategotos:
+			for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+				C* node = *it;
+				if(posX >= node->x && posX <= node->x + node->w &&
+					posY >= node->y && posY <= node->y + node->h) {
+					return node;
+				}
+			}
+			return nullptr;
+		} else if(posX > x + w / (U)2 && posY < y + h) {
+			if(posY > y + h / (U)2 && posY < y + h) {
+				tempNode = SE->PreciseNodeAt(posX, posY);
+			} else if(posY > y && posY <= y + h / (U)2) {
+				tempNode = NE->PreciseNodeAt(posX, posY);
+			}
+		} else if(posX > x && posX <= x + w / (U)2) {
+			if(posY > y + h / (U)2 && posY < y + h) {
+				tempNode = SW->PreciseNodeAt(posX, posY);
+			} else if(posY > y && posY <= y + h / (U)2) {
+				tempNode = NW->PreciseNodeAt(posX, posY);
+			}
+		} 
+		if(tempNode == nullptr) {
+			// Try looking in our own nodes
+			goto ifuckinghategotos;
+		} else {
+			return tempNode;
+		}
+	}
+
 	void Clear() {
 		if(depth == maxDepth) {
 			nodes.clear();

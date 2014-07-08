@@ -87,14 +87,17 @@ void UI::Render() {
 		}
 		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
 		SDL_Texture* tex = uiTextures[lastActiveLayer];
-		unsigned char* pixels;
-		int pitch;
-		if(SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch) < 0) {
-			R_Printf("Failed to lock texture: %s\n", SDL_GetError());
-			return;
+		if(bmp->is_dirty()) {
+			// If it's not dirty, then we don't need to re-render
+			unsigned char* pixels;
+			int pitch;
+			if(SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch) < 0) {
+				R_Printf("Failed to lock texture: %s\n", SDL_GetError());
+				return;
+			}
+			bmp->CopyTo(pixels, pitch, 4, false, false);
+			SDL_UnlockTexture(tex);
 		}
-		bmp->CopyTo(pixels, pitch, 4, false, false);
-		SDL_UnlockTexture(tex);
 		RenderCode::BlendTexture((void*)tex);
 		//SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 		//RenderCode::AddSurface((void*)x);

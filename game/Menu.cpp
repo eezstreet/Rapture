@@ -32,7 +32,7 @@ JSValue EXPORT_getCvarString(const JSArray& args) {
 		R_Printf("JS warning: getCvarString: cvar %s is not string type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
-	string value = CvarSystem::GetStringValue(cvarName);
+	string value = CvarSystem::GetStringValue(cvarName.c_str());
 	return JSValue(WSLit(value.c_str()));
 }
 
@@ -45,7 +45,7 @@ JSValue EXPORT_getCvarInteger(const JSArray& args) {
 		R_Printf("JS warning: getCvarInteger: cvar %s is not integer type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
-	return JSValue(CvarSystem::GetIntegerValue(cvarName));
+	return JSValue(CvarSystem::GetIntegerValue(cvarName.c_str()));
 }
 
 JSValue EXPORT_getCvarFloat(const JSArray& args) {
@@ -57,7 +57,7 @@ JSValue EXPORT_getCvarFloat(const JSArray& args) {
 		R_Printf("JS warning: getCvarFloat: cvar %s is not float type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
-	return JSValue(CvarSystem::GetFloatValue(cvarName));
+	return JSValue(CvarSystem::GetFloatValue(cvarName.c_str()));
 }
 
 JSValue EXPORT_getCvarBoolean(const JSArray& args) {
@@ -69,7 +69,7 @@ JSValue EXPORT_getCvarBoolean(const JSArray& args) {
 		R_Printf("JS warning: getCvarBoolean: cvar %s is not boolean type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
-	return JSValue(CvarSystem::GetBooleanValue(cvarName));
+	return JSValue(CvarSystem::GetBooleanValue(cvarName.c_str()));
 }
 
 bool CvarSet_IsValid(const JSArray& args) {

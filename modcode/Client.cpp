@@ -98,6 +98,9 @@ void Client::DrawViewportInfo() {
 void Client::Preframe() {
 	bEntDrawingLabels = false;
 	ptFocusEnt = nullptr;
+
+	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("r_height", &screenHeight);
 }
 
 void Client::Frame() {
