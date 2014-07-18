@@ -14,6 +14,8 @@
 #include <map>
 #include <dirent.h>
 #include <functional>
+#include <time.h>
+#include <assert.h>
 using namespace std;
 
 #ifdef _WIN32
@@ -130,3 +132,14 @@ struct gameExports_s {
 // sys_main.cpp
 void R_Printf(const char *fmt, ...);
 void R_Error(const char *fmt, ...);
+
+// Erases an item from a vector provided that the vector contains all unique elements.
+template <typename T>
+void VectorErase(vector<T>& rtVector, T uniqueMember) {
+	for(auto it = rtVector.begin(); it != rtVector.end(); ++it) {
+		if(*it == uniqueMember) {
+			rtVector.erase(it);
+			break;
+		}
+	}
+}

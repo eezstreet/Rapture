@@ -82,6 +82,7 @@
     <ClCompile Include="..\modcode\Actor.cpp" />
     <ClCompile Include="..\modcode\Client.cpp" />
     <ClCompile Include="..\modcode\Container.cpp" />
+    <ClCompile Include="..\modcode\DRLG.cpp" />
     <ClCompile Include="..\modcode\DungeonManager.cpp" />
     <ClCompile Include="..\modcode\entities\contain_chest.cpp" />
     <ClCompile Include="..\modcode\entities\info_player_start.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="..\modcode\Local.cpp" />
     <ClCompile Include="..\modcode\Map.cpp" />
     <ClCompile Include="..\modcode\MapLoader.cpp" />
+    <ClCompile Include="..\modcode\Seed.cpp" />
     <ClCompile Include="..\modcode\Worldspace.cpp" />
     <ClCompile Include="..\modcode\Player.cpp" />
   </ItemGroup>
@@ -100,6 +102,7 @@
     <ClInclude Include="..\modcode\Actor.h" />
     <ClInclude Include="..\modcode\Client.h" />
     <ClInclude Include="..\modcode\Container.h" />
+    <ClInclude Include="..\modcode\DRLG.h" />
     <ClInclude Include="..\modcode\DungeonManager.h" />
     <ClInclude Include="..\modcode\entities\contain_chest.h" />
     <ClInclude Include="..\modcode\entities\info_player_start.h" />
@@ -109,9 +112,11 @@
     <ClInclude Include="..\modcode\Map.h" />
     <ClInclude Include="..\modcode\MapFramework.h" />
     <ClInclude Include="..\modcode\MapLoader.h" />
+    <ClInclude Include="..\modcode\MazeFramework.h" />
     <ClInclude Include="..\modcode\Player.h" />
     <ClInclude Include="..\modcode\PresetFileData.h" />
     <ClInclude Include="..\modcode\QuadTree.h" />
+    <ClInclude Include="..\modcode\Seed.h" />
     <ClInclude Include="..\modcode\Tile.h" />
     <ClInclude Include="..\modcode\Warp.h" />
     <ClInclude Include="..\modcode\Worldspace.h" />

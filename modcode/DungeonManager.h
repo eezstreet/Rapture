@@ -1,6 +1,7 @@
 #pragma once
 #include "Worldspace.h"
 #include "MapFramework.h"
+#include "PresetFileData.h"
 #include "Entity.h"
 
 /////////////////////
@@ -27,7 +28,6 @@ private:
 	void PresetGeneration(const MapFramework* ptFramework, Map& in);
 	
 	unordered_map<string, spawnFunc_t> mSpawnFuncs;
-	Entity* GenerateEntity(const char* entName, float x, float y, int spawnflags, int act);
 public:
 	DungeonManager();
 	~DungeonManager();
@@ -42,6 +42,10 @@ public:
 	Map* FindProperMap(int iAct, int x, int y);
 	string FindNextMapStr(int iAct, int iPlayerNum, int nextVis);
 
+	PresetFileData* GetPFD(const string& sName);
+	Tile* GetTileByName(const string& sName);
+
 	vector<Entity*> GetEntsAt(float x, float y, int act);
+	Entity* GenerateEntity(const char* entName, float x, float y, int spawnflags, int act);
 };
 extern DungeonManager* ptDungeonManager;

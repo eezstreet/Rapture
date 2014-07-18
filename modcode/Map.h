@@ -2,6 +2,7 @@
 #include "QuadTree.h"
 #include "Tile.h"
 #include "Entity.h"
+#include "Seed.h"
 
 #define MAX_MAP_LINKS		8
 #define MAX_HANDLE_STRING	64

@@ -1,6 +1,7 @@
 #include "DungeonManager.h"
 #include "MapLoader.h"
 #include "PresetFileData.h"
+#include "DRLG.h"
 
 #include "entities\info_player_start.h"
 #include "entities\contain_chest.h"
@@ -46,9 +47,9 @@ void DungeonManager::StartBuild(const string& sDungeonName) {
 void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) {
 	// Generate a preset level.
 	// Locate the pfd in storage
-	const PresetFileData* pfd = ptMapLoader->FindPresetByName(ptFramework->entryPreset);
+	const PresetFileData* pfd = ptMapLoader->FindPresetByName(ptFramework->dataPreset.preset);
 	if(!pfd) {
-		R_Printf("WARNING: Couldn't find pfd: %s\n", ptFramework->entryPreset);
+		R_Printf("WARNING: Couldn't find pfd: %s\n", ptFramework->dataPreset.preset);
 		return;
 	}
 
@@ -118,8 +119,8 @@ void DungeonManager::Construct(const MapFramework* ptFramework) {
 		// It's preset, so lets just do that then
 		PresetGeneration(ptFramework, *theMap);
 	} else {
-		// DRLG generation -- currently not done
-		return;
+		// DRLG generation
+		RandomizeDungeon(ptMapLoader->FindMazeFrameworkByName(ptFramework->mazeName), *theMap, this);
 	}
 
 	// For each map that this one links to, we generate those maps (recursively)
@@ -184,6 +185,14 @@ void DungeonManager::SpawnPlayer(const string& sDungeonName) {
 	// networking FIXME
 	thisClient->ptPlayer = ptPlayer;
 	ptPlayer->SignalZoneChange(ent->x, ent->y, sDungeonName.c_str());
+}
+
+PresetFileData* DungeonManager::GetPFD(const string& sName) {
+	return ptMapLoader->FindPresetByName(sName);
+}
+
+Tile* DungeonManager::GetTileByName(const string& sName) {
+	return ptMapLoader->FindTileByName(sName);
 }
 
 Map* DungeonManager::FindProperMap(int iAct, float x, float y) {

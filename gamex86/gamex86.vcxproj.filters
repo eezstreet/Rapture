@@ -72,6 +72,12 @@
     <ClCompile Include="..\modcode\entities\contain_chest.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\DRLG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\Seed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h">
@@ -135,6 +141,15 @@
       <Filter>Header Files\entities</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\Client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\MazeFramework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\DRLG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\Seed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

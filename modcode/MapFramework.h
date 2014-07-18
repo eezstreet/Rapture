@@ -1,6 +1,17 @@
 #pragma once
 #include "Map.h"
 #include "Local.h"
+#include "MazeFramework.h"
+
+/////////////////////
+//
+//  PresetFramework
+//
+/////////////////////
+
+struct PresetFramework {
+	char preset[MAX_HANDLE_STRING];
+};
 
 /////////////////////
 //
@@ -18,7 +29,11 @@ struct MapFramework {
 	int nDungeonLevel;
 	string sLink[MAX_MAP_LINKS];
 
-	char entryPreset[MAX_HANDLE_STRING];
+	char mazeName[MAX_HANDLE_STRING];
+	union {
+		PresetFramework dataPreset;
+		MazeFramework dataDRLG;
+	};
 	
 	int iWorldspaceX;
 	int iWorldspaceY;

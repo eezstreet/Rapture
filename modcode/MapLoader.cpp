@@ -5,12 +5,13 @@
 static unordered_map<const char*, jsonParseFunc> levelParseFields;
 void InitLevelParseFields() {
 #define NAME_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->name, cJSON_ToString(j)); }
-#define FIRST_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->entryPreset, cJSON_ToString(j)); }
+#define FIRST_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->dataPreset.preset, cJSON_ToString(j)); }
 #define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
 #define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->sLink[x] = cJSON_ToString(j); }
 #define P_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->bIsPreset = cJSON_ToBoolean(j); }
 #define INT_PARSER(x) [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->##x## = cJSON_ToInteger(j); }
 #define TO_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->toName, cJSON_ToString(j)); }
+#define MAZE_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strncpy(t->mazeName, cJSON_ToString(j), sizeof(t->mazeName)); }
 	levelParseFields["name"] = NAME_PARSER;
 	levelParseFields["toName"] = TO_PARSER;
 	levelParseFields["level"] = LEVEL_PARSER;
@@ -29,6 +30,7 @@ void InitLevelParseFields() {
 	levelParseFields["sizeX"] = INT_PARSER(iSizeX);
 	levelParseFields["sizeY"] = INT_PARSER(iSizeY);
 	levelParseFields["act"] = INT_PARSER(iAct);
+	levelParseFields["maze"] = MAZE_PARSER;
 #undef NAME_PARSER
 #undef INT_PARSER
 }
@@ -49,6 +51,33 @@ void InitWarpParseFields() {
 	warpParseFields["h"] = INT_PARSER(h);
 #undef INT_PARSER
 #undef NAME_PARSER
+}
+
+// MAZE PARSING
+static unordered_map<const char*, jsonParseFunc> mazeParseFields;
+
+void Maze_AlgorithmParser(cJSON* j, void* p) {
+	MazeFramework* t = (MazeFramework*)p;
+	char algo[MAX_HANDLE_STRING];
+	strncpy(algo, cJSON_ToString(j), sizeof(algo));
+
+	if(!stricmp(algo, "ALGO_DRUNKEN_STAGGER")) {
+		t->algorithm = ALGO_DRUNKEN_STAGGER;
+	} else if (!stricmp(algo, "ALGO_SATURATION")) {
+		t->algorithm = ALGO_SATURATION;
+	}
+}
+void InitMazeParseFields() {
+#define INT_PARSER(x) [](cJSON* j, void* p) -> void { MazeFramework* t = (MazeFramework*)p; t->##x## = cJSON_ToInteger(j); }
+#define SET_PARSER [](cJSON* j, void* p) -> void { MazeFramework* t = (MazeFramework*)p; strncpy(t->tileSet, cJSON_ToString(j), sizeof(t->tileSet)); }
+#define NAME_PARSER [](cJSON* j, void* p) -> void { MazeFramework* t = (MazeFramework*)p; strncpy(t->name, cJSON_ToString(j), sizeof(t->name)); }
+	mazeParseFields["name"] = NAME_PARSER;
+	mazeParseFields["mazeSet"] = SET_PARSER;
+	mazeParseFields["roomSizeX"] = INT_PARSER(roomSizeX);
+	mazeParseFields["roomSizeY"] = INT_PARSER(roomSizeY);
+	mazeParseFields["algorithm"] = Maze_AlgorithmParser;
+#undef NAME_PARSER
+#undef INT_PARSER
 }
 
 // TILE PARSING
@@ -242,6 +271,9 @@ void MapLoader::LoadPresets(const char* path) {
 	// We use a special zone tag for presets, we should add that now
 	trap->Zone_NewTag("pfd");
 
+	// We also use a special zone tag for DRLG allocations
+	trap->Zone_NewTag("roomgrid");
+
 	for(int i = 0; i < numFiles; i++) {
 		LoadPreset(paths[i]);
 	}
@@ -256,6 +288,13 @@ MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
 	JSON_ParseMultifile<Warp>("levels/LevelWarp.json", warpParseFields, vWarpData);
 	for(auto it = vWarpData.begin(); it != vWarpData.end(); ++it) {
 		mWarpResolver[it->sName] = it;
+	}
+
+	// Load mazes
+	InitMazeParseFields();
+	JSON_ParseMultifile<MazeFramework>("levels/LevelMaze.json", mazeParseFields, vMazeData);
+	for(auto it = vMazeData.begin(); it != vMazeData.end(); ++it) {
+		mMazeResolver[it->name] = it;
 	}
 
 	// Load the tiles.
@@ -284,6 +323,19 @@ MapLoader::MapLoader(const char* presetsPath, const char* tilePath) {
 	// Load the Levels.json
 	InitLevelParseFields();
 	JSON_ParseMultifile<MapFramework>("levels/Levels.json", levelParseFields, vMapData);
+
+	// Special: We need to copy data from the maze framework if needed
+	for(auto it = vMapData.begin(); it != vMapData.end(); ++it) {
+		if(!it->bIsPreset) {
+			if(it->mazeName[0] != '\0') {
+				auto maze = mMazeResolver.find(it->mazeName);
+				if(maze == mMazeResolver.end()) {
+					continue;
+				}
+				memcpy(&it->dataDRLG, &(*maze->second), sizeof(it->dataDRLG));
+			}
+		}
+	}
 
 	// Load presets.
 	LoadPresets(presetsPath);
@@ -322,4 +374,12 @@ PresetFileData* MapLoader::FindPresetByName(const string& str) {
 		return NULL;
 	}
 	return it->second;
+}
+
+MazeFramework* MapLoader::FindMazeFrameworkByName(const char* name) {
+	auto it = mMazeResolver.find(name);
+	if(it == mMazeResolver.end()) {
+		return nullptr;
+	}
+	return &(*(it->second));
 }
