@@ -153,22 +153,22 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 			switch(connection) {
 				default:
 				case 0:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y-1) * ptRoom->x + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y-1) * rtRoomGrid.sizeX + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_N);
 					otherRoom->iConnectionFlags |= (1 << ROOM_S);
 					break;
 				case 1:
-					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * ptRoom->x + ptRoom->x - 1];
+					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x - 1];
 					ptRoom->iConnectionFlags |= (1 << ROOM_W);
 					otherRoom->iConnectionFlags |= (1 << ROOM_E);
 					break;
 				case 2:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y+1) * ptRoom->x + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y+1) * rtRoomGrid.sizeX + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_S);
 					otherRoom->iConnectionFlags |= (1 << ROOM_N);
 					break;
 				case 3:
-					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * ptRoom->x + ptRoom->x + 1];
+					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x + 1];
 					ptRoom->iConnectionFlags |= (1 << ROOM_E);
 					otherRoom->iConnectionFlags |= (1 << ROOM_W);
 					break;
@@ -213,6 +213,9 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 		int nextIndex;
 		Room* ptNextRoom;
 		Room* ptRoom = &rtRoomGrid.roomArray[index];
+		if(bRanLastStage[index] == true) {
+			return;
+		}
 		bRanLastStage[index] = true;
 		if(c.tComponents[1] > 0) {
 			nextIndex = index - rtRoomGrid.sizeX;
@@ -264,9 +267,6 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 		}
 	};
 	g(currentPos);
-
-	trap->Zone_FastFree(bConnects, "roomgrid");
-	trap->Zone_FastFree(bRanLastStage, "roomGrid");
 	return true;
 }
 
@@ -324,11 +324,14 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 			R_Printf("WARNING: couldn't find pfd: %s\n", preset.c_str());
 			continue;
 		}
+		R_Printf("DRLG: requesting pfd resource %s\n", preset.c_str());
 		TileNode* tiles = (TileNode*)trap->Zone_Alloc(sizeof(TileNode)*pfd->head.numTiles, "tiles");
 		for(int j = 0; j < pfd->head.numTiles; j++) {
 			auto tile = pfd->tileBlocks[j];
-			tiles[j].x = tile.x + rtMap.x + (i % rtRoomGrid.sizeX);
-			tiles[j].y = tile.y + rtMap.y + ((int)floor((float)i / rtRoomGrid.sizeX));
+			int roomOffsetX = (i % rtRoomGrid.sizeX) + (ptRoom->x * rtRoomGrid.sizeX);
+			int roomOffsetY = ((int)floor((float)i / rtRoomGrid.sizeX)) + (ptRoom->y * rtRoomGrid.sizeY);
+			tiles[j].x = tile.x + rtMap.x + roomOffsetX - ptRoom->x;
+			tiles[j].y = tile.y + rtMap.y + roomOffsetY - ptRoom->y;
 			tiles[j].w = tiles[j].h = 1;
 			tiles[j].ptTile = ptDungeonManager->GetTileByName(tile.lookup);
 			if(tiles[j].ptTile == nullptr) {
@@ -339,10 +342,12 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 			rtMap.qtTileTree.AddNode(&(tiles[j]));
 		}
 
-		for(int j = 0; j < pfd->head.numEntities; i++) {
+		for(int j = 0; j < pfd->head.numEntities; j++) {
 			auto loadedEnt = pfd->entities[j];
-			Entity* ent = ptDungeonManager->GenerateEntity(loadedEnt.lookup, loadedEnt.x + rtMap.x + (i % rtRoomGrid.sizeX), loadedEnt.y + rtMap.y + floor((float)i / rtRoomGrid.sizeX),
-				loadedEnt.spawnflags, rtMap.iAct);
+			float roomOffsetX = (i % rtRoomGrid.sizeX) + (ptRoom->x * rtRoomGrid.sizeX) - ptRoom->x;
+			float roomOffsetY = floor((float)i / rtRoomGrid.sizeX) + (ptRoom->y * rtRoomGrid.sizeY) - ptRoom->y;
+			Entity* ent = ptDungeonManager->GenerateEntity(loadedEnt.lookup, loadedEnt.x + rtMap.x + roomOffsetX, 
+				loadedEnt.y + rtMap.y + roomOffsetY, loadedEnt.spawnflags, rtMap.iAct);
 			Worldspace* ptWorld = ptDungeonManager->GetWorld(rtMap.iAct);
 			ptWorld->SpawnEntity(ent, ent->bShouldWeRender, ent->bShouldWeThink, ent->bShouldWeCollide);
 			ent->ptContainingTree = rtMap.qtEntTree.AddNode(ent);
@@ -367,5 +372,4 @@ void RandomizeDungeon(MazeFramework* ptFramework, Map& rtMap, DungeonManager* pt
 	randomizeDungeonFuncs[ptFramework->algorithm](ptFramework, rtMap, rg);
 	linkDungeonFuncs[ptFramework->algorithm](ptFramework, rtMap, rg);
 	Maze_Build(ptFramework, rtMap, rg, ptDungeonManager);
-	trap->Zone_FastFree(rg.roomArray, "roomgrid");
 }

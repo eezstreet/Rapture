@@ -60,7 +60,12 @@ namespace Zone {
 	// free some zone memory (quicker but still SLOW and not recommended)
 	void MemoryManager::FastFree(void* memory, const string& tag) {
 		try {
-			auto mpair = zone[tag].zone.find(memory)->second;
+			auto memblock = zone[tag].zone.find(memory);
+			if(memblock == zone[tag].zone.end()) {
+				R_Printf("WARNING: could not dealloc memory block at 0x%X, memory not allocated!\n", (unsigned int)memory);
+				return;
+			}
+			auto mpair = memblock->second;
 			zone[tag].zoneInUse -= mpair.memInUse;
 			zone[tag].zone.erase(memory);
 			if(!mpair.isClassObject)

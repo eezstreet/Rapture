@@ -203,7 +203,6 @@ void MapLoader::LoadPreset(const string& path) {
 		trap->Zone_FastFree(pfd, "pfd");
 		return;
 	}
-	R_Printf("DEBUG: Loading BDF (%s): %s\n", path.c_str(), pfd->head.lookup);
 
 #ifdef BIG_ENDIAN
 	// read: i'm an idiot.
@@ -257,7 +256,6 @@ void MapLoader::LoadPreset(const string& path) {
 	trap->CloseFile(file);
 
 	mPfd[pfd->head.lookup] = pfd;
-	R_Printf("DEBUG: Loaded %s\n", pfd->head.lookup);
 }
 
 void MapLoader::LoadPresets(const char* path) {
