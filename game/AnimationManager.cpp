@@ -77,7 +77,7 @@ bool AnimationManager::Finished() {
 void AnimationManager::SetSequence(const char* sSequence) {
 	auto it = ptSequences->find(sSequence);
 	if(it == ptSequences->end()) {
-		R_Printf("WARNING: bad sequence change (got: %s)\n", sSequence);
+		R_Message(PRIORITY_WARNING, "WARNING: bad sequence change (got: %s)\n", sSequence);
 		return;
 	}
 	sCurrentSequence = sSequence;
@@ -95,7 +95,7 @@ AnimationManager* AnimationManager::GetAnimInstance(const char* sRef, const char
 	}
 	Material* ptMat = mats->GetMaterial(sMaterial);
 	if(ptMat == nullptr) {
-		R_Printf("AnimationManager::GetAnimInstance: couldn't find material '%s'\n", sMaterial);
+		R_Message(PRIORITY_WARNING, "AnimationManager::GetAnimInstance: couldn't find material '%s'\n", sMaterial);
 		return nullptr;
 	}
 	AnimationManager* ptManager = new AnimationManager(&ptMat->mSequences, &ptMat->sd);
@@ -106,7 +106,7 @@ AnimationManager* AnimationManager::GetAnimInstance(const char* sRef, const char
 void AnimationManager::KillAnimInstance(const char* sRef) {
 	auto it = mAnimInstances.find(sRef);
 	if(it == mAnimInstances.end()) {
-		R_Printf("WARNING: cannot kill anim instance %s due to missing ref\n", sRef);
+		R_Message(PRIORITY_WARNING, "WARNING: cannot kill anim instance %s due to missing ref\n", sRef);
 		return;
 	}
 	delete it->second;

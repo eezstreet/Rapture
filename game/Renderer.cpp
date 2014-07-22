@@ -56,18 +56,16 @@ namespace RenderCode {
 	}
 
 	void Initialize() {
-		Sys_InitViewlog();
-
-		R_Printf("Initializing renderer\n");
+		R_Message(PRIORITY_NOTE, "Initializing renderer\n");
 		InitCvars();
 
-		R_Printf("SDL_Init()\n");
+		R_Message(PRIORITY_NOTE, "SDL_Init()\n");
 		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0) {
 			printf("could not init SDL (error code: %s)\n", SDL_GetError());
 			return;
 		}
 
-		R_Printf("SDL_CreateWindow()\n");
+		R_Message(PRIORITY_NOTE, "SDL_CreateWindow()\n");
 		window = SDL_CreateWindow(r_windowtitle->String(),
 										SDL_WINDOWPOS_CENTERED, 
 										SDL_WINDOWPOS_CENTERED,
@@ -80,8 +78,6 @@ namespace RenderCode {
 			return;
 		}
 
-		viewlog->TestViewlogShow();
-
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 		if(renderer == NULL) {
 			SDL_Quit();
@@ -91,7 +87,7 @@ namespace RenderCode {
 		SDL_RendererInfo info;
 		SDL_GetRendererInfo(renderer, &info);
 		if(info.flags & SDL_RENDERER_SOFTWARE) {
-			R_Printf("WARNING: Using software renderer due to hardware fallback. Performance will suffer.\n");
+			R_Message(PRIORITY_WARNING, "WARNING: Using software renderer due to hardware fallback. Performance will suffer.\n");
 		}
 		if(!(info.flags & SDL_RENDERER_TARGETTEXTURE)) {
 			R_Error("ERROR: Renderer does not support render-to-texture. Game will not run.");
@@ -111,14 +107,14 @@ namespace RenderCode {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
 		int flags = IMG_INIT_JPG|IMG_INIT_PNG;
-		R_Printf("IMG_Init()\n");
+		R_Message(PRIORITY_NOTE, "IMG_Init()\n");
 		if((IMG_Init(flags) & flags) != flags) {
-			R_Printf("FAILED! %s\n", IMG_GetError());
+			R_Message(PRIORITY_ERROR, "FAILED! %s\n", IMG_GetError());
 		}
 
 		SDL_SetRenderTarget(renderer, NULL);
 
-		R_Printf("Init font\n");
+		R_Message(PRIORITY_NOTE, "Init font\n");
 		for(int i = 0; i < MAX_TEXTRENDER; i++) {
 			textFields[i] = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, r_width->Integer(), r_height->Integer() );
 		}
@@ -150,7 +146,7 @@ namespace RenderCode {
 		}
 
 		if(!bSilent) {
-			R_Printf("IMG_Quit()\n");
+			R_Message(PRIORITY_NOTE, "IMG_Quit()\n");
 		}
 		IMG_Quit();
 		for(auto it = images.begin(); it != images.end(); ++it) {
@@ -159,7 +155,7 @@ namespace RenderCode {
 		images.clear();
 
 		if(!bSilent) {
-			R_Printf("gamma ramp down--\n");
+			R_Message(PRIORITY_NOTE, "gamma ramp down--\n");
 		}
 		unsigned short ramp[256];
 		SDL_CalculateGammaRamp(1.0f, ramp);
@@ -188,10 +184,10 @@ namespace RenderCode {
 		const string path = File::GetFileSearchPath(filename);
 		SDL_SaveBMP(screenshot, path.c_str()); 
 		if(true) {
-			R_Printf("Screenshot: %s\n", filename.c_str());
+			R_Message(PRIORITY_MESSAGE, "Screenshot: %s\n", filename.c_str());
 		}
 		else {
-			R_Printf("Could not write %s\n", filename.c_str());
+			R_Message(PRIORITY_WARNING, "Could not write %s\n", filename.c_str());
 		}
 
 		delete[] pixels;
@@ -472,12 +468,12 @@ namespace RenderCode {
 	}
 
 	void InitMaterials() {
-		R_Printf("Initializing materials..\n");
+		R_Message(PRIORITY_NOTE, "Initializing materials..\n");
 		mats = new MaterialHandler();
 	}
 
 	void ShutdownMaterials() {
-		R_Printf("Freeing materials..\n");
+		R_Message(PRIORITY_NOTE, "Freeing materials..\n");
 		delete mats;
 	}
 
@@ -524,7 +520,7 @@ namespace RenderCode {
 		colorForeground.r = fr; colorForeground.g = fg; colorForeground.b = fb; colorForeground.a = 255;
 		SDL_Surface* surf = TTF_RenderText_Shaded(font->GetFont(), text, colorBackground, colorForeground);
 		if(surf == NULL) {
-			R_Printf("%s\n", SDL_GetError());
+			R_Message(PRIORITY_ERROR, "%s\n", SDL_GetError());
 			return;
 		}
 

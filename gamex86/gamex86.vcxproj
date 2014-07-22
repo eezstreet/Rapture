@@ -77,7 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\game\r_shared.cpp" />
+    <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\modcode\Actor.cpp" />
     <ClCompile Include="..\modcode\Client.cpp" />

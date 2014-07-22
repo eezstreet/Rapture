@@ -34,7 +34,7 @@ namespace Cmd {
 	void ListCommands() {
 		bool bFoundCommand = true;
 		for(string s = GetFirstCommand(bFoundCommand); bFoundCommand; s = GetNextCommand(s, bFoundCommand)) {
-			R_Printf("%s\n", s.c_str());
+			R_Message(PRIORITY_MESSAGE, "%s\n", s.c_str());
 		}
 	}
 
@@ -52,7 +52,7 @@ namespace Cmd {
 		else if(CvarSystem::ProcessCvarCommand(arguments[0], arguments)) {
 			return;
 		}
-		R_Printf("unknown cmd '%s'\n", arguments[0].c_str());
+		R_Message(PRIORITY_MESSAGE, "unknown cmd '%s'\n", arguments[0].c_str());
 	}
 
 	void AddCommand(const string& cmdName, conCmd_t cmd) {
@@ -99,7 +99,7 @@ namespace Cmd {
 		}
 
 		if(vFoundElements.size() <= 0) {
-			R_Printf("No commands found.\n");
+			R_Message(PRIORITY_MESSAGE, "No commands found.\n");
 			return input;
 		}
 
@@ -133,7 +133,7 @@ namespace Cmd {
 			}
 		}
 		if(retVal.size() >= 128) {
-			R_Printf("Command too large to process.\n");
+			R_Message(PRIORITY_MESSAGE, "Command too large to process.\n");
 			vector<string> returnValue;
 			returnValue.push_back(str);
 			return returnValue;

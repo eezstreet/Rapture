@@ -35,22 +35,22 @@ RightClickCallback rccb = NULL;
 
 /* UI Class */
 void UI::Initialize() {
-	R_Printf("UI::Initialize()\n");
+	R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
 	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
 		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
 			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
 	}
 	lastActiveLayer = 0;
 
-	R_Printf("Initializing Awesomium Webcore\n");
+	R_Message(PRIORITY_NOTE, "Initializing Awesomium Webcore\n");
 	WebConfig x;
 	x.log_level = Awesomium::kLogLevel_Verbose;
 	wc = WebCore::Initialize(x);
-	R_Printf("Creating web session\n");
+	R_Message(PRIORITY_NOTE, "Creating web session\n");
 	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), WebPreferences());
-	R_Printf("creating main menu webview\n");
+	R_Message(PRIORITY_NOTE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
-	R_Printf("CreateConsole()\n");
+	R_Message(PRIORITY_NOTE, "CreateConsole()\n");
 	Console::GetSingleton();
 }
 
@@ -92,7 +92,7 @@ void UI::Render() {
 			unsigned char* pixels;
 			int pitch;
 			if(SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch) < 0) {
-				R_Printf("Failed to lock texture: %s\n", SDL_GetError());
+				R_Message(PRIORITY_ERROR, "Failed to lock texture: %s\n", SDL_GetError());
 				return;
 			}
 			bmp->CopyTo(pixels, pitch, 4, false, false);
@@ -109,7 +109,7 @@ void UI::RunJavaScript(Menu* ptMenu, const char* sJS) {
 	if(!ptMenu) {
 		return;
 	}
-	//R_Printf("Executing JavaScript: %s\n", sJS);
+	//R_Message("Executing JavaScript: %s\n", sJS);
 	ptMenu->RunJavaScript(sJS);
 }
 

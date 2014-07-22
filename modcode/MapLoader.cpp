@@ -218,7 +218,7 @@ void MapLoader::LoadPreset(const string& path) {
 	}
 
 	if(trap->GetFileSize(file) <= 0) {
-		R_Printf("WARNING: BDF file (%s) is empty!\n", path.c_str());
+		R_Message(PRIORITY_WARNING, "WARNING: BDF file (%s) is empty!\n", path.c_str());
 		trap->CloseFile(file);
 		trap->Zone_FastFree(pfd, "pfd");
 		return;
@@ -227,7 +227,7 @@ void MapLoader::LoadPreset(const string& path) {
 	// Take care of the (constant) header
 	trap->ReadBinary(file, (unsigned char*)&pfd->head, sizeof(pfd->head), false);
 	if(strnicmp(pfd->head.header, "DRLG.BDF", sizeof(pfd->head.header))) {
-		R_Printf("WARNING: BDF file (%s) contains invalid header! (found: \"%s\", expected \"DRLG.BDF\")\n",
+		R_Message(PRIORITY_WARNING, "WARNING: BDF file (%s) contains invalid header! (found: \"%s\", expected \"DRLG.BDF\")\n",
 			path.c_str(), pfd->head.header);
 		trap->CloseFile(file);
 		trap->Zone_FastFree(pfd, "pfd");
@@ -235,7 +235,7 @@ void MapLoader::LoadPreset(const string& path) {
 	}
 
 	if(pfd->head.version != 1) { // TODO: use proper compare
-		R_Printf("WARNING: BDF file (%s) uses invalid version number! (%i)\n",
+		R_Message(PRIORITY_WARNING, "WARNING: BDF file (%s) uses invalid version number! (%i)\n",
 			path.c_str(), pfd->head.version);
 		trap->CloseFile(file);
 		trap->Zone_FastFree(pfd, "pfd");
@@ -255,7 +255,7 @@ void MapLoader::LoadPreset(const string& path) {
 
 	if(pfd->head.numTiles == 0 && pfd->head.numEntities == 0) {
 		// Don't try to alloc zero memory..
-		R_Printf("WARNING: no entities or tiles in %s..not loading\n", path.c_str());
+		R_Message(PRIORITY_WARNING, "WARNING: no entities or tiles in %s..not loading\n", path.c_str());
 		trap->CloseFile(file);
 		trap->Zone_FastFree(pfd, "pfd");
 		return;
@@ -314,7 +314,7 @@ void MapLoader::LoadPresets(const char* path) {
 		LoadPreset(paths[i]);
 	}
 
-	R_Printf("Loaded %i presets\n", numFiles);
+	R_Message(PRIORITY_NOTE, "Loaded %i presets\n", numFiles);
 	trap->FreeFileList(paths, numFiles);
 }
 

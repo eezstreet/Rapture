@@ -24,12 +24,12 @@ void Editor_Load() {
 }
 
 void Editor_Init() {
-	trap->printf("--- Editor Begin ---\n");
+	trap->printf(PRIORITY_NOTE, "--- Editor Begin ---\n");
 	Editor_Load();
 }
 
 void Editor_Shutdown() {
-	trap->printf("--- Editor Exit ---\n");
+	trap->printf(PRIORITY_NOTE, "--- Editor Exit ---\n");
 	trap->KillStaticMenu(hotkeyDisplay);
 	trap->ShutdownMaterials();
 }

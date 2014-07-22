@@ -90,7 +90,7 @@ void Sys_PrintSDLVersion() {
 	SDL_version ver;
 	SDL_VERSION(&ver);
 
-	R_Printf("using SDL %u.%u.%u\n", ver.major, ver.minor, ver.patch);
+	R_Message(PRIORITY_NOTE, "using SDL %u.%u.%u\n", ver.major, ver.minor, ver.patch);
 }
 
 /* RaptureGame class, this does all the heavy lifting */
@@ -98,9 +98,9 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	game = NULL;
 	editor = NULL;
 
-	Sys_PrintSDLVersion();
+	ptDispatch = new Dispatch(0, 0, 0);
 
-	Sys_InitViewlog();
+	Sys_PrintSDLVersion();
 
 	// init cmds
 	Sys_InitCommands();
@@ -113,6 +113,9 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 
 	// Init filesystem
 	FileSystem::Init();
+
+	// Setup the dispatch system
+	ptDispatch->Setup();
 
 	// Read from the config
 	Cmd::ProcessCommand("exec raptureconfig.cfg");
@@ -149,6 +152,7 @@ RaptureGame::~RaptureGame() {
 	DeleteInput();
 	RenderCode::Exit();
 	CvarSystem::Destroy();
+	delete ptDispatch;
 	FileSystem::Shutdown();
 	Zone::Shutdown();
 }
@@ -194,7 +198,7 @@ void RaptureGame::PassQuitEvent() {
 /* Set up common exports which are used in both the game and the editor */
 extern bool IsConsoleOpen();
 void RaptureGame::AssignExports(gameImports_s *imp) {
-	imp->printf = R_Printf;
+	imp->printf = R_Message;
 	imp->error = R_Error;
 	imp->GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
 	imp->OpenFile = FileSystem::EXPORT_OpenFile;
@@ -275,7 +279,7 @@ gameExports_s* RaptureGame::GetImport() {
 
 /* Some shared functions */
 #include "ui_local.h"
-void R_Printf(const char *fmt, ...) {
+void R_Message(int iPriority, const char *fmt, ...) {
 	va_list args;
 	char str[1024];
 
@@ -283,8 +287,9 @@ void R_Printf(const char *fmt, ...) {
 	vsnprintf(str, 1024, fmt, args);
 	va_end(args);
 
+	ptDispatch->PrintMessage(iPriority, str);
+
 	Console::PushConsoleMessage(str);
-	Sys_PassToViewlog(str);
 }
 
 void NewGame() {
@@ -324,6 +329,6 @@ void ReturnToMain() {
 		delete sys->editor;
 		sys->editor = NULL;
 	}
-	R_Printf("creating main menu webview\n");
+	R_Message(PRIORITY_MESSAGE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
 }

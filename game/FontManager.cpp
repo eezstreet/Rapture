@@ -16,14 +16,14 @@ Font::~Font() {
 
 void Font::LoadFont(const char* sFontFile, int iPointSize) {
 	if(ptFont != NULL) {
-		R_Printf("WARNING: attempted to reload font %s\n", sFontFile);
+		R_Message(PRIORITY_WARNING, "WARNING: attempted to reload font %s\n", sFontFile);
 		return;
 	}
 
 	// We need to load the actual file using FS and then run it through TTF.
 	File* file = File::Open(sFontFile, "r");
 	if(file == NULL) {
-		R_Printf("WARNING: could not read font %s\n", sFontFile);
+		R_Message(PRIORITY_WARNING, "WARNING: could not read font %s\n", sFontFile);
 		return;
 	}
 
@@ -34,7 +34,7 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 	ptFont = TTF_OpenFontRW(rw, 1, iPointSize);
 	//delete[] bytes;
 	if(!ptFont) {
-		R_Printf("WARNING: could not read font %s: %s\n", sFontFile, SDL_GetError());
+		R_Message(PRIORITY_WARNING, "WARNING: could not read font %s: %s\n", sFontFile, SDL_GetError());
 		ptFont = NULL;
 		return;
 	}
@@ -43,7 +43,7 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 
 Font* Font::Register(const char* sFontFile, int iPointSize) {
 	if(!FontMan) {
-		R_Printf("Couldn't load %s (font manager not loaded)\n");
+		R_Message(PRIORITY_ERROR, "Couldn't load %s (font manager not loaded)\n");
 		return NULL;
 	}
 	return FontMan->RegisterFont(sFontFile, iPointSize);

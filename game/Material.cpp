@@ -42,7 +42,7 @@ void Material::LoadResources() {
 	// Load diffuse map
 	SDL_Surface* temp = IMG_Load(File::GetFileSearchPath(resourceFile).c_str());
 	if(!temp) {
-		R_Printf("WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
+		R_Message(PRIORITY_WARNING, "WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
 		bLoadedResources = false;
 		bLoadedIncorrectly = true;
 		return;
@@ -55,7 +55,7 @@ void Material::LoadResources() {
 	if(bHasTransparencyMap) {
 		temp = IMG_Load(File::GetFileSearchPath(transResourceFile).c_str());
 		if(!temp) {
-			R_Printf("WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
+			R_Message(PRIORITY_WARNING, "WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
 			bHasTransparencyMap = false;
 		} else {
 			ptTransResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);

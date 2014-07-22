@@ -10,12 +10,12 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 template <class T>
 bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, jsonParseFunc>& parsers, vector<T>& out) {
 	if(!filename || !filename[0]) {
-		R_Printf("JSON_ParseMultifile: bad filename sent\n");
+		R_Message(PRIORITY_WARNING, "JSON_ParseMultifile: bad filename sent\n");
 		return false;
 	}
 	File* file = trap->OpenFile(filename, "rb");
 	if(!file) {
-		R_Printf("JSON_ParseMultifile: could not open file %s\n", filename);
+		R_Message(PRIORITY_WARNING, "JSON_ParseMultifile: could not open file %s\n", filename);
 		return false;
 	}
 	string s = trap->ReadPlaintext(file, 0);
@@ -24,7 +24,7 @@ bool JSON_ParseMultifile(const char* filename, const unordered_map<const char*, 
 	char error[1024] = {0};
 	cJSON* root = cJSON_ParsePooled(s.c_str(), error, sizeof(error));
 	if(error[0] || !root) {
-		R_Printf("ERROR: %s: %s\n", filename, error);
+		R_Message(PRIORITY_ERROR, "ERROR: %s: %s\n", filename, error);
 		return false;
 	}
 	int i = 0;

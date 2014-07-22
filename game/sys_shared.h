@@ -12,6 +12,7 @@
 #include <sstream>
 #include <algorithm>
 #include <map>
+#include <regex>
 #include <dirent.h>
 #include <functional>
 #include <time.h>
@@ -21,6 +22,8 @@ using namespace std;
 #ifdef _WIN32
 #pragma warning(disable: 4996)
 #endif
+
+#define MAX_HANDLE_STRING	64
 
 vector<string>& split(const string& str, const char delim, vector<string>& elems);
 vector<wstring>& split(const wstring& str, const wchar_t delim);
@@ -45,9 +48,20 @@ class Material;
 class Cvar;
 class AnimationManager;
 
+enum {
+	PRIORITY_NONE,
+	PRIORITY_NOTE,
+	PRIORITY_DEBUG,
+	PRIORITY_MESSAGE,
+	PRIORITY_WARNING,
+	PRIORITY_ERROR,
+	PRIORITY_ERRFATAL,
+	PRIORITY_MAX
+};
+
 struct gameImports_s {
 	// Logging
-	void (*printf)(const char* fmt, ...);
+	void (*printf)(int iPriority, const char* fmt, ...);
 	void (*error)(const char* fmt, ...);
 
 	// Time
@@ -130,8 +144,7 @@ struct gameExports_s {
 };
 
 // sys_main.cpp
-void R_Printf(const char *fmt, ...);
-void R_Error(const char *fmt, ...);
+void R_Message(int iPriority, const char *fmt, ...);
 
 // Erases an item from a vector provided that the vector contains all unique elements.
 template <typename T>

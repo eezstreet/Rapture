@@ -11,7 +11,7 @@ DungeonManager* ptDungeonManager;
 #define DEF_SPAWN_FUNC(x)	mSpawnFuncs["" #x ""] = ##x##::spawnme
 DungeonManager::DungeonManager() {
 	// Initialize the DungeonManager, creating all the spawn funcs and initializing zone memory
-	R_Printf("loading dungeons...\n");
+	R_Message(PRIORITY_NOTE, "loading dungeons...\n");
 	ptMapLoader = new MapLoader("levels/preset", "levels/tiles");
 
 	DEF_SPAWN_FUNC(info_player_start);
@@ -49,7 +49,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 	// Locate the pfd in storage
 	const PresetFileData* pfd = ptMapLoader->FindPresetByName(ptFramework->dataPreset.preset);
 	if(!pfd) {
-		R_Printf("WARNING: Couldn't find pfd: %s\n", ptFramework->dataPreset.preset);
+		R_Message(PRIORITY_WARNING, "WARNING: Couldn't find pfd: %s\n", ptFramework->dataPreset.preset);
 		return;
 	}
 
@@ -66,7 +66,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 			v[i].ptTile = ptMapLoader->FindTileByName(tile.lookup);
 			v[i].rt = (tileRenderType_e)tile.rt;
 			if(v[i].ptTile == NULL) {
-				R_Printf("Cannot find tile %s\n", tile.lookup);
+				R_Message(PRIORITY_WARNING, "Cannot find tile %s\n", tile.lookup);
 				return;
 			}
 			// Add the tile to the map
@@ -80,7 +80,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 		// Spawn an instance of the entity by calling its ::spawnme function
 		Entity* ent = GenerateEntity(loadedEnt.lookup, loadedEnt.x + ptFramework->iWorldspaceX, loadedEnt.y + ptFramework->iWorldspaceY, loadedEnt.spawnflags, ptFramework->iAct);
 		if(!ent) {
-			R_Printf("%s does not have a spawn function\n", loadedEnt.lookup);
+			R_Message(PRIORITY_WARNING, "%s does not have a spawn function\n", loadedEnt.lookup);
 			continue;
 		}
 		// Actually call its spawn() function

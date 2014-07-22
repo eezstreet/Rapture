@@ -1,4 +1,4 @@
-#include "win32_local.h"
+#include "sys_local.h"
 #include <direct.h>
 #include <process.h>
 
@@ -58,7 +58,7 @@ void Sys_SendToClipboard(string text) {
 	}
 	HGLOBAL hMem =  GlobalAlloc(GMEM_MOVEABLE, text.length());
 	if(hMem == 0) {
-		R_Printf("Sys_SendToClipboard: couldn't GlobalAlloc (out of memory?)\n");
+		R_Message(PRIORITY_ERROR, "Sys_SendToClipboard: couldn't GlobalAlloc (out of memory?)\n");
 		return;
 	}
 	memcpy(GlobalLock(hMem), text.c_str(), text.length());
@@ -74,14 +74,14 @@ ptModule Sys_LoadLibrary(string name) {
 	string filepath = File::GetFileSearchPath(name);
 	ptModule hLib = (ptModule)LoadLibrary(filepath.c_str());
 	if(!hLib) {
-		R_Printf("module load failure: %i\n", GetLastError());
+		R_Message(PRIORITY_ERROR, "module load failure: %i\n", GetLastError());
 	}
 	return hLib;
 }
 
 void Sys_FreeLibrary(ptModule module) {
 	if(!module) {
-		R_Printf("attempted to free library which doesn't exist!\n");
+		R_Message(PRIORITY_ERROR, "attempted to free library which doesn't exist!\n");
 		return;
 	}
 	FreeLibrary((HMODULE)module);
@@ -113,13 +113,10 @@ void Sys_Error(const char* error, ...) {
 	va_start (argptr, error);
 	vsnprintf(text, sizeof(text), error, argptr);
 	va_end (argptr);
-	R_Printf(text);
-	R_Printf("\n");
+	R_Message(PRIORITY_ERRFATAL, text);
+	R_Message(PRIORITY_MESSAGE, "\n");
 
 	RenderCode::Exit(true);
-
-	viewlog->SetErrorText(text);
-	viewlog->Show();
 
 	setGameQuitting(false);
 	throw false;

@@ -481,6 +481,29 @@ public:
 
 
 //
+// Dispatch.cpp
+//
+class Dispatch {
+private:
+	File* ptLogFile;
+
+	int iHiddenMask;
+	int iShutdownMask;
+	int iMessageMask;
+public:
+	Dispatch(const int _iHiddenMask, const int _iShutdownMask, const int _iMessageMask);
+	void CatchError();
+	void PrintMessage(const int iPriority, const char* message);
+	void Setup();
+	~Dispatch();
+
+	static void ChangeHiddenMask(int newValue);
+	static void ChangeShutdownMask(int newValue);
+	static void ChangeMessageMask(int newValue);
+};
+extern Dispatch* ptDispatch;
+
+//
 // FrameCapper.cpp
 //
 class FrameCapper {
@@ -493,25 +516,6 @@ public:
 	void EndFrame();
 	FrameCapper();
 };
-
-
-//
-// Viewlog (shared)
-//
-class Viewlog {
-protected:
-	Cvar* cvViewlog;
-	bool bIsShown;
-	bool bIsError;
-	string errorText;
-public:
-	virtual void SetErrorText(const string& message) = 0;
-	virtual void Show() = 0;
-	virtual void Hide() = 0;
-	virtual void TestViewlogShow() = 0;
-};
-extern Viewlog* viewlog;
-void Sys_InitViewlog();
 
 void setGameQuitting(const bool b);
 
@@ -536,4 +540,3 @@ void Sys_FreeLibrary(ptModule module);
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
-void Sys_PassToViewlog(const char* text);

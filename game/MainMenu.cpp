@@ -5,14 +5,14 @@ using namespace Awesomium;
 MainMenu* MainMenu::singleton = NULL;
 
 MainMenu::MainMenu() {
-	R_Printf("Loading main menu...");
+	R_Message(PRIORITY_NOTE, "Loading main menu...");
 	string mainFileName = "file://" + File::GetFileSearchPath("ui/main.html");
 	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
 	// TODO: refactor all of this into a inherited func
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	while(wView->IsLoading())
 		wc->Update();
-	R_Printf("done.\n");
+	R_Message(PRIORITY_NOTE, "done.\n");
 	AddRenderable(wView);
 	currentFocus = wView;
 	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));

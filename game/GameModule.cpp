@@ -3,7 +3,7 @@
 GameModule::GameModule(string module) {
 	ptModuleHandle = Sys_LoadLibrary(module);
 	if(ptModuleHandle == NULL) {
-		R_Printf("FATAL: GameModule failed to load\n");
+		R_Message(PRIORITY_ERRFATAL, "FATAL: GameModule failed to load\n");
 	}
 }
 

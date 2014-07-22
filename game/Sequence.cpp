@@ -7,7 +7,7 @@ void Sequence::Parse(void* in) {
 
 	node = cJSON_GetObjectItem(root, "name");
 	if(!node) {
-		R_Printf("WARNING: Sequence without name\n");
+		R_Message(PRIORITY_WARNING, "WARNING: Sequence without name\n");
 		return;
 	} else {
 		strncpy(name, cJSON_ToString(node), sizeof(name));

@@ -253,7 +253,7 @@ void Cvar::SetValue(char* value) {
 	if(type != CV_STRING) return; 
 	strncpy(s.currentVal, value, sizeof(s.currentVal)); 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
-		R_Printf("%s changed to %s\n", name.c_str(), value); 
+		R_Message(PRIORITY_NOTE, "%s changed to %s\n", name.c_str(), value); 
 	RunCallback();
 }
 
@@ -261,7 +261,7 @@ void Cvar::SetValue(int value) {
 	if(type != CV_INTEGER) return; 
 	i.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
-		R_Printf("%s changed to %i\n", name.c_str(), value); 
+		R_Message(PRIORITY_NOTE, "%s changed to %i\n", name.c_str(), value); 
 	RunCallback();
 }
 
@@ -269,7 +269,7 @@ void Cvar::SetValue(float value) {
 	if(type != CV_FLOAT) return; 
 	v.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
-		R_Printf("%s changed to %f\n", name.c_str(), value); 
+		R_Message(PRIORITY_NOTE, "%s changed to %f\n", name.c_str(), value); 
 	RunCallback();
 }
 
@@ -277,7 +277,7 @@ void Cvar::SetValue(bool value) {
 	if(type != CV_BOOLEAN) return; 
 	b.currentVal = value; 
 	if(flags & (1 << CVAR_ANNOUNCE)) 
-		R_Printf("%s changed to %s\n", name.c_str(), btoa(value)); 
+		R_Message(PRIORITY_NOTE, "%s changed to %s\n", name.c_str(), btoa(value)); 
 	RunCallback();
 }
 

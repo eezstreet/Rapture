@@ -62,7 +62,7 @@ namespace Zone {
 		try {
 			auto memblock = zone[tag].zone.find(memory);
 			if(memblock == zone[tag].zone.end()) {
-				R_Printf("WARNING: could not dealloc memory block at 0x%X, memory not allocated!\n", (unsigned int)memory);
+				R_Message(PRIORITY_WARNING, "WARNING: could not dealloc memory block at 0x%X, memory not allocated!\n", (unsigned int)memory);
 				return;
 			}
 			auto mpair = memblock->second;
@@ -122,7 +122,7 @@ namespace Zone {
 	}
 
 	MemoryManager::MemoryManager() {
-		R_Printf("Initializing zone memory\n");
+		R_Message(PRIORITY_NOTE, "Initializing zone memory\n");
 	}
 
 	MemoryManager::~MemoryManager() {
@@ -132,10 +132,10 @@ namespace Zone {
 	}
 
 	void MemoryManager::PrintMemUsage() {
-		R_Printf("\n%-10s %20s %20s %20s %20s %20s %20s\n", "Tag", "Cur Usage (b)", "Cur Usage (KB)", "Cur Usage (MB)", "Peak Usage (b)", "Peak Usage (KB)", "Peak Usage (MB)");
-		R_Printf("%-10s %20s %20s %20s %20s %20s %20s\n", "-----", "-------------", "--------------", "--------------", "--------------", "---------------", "---------------");
+		R_Message(PRIORITY_MESSAGE, "\n%-10s %20s %20s %20s %20s %20s %20s\n", "Tag", "Cur Usage (b)", "Cur Usage (KB)", "Cur Usage (MB)", "Peak Usage (b)", "Peak Usage (KB)", "Peak Usage (MB)");
+		R_Message(PRIORITY_MESSAGE, "%-10s %20s %20s %20s %20s %20s %20s\n", "-----", "-------------", "--------------", "--------------", "--------------", "---------------", "---------------");
 		for(auto it = zone.begin(); it != zone.end(); ++it) {
-			R_Printf("%-10s %20i %20.2f %20.2f %20i %20.2f %20.2f\n", it->first.c_str(), it->second.zoneInUse, 
+			R_Message(PRIORITY_MESSAGE, "%-10s %20i %20.2f %20.2f %20i %20.2f %20.2f\n", it->first.c_str(), it->second.zoneInUse, 
 				(float)((double)it->second.zoneInUse/1024.0f), (float)((double)it->second.zoneInUse/1048576.0f),
 				it->second.peakUsage,
 				(float)((double)it->second.peakUsage/1024.0f), (float)((double)it->second.peakUsage/1048576.0f));
@@ -150,7 +150,7 @@ namespace Zone {
 	}
 
 	void Shutdown() {
-		R_Printf("Shutting down zone memory...");
+		R_Message(PRIORITY_MESSAGE, "Shutting down zone memory...");
 		delete mem; // yea fuck up dem peasant's RAM
 	}
 

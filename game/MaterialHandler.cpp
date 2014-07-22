@@ -16,14 +16,14 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 	cJSON* json = cJSON_ParsePooled(contents.c_str(), error, sizeof(error));
 	if(!json) {
 		Zone::FastFree(mat, "materials");
-		R_Printf("ERROR loading material %s: %s\n", matfile, error);
+		R_Message(PRIORITY_ERROR, "ERROR loading material %s: %s\n", matfile, error);
 		return;
 	}
 
 	cJSON* child = cJSON_GetObjectItem(json, "name");
 	if(!child) {
 		Zone::FastFree(mat, "materials");
-		R_Printf("WARNING: Material without name (%s)\n", matfile);
+		R_Message(PRIORITY_WARNING, "WARNING: Material without name (%s)\n", matfile);
 		strcpy(mat->name, matfile);
 	} else {
 		strcpy(mat->name, cJSON_ToString(child));
@@ -32,7 +32,7 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 	child = cJSON_GetObjectItem(json, "diffuseMap");
 	if(!child) {
 		Zone::FastFree(mat, "materials");
-		R_Printf("WARNING: %s doesn't have a diffuse map!\n", mat->name);
+		R_Message(PRIORITY_WARNING, "WARNING: %s doesn't have a diffuse map!\n", mat->name);
 	} else {
 		strcpy(mat->resourceFile, cJSON_ToString(child));
 	}
@@ -102,14 +102,14 @@ MaterialHandler::MaterialHandler() {
 	int numFiles = 0;
 	char** matFiles = FileSystem::EXPORT_ListFilesInDir("materials/", ".json", &numFiles);
 	if(numFiles == 0) {
-		R_Printf("WARNING: no materials loaded\n");
+		R_Message(PRIORITY_WARNING, "WARNING: no materials loaded\n");
 		return;
 	}
 	for(int i = 0; i < numFiles; i++) {
 		LoadMaterial(matFiles[i]);
 	}
 	FileSystem::FreeFileList(matFiles, numFiles);
-	R_Printf("Loaded %i materials\n", numFiles);
+	R_Message(PRIORITY_NOTE, "Loaded %i materials\n", numFiles);
 }
 
 MaterialHandler::~MaterialHandler() {
@@ -119,7 +119,7 @@ MaterialHandler::~MaterialHandler() {
 Material* MaterialHandler::GetMaterial(const char* material) {
 	auto found = materials.find(material);
 	if(found == materials.end()) {
-		R_Printf("WARNING: material '%s' not found\n", material);
+		R_Message(PRIORITY_WARNING, "WARNING: material '%s' not found\n", material);
 		return NULL;
 	}
 	return found->second;

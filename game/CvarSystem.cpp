@@ -24,7 +24,7 @@ void CvarSystem::CacheCvar(const string& sName, const string& sValue, bool bArch
 		cache[sName]->archive = bArchive;
 		cache[sName]->initvalue = sValue;
 	}
-	R_Printf("Caching cvar %s\n", sName.c_str());
+	R_Message(PRIORITY_NOTE, "Caching cvar %s\n", sName.c_str());
 }
 
 void CvarSystem::Cache_Free(const string& sName) {
@@ -131,7 +131,7 @@ string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand) {
 void CvarSystem::ListCvars() {
 	bool bFoundCommand = true;
 	for(string s = GetFirstCvar(bFoundCommand); bFoundCommand; s = GetNextCvar(s, bFoundCommand)) {
-		R_Printf("%s\n", s.c_str());
+		R_Message(PRIORITY_MESSAGE, "%s\n", s.c_str());
 	}
 }
 
@@ -143,24 +143,24 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 
 	Cvar* cvar = cv->second;
 	if(VArguments.size() == 1) {
-		R_Printf("%s\n", cvar->description.c_str());
+		R_Message(PRIORITY_MESSAGE, "%s\n", cvar->description.c_str());
 		switch(cvar->GetType()) {
 			case Cvar::CV_BOOLEAN:
 				{
 					string sCurrentValue = cvar->Bool() ? "true" : "false";
 					string sDefaultValue = cvar->DefaultBool() ? "true" : "false";
-					R_Printf("%s is %s, default: %s\n", sName.c_str(), sCurrentValue.c_str(), sDefaultValue.c_str());
+					R_Message(PRIORITY_MESSAGE, "%s is %s, default: %s\n", sName.c_str(), sCurrentValue.c_str(), sDefaultValue.c_str());
 				}
 				break;
 			case Cvar::CV_FLOAT:
-				R_Printf("%s is %f, default: %f\n", sName.c_str(), cvar->Value(), cvar->DefaultValue());
+				R_Message(PRIORITY_MESSAGE, "%s is %f, default: %f\n", sName.c_str(), cvar->Value(), cvar->DefaultValue());
 				break;
 			case Cvar::CV_INTEGER:
-				R_Printf("%s is %i, default: %i\n", sName.c_str(), cvar->Integer(), cvar->DefaultInteger());
+				R_Message(PRIORITY_MESSAGE, "%s is %i, default: %i\n", sName.c_str(), cvar->Integer(), cvar->DefaultInteger());
 				break;
 			default:
 			case Cvar::CV_STRING:
-				R_Printf("%s is \"%s\", default: \"%s\"\n", sName.c_str(), cvar->String(), cvar->DefaultString());
+				R_Message(PRIORITY_MESSAGE, "%s is \"%s\", default: \"%s\"\n", sName.c_str(), cvar->String(), cvar->DefaultString());
 				break;
 		}
 	} else {
@@ -186,15 +186,15 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 	if(!Cvar::Exists(name)) {
 		value = NULL;
-		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
 	if(value == NULL) {
-		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::BoolValue\n");
+		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::BoolValue\n");
 		return;
 	}
 	if(GetCvarType(name) != Cvar::CV_BOOLEAN) {
-		R_Printf("WARNING: cvar %s is not boolean type!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not boolean type!\n", name);
 		return;
 	}
 	bool retVal = GetBooleanValue(name);
@@ -204,15 +204,15 @@ void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 	if(!Cvar::Exists(name)) {
 		value = NULL;
-		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
 	if(value == NULL) {
-		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::IntValue\n");
+		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::IntValue\n");
 		return;
 	}
 	if(GetCvarType(name) != Cvar::CV_INTEGER) {
-		R_Printf("WARNING: cvar %s is not integral type!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not integral type!\n", name);
 		return;
 	}
 	int retVal = GetIntegerValue(name);
@@ -222,15 +222,15 @@ void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 	if(!Cvar::Exists(name)) {
 		value = NULL;
-		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
 	if(value == NULL) {
-		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::StrValue\n");
+		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::StrValue\n");
 		return;
 	}
 	if(GetCvarType(name) != Cvar::CV_STRING) {
-		R_Printf("WARNING: cvar %s is not a string!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not a string!\n", name);
 		return;
 	}
 	string retVal = GetStringValue(name);
@@ -240,15 +240,15 @@ void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 void CvarSystem::EXPORT_Value(const char* name, float* value) {
 	if(!Cvar::Exists(name)) {
 		value = NULL;
-		R_Printf("WARNING: cvar %s does not exist!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
 	if(value == NULL) {
-		R_Printf("WARNING: gamecode passed 'null' to CvarSystem::Value\n");
+		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::Value\n");
 		return;
 	}
 	if(GetCvarType(name) != Cvar::CV_FLOAT) {
-		R_Printf("WARNING: cvar %s is not floating point type!\n", name);
+		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not floating point type!\n", name);
 		return;
 	}
 	float retVal = GetFloatValue(name);

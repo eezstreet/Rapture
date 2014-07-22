@@ -86,6 +86,7 @@
     <ClCompile Include="..\game\Console.cpp" />
     <ClCompile Include="..\game\Cvar.cpp" />
     <ClCompile Include="..\game\CvarSystem.cpp" />
+    <ClCompile Include="..\game\Dispatch.cpp" />
     <ClCompile Include="..\game\FileSystem.cpp" />
     <ClCompile Include="..\game\FontManager.cpp" />
     <ClCompile Include="..\game\FrameCapper.cpp" />
@@ -97,14 +98,13 @@
     <ClCompile Include="..\game\MaterialHandler.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
-    <ClCompile Include="..\game\r_shared.cpp" />
+    <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\game\Sequence.cpp" />
     <ClCompile Include="..\game\sys_cmds.cpp" />
     <ClCompile Include="..\game\sys_main.cpp" />
     <ClCompile Include="..\game\sys_win32.cpp" />
     <ClCompile Include="..\game\Timer.cpp" />
     <ClCompile Include="..\game\ui_main.cpp" />
-    <ClCompile Include="..\game\win32_viewlog.cpp" />
     <ClCompile Include="..\game\Zone.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
   </ItemGroup>
@@ -115,7 +115,6 @@
     <ClInclude Include="..\game\tr_shared.h" />
     <ClInclude Include="..\game\ui_local.h" />
     <ClInclude Include="..\game\ui_shared.h" />
-    <ClInclude Include="..\game\win32_local.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

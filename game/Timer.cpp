@@ -27,10 +27,10 @@ void Timer::Stop() {
 
 void Timer::Pause() {
 	if(bIsPaused) {
-		R_Printf("WARNING: Timer '%s' attempted to re-pause! (@ ticks: %i)\n", sTimerName.c_str(), SDL_GetTicks());
+		R_Message(PRIORITY_WARNING, "WARNING: Timer '%s' attempted to re-pause! (@ ticks: %i)\n", sTimerName.c_str(), SDL_GetTicks());
 		return;
 	} else if(!bIsStarted) {
-		R_Printf("WARNING: Attempted to pause stopped timer '%s'!\n", sTimerName.c_str());
+		R_Message(PRIORITY_WARNING, "WARNING: Attempted to pause stopped timer '%s'!\n", sTimerName.c_str());
 		return;
 	}
 
@@ -41,10 +41,10 @@ void Timer::Pause() {
 
 void Timer::Unpause() {
 	if(!bIsPaused) {
-		R_Printf("WARNING: Attempted to unpause running timer '%s'\n", sTimerName.c_str());
+		R_Message(PRIORITY_WARNING, "WARNING: Attempted to unpause running timer '%s'\n", sTimerName.c_str());
 		return;
 	} else if(!bIsStarted) {
-		R_Printf("WARNING: Attempted to unpause stopped timer '%s'\n", sTimerName.c_str());
+		R_Message(PRIORITY_WARNING, "WARNING: Attempted to unpause stopped timer '%s'\n", sTimerName.c_str());
 		return;
 	}
 

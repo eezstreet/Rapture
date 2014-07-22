@@ -65,15 +65,15 @@ void Cmd_Seta_f(vector<string>& args) {
 
 void Cmd_Exec_f(vector<string>& args) {
 	if(args.size() < 2) {
-		R_Printf("usage: exec <filename.cfg>\n");
+		R_Message(PRIORITY_MESSAGE, "usage: exec <filename.cfg>\n");
 		return;
 	}
 	File* p = File::Open(args[1], "rb+");
 	if(p == NULL) {
-		R_Printf("could not exec %s\n", args[1].c_str());
+		R_Message(PRIORITY_MESSAGE, "could not exec %s\n", args[1].c_str());
 		return;
 	}
-	R_Printf("executing %s\n", args[1].c_str());
+	R_Message(PRIORITY_NOTE, "executing %s\n", args[1].c_str());
 	string text = p->ReadPlaintext();
 	p->Close();
 	Zone::FastFree(p, "files");
@@ -145,7 +145,7 @@ void Cmd_Echo_f(vector<string>& args) {
 		text += *it;
 		text += " ";
 	}
-	R_Printf("%s\n", text.c_str());
+	R_Message(PRIORITY_MESSAGE, "%s\n", text.c_str());
 }
 
 void Cmd_VidRestart_f(vector<string>& args) {

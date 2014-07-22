@@ -8,13 +8,13 @@ static int iLoadingScreen = 0;
 static Image* ptLoadScreenImage = NULL;
 
 void Game_Init() {
-	trap->printf("--- New Game ---\n");
+	trap->printf(PRIORITY_NOTE, "--- New Game ---\n");
 	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
 	iLoadingScreen = 1;
 }
 
 void Game_Shutdown() {
-	trap->printf("--- Quit Game ---\n");
+	trap->printf(PRIORITY_NOTE, "--- Quit Game ---\n");
 	trap->ShutdownMaterials();
 	delete thisClient;
 	delete ptDungeonManager;

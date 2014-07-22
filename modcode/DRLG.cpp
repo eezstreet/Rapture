@@ -401,10 +401,10 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 
 		PresetFileData* pfd = ptDungeonManager->GetPFD(preset);
 		if(!pfd) {
-			R_Printf("WARNING: couldn't find pfd: %s\n", preset.c_str());
+			R_Message(PRIORITY_WARNING, "WARNING: couldn't find pfd: %s\n", preset.c_str());
 			continue;
 		}
-		R_Printf("DRLG: requesting pfd resource %s\n", preset.c_str());
+		R_Message(PRIORITY_DEBUG, "DRLG: requesting pfd resource %s\n", preset.c_str());
 		TileNode* tiles = (TileNode*)trap->Zone_Alloc(sizeof(TileNode)*pfd->head.numTiles, "tiles");
 		for(int j = 0; j < pfd->head.numTiles; j++) {
 			auto tile = pfd->tileBlocks[j];
@@ -415,7 +415,7 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 			tiles[j].w = tiles[j].h = 1;
 			tiles[j].ptTile = ptDungeonManager->GetTileByName(tile.lookup);
 			if(tiles[j].ptTile == nullptr) {
-				R_Printf("WARNING: couldn't find tile %s in pfd %s\n", tile.lookup, preset.c_str());
+				R_Message(PRIORITY_WARNING, "WARNING: couldn't find tile %s in pfd %s\n", tile.lookup, preset.c_str());
 				continue;
 			}
 			tiles[j].rt = (tileRenderType_e)tile.rt;

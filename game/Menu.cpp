@@ -13,11 +13,11 @@ void EXPORT_execCommand(const JSArray& args) {
 
 bool CvarGet_IsValid(const JSArray& args) {
 	if(args.size() != 1) {
-		R_Printf("JS warning: getCvar bad arguments\n");
+		R_Message(PRIORITY_WARNING, "JS warning: getCvar bad arguments\n");
 		return false;
 	}
 	if(!args[0].IsString()) {
-		R_Printf("JS warning: getCvar arg not string\n");
+		R_Message(PRIORITY_WARNING, "JS warning: getCvar arg not string\n");
 		return false;
 	}
 	return true;
@@ -29,7 +29,7 @@ JSValue EXPORT_getCvarString(const JSArray& args) {
 	string cvarName = ToString(args[0].ToString());
 	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
 	if(type != Cvar::CV_STRING) {
-		R_Printf("JS warning: getCvarString: cvar %s is not string type\n", cvarName.c_str());
+		R_Message(PRIORITY_WARNING, "JS warning: getCvarString: cvar %s is not string type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
 	string value = CvarSystem::GetStringValue(cvarName.c_str());
@@ -42,7 +42,7 @@ JSValue EXPORT_getCvarInteger(const JSArray& args) {
 	string cvarName = ToString(args[0].ToString());
 	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
 	if(type != Cvar::CV_INTEGER) {
-		R_Printf("JS warning: getCvarInteger: cvar %s is not integer type\n", cvarName.c_str());
+		R_Message(PRIORITY_WARNING, "JS warning: getCvarInteger: cvar %s is not integer type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
 	return JSValue(CvarSystem::GetIntegerValue(cvarName.c_str()));
@@ -54,7 +54,7 @@ JSValue EXPORT_getCvarFloat(const JSArray& args) {
 	string cvarName = ToString(args[0].ToString());
 	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
 	if(type != Cvar::CV_FLOAT) {
-		R_Printf("JS warning: getCvarFloat: cvar %s is not float type\n", cvarName.c_str());
+		R_Message(PRIORITY_WARNING, "JS warning: getCvarFloat: cvar %s is not float type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
 	return JSValue(CvarSystem::GetFloatValue(cvarName.c_str()));
@@ -66,7 +66,7 @@ JSValue EXPORT_getCvarBoolean(const JSArray& args) {
 	string cvarName = ToString(args[0].ToString());
 	Cvar::cvarType_e type = CvarSystem::GetCvarType(cvarName);
 	if(type != Cvar::CV_BOOLEAN) {
-		R_Printf("JS warning: getCvarBoolean: cvar %s is not boolean type\n", cvarName.c_str());
+		R_Message(PRIORITY_WARNING, "JS warning: getCvarBoolean: cvar %s is not boolean type\n", cvarName.c_str());
 		return JSValue::Null();
 	}
 	return JSValue(CvarSystem::GetBooleanValue(cvarName.c_str()));
@@ -74,15 +74,15 @@ JSValue EXPORT_getCvarBoolean(const JSArray& args) {
 
 bool CvarSet_IsValid(const JSArray& args) {
 	if(args.size() != 2) {
-		R_Printf("JS warning: setCvar using incorrect arguments\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvar using incorrect arguments\n");
 		return false;
 	}
 	if(!args[0].IsString()) {
-		R_Printf("JS warning: setCvar: first arg is not string\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvar: first arg is not string\n");
 		return false;
 	}
 	if(!Cvar::Exists(ToString(args[0].ToString()))) {
-		R_Printf("JS warning: setCvar: cvar doesn't exist\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvar: cvar doesn't exist\n");
 		return false;
 	}
 	return true;
@@ -92,7 +92,7 @@ void EXPORT_setCvarString(const JSArray& args) {
 	if(!CvarSet_IsValid(args))
 		return;
 	if(!args[1].IsString()) {
-		R_Printf("JS warning: setCvarString: second arg is not string\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvarString: second arg is not string\n");
 		return;
 	}
 	CvarSystem::SetStringValue(ToString(args[0].ToString()), (char*)ToString(args[1].ToString()).c_str());
@@ -102,7 +102,7 @@ void EXPORT_setCvarInteger(const JSArray& args) {
 	if(!CvarSet_IsValid(args))
 		return;
 	if(!args[1].IsInteger()) {
-		R_Printf("JS warning: setCvarInteger: second arg is not integer\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvarInteger: second arg is not integer\n");
 		return;
 	}
 	CvarSystem::SetIntegerValue(ToString(args[0].ToString()), args[1].ToInteger());
@@ -112,7 +112,7 @@ void EXPORT_setCvarFloat(const JSArray& args) {
 	if(!CvarSet_IsValid(args))
 		return;
 	if(!args[1].IsNumber()) {
-		R_Printf("JS warning: setCvarFloat: second arg is not float\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvarFloat: second arg is not float\n");
 		return;
 	}
 	CvarSystem::SetFloatValue(ToString(args[0].ToString()), args[1].ToDouble());
@@ -122,14 +122,14 @@ void EXPORT_setCvarBoolean(const JSArray& args) {
 	if(!CvarSet_IsValid(args))
 		return;
 	if(!args[1].IsBoolean()) {
-		R_Printf("JS warning: setCvarBoolean: second arg is not boolean\n");
+		R_Message(PRIORITY_WARNING, "JS warning: setCvarBoolean: second arg is not boolean\n");
 		return;
 	}
 	CvarSystem::SetBooleanValue(ToString(args[0].ToString()), args[1].ToBoolean());
 }
 
 void EXPORT_echo(const JSArray& args) {
-	R_Printf(ToString(args[0].ToString()).c_str());
+	R_Message(PRIORITY_MESSAGE, ToString(args[0].ToString()).c_str());
 }
 
 /* End function definitions */
@@ -164,7 +164,7 @@ Menu::Menu() {
 }
 
 Menu::Menu(const char *menuName) {
-	R_Printf("Loading %s\n", menuName);
+	R_Message(PRIORITY_NOTE, "Loading %s\n", menuName);
 	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
 	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));

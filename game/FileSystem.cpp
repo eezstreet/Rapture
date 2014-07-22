@@ -14,7 +14,7 @@ Cvar* fs_basepath;
 static FileSystem* fs;
 
 void FileSystem::Init() {
-	R_Printf("fs_init\n");
+	R_Message(PRIORITY_MESSAGE, "fs_init\n");
 	fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; contains all essential game data.", (1 << Cvar::CVAR_ROM), "core");
 	fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "homepath", (1 << Cvar::CVAR_ROM), Sys_FS_GetBasepath());
 	fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", (1 << Cvar::CVAR_ROM), "");
@@ -47,9 +47,9 @@ void FileSystem::CreateModSearchPaths(const string& basepath, const string& modl
 }
 
 void FileSystem::PrintSearchPaths() {
-	R_Printf("All search paths:\n");
+	R_Message(PRIORITY_NOTE, "All search paths:\n");
 	for_each(searchpaths.begin(), searchpaths.end(), [](string& s) {
-		R_Printf("%s\n", s.c_str());
+		R_Message(PRIORITY_NOTE, "%s\n", s.c_str());
 	});
 }
 
@@ -206,8 +206,9 @@ File* File::Open(const string& fileName, const string& mode) {
 
 void File::Close() {
 	if(!handle) { return; }
+	fflush(handle);
 	fclose(handle);
-	handle = NULL;
+	handle = nullptr;
 }
 
 string File::ReadPlaintext(size_t numChars) {
