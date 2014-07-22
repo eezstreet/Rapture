@@ -3,6 +3,8 @@
 #include "Local.h"
 #include "MazeFramework.h"
 
+#define MAX_PARMS	8
+
 /////////////////////
 //
 //  PresetFramework
@@ -40,4 +42,8 @@ struct MapFramework {
 	int iSizeX;
 	int iSizeY;
 	int iAct;
+
+	// These parm things are for DRLG...but maybe they can find a use in preset dungeons too?
+	int parm[MAX_PARMS];
+	vector<AlwaysRoomPlace> vAlwaysPlace;
 };

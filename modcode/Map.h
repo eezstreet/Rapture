@@ -44,4 +44,6 @@ struct Map : public QTreeNode<int> {
 	vector<Entity*> FindEntities(const string& classname);
 
 	char links[MAX_MAP_LINKS][MAX_HANDLE_STRING];
+
+	const void* ptFramework;
 };

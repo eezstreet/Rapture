@@ -1,12 +1,11 @@
 #include "DRLG.h"
 #include "DungeonManager.h"
+#include "MapFramework.h"
 #include "PresetFileData.h"
 #include "Entity.h"
 #include "RVector.h"
 
 static Seed drlgSeed;
-static int parm0 = 5; // FIXME
-static int iTilesAlloc = 0;
 
 // These functions just generate the rooms, we need to actually set up connections etc
 bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid) {
@@ -15,7 +14,6 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 	int startX = drlgSeed.GenerateRandom(0, maxX);
 	int startY = drlgSeed.GenerateRandom(0, maxY);
 	int i = 0;
-	iTilesAlloc = 0;
 	rtRoomGrid.sizeX = maxX;
 	rtRoomGrid.sizeY = maxY;
 	rtRoomGrid.roomArray = (Room*)trap->Zone_Alloc(maxX * maxY * sizeof(Room), "roomgrid");	// FIXME: magically invent hunk memory
@@ -27,18 +25,100 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 	entry.y = startY;
 	rtRoomGrid.roomArray[startY * maxX + startX] = entry;
 
-	while(i < parm0) {
-		// Pick one direction and go with it
+	vector<int> vWalkableDirections;
+	const MapFramework* ptMapFramework = (const MapFramework*)rtMap.ptFramework;
+
+	function<void(int, bool)> walk = [&](int max, bool bIgnoreBuiltRooms) -> void {
+		i = 0;
+		while(i < ptMapFramework->parm[0]) {
+			// Pick one direction and go with it
+			int numWalkableDirections = 4;
+			int xInc = 0;
+			int yInc = 0;
+			vWalkableDirections.clear();
+			vWalkableDirections.push_back(0);
+			vWalkableDirections.push_back(1);
+			vWalkableDirections.push_back(2);
+			vWalkableDirections.push_back(3);
+			int direction = -1;
+
+			if(currentPos.tComponents[1] <= 0) {
+				VectorErase<int>(vWalkableDirections, 0);
+				numWalkableDirections--;
+			}
+			if(currentPos.tComponents[0] <= 0) {
+				VectorErase<int>(vWalkableDirections, 1);
+				numWalkableDirections--;
+			}
+			if(currentPos.tComponents[1] >= maxY-1) {
+				VectorErase<int>(vWalkableDirections, 2);
+				numWalkableDirections--;
+			}
+			if(currentPos.tComponents[0] >= maxX-1) {
+				VectorErase<int>(vWalkableDirections, 3);
+				numWalkableDirections--;
+			}
+			if(numWalkableDirections <= 0) {
+				R_Error("Maze with grid size 0");
+				break;
+			}
+
+			direction = drlgSeed.GenerateRandom(0, vWalkableDirections.size());
+			direction = vWalkableDirections.at(direction);
+
+			// NWSE
+			switch(direction) {
+				case 0:
+					yInc--;
+					break;
+				case 1:
+					xInc--;
+					break;
+				case 2:
+					yInc++;
+					break;
+				case 3:
+					xInc++;
+					break;
+			}
+
+			currentPos.tComponents[0] += xInc;
+			currentPos.tComponents[1] += yInc;
+			Room& thisRoom = rtRoomGrid.roomArray[currentPos.tComponents[1] * maxX + currentPos.tComponents[0]];
+			if(thisRoom.bAreYouReallyReal == false && bIgnoreBuiltRooms == false) {
+				i++;
+			} else if(bIgnoreBuiltRooms == true) {
+				i++;
+			}
+			if(thisRoom.bAreYouReallyReal == false) {
+				// No room here = increment and add a new room
+				// TODO: eliminate code reuse
+				thisRoom.bAreYouReallyReal = true;
+				thisRoom.eType = ROOM_FILLER;
+				thisRoom.x = currentPos.tComponents[0];
+				thisRoom.y = currentPos.tComponents[1];
+			}
+		}
+		vWalkableDirections.clear();
+	};
+
+	walk(ptMapFramework->parm[0], false);
+	for(auto it = ptMapFramework->vAlwaysPlace.begin(); it != ptMapFramework->vAlwaysPlace.end(); ++it) {
+		currentPos.tComponents[0] = startX;
+		currentPos.tComponents[1] = startY;
+		walk(ptMapFramework->parm[1], true);
+		walk(ptMapFramework->parm[2], false);
+		// Now that we've figured out where we need to end up...let's build the room that we need.
+		// TODO: eliminate code reuse
 		int numWalkableDirections = 4;
 		int xInc = 0;
 		int yInc = 0;
-		vector<int> vWalkableDirections;
+		int direction = -1;
+		vWalkableDirections.clear();
 		vWalkableDirections.push_back(0);
 		vWalkableDirections.push_back(1);
 		vWalkableDirections.push_back(2);
 		vWalkableDirections.push_back(3);
-		int direction = -1;
-
 		if(currentPos.tComponents[1] <= 0) {
 			VectorErase<int>(vWalkableDirections, 0);
 			numWalkableDirections--;
@@ -85,13 +165,12 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 		if(thisRoom.bAreYouReallyReal == false) {
 			// No room here = increment and add a new room
 			thisRoom.bAreYouReallyReal = true;
-			thisRoom.eType = ROOM_FILLER;
+			thisRoom.eType = it->type;
 			thisRoom.x = currentPos.tComponents[0];
 			thisRoom.y = currentPos.tComponents[1];
-			iTilesAlloc += ptFramework->roomSizeX * ptFramework->roomSizeY;
-			i++;
 		}
 	}
+
 	return true;
 }
 
@@ -103,6 +182,7 @@ bool Do_Saturation(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid 
 bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid) {
 	// Find the entrance.
 	int i;
+	vector<int> vConnectables;
 	for(i = 0; i != rtRoomGrid.sizeX * rtRoomGrid.sizeY; i++) {
 		if(!rtRoomGrid.roomArray[i].bAreYouReallyReal) {
 			continue;
@@ -123,7 +203,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 		}
 		if(ptRoom->iConnectionFlags == 0) {
 			// Give us a random connection
-			vector<int> vConnectables;
+			vConnectables.clear();
 			vConnectables.push_back(0);
 			vConnectables.push_back(1);
 			vConnectables.push_back(2);
@@ -267,6 +347,9 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 		}
 	};
 	g(currentPos);
+	vConnectables.clear();
+	trap->Zone_FastFree(bRanLastStage, "roomgrid");
+	trap->Zone_FastFree(bConnects, "roomgrid");
 	return true;
 }
 
@@ -276,9 +359,6 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 		Room* ptRoom = &rtRoomGrid.roomArray[i];
 		if(!ptRoom->bAreYouReallyReal) {
 			continue;
-		}
-		if(iTilesDone >= iTilesAlloc) {
-			break;
 		}
 		string preset = ptFramework->tileSet;
 		if(ptRoom->eType != ROOM_FILLER) {
@@ -357,7 +437,7 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 
 // Construct rooms
 randomizeDungeonFunc randomizeDungeonFuncs[] = {
-	Do_DrunkenStagger,
+	Do_DrunkenStagger,					// parm0 = how many rooms to walk, parm1 = special room walk, parm2 = special room corridor walk
 	Do_Saturation
 };
 
@@ -372,4 +452,5 @@ void RandomizeDungeon(MazeFramework* ptFramework, Map& rtMap, DungeonManager* pt
 	randomizeDungeonFuncs[ptFramework->algorithm](ptFramework, rtMap, rg);
 	linkDungeonFuncs[ptFramework->algorithm](ptFramework, rtMap, rg);
 	Maze_Build(ptFramework, rtMap, rg, ptDungeonManager);
+	trap->Zone_FastFree(rg.roomArray, "roomgrid");
 }

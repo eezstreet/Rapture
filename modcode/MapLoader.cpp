@@ -3,11 +3,41 @@
 
 // LEVEL PARSING
 static unordered_map<const char*, jsonParseFunc> levelParseFields;
+
+void ParseAlwaysRooms(cJSON* j, void* p) {
+	MapFramework* t = (MapFramework*)p;
+	int max = cJSON_GetArraySize(j);
+	for(int i = 0; i < max; i++) {
+		cJSON* node = cJSON_GetArrayItem(j, i);
+		cJSON* childNode = cJSON_GetObjectItem(node, "type");
+		if(!childNode) {
+			continue;
+		}
+		const char* str = cJSON_ToString(childNode);
+		AlwaysRoomPlace ap;
+		if(!stricmp(str, "ROOM_FILLER")) {
+			ap.type = ROOM_FILLER;
+		} else if(!stricmp(str, "ROOM_SHRINE")) {
+			ap.type = ROOM_SHRINE;
+		} else if(!stricmp(str, "ROOM_ENTRY")) {
+			ap.type = ROOM_ENTRY;
+		} else if(!stricmp(str, "ROOM_EXIT")) {
+			ap.type = ROOM_EXIT;
+		} else if(!strncmp(str, "ROOM_SPECIAL_", 13)) {
+			int num = atoi(str+13);
+			ap.type = (RoomType_e)(ROOM_SPECIAL_0 + num);
+		}
+
+		t->vAlwaysPlace.push_back(ap);
+	}
+}
+
 void InitLevelParseFields() {
 #define NAME_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->name, cJSON_ToString(j)); }
 #define FIRST_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->dataPreset.preset, cJSON_ToString(j)); }
 #define LEVEL_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->nDungeonLevel = cJSON_ToInteger(j); }
 #define VIS_PARSER(x) [](cJSON* j, void*p) -> void { MapFramework* t = (MapFramework*)p; t->sLink[x] = cJSON_ToString(j); }
+#define PARM_PARSER(x) [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->parm[x] = cJSON_ToInteger(j); }
 #define P_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->bIsPreset = cJSON_ToBoolean(j); }
 #define INT_PARSER(x) [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; t->##x## = cJSON_ToInteger(j); }
 #define TO_PARSER [](cJSON* j, void* p) -> void { MapFramework* t = (MapFramework*)p; strcpy(t->toName, cJSON_ToString(j)); }
@@ -31,6 +61,15 @@ void InitLevelParseFields() {
 	levelParseFields["sizeY"] = INT_PARSER(iSizeY);
 	levelParseFields["act"] = INT_PARSER(iAct);
 	levelParseFields["maze"] = MAZE_PARSER;
+	levelParseFields["parm0"] = PARM_PARSER(0);
+	levelParseFields["parm1"] = PARM_PARSER(1);
+	levelParseFields["parm2"] = PARM_PARSER(2);
+	levelParseFields["parm3"] = PARM_PARSER(3);
+	levelParseFields["parm4"] = PARM_PARSER(4);
+	levelParseFields["parm5"] = PARM_PARSER(5);
+	levelParseFields["parm6"] = PARM_PARSER(6);
+	levelParseFields["parm7"] = PARM_PARSER(7);
+	levelParseFields["alwaysPlaceRooms"] = ParseAlwaysRooms;
 #undef NAME_PARSER
 #undef INT_PARSER
 }
@@ -58,12 +97,11 @@ static unordered_map<const char*, jsonParseFunc> mazeParseFields;
 
 void Maze_AlgorithmParser(cJSON* j, void* p) {
 	MazeFramework* t = (MazeFramework*)p;
-	char algo[MAX_HANDLE_STRING];
-	strncpy(algo, cJSON_ToString(j), sizeof(algo));
+	string str = cJSON_ToString(j);
 
-	if(!stricmp(algo, "ALGO_DRUNKEN_STAGGER")) {
+	if(str == "ALGO_DRUNKEN_STAGGER") {
 		t->algorithm = ALGO_DRUNKEN_STAGGER;
-	} else if (!stricmp(algo, "ALGO_SATURATION")) {
+	} else if(str == "ALGO_SATURATION") {
 		t->algorithm = ALGO_SATURATION;
 	}
 }

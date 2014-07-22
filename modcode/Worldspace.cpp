@@ -116,8 +116,8 @@ static vector<VisInfo_t> vis;
 	visTouching = -1;
 	bool bHaveWeRenderedPlayer = false;
 	// Lastly we need to render the actual stuff
-	for(auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
-		RenderObject obj = *it;
+	for(auto itObj = sortedObjects.begin(); itObj != sortedObjects.end(); ++itObj) {
+		RenderObject obj = *itObj;
 		if(obj.bIsTile) {
 			TileNode* tile = obj.tileData;
 			int renderX = WorldPlaceToScreenSpaceIX(tile->x, tile->y) + (int)floor(PlayerOffsetX(ptPlayer));
@@ -196,6 +196,9 @@ void Worldspace::Run() {
 				theMap = thisMap;
 		}
 	}
+	if(!theMap) {
+		return;
+	}
 	auto ents = theMap->qtEntTree.NodesAt(player->x, player->y); // FIXME
 	for(auto it = ents.begin(); it != ents.end(); ++it) {
 		auto spatialEnt = *it;
@@ -209,8 +212,8 @@ void Worldspace::Run() {
 
 void Worldspace::UpdateEntities() {
 	// FIXME
-	for(auto it = vActorsMoved.begin(); it != vActorsMoved.end(); ++it) {
-		auto ptActor = *it;
+	for(auto itActor = vActorsMoved.begin(); itActor != vActorsMoved.end(); ++itActor) {
+		auto ptActor = *itActor;
 		auto containingMap = qtMapTree->NodesAt(ptActor->x, ptActor->y);
 		Map* theMap = nullptr;
 		for(auto it = containingMap.begin(); it != containingMap.end(); ++it) {

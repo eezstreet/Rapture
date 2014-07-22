@@ -105,6 +105,7 @@ void DungeonManager::Construct(const MapFramework* ptFramework) {
 	Map *theMap = new Map(ptFramework->iWorldspaceX, ptFramework->iWorldspaceY,
 		ptFramework->iSizeX, ptFramework->iSizeY, ptFramework->iAct, 1);
 	strcpy(theMap->name, ptFramework->name);
+	theMap->ptFramework = ptFramework;
 	for(int i = 0; i < MAX_MAP_LINKS; i++) {
 		if(ptFramework->sLink[i].length() > 0) {
 			strcpy(theMap->links[i], ptFramework->sLink[i].c_str());
