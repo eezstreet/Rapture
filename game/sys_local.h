@@ -80,11 +80,6 @@ public:
 		CV_FLOAT,
 		CV_BOOLEAN
 	};
-	enum cvarFlags_e {
-		CVAR_ARCHIVE,
-		CVAR_ROM,
-		CVAR_ANNOUNCE,
-	};
 private:
 	string name;
 	string description;

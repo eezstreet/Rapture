@@ -59,6 +59,12 @@ enum {
 	PRIORITY_MAX
 };
 
+enum cvarFlags_e {
+	CVAR_ARCHIVE,
+	CVAR_ROM,
+	CVAR_ANNOUNCE,
+};
+
 struct gameImports_s {
 	// Logging
 	void (*printf)(int iPriority, const char* fmt, ...);

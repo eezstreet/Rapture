@@ -15,15 +15,15 @@ Dispatch::~Dispatch() {
 }
 
 void Dispatch::Setup() {
-	Cvar* com_dispatchHiddenMask = Cvar::Get<int>("com_dispatchHiddenMask", "Hide messages with these priorities", (1 << Cvar::CVAR_ARCHIVE), 
+	Cvar* com_dispatchHiddenMask = Cvar::Get<int>("com_dispatchHiddenMask", "Hide messages with these priorities", (1 << CVAR_ARCHIVE), 
 		(1 << PRIORITY_NONE) 
 #ifndef _DEBUG 
 		| (1 << PRIORITY_DEBUG)
 #endif
 		);
 	Cvar* com_dispatchShutdownMask = Cvar::Get<int>("com_dispatchShutdownMask", "Shutdown when messages are dispatched with these priorities",
-		(1 << Cvar::CVAR_ARCHIVE), (1 << PRIORITY_ERRFATAL));
-	Cvar* com_dispatchMessageMask = Cvar::Get<int>("com_dispatchMessageMask", "Show popup with these priorities", (1 << Cvar::CVAR_ARCHIVE),
+		(1 << CVAR_ARCHIVE), (1 << PRIORITY_ERRFATAL));
+	Cvar* com_dispatchMessageMask = Cvar::Get<int>("com_dispatchMessageMask", "Show popup with these priorities", (1 << CVAR_ARCHIVE),
 		(1 << PRIORITY_ERROR) | (1 << PRIORITY_ERRFATAL));
 
 	com_dispatchHiddenMask->AddCallback((void*)Dispatch::ChangeHiddenMask);

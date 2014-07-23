@@ -15,10 +15,10 @@ static FileSystem* fs;
 
 void FileSystem::Init() {
 	R_Message(PRIORITY_MESSAGE, "fs_init\n");
-	fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; contains all essential game data.", (1 << Cvar::CVAR_ROM), "core");
-	fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "homepath", (1 << Cvar::CVAR_ROM), Sys_FS_GetBasepath());
-	fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", (1 << Cvar::CVAR_ROM), "");
-	fs_basepath = CvarSystem::RegisterCvar("fs_basepath", "Directory to gamedata", (1 << Cvar::CVAR_ROM), Sys_FS_GetBasepath());
+	fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; contains all essential game data.", (1 << CVAR_ROM), "core");
+	fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "homepath", (1 << CVAR_ROM), Sys_FS_GetBasepath());
+	fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", (1 << CVAR_ROM), "");
+	fs_basepath = CvarSystem::RegisterCvar("fs_basepath", "Directory to gamedata", (1 << CVAR_ROM), Sys_FS_GetBasepath());
 
 	fs = new FileSystem();
 	// the order of these searchpaths matters!

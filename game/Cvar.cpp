@@ -116,7 +116,7 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	if(it2 != cache.end()) {
 		// use from the cache
 		if(it2->second->archive) {
-			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
 		} else {
 			cvar->flags = iFlags;
 		}
@@ -147,7 +147,7 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	if(it2 != cache.end()) {
 		// use from the cache
 		if(it2->second->archive) {
-			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
 		} else {
 			cvar->flags = iFlags;
 		}
@@ -179,7 +179,7 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	if(it2 != cache.end()) {
 		// use from the cache
 		if(it2->second->archive) {
-			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
 		} else {
 			cvar->flags = iFlags;
 		}
@@ -209,7 +209,7 @@ Cvar* CvarSystem::RegisterCvar(const string& sName, const string& sDesc, int iFl
 	if(it2 != cache.end()) {
 		// use from the cache
 		if(it2->second->archive) {
-			cvar->flags = iFlags | (1 << Cvar::CVAR_ARCHIVE);
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
 		} else {
 			cvar->flags = iFlags;
 		}

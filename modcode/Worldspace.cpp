@@ -4,6 +4,9 @@
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
 #define WORLDSPACE_LOG2		/*15*/		2
 
+#define TILE_WIDTH		192
+#define TILE_HEIGHT		96
+
 int visTouching = -1;
 
 Worldspace::Worldspace() {
@@ -53,10 +56,10 @@ static vector<RenderObject> sortedObjects;	// Static so that we aren't allocatin
 	}
 
 	// mega ultra hack
-	float fBoundsX = Worldspace::ScreenSpaceToWorldPlaceX(-192, ptClient->screenWidth + 192, ptClient->ptPlayer);
-	float fBoundsY = Worldspace::ScreenSpaceToWorldPlaceY(-192, -192, ptClient->ptPlayer);
-	float fBoundsW = Worldspace::ScreenSpaceToWorldPlaceX(ptClient->screenWidth + 192, -192, ptClient->ptPlayer) - fBoundsX;
-	float fBoundsH = Worldspace::ScreenSpaceToWorldPlaceY(ptClient->screenWidth + 192, ptClient->screenHeight + 192, ptClient->ptPlayer) - fBoundsY;
+	float fBoundsX = Worldspace::ScreenSpaceToWorldPlaceX(-TILE_WIDTH, ptClient->screenWidth + TILE_WIDTH, ptClient->ptPlayer);
+	float fBoundsY = Worldspace::ScreenSpaceToWorldPlaceY(-TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer);
+	float fBoundsW = Worldspace::ScreenSpaceToWorldPlaceX(ptClient->screenWidth + TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer) - fBoundsX;
+	float fBoundsH = Worldspace::ScreenSpaceToWorldPlaceY(ptClient->screenWidth + TILE_WIDTH, ptClient->screenHeight + TILE_WIDTH, ptClient->ptPlayer) - fBoundsY;
 static vector<TileNode*> mapTiles;
 static vector<Entity*> mapEnts;
 	mapTiles.clear();
@@ -90,7 +93,7 @@ static vector<VisInfo_t> vis;
 		RenderObject obj;
 		obj.bIsTile = true;
 		obj.tileData = tile;
-		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - 96.0f - tile->ptTile->fDepthScoreOffset);
+		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - TILE_HEIGHT - tile->ptTile->fDepthScoreOffset);
 		sortedObjects.push_back(obj);
 
 		if(tile->ptTile->name[0] == 'V' && tile->ptTile->name[1] == 'I' && tile->ptTile->name[2] == 'S') {
@@ -253,36 +256,36 @@ void Worldspace::ActorMoved(Actor* ptActor) {
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFX(float x, float y) {
-	return (96.0f * x) + (96.0f * y);
+	return (TILE_HEIGHT * x) + (TILE_HEIGHT * y);
 		
 }
 
 float Worldspace::WorldPlaceToScreenSpaceFY(float x, float y) {
-	return (48.0f * y) - (48.0f * x);
+	return ((TILE_HEIGHT/2.0f) * y) - ((TILE_HEIGHT/2.0f) * x);
 }
 
 int Worldspace::WorldPlaceToScreenSpaceIX(int x, int y) {
-	return (96 * x) + (96 * y);
+	return (TILE_HEIGHT * x) + (TILE_HEIGHT * y);
 }
 
 int Worldspace::WorldPlaceToScreenSpaceIY(int x, int y) {
-	return (48 * y) - (48 * x);
+	return ((TILE_HEIGHT/2.0f) * y) - ((TILE_HEIGHT/2.0f) * x);
 }
 
 float Worldspace::PlayerOffsetX(Player* ptPlayer) {
-	return (thisClient->screenWidth / 2.0f) - (96.0f * ptPlayer->x) - (96.0f * ptPlayer->y);
+	return (thisClient->screenWidth / 2.0f) - (TILE_HEIGHT * ptPlayer->x) - (TILE_HEIGHT * ptPlayer->y);
 }
 
 float Worldspace::PlayerOffsetY(Player* ptPlayer) {
-	return (thisClient->screenHeight / 2.0f) - (48.0f * ptPlayer->y) + (48.0f * ptPlayer->x);
+	return (thisClient->screenHeight / 2.0f) - ((TILE_HEIGHT/2.0f) * ptPlayer->y) + ((TILE_HEIGHT/2.0f) * ptPlayer->x);
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer) {
 	float plyX = ptPlayer->x;
-	return (x/192.0f) - (y/96.0f) + plyX - (thisClient->screenWidth/384.0f) + (thisClient->screenHeight/192.0f) + 0.5f;
+	return (x/TILE_WIDTH) - (y/TILE_HEIGHT) + plyX - (thisClient->screenWidth/(TILE_WIDTH*2.0f)) + (thisClient->screenHeight/TILE_WIDTH) + 0.5f;
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer) {
 	float plyY = ptPlayer->y;
-	return (y/96.0f) + (x/192.0f) - (thisClient->screenWidth/384.0f) + plyY - (thisClient->screenHeight/192.0f) - 0.5f;
+	return (y/TILE_HEIGHT) + (x/TILE_WIDTH) - (thisClient->screenWidth/(TILE_WIDTH*2.0f)) + plyY - (thisClient->screenHeight/TILE_WIDTH) - 0.5f;
 }

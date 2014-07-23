@@ -39,12 +39,12 @@ namespace RenderCode {
 	}
 
 	static void InitCvars() {
-		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", (1 << Cvar::CVAR_ARCHIVE), false);
-		r_width = Cvar::Get<int>("r_width", "Resolution: width", (1 << Cvar::CVAR_ARCHIVE), 1024);
-		r_height = Cvar::Get<int>("r_height", "Resolution: height", (1 << Cvar::CVAR_ARCHIVE), 768);
-		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", (1 << Cvar::CVAR_ARCHIVE) | (1 << Cvar::CVAR_ROM), "Rapture");
-		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", (1 << Cvar::CVAR_ARCHIVE), 1.0f);
-		r_filter = Cvar::Get<int>("r_filter", "Filter quality. 0 = nearest pixel sampling, 1 = linear filtering, 2 = anisotropic filtering", (1 << Cvar::CVAR_ARCHIVE), 1);
+		r_fullscreen = Cvar::Get<bool>("r_fullscreen", "Dictates whether the application runs in fullscreen mode.", (1 << CVAR_ARCHIVE), false);
+		r_width = Cvar::Get<int>("r_width", "Resolution: width", (1 << CVAR_ARCHIVE), 1024);
+		r_height = Cvar::Get<int>("r_height", "Resolution: height", (1 << CVAR_ARCHIVE), 768);
+		r_windowtitle = Cvar::Get<char*>("r_windowtitle", "Window title", (1 << CVAR_ARCHIVE) | (1 << CVAR_ROM), "Rapture");
+		r_gamma = Cvar::Get<float>("r_gamma", "Gamma", (1 << CVAR_ARCHIVE), 1.0f);
+		r_filter = Cvar::Get<int>("r_filter", "Filter quality. 0 = nearest pixel sampling, 1 = linear filtering, 2 = anisotropic filtering", (1 << CVAR_ARCHIVE), 1);
 
 		// Debug cvars
 #ifdef _DEBUG

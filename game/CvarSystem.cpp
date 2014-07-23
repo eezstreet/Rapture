@@ -41,7 +41,7 @@ void CvarSystem::ArchiveCvars() {
 		return; // also should not happen
 	for(auto it = cvars.begin(); it != cvars.end(); ++it) {
 		Cvar* cv = it->second;
-		if(cv->flags & (1 << Cvar::CVAR_ARCHIVE)) {
+		if(cv->flags & (1 << CVAR_ARCHIVE)) {
 			stringstream ss;
 			ss << "seta " << cv->name << " ";
 			switch(cv->type) {

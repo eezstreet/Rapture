@@ -59,7 +59,7 @@ void Cmd_Seta_f(vector<string>& args) {
 
 	Cmd_Set_f(args);
 	int flags = CvarSystem::GetCvarFlags(args[1]);
-	flags = flags | (1 << Cvar::CVAR_ARCHIVE);
+	flags = flags | (1 << CVAR_ARCHIVE);
 	CvarSystem::SetCvarFlags(args[1], flags);
 }
 

@@ -23,9 +23,9 @@ void Game_Shutdown() {
 void Game_Load() {
 	trap->InitMaterials();
 
-	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame? (1 = FPS, 2 = MS, 3 = both)", 1, 0);
-	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", 1, false);
-	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", 1, false);
+	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame? (1 = FPS, 2 = MS, 3 = both)", (1 << CVAR_ARCHIVE), 0);
+	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
+	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
 
 	thisClient = new Client();
 

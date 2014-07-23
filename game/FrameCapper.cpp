@@ -1,8 +1,8 @@
 #include "sys_local.h"
 
 FrameCapper::FrameCapper() {
-	capCvar = Cvar::Get<int>("com_maxfps", "Maximum allowed FPS", (1 << Cvar::CVAR_ARCHIVE), 180);
-	hitchWarningCvar = Cvar::Get<int>("com_hitch", "Hitch warning", (1 << Cvar::CVAR_ARCHIVE), 100);
+	capCvar = Cvar::Get<int>("com_maxfps", "Maximum allowed FPS", (1 << CVAR_ARCHIVE), 180);
+	hitchWarningCvar = Cvar::Get<int>("com_hitch", "Hitch warning", (1 << CVAR_ARCHIVE), 100);
 }
 
 void FrameCapper::StartFrame() {
