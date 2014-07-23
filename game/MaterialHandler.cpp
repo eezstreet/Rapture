@@ -1,7 +1,7 @@
 #include "tr_local.h"
 #include "../json/cJSON.h"
 
-MaterialHandler* mats = NULL;
+MaterialHandler* mats = nullptr;
 
 void MaterialHandler::LoadMaterial(const char* matfile) {
 	Material* mat = Zone::New<Material>(Zone::TAG_MATERIALS);
@@ -120,7 +120,7 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 	auto found = materials.find(material);
 	if(found == materials.end()) {
 		R_Message(PRIORITY_WARNING, "WARNING: material '%s' not found\n", material);
-		return NULL;
+		return nullptr;
 	}
 	return found->second;
 }

@@ -2,7 +2,7 @@
 
 namespace Zone {
 
-	MemoryManager *mem = NULL;
+	MemoryManager *mem = nullptr;
 
 	string tagNames[] = {
 			"none",
@@ -20,7 +20,7 @@ namespace Zone {
 	void* MemoryManager::Allocate(int iSize, zoneTags_e tag) {
 		if(tag == TAG_NONE) {
 			Sys_Error("Zone::Alloc passed TAG_NONE\n");
-			return NULL;
+			return nullptr;
 		}
 
 		return Allocate(iSize, tagNames[tag]);
@@ -30,7 +30,7 @@ namespace Zone {
 	void* MemoryManager::Allocate(int iSize, const string& tag) {
 		if(tag.length() <= 0) {
 			Sys_Error("Zone::Alloc passed zero-size tag string\n");
-			return NULL;
+			return nullptr;
 		}
 
 		zone[tag].zoneInUse += iSize;
@@ -118,7 +118,7 @@ namespace Zone {
 			}
 		}
 		Sys_Error("Zone::Realloc: corrupt zone memory!");
-		return NULL;
+		return nullptr;
 	}
 
 	MemoryManager::MemoryManager() {

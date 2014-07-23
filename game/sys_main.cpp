@@ -2,7 +2,7 @@
 
 /* main game initialization */
 
-static RaptureGame *sys = NULL;
+static RaptureGame *sys = nullptr;
 bool bStartupQuit = false;
 
 void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFinished = true; }
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 		while((sys && !sys->bHasFinished) || (!bStartupQuit)) {
 #ifdef _WIN32
 			MSG        msg;
-			if (!GetMessage (&msg, NULL, 0, 0)) {
+			if (!GetMessage (&msg, nullptr, 0, 0)) {
 				break;
 			}
 			TranslateMessage(&msg);
@@ -95,8 +95,8 @@ void Sys_PrintSDLVersion() {
 
 /* RaptureGame class, this does all the heavy lifting */
 RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
-	game = NULL;
-	editor = NULL;
+	game = nullptr;
+	editor = nullptr;
 
 	ptDispatch = new Dispatch(0, 0, 0);
 
@@ -131,7 +131,7 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	// Init rand (cuz we will DEFINITELY need it ;D
 
 	// Init input
-	SDL_SetEventFilter(RaptureInputCallback, NULL);
+	SDL_SetEventFilter(RaptureInputCallback, nullptr);
 	InitInput();
 
 	// Load font
@@ -256,7 +256,7 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
-		return NULL;
+		return nullptr;
 	}
 	trap->init();
 	return game;
@@ -267,14 +267,14 @@ GameModule* RaptureGame::GetGameModule() {
 	if(sys) {
 		return sys->game;
 	}
-	return NULL;
+	return nullptr;
 }
 
 gameExports_s* RaptureGame::GetImport() {
 	if(sys) {
 		return sys->trap;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /* Some shared functions */
@@ -323,11 +323,11 @@ void ReturnToMain() {
 	if(sys->game) {
 		sys->trap->shutdown();
 		delete sys->game;
-		sys->game = NULL;
+		sys->game = nullptr;
 	} else if(sys->editor) {
 		sys->trap->shutdown();
 		delete sys->editor;
-		sys->editor = NULL;
+		sys->editor = nullptr;
 	}
 	R_Message(PRIORITY_MESSAGE, "creating main menu webview\n");
 	MainMenu::GetSingleton();

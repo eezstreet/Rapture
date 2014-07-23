@@ -61,11 +61,11 @@ char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNum
 	vector<string> fileNames;
 
 	if(!iNumFiles) {
-		return NULL;
+		return nullptr;
 	}
 	*iNumFiles = 0;
 	if(strlen(extension) <= 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	if(dir.back() == '\\' || dir.back() == '/') {
@@ -76,11 +76,11 @@ char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNum
 	auto x = fs->GetSearchPaths();
 	for(auto it = x.begin(); it != x.end(); ++it) {
 		string compString = *it + '/' + dir; // hm, this'll be searchpath + search dir
-		if((xdir = opendir(compString.c_str())) != NULL) {
+		if((xdir = opendir(compString.c_str())) != nullptr) {
 			// loop through all files
 			while(1) {
 				ent = readdir(xdir);
-				if(ent == NULL) {
+				if(ent == nullptr) {
 					break;
 				}
 				if(!checkExtension(ent->d_name, extension)) {
@@ -97,7 +97,7 @@ char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNum
 	}
 
 	if(*iNumFiles == 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	char** ptStrList = (char**)Zone::Alloc(sizeof(char*) * (*iNumFiles), Zone::TAG_FILES);
@@ -111,7 +111,7 @@ char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNum
 }
 
 void FileSystem::FreeFileList(char** ptFileList, int iNumItems) {
-	if(ptFileList == NULL) {
+	if(ptFileList == nullptr) {
 		return;
 	}
 	for(int i = 0; i < iNumItems; i++) {
@@ -172,7 +172,7 @@ File* File::Open(const string& fileName, const string& mode) {
 		bWeAreReading = true;
 		if(it != fs->files.end()) {
 			string path = it->second->searchpath + fixedName;
-			if(it->second->handle) return NULL;
+			if(it->second->handle) return nullptr;
 			it->second->handle = fopen(path.c_str(), mode.c_str());
 			return it->second;
 		}
@@ -201,7 +201,7 @@ File* File::Open(const string& fileName, const string& mode) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void File::Close() {
@@ -229,7 +229,7 @@ string File::ReadPlaintext(size_t numChars) {
 }
 
 size_t File::ReadBinary(unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {
-	if(!handle) return NULL;
+	if(!handle) return 0;
 	if(numBytes == 0 && !bDontResetCursor) { // reset cursor to beginning of file and read whole thing
 		fseek(handle, 0L, SEEK_SET);
 		numBytes = GetSize()/sizeof(unsigned char);

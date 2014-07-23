@@ -6,7 +6,7 @@ using namespace Awesomium;
 
 /* Manipulation of text box information */
 
-Console* Console::singleton = NULL;
+Console* Console::singleton = nullptr;
 string Console::conLines = "";
 
 const int Console::GetLineCount() {
@@ -63,7 +63,7 @@ Console::Console() {
 Console::~Console() {
 	RemoveRenderable(wView);
 	wView->Destroy();
-	wView = NULL;
+	wView = nullptr;
 	currentFocus = prevFocus;
 	bIsOpen = false;
 }
@@ -88,7 +88,7 @@ void Console::Show(){
 	AddRenderable(wView);
 	prevFocus = currentFocus;
 	currentFocus = wView;
-	rccb = /*FIXME*/ NULL;
+	rccb = /*FIXME*/ nullptr;
 	// HACK: Sometimes doesn't work on first focus, so we need to do this twice
 	wView->Focus();
 	wView->Focus();
@@ -108,7 +108,7 @@ void Console::Hide() {
 		currentFocus->Focus();
 		currentFocus->Focus();
 	}
-	rccb = NULL;
+	rccb = nullptr;
 }
 
 void Console::BlankConsole() {

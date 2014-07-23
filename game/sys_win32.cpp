@@ -4,7 +4,7 @@
 
 char* Sys_FS_GetHomepath() {
 	// not sure
-	return NULL;
+	return nullptr;
 }
 
 char* Sys_FS_GetBasepath() {
@@ -15,7 +15,7 @@ char* Sys_FS_GetBasepath() {
 }
 
 void Sys_FS_MakeDirectory(const char* path) {
-	CreateDirectory(path, NULL);
+	CreateDirectory(path, nullptr);
 }
 
 void Sys_RunThread(void (*threadRun)(void*), void* arg) {
@@ -94,7 +94,7 @@ ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name) {
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line) {
 	char text[256];
 	sprintf(text, "Assertion Failure!\r\nFile: %s\r\nLine: %i\r\nExpression: %s", file, line, msg);
-	int val = MessageBox(NULL, text, "Rapture Assertion Failure",  MB_ABORTRETRYIGNORE|MB_ICONWARNING|MB_TASKMODAL|MB_SETFOREGROUND|MB_TOPMOST);
+	int val = MessageBox(nullptr, text, "Rapture Assertion Failure",  MB_ABORTRETRYIGNORE|MB_ICONWARNING|MB_TASKMODAL|MB_SETFOREGROUND|MB_TOPMOST);
 	switch(val) {
 		default:
 		case IDABORT:

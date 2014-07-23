@@ -14,7 +14,7 @@ bool JSON_ParseFieldSet(cJSON* root, const unordered_map<const char*, jsonParseF
 	}
 
 	// FIXME: below method is faster and reports incorrect fields, but doesn't work for some reason...
-	/*for(auto it = cJSON_GetFirstItem(root); it != NULL; it = cJSON_GetNextItem(it)) {
+	/*for(auto it = cJSON_GetFirstItem(root); it != nullptr; it = cJSON_GetNextItem(it)) {
 		const char* name = cJSON_GetItemKey(it);
 		auto obj = parsers.find(name);
 		if(obj != parsers.end()) {

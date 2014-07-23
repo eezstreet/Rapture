@@ -9,7 +9,7 @@ Cvar::Cvar(const string& sName, const string& sDesc, int iFlags, char* startValu
   description(sDesc),
   type(Cvar::CV_STRING),
   flags(iFlags),
-  ptsChangeCallback(NULL) {
+  ptsChangeCallback(nullptr) {
 	  s.AssignBoth(startValue);
 }
 
@@ -18,7 +18,7 @@ name(sName),
 description(sDesc),
 type(Cvar::CV_INTEGER),
 flags(iFlags),
-ptiChangeCallback(NULL) {
+ptiChangeCallback(nullptr) {
 	i.AssignBoth(startValue);
 }
 
@@ -27,7 +27,7 @@ name(sName),
 description(sDesc),
 type(Cvar::CV_FLOAT),
 flags(iFlags),
-ptfChangeCallback(NULL) {
+ptfChangeCallback(nullptr) {
 	v.AssignBoth(startValue);
 }
 
@@ -36,7 +36,7 @@ name(sName),
 description(sDesc),
 type(Cvar::CV_BOOLEAN),
 flags(iFlags),
-ptbChangeCallback(NULL) {
+ptbChangeCallback(nullptr) {
 	b.AssignBoth(startValue);
 }
 
@@ -45,7 +45,7 @@ Cvar::Cvar() :
   name(""),
   description(""),
   type(Cvar::CV_BOOLEAN),
-  ptbChangeCallback(NULL) {
+  ptbChangeCallback(nullptr) {
 	b.AssignBoth(false);
 }
 

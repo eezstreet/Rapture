@@ -149,7 +149,7 @@ nonReturningTable_t tbl_nonreturn [] = {
 	{ "setCvarFloat", EXPORT_setCvarFloat },
 	{ "setCvarBoolean", EXPORT_setCvarBoolean },
 	{ "echo", EXPORT_echo },
-	{ "END", NULL }
+	{ "END", nullptr }
 };
 
 returningTable_t tbl_return [] = {
@@ -157,7 +157,7 @@ returningTable_t tbl_return [] = {
 	{ "getCvarInteger", EXPORT_getCvarInteger },
 	{ "getCvarFloat", EXPORT_getCvarFloat },
 	{ "getCvarBoolean", EXPORT_getCvarBoolean },
-	{ "END", NULL }
+	{ "END", nullptr }
 };
 
 Menu::Menu() {
@@ -184,7 +184,7 @@ Menu::~Menu() {
 	}
 	RemoveRenderable(wView);
 	wView->Destroy();
-	wView = NULL;
+	wView = nullptr;
 }
 
 void Menu::RunJavaScript(const char* sJS) {

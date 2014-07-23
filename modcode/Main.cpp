@@ -5,7 +5,7 @@ gameImports_s* trap;
 
 static gameExports_s exportFns;
 static int iLoadingScreen = 0;
-static Image* ptLoadScreenImage = NULL;
+static Image* ptLoadScreenImage = nullptr;
 
 void Game_Init() {
 	trap->printf(PRIORITY_NOTE, "--- New Game ---\n");

@@ -2,7 +2,7 @@
 /* Namespace management */
 using namespace Awesomium;
 
-MainMenu* MainMenu::singleton = NULL;
+MainMenu* MainMenu::singleton = nullptr;
 
 MainMenu::MainMenu() {
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
@@ -24,8 +24,8 @@ MainMenu::MainMenu() {
 MainMenu::~MainMenu() {
 	RemoveRenderable(wView);
 	wView->Destroy();
-	wView = NULL;
-	currentFocus = NULL;
+	wView = nullptr;
+	currentFocus = nullptr;
 }
 
 MainMenu::MainMenu(MainMenu& other) {

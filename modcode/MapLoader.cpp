@@ -273,7 +273,7 @@ void MapLoader::LoadPreset(const string& path) {
 		fileSize += tileSize;
 		pfd->tileBlocks = tiles;
 	} else {
-		pfd->tileBlocks = NULL;
+		pfd->tileBlocks = nullptr;
 	}
 	
 	if(pfd->head.numEntities > 0) {
@@ -288,7 +288,7 @@ void MapLoader::LoadPreset(const string& path) {
 #endif // BIG_ENDIAN
 		pfd->entities = ents;
 	} else {
-		pfd->entities = NULL;
+		pfd->entities = nullptr;
 	}
 	delete[] binaryFile;
 	trap->CloseFile(file);
@@ -390,7 +390,7 @@ MapLoader::~MapLoader() {
 Tile* MapLoader::FindTileByName(const string& str) {
 	auto it = mTileResolver.find(str);
 	if(it == mTileResolver.end()) {
-		return NULL;
+		return nullptr;
 	}
 	return &(*(it->second)); // HACK
 }
@@ -401,13 +401,13 @@ MapFramework* MapLoader::FindMapFrameworkByName(const char* name) {
 			return &(*it);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 PresetFileData* MapLoader::FindPresetByName(const string& str) {
 	auto it = mPfd.find(str);
 	if(it == mPfd.end()) {
-		return NULL;
+		return nullptr;
 	}
 	return it->second;
 }

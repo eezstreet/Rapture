@@ -1,7 +1,7 @@
 #include "sys_local.h"
 #include "ui_shared.h"
 
-InputManager *Input = NULL;
+InputManager *Input = nullptr;
 
 const string keycodeNames[] = {
 	"unknown",
@@ -177,7 +177,7 @@ void InputManager::BindCommand(const string& keycodeArg, string commandArg) {
 }
 
 InputManager::InputManager() {
-	Keycatcher = NULL;
+	Keycatcher = nullptr;
 }
 
 void InputManager::ExecuteBind(const string& bindStuff) {
@@ -187,21 +187,21 @@ bool bVMInputBlocked = false;
 void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y) {
 	if(state == SDL_PRESSED) {
 		UI::MouseButtonEvent(buttonId, true);
-		if(RaptureGame::GetGameModule() != NULL) {
+		if(RaptureGame::GetGameModule() != nullptr) {
 			if(!bVMInputBlocked) {
 				RaptureGame::GetImport()->passmousedown(x, y);
 			}
 		}
 	} else {
 		UI::MouseButtonEvent(buttonId, false);
-		if(RaptureGame::GetGameModule() != NULL) {
+		if(RaptureGame::GetGameModule() != nullptr) {
 			RaptureGame::GetImport()->passmouseup(x, y);
 		}
 	}
 }
 
 void InputManager::SendMouseMoveEvent(int x, int y) {
-	if(RaptureGame::GetGameModule() != NULL) {
+	if(RaptureGame::GetGameModule() != nullptr) {
 		RaptureGame::GetImport()->passmousemove(x, y);
 	}
 	UI::MouseMoveEvent(x, y);

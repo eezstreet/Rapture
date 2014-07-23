@@ -1,14 +1,14 @@
 #include "tr_local.h"
 
-Cvar* r_fullscreen = NULL;
-Cvar* r_width = NULL;
-Cvar* r_height = NULL;
-Cvar* r_windowtitle = NULL;
-Cvar* r_gamma = NULL;
-Cvar* r_filter = NULL;
+Cvar* r_fullscreen = nullptr;
+Cvar* r_width = nullptr;
+Cvar* r_height = nullptr;
+Cvar* r_windowtitle = nullptr;
+Cvar* r_gamma = nullptr;
+Cvar* r_filter = nullptr;
 
 #ifdef _DEBUG
-Cvar* r_imgdebug = NULL;
+Cvar* r_imgdebug = nullptr;
 #endif
 
 static int fadeTime = 0;
@@ -21,8 +21,8 @@ namespace RenderCode {
 	static bool screenshotQueued = false;
 	static string screenshotName = "";
 
-	static SDL_Surface* renderSurf = NULL;
-	static SDL_Texture* renderTex = NULL;
+	static SDL_Surface* renderSurf = nullptr;
+	static SDL_Texture* renderTex = nullptr;
 	static unordered_map<string, SDL_Texture*> images;
 	static int textFieldCount = 0;
 #define MAX_TEXTRENDER 8
@@ -73,13 +73,13 @@ namespace RenderCode {
 										r_height->Integer(),
 										SDL_WINDOW_OPENGL | (r_fullscreen->Bool() ? 
 										SDL_WINDOW_FULLSCREEN : SDL_WINDOW_SHOWN));
-		if(window == NULL) {
+		if(window == nullptr) {
 			SDL_Quit();
 			return;
 		}
 
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-		if(renderer == NULL) {
+		if(renderer == nullptr) {
 			SDL_Quit();
 			return;
 		}
@@ -112,7 +112,7 @@ namespace RenderCode {
 			R_Message(PRIORITY_ERROR, "FAILED! %s\n", IMG_GetError());
 		}
 
-		SDL_SetRenderTarget(renderer, NULL);
+		SDL_SetRenderTarget(renderer, nullptr);
 
 		R_Message(PRIORITY_NOTE, "Init font\n");
 		for(int i = 0; i < MAX_TEXTRENDER; i++) {
@@ -206,15 +206,15 @@ namespace RenderCode {
 
 	void AddSurface(void* surf) {
 		SDL_Surface* sdlsurf = (SDL_Surface*)surf;
-		SDL_BlitSurface(sdlsurf, NULL, renderSurf, NULL);
+		SDL_BlitSurface(sdlsurf, nullptr, renderSurf, nullptr);
 		SDL_FreeSurface(sdlsurf);
 	}
 
 	void BlendTexture(void* tex) {
 		SDL_Texture* text = (SDL_Texture*)tex;
-		SDL_SetRenderTarget(renderer, NULL);
+		SDL_SetRenderTarget(renderer, nullptr);
 		SDL_SetTextureBlendMode(text, SDL_BLENDMODE_BLEND);
-		SDL_RenderCopy(renderer, text, NULL, NULL);
+		SDL_RenderCopy(renderer, text, nullptr, nullptr);
 	}
 
 	void* GetRenderer() {
@@ -294,11 +294,11 @@ namespace RenderCode {
 
 		string path = ResolveImagePath(name);
 		if(path.length() <= 0) {
-			return NULL;
+			return nullptr;
 		}
 		
 		temp = IMG_Load(path.c_str());
-		if(temp == NULL) {
+		if(temp == nullptr) {
 			return (Image*)temp;
 		}
 
@@ -339,7 +339,7 @@ namespace RenderCode {
 		}
 
 		// Copy the texture
-		SDL_RenderCopy(renderer, image, NULL, &rect);
+		SDL_RenderCopy(renderer, image, nullptr, &rect);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
 			DebugImageDraw(&rect);
@@ -499,7 +499,7 @@ namespace RenderCode {
 		SDL_Color color;
 		color.r = r; color.g = g; color.b = b; color.a = 255;
 		SDL_Surface* surf = TTF_RenderText_Solid(font->GetFont(), text, color);
-		if(surf == NULL) {
+		if(surf == nullptr) {
 			return;
 		}
 
@@ -509,7 +509,7 @@ namespace RenderCode {
 		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
 		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], nullptr, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 		SDL_FreeSurface(surf2);
 	}
@@ -519,7 +519,7 @@ namespace RenderCode {
 		colorBackground.r = br; colorBackground.g = bg; colorBackground.b = bb; colorBackground.a = 255;
 		colorForeground.r = fr; colorForeground.g = fg; colorForeground.b = fb; colorForeground.a = 255;
 		SDL_Surface* surf = TTF_RenderText_Shaded(font->GetFont(), text, colorBackground, colorForeground);
-		if(surf == NULL) {
+		if(surf == nullptr) {
 			R_Message(PRIORITY_ERROR, "%s\n", SDL_GetError());
 			return;
 		}
@@ -530,7 +530,7 @@ namespace RenderCode {
 		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
 		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], nullptr, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 		SDL_FreeSurface(surf2);
 	}
@@ -539,7 +539,7 @@ namespace RenderCode {
 		SDL_Color color;
 		color.r = r; color.g = g; color.b = b; color.a = 255;
 		SDL_Surface* surf = TTF_RenderText_Blended(font->GetFont(), text, color);
-		if(surf == NULL) {
+		if(surf == nullptr) {
 			return;
 		}
 
@@ -549,7 +549,7 @@ namespace RenderCode {
 		SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 		if(textFields[textFieldCount]) SDL_DestroyTexture(textFields[textFieldCount]);
 		textFields[textFieldCount] = SDL_CreateTextureFromSurface(renderer, surf2);
-		SDL_RenderCopy(renderer, textFields[textFieldCount], NULL, &surf->clip_rect);
+		SDL_RenderCopy(renderer, textFields[textFieldCount], nullptr, &surf->clip_rect);
 		SDL_FreeSurface(surf);
 		SDL_FreeSurface(surf2);
 	}

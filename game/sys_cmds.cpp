@@ -69,7 +69,7 @@ void Cmd_Exec_f(vector<string>& args) {
 		return;
 	}
 	File* p = File::Open(args[1], "rb+");
-	if(p == NULL) {
+	if(p == nullptr) {
 		R_Message(PRIORITY_MESSAGE, "could not exec %s\n", args[1].c_str());
 		return;
 	}

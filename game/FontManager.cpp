@@ -1,28 +1,28 @@
 #include "sys_local.h"
 
-FontManager* FontMan = NULL;
+FontManager* FontMan = nullptr;
 
 /* Font class */
 Font::Font() {
-	ptFont = NULL;
+	ptFont = nullptr;
 }
 
 Font::~Font() {
-	if(ptFont != NULL) {
+	if(ptFont != nullptr) {
 		TTF_CloseFont(ptFont);
-		ptFont = NULL;
+		ptFont = nullptr;
 	}
 }
 
 void Font::LoadFont(const char* sFontFile, int iPointSize) {
-	if(ptFont != NULL) {
+	if(ptFont != nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: attempted to reload font %s\n", sFontFile);
 		return;
 	}
 
 	// We need to load the actual file using FS and then run it through TTF.
 	File* file = File::Open(sFontFile, "r");
-	if(file == NULL) {
+	if(file == nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: could not read font %s\n", sFontFile);
 		return;
 	}
@@ -35,7 +35,7 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 	//delete[] bytes;
 	if(!ptFont) {
 		R_Message(PRIORITY_WARNING, "WARNING: could not read font %s: %s\n", sFontFile, SDL_GetError());
-		ptFont = NULL;
+		ptFont = nullptr;
 		return;
 	}
 	file->Close();
@@ -44,7 +44,7 @@ void Font::LoadFont(const char* sFontFile, int iPointSize) {
 Font* Font::Register(const char* sFontFile, int iPointSize) {
 	if(!FontMan) {
 		R_Message(PRIORITY_ERROR, "Couldn't load %s (font manager not loaded)\n");
-		return NULL;
+		return nullptr;
 	}
 	return FontMan->RegisterFont(sFontFile, iPointSize);
 }

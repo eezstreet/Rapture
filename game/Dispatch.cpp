@@ -31,7 +31,7 @@ void Dispatch::Setup() {
 	com_dispatchMessageMask->AddCallback((void*)Dispatch::ChangeMessageMask);
 
 	char fileName[MAX_HANDLE_STRING*2] = { 0 };
-	time_t theTime = time(NULL);
+	time_t theTime = time(nullptr);
 
 	strftime(fileName, sizeof(fileName), "logs/rapturelog_%Y-%m-%d_%H-%M-%S.log", localtime(&theTime));
 	ptLogFile = File::Open(fileName, "wb+");
@@ -75,22 +75,22 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 			default:
 				break;
 			case PRIORITY_NOTE:
-				MessageBox(NULL, message, "Note", MB_OK | MB_SYSTEMMODAL | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Note", MB_OK | MB_SYSTEMMODAL | MB_SETFOREGROUND);
 				break;
 			case PRIORITY_DEBUG:
-				MessageBox(NULL, message, "Debug Message", MB_OK | MB_SYSTEMMODAL | MB_ICONINFORMATION | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Debug Message", MB_OK | MB_SYSTEMMODAL | MB_ICONINFORMATION | MB_SETFOREGROUND);
 				break;
 			case PRIORITY_MESSAGE:
-				MessageBox(NULL, message, "Message", MB_OK |  MB_SYSTEMMODAL | MB_ICONINFORMATION | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Message", MB_OK |  MB_SYSTEMMODAL | MB_ICONINFORMATION | MB_SETFOREGROUND);
 				break;
 			case PRIORITY_WARNING:
-				MessageBox(NULL, message, "Warning", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Warning", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL | MB_SETFOREGROUND);
 				break;
 			case PRIORITY_ERROR:
-				MessageBox(NULL, message, "Error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Error", MB_OK | MB_ICONWARNING | MB_SYSTEMMODAL | MB_SETFOREGROUND);
 				break;
 			case PRIORITY_ERRFATAL:
-				MessageBox(NULL, message, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND);
+				MessageBox(nullptr, message, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND);
 				break;
 		}
 	}

@@ -30,7 +30,7 @@ DungeonManager::~DungeonManager() {
 Worldspace* DungeonManager::GetWorld(unsigned int iAct) {
 	// Find the worldspace we're looking for
 	if(iAct >= NUM_ACTS) {
-		return NULL;
+		return nullptr;
 	}
 	return &(wActs[iAct]);
 }
@@ -65,7 +65,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 			v[i].w = 1; v[i].h = 1;
 			v[i].ptTile = ptMapLoader->FindTileByName(tile.lookup);
 			v[i].rt = (tileRenderType_e)tile.rt;
-			if(v[i].ptTile == NULL) {
+			if(v[i].ptTile == nullptr) {
 				R_Message(PRIORITY_WARNING, "Cannot find tile %s\n", tile.lookup);
 				return;
 			}

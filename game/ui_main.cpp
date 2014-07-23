@@ -3,8 +3,8 @@
 using namespace UI;
 using namespace Awesomium;
 
-WebCore *wc = NULL;
-static WebSession *sess = NULL;
+WebCore *wc = nullptr;
+static WebSession *sess = nullptr;
 
 vector<Menu*> vmMenus;
 static vector<WebView*> renderables;
@@ -29,9 +29,9 @@ bool IsConsoleOpen() {
 	return Console::GetSingleton()->IsOpen();
 }
 
-WebView* currentFocus = NULL; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
+WebView* currentFocus = nullptr; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
 
-RightClickCallback rccb = NULL;
+RightClickCallback rccb = nullptr;
 
 /* UI Class */
 void UI::Initialize() {
@@ -91,7 +91,7 @@ void UI::Render() {
 			// If it's not dirty, then we don't need to re-render
 			unsigned char* pixels;
 			int pitch;
-			if(SDL_LockTexture(tex, NULL, (void**)&pixels, &pitch) < 0) {
+			if(SDL_LockTexture(tex, nullptr, (void**)&pixels, &pitch) < 0) {
 				R_Message(PRIORITY_ERROR, "Failed to lock texture: %s\n", SDL_GetError());
 				return;
 			}
@@ -254,7 +254,7 @@ int SDL_ScancodeToAwesomium(SDL_Keycode key) {
 }
 
 void InjectAKeyboardEvent(Awesomium::WebKeyboardEvent e) {
-	if(currentFocus != NULL)
+	if(currentFocus != nullptr)
 		currentFocus->InjectKeyboardEvent(e);
 	else
 		for(auto it = renderables.begin(); it != renderables.end(); ++it)
@@ -366,11 +366,11 @@ void PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down) {
 }
 
 void UI::MouseButtonEvent(unsigned int buttonId, bool down) {
-	if(currentFocus != NULL) {
+	if(currentFocus != nullptr) {
 		PipeMouseInputToWebView(currentFocus, buttonId, down);
 		if(buttonId == SDL_BUTTON_RIGHT && down) {
 			// special callback
-			if(rccb != NULL) {
+			if(rccb != nullptr) {
 				rccb();
 			}
 		}

@@ -44,8 +44,8 @@ protected:
 	static T* singleton;
 public:
 	static T* GetSingleton() { if(!singleton) return singleton = new T(); return singleton; }
-	static void DestroySingleton() { if(!singleton) return; delete singleton; singleton = NULL; }
-	static bool SingletonExists() { return (singleton != NULL); }
+	static void DestroySingleton() { if(!singleton) return; delete singleton; singleton = nullptr; }
+	static bool SingletonExists() { return (singleton != nullptr); }
 };
 
 class Console : public SingletonMenu<Console>, public Menu {

@@ -7,7 +7,7 @@
 int visTouching = -1;
 
 Worldspace::Worldspace() {
-	qtMapTree = new QuadTree<Map, int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, NULL);
+	qtMapTree = new QuadTree<Map, int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, nullptr);
 };
 
 Worldspace::~Worldspace() {
@@ -245,7 +245,7 @@ Player* Worldspace::GetFirstPlayer() {
 	if(vPlayers.size() > 0) {
 		return vPlayers.front();
 	}
-	return NULL;
+	return nullptr;
 }
 
 void Worldspace::ActorMoved(Actor* ptActor) {

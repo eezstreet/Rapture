@@ -185,11 +185,11 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 
 void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 	if(!Cvar::Exists(name)) {
-		value = NULL;
+		value = nullptr;
 		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
-	if(value == NULL) {
+	if(value == nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::BoolValue\n");
 		return;
 	}
@@ -203,11 +203,11 @@ void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 
 void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 	if(!Cvar::Exists(name)) {
-		value = NULL;
+		value = nullptr;
 		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
-	if(value == NULL) {
+	if(value == nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::IntValue\n");
 		return;
 	}
@@ -221,11 +221,11 @@ void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 
 void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 	if(!Cvar::Exists(name)) {
-		value = NULL;
+		value = nullptr;
 		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
-	if(value == NULL) {
+	if(value == nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::StrValue\n");
 		return;
 	}
@@ -239,11 +239,11 @@ void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 
 void CvarSystem::EXPORT_Value(const char* name, float* value) {
 	if(!Cvar::Exists(name)) {
-		value = NULL;
+		value = nullptr;
 		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
 		return;
 	}
-	if(value == NULL) {
+	if(value == nullptr) {
 		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::Value\n");
 		return;
 	}

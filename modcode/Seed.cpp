@@ -1,7 +1,7 @@
 #include "Seed.h"
 
 Seed::Seed() {
-	srand(time(NULL));
+	srand(time(nullptr));
 	seedNum = (unsigned int)rand();
 }
 
@@ -39,10 +39,10 @@ int Seed::GenerateRandom(int min, int max) {
 }
 
 TwoPartSeed::TwoPartSeed() {
-	srand(time(NULL));
+	srand(time(nullptr));
 	loSeed = rand();
 
-	srand(time(NULL));
+	srand(time(nullptr));
 	hiSeed = rand();
 
 	if(loSeed > hiSeed) {
