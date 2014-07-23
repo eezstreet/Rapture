@@ -55,7 +55,13 @@ namespace Cmd {
 		R_Message(PRIORITY_MESSAGE, "unknown cmd '%s'\n", arguments[0].c_str());
 	}
 
+	static vector<string> vTabCompletion;
+	void AddTabCompletion(const string& cmdName) {
+		vTabCompletion.push_back(cmdName);
+	}
+
 	void AddCommand(const string& cmdName, conCmd_t cmd) {
+		AddTabCompletion(cmdName);
 		cmdlist[cmdName] = cmd;
 	}
 
@@ -68,42 +74,26 @@ namespace Cmd {
 	}
 
 	string TabComplete(const string& input) {
-		bool bSimple = false;
-		string useToCompare = input;
-		if(sLastTriedToComplete.length() <= 0) {
-			// Since we haven't tried to complete anything recently, we need to use simple mode
-			bSimple = true;
-		}
-
-		if(input.compare(0, sLastTriedToComplete.length(), sLastTriedToComplete) != 0) {
-			// We last tried to complete with a simpler input, so follow the same train
-			bSimple = true;
-		}
-
-		if(!bSimple) {
-			useToCompare = sLastTriedToComplete;
-		}
-
-		vector<string> vFoundElements;
-		for(auto it = cmdlist.begin(); it != cmdlist.end(); it++) {
-			if(it->first.compare(0, useToCompare.length(), useToCompare) == 0) {
-				vFoundElements.push_back(it->first);
+		vector<string> vValid;
+		for(auto it = vTabCompletion.begin(); it != vTabCompletion.end(); ++it) {
+			string& thisOne = *it;
+			if(!thisOne.compare(0, input.size(), input)) {
+				vValid.push_back(thisOne);
 			}
 		}
-
-		bool bFoundCommand = true;
-		for(auto it = CvarSystem::GetFirstCvar(bFoundCommand); bFoundCommand; it = CvarSystem::GetNextCvar(it, bFoundCommand)) {
-			if(it.compare(0, useToCompare.length(), useToCompare) == 0) {
-				vFoundElements.push_back(it);
-			}
-		}
-
-		if(vFoundElements.size() <= 0) {
+		if(vValid.size() == 0) {
 			R_Message(PRIORITY_MESSAGE, "No commands found.\n");
 			return input;
 		}
-
-		sLastTriedToComplete = input;
+		else if(vValid.size() == 1) {
+			return vValid.at(0);
+		}
+		R_Message(PRIORITY_MESSAGE, "\n");
+		for(auto it = vValid.begin(); it != vValid.end(); ++it) {
+			R_Message(PRIORITY_MESSAGE, "%s\n", (*it).c_str());
+		}
+		R_Message(PRIORITY_MESSAGE, "\n");
+		return input;
 	}
 
 	// This uses a standard quote-token system.

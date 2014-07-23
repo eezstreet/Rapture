@@ -97,6 +97,7 @@ Cvar* CvarSystem::RegisterCvar(Cvar *cvar) {
 	}
 	cvar->registered = true;
 	cvars[cvar->name] = cvar;
+	Cmd::AddTabCompletion(cvar->name);
 	return cvar;
 }
 

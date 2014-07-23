@@ -172,10 +172,10 @@ void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_calle
 		}
 		JSValue theArgument = args[0];
 		string value = ToString(theArgument.ToString());
-		/*string tabCompletion = Cmd::TabComplete(value);
+		string tabCompletion = Cmd::TabComplete(value);
 
 		jsFuncArgs.Push(WSLit(tabCompletion.c_str()));
-		window.ToObject().Invoke(WSLit("InputBufferUpdated"), jsFuncArgs);*/
+		window.ToObject().Invoke(WSLit("InputBufferUpdated"), jsFuncArgs);
 	}
 }
 

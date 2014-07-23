@@ -386,6 +386,7 @@ friend class File;
 
 namespace Cmd {
 	void ProcessCommand(const char *cmd);
+	void AddTabCompletion(const string& cmdName);
 	void AddCommand(const string& cmdName, conCmd_t cmd);
 	void RemoveCommand(const string& cmdName);
 	void ClearCommandList();
