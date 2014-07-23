@@ -4,8 +4,8 @@
 #define MAX_WORLDSPACE_SIZE	/*32768*/	256
 #define WORLDSPACE_LOG2		/*15*/		2
 
-#define TILE_WIDTH		192
-#define TILE_HEIGHT		96
+#define TILE_WIDTH		192.0f
+#define TILE_HEIGHT		96.0f
 
 int visTouching = -1;
 
