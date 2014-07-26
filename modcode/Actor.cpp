@@ -20,7 +20,7 @@ bool Actor::Move() {
 
 bool Actor::Move_NoPathfinding() {
 	Worldspace* ptWorld = ptDungeonManager->GetWorld(iAct);
-	RVec2<float> nextFramePosition((dir.tComponents[0] * fSpeed * thisClient->GetFrametime())+x, (dir.tComponents[1] * fSpeed * thisClient->GetFrametime())+y);
+	RVec2<float> nextFramePosition((dir.tComponents[0] * fSpeed * thisClient->GetFrametime()) + x, (dir.tComponents[1] * fSpeed * thisClient->GetFrametime()) + y);
 	if(nextFramePosition.tComponents[0] <= 0 || nextFramePosition.tComponents[1] <= 0) {
 		// No moving into negative/zero coords
 		return false;
@@ -28,20 +28,20 @@ bool Actor::Move_NoPathfinding() {
 
 	int bottomedOutX = (int)floor(nextFramePosition.tComponents[0]);
 	int bottomedOutY = (int)floor(nextFramePosition.tComponents[1]);
-	int bottomedOutSubtileX = (int)floor((nextFramePosition.tComponents[0]-bottomedOutX)*4);
-	int bottomedOutSubtileY = (int)floor((nextFramePosition.tComponents[1]-bottomedOutY)*4);
+	int bottomedOutSubtileX = (int)floor((nextFramePosition.tComponents[0] - bottomedOutX) * 4);
+	int bottomedOutSubtileY = (int)floor((nextFramePosition.tComponents[1] - bottomedOutY) * 4);
 
 	if(bottomedOutX <= 0 || bottomedOutY <= 0) {
 		// can sometimes happen
 		return true;
 	}
-		
+
 	auto nodes = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesIn(bottomedOutX, bottomedOutY, 2, 2);
 	if(nodes.size() <= 0) {
 		// No nodes in this sector = no movement
 		return true;
 	}
-		
+
 	bool bDoWeHaveNodeHere = false;
 	vector<TileNode*> nodesOnThis;
 	for(auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -61,13 +61,13 @@ bool Actor::Move_NoPathfinding() {
 			continue;
 		}
 		if(bIsPlayer) {
-			if(node->ptTile->vismask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY) && iMovingToVis != -1) {
+			if(node->ptTile->vismask & (1 << (bottomedOutSubtileX * 4) + bottomedOutSubtileY) && iMovingToVis != -1) {
 				Player* ptPlayer = (Player*)this;
 				ptPlayer->MoveToNextVis();
 				return false;
 			}
 		}
-		if(node->ptTile->lowmask & (1 << (bottomedOutSubtileX * 4)+bottomedOutSubtileY)) {
+		if(node->ptTile->lowmask & (1 << (bottomedOutSubtileX * 4) + bottomedOutSubtileY)) {
 			// Does this subtile specifically block movement? Don't allow it.
 			return true;
 		}
@@ -85,7 +85,7 @@ bool Actor::Move_NoPathfinding() {
 				continue;
 			}
 			if(ent->x <= nextFramePosition.tComponents[0] && ent->x + ent->w >= nextFramePosition.tComponents[0] &&
-				ent->y <= nextFramePosition.tComponents[1] && ent->y + ent->h >= nextFramePosition.tComponents[1]) {
+			   ent->y <= nextFramePosition.tComponents[1] && ent->y + ent->h >= nextFramePosition.tComponents[1]) {
 				if(ptDestinationEnt == ent) {
 					ent->interact(this);
 				}

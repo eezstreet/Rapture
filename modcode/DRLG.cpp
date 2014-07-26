@@ -28,7 +28,7 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 	vector<int> vWalkableDirections;
 	const MapFramework* ptMapFramework = (const MapFramework*)rtMap.ptFramework;
 
-	function<void(int, bool)> walk = [&](int max, bool bIgnoreBuiltRooms) -> void {
+	function<void(int, bool)> walk = [ &](int max, bool bIgnoreBuiltRooms) -> void {
 		i = 0;
 		while(i < ptMapFramework->parm[0]) {
 			// Pick one direction and go with it
@@ -51,11 +51,11 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 				VectorErase<int>(vWalkableDirections, 1);
 				numWalkableDirections--;
 			}
-			if(currentPos.tComponents[1] >= maxY-1) {
+			if(currentPos.tComponents[1] >= maxY - 1) {
 				VectorErase<int>(vWalkableDirections, 2);
 				numWalkableDirections--;
 			}
-			if(currentPos.tComponents[0] >= maxX-1) {
+			if(currentPos.tComponents[0] >= maxX - 1) {
 				VectorErase<int>(vWalkableDirections, 3);
 				numWalkableDirections--;
 			}
@@ -65,22 +65,44 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 			}
 
 			for(auto it = vWalkableDirections.begin(); it != vWalkableDirections.end(); ++it) {
+				int index;
 				switch(*it) {
 					case 0:
+						index = currentPos.tComponents[0] + (currentPos.tComponents[1] - 1)*rtRoomGrid.sizeX;
+						if(rtRoomGrid.roomArray[index].bAreYouReallyReal == false) {
+							vWeWouldPrefer.push_back(*it);
+						}
 						break;
 					case 1:
+						index = currentPos.tComponents[0] - 1 + (currentPos.tComponents[1] * rtRoomGrid.sizeX);
+						if(rtRoomGrid.roomArray[index].bAreYouReallyReal == false) {
+							vWeWouldPrefer.push_back(*it);
+						}
 						break;
 					case 2:
+						index = currentPos.tComponents[0] + ((currentPos.tComponents[1] + 1)*rtRoomGrid.sizeX);
+						if(rtRoomGrid.roomArray[index].bAreYouReallyReal == false) {
+							vWeWouldPrefer.push_back(*it);
+						}
 						break;
 					case 3:
+						index = currentPos.tComponents[0] + 1 + (currentPos.tComponents[1] * rtRoomGrid.sizeX);
+						if(rtRoomGrid.roomArray[index].bAreYouReallyReal == false) {
+							vWeWouldPrefer.push_back(*it);
+						}
 						break;
 					default:
 						break;
 				}
 			}
 
-			direction = drlgSeed.GenerateRandom(0, vWalkableDirections.size());
-			direction = vWalkableDirections.at(direction);
+			if(vWeWouldPrefer.size() <= 0) {
+				direction = drlgSeed.GenerateRandom(0, vWalkableDirections.size());
+				direction = vWalkableDirections.at(direction);
+			} else {
+				direction = drlgSeed.GenerateRandom(0, vWeWouldPrefer.size());
+				direction = vWeWouldPrefer.at(direction);
+			}
 
 			// NWSE
 			switch(direction) {
@@ -143,11 +165,11 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 			VectorErase<int>(vWalkableDirections, 1);
 			numWalkableDirections--;
 		}
-		if(currentPos.tComponents[1] >= maxY-1) {
+		if(currentPos.tComponents[1] >= maxY - 1) {
 			VectorErase<int>(vWalkableDirections, 2);
 			numWalkableDirections--;
 		}
-		if(currentPos.tComponents[0] >= maxX-1) {
+		if(currentPos.tComponents[0] >= maxX - 1) {
 			VectorErase<int>(vWalkableDirections, 3);
 			numWalkableDirections--;
 		}
@@ -190,7 +212,7 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 	return true;
 }
 
-bool Do_Saturation(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid ) {
+bool Do_Saturation(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid) {
 	return true;
 }
 
@@ -210,7 +232,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 	if(i == rtRoomGrid.sizeX * rtRoomGrid.sizeY) {
 		return false; // Couldn't find the entrance
 	}
-	
+
 	// Assign random links to everything until we run out of orphaned rooms
 	for(int j = 0; j < rtRoomGrid.sizeX * rtRoomGrid.sizeY; j++) {
 		Room *ptRoom = &rtRoomGrid.roomArray[j];
@@ -249,7 +271,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 			switch(connection) {
 				default:
 				case 0:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y-1) * rtRoomGrid.sizeX + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y - 1) * rtRoomGrid.sizeX + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_N);
 					otherRoom->iConnectionFlags |= (1 << ROOM_S);
 					break;
@@ -259,7 +281,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 					otherRoom->iConnectionFlags |= (1 << ROOM_E);
 					break;
 				case 2:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y+1) * rtRoomGrid.sizeX + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y + 1) * rtRoomGrid.sizeX + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_S);
 					otherRoom->iConnectionFlags |= (1 << ROOM_N);
 					break;
@@ -275,9 +297,9 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 
 	// Determine if we're able to reach the entrance, first by working from the entrance's block
 	RVec2<int> currentPos(rtRoomGrid.roomArray[i].x, rtRoomGrid.roomArray[i].y);
-	size_t connectionSize = sizeof(bool) * rtRoomGrid.sizeX * rtRoomGrid.sizeY;
+	size_t connectionSize = sizeof(bool)* rtRoomGrid.sizeX * rtRoomGrid.sizeY;
 	vector<bool> bConnects(connectionSize, false);
-	function<void(RVec2<int>&)> f = [&](RVec2<int>& c) -> void {
+	function<void(RVec2<int>&)> f = [ &](RVec2<int>& c) -> void {
 		int index = c.tComponents[1] * rtRoomGrid.sizeX + c.tComponents[0];
 		Room& room = rtRoomGrid.roomArray[index];
 		if(bConnects[index] == true) {
@@ -285,16 +307,16 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 		}
 		bConnects[index] = true;
 		if(room.iConnectionFlags & (1 << ROOM_N)) {
-			f(RVec2<int>(c.tComponents[0], c.tComponents[1]-1));
+			f(RVec2<int>(c.tComponents[0], c.tComponents[1] - 1));
 		}
 		if(room.iConnectionFlags & (1 << ROOM_W)) {
-			f(RVec2<int>(c.tComponents[0]-1, c.tComponents[1]));
+			f(RVec2<int>(c.tComponents[0] - 1, c.tComponents[1]));
 		}
 		if(room.iConnectionFlags & (1 << ROOM_S)) {
-			f(RVec2<int>(c.tComponents[0], c.tComponents[1]+1));
+			f(RVec2<int>(c.tComponents[0], c.tComponents[1] + 1));
 		}
 		if(room.iConnectionFlags & (1 << ROOM_E)) {
-			f(RVec2<int>(c.tComponents[0]+1, c.tComponents[1]));
+			f(RVec2<int>(c.tComponents[0] + 1, c.tComponents[1]));
 		}
 	};
 	f(currentPos);
@@ -302,7 +324,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 	// Lastly, walk from the entrance and link up rooms which can't connect to us.
 	vector<bool> bRanLastStage(connectionSize, false);
 	// TODO: eliminate code reuse
-	function<void(RVec2<int>&)> g = [&](RVec2<int>& c) -> void {
+	function<void(RVec2<int>&)> g = [ &](RVec2<int>& c) -> void {
 		int index = c.tComponents[1] * rtRoomGrid.sizeX + c.tComponents[0];
 		int nextIndex;
 		Room* ptNextRoom;
@@ -375,26 +397,26 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 		string preset = ptFramework->tileSet;
 		if(ptRoom->eType != ROOM_FILLER) {
 			switch(ptRoom->eType) {
-			case ROOM_SPECIAL_0:
-			case ROOM_SPECIAL_1:
-			case ROOM_SPECIAL_2:
-			case ROOM_SPECIAL_3:
-			case ROOM_SPECIAL_4:
-			case ROOM_SPECIAL_5:
-			case ROOM_SPECIAL_6:
-			case ROOM_SPECIAL_7:
-				preset += "spc";
-				preset += ptRoom->eType - ROOM_SPECIAL_0;
-				break;
-			case ROOM_SHRINE:
-				preset += "shr";
-				break;
-			case ROOM_ENTRY:
-				preset += "etr";
-				break;
-			case ROOM_EXIT:
-				preset += "exi";
-				break;
+				case ROOM_SPECIAL_0:
+				case ROOM_SPECIAL_1:
+				case ROOM_SPECIAL_2:
+				case ROOM_SPECIAL_3:
+				case ROOM_SPECIAL_4:
+				case ROOM_SPECIAL_5:
+				case ROOM_SPECIAL_6:
+				case ROOM_SPECIAL_7:
+					preset += "spc";
+					preset += ptRoom->eType - ROOM_SPECIAL_0;
+					break;
+				case ROOM_SHRINE:
+					preset += "shr";
+					break;
+				case ROOM_ENTRY:
+					preset += "etr";
+					break;
+				case ROOM_EXIT:
+					preset += "exi";
+					break;
 			}
 		}
 		if(ptRoom->iConnectionFlags & (1 << ROOM_N)) {
@@ -438,8 +460,8 @@ void Maze_Build(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomGrid, Du
 			auto loadedEnt = pfd->entities[j];
 			float roomOffsetX = (i % rtRoomGrid.sizeX) + (ptRoom->x * rtRoomGrid.sizeX) - ptRoom->x;
 			float roomOffsetY = floor((float)i / rtRoomGrid.sizeX) + (ptRoom->y * rtRoomGrid.sizeY) - ptRoom->y;
-			Entity* ent = ptDungeonManager->GenerateEntity(loadedEnt.lookup, loadedEnt.x + rtMap.x + roomOffsetX, 
-				loadedEnt.y + rtMap.y + roomOffsetY, loadedEnt.spawnflags, rtMap.iAct);
+			Entity* ent = ptDungeonManager->GenerateEntity(loadedEnt.lookup, loadedEnt.x + rtMap.x + roomOffsetX,
+														   loadedEnt.y + rtMap.y + roomOffsetY, loadedEnt.spawnflags, rtMap.iAct);
 			Worldspace* ptWorld = ptDungeonManager->GetWorld(rtMap.iAct);
 			ptWorld->SpawnEntity(ent, ent->bShouldWeRender, ent->bShouldWeThink, ent->bShouldWeCollide);
 			ent->ptContainingTree = rtMap.qtEntTree.AddNode(ent);
