@@ -3,125 +3,6 @@
 
 InputManager *Input = nullptr;
 
-const string keycodeNames[] = {
-	"unknown",
-	"a",
-	"b",
-	"c",
-	"d",
-	"e",
-	"f",
-	"g",
-	"h",
-	"i",
-	"j",
-	"k",
-	"l",
-	"m",
-	"n",
-	"o",
-	"p",
-	"q",
-	"r",
-	"s",
-	"t",
-	"u",
-	"v",
-	"w",
-	"x",
-	"y",
-	"z",
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"0",
-	"enter",
-	"esc",
-	"backspace",
-	"tab",
-	"space",
-	"-",
-	"=",
-	"[",
-	"]",
-	"\\",
-	"\\",
-	";",
-	"'",
-	"`",
-	",",
-	".",
-	"/",
-	"capslock",
-	"f1",
-	"f2",
-	"f3",
-	"f4",
-	"f5",
-	"f6",
-	"f7",
-	"f8",
-	"f9",
-	"f10",
-	"f11",
-	"f12",
-	"printscreen",
-	"scrolllock",
-	"pause",
-	"insert",
-	"home",
-	"pageup",
-	"delete",
-	"end",
-	"pagedown",
-	"right",
-	"left",
-	"down",
-	"up",
-#ifdef _WIN32
-	"numlock",
-#else
-	"clear",
-#endif
-	"kp_divide",
-	"kp_multiply",
-	"kp_minus",
-	"kp_plus",
-	"kp_enter",
-	"kp_1",
-	"kp_2",
-	"kp_3",
-	"kp_4",
-	"kp_5",
-	"kp_6",
-	"kp_7",
-	"kp_8",
-	"kp_9",
-	"kp_period",
-#ifdef _WIN32
-	"contextual",
-#else
-	"compose",
-#endif
-	"power",
-	// HACK
-	"lctrl",
-	"lshift",
-	"lalt",
-	"lgui",
-	"rctrl",
-	"rshift",
-	"ralt",
-	"rgui"
-	// END HACK
-};
-
 void InitInput() {
 	Input = new InputManager();
 }
@@ -141,18 +22,16 @@ void InputManager::SendKeyDownEvent(SDL_Keysym key, char* text) {
 	UI::KeyboardEvent(key, true, text);
 }
 
+bool bVMInputBlocked = false;
 void InputManager::SendKeyUpEvent(SDL_Keysym key, char* text) {
 	SDL_Scancode k = key.scancode;
-	if(thisFrameKeysDown.end() == thisFrameKeysDown.begin()) {
-		return;
-	}
-	auto it = find(thisFrameKeysDown.begin(), thisFrameKeysDown.end(), k);
-	if(it == thisFrameKeysDown.end())
-		return;
-	thisFrameKeysDown.erase(it);
 
-	// TODO: keycatchers
 	UI::KeyboardEvent(key, false, text);
+	if(RaptureGame::GetGameModule() != nullptr || RaptureGame::GetEditorModule() != nullptr) {
+		if(!bVMInputBlocked) {
+			RaptureGame::GetImport()->passkeypress(key.scancode);
+		}
+	}
 }
 
 void InputManager::InputFrame() {
@@ -183,25 +62,24 @@ InputManager::InputManager() {
 void InputManager::ExecuteBind(const string& bindStuff) {
 }
 
-bool bVMInputBlocked = false;
 void InputManager::SendMouseButtonEvent(unsigned int buttonId, unsigned char state, int x, int y) {
 	if(state == SDL_PRESSED) {
 		UI::MouseButtonEvent(buttonId, true);
-		if(RaptureGame::GetGameModule() != nullptr) {
+		if(RaptureGame::GetGameModule() != nullptr || RaptureGame::GetEditorModule() != nullptr) {
 			if(!bVMInputBlocked) {
 				RaptureGame::GetImport()->passmousedown(x, y);
 			}
 		}
 	} else {
 		UI::MouseButtonEvent(buttonId, false);
-		if(RaptureGame::GetGameModule() != nullptr) {
+		if(RaptureGame::GetGameModule() != nullptr || RaptureGame::GetEditorModule() != nullptr) {
 			RaptureGame::GetImport()->passmouseup(x, y);
 		}
 	}
 }
 
 void InputManager::SendMouseMoveEvent(int x, int y) {
-	if(RaptureGame::GetGameModule() != nullptr) {
+	if(RaptureGame::GetGameModule() != nullptr || RaptureGame::GetEditorModule() != nullptr) {
 		RaptureGame::GetImport()->passmousemove(x, y);
 	}
 	UI::MouseMoveEvent(x, y);

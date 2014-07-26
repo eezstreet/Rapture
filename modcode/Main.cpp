@@ -79,6 +79,9 @@ void Game_OnMouseMove(int x, int y) {
 	}
 }
 
+void Game_OnKeyPress(int x) {
+}
+
 extern "C" {
 	__declspec(dllexport) gameExports_s* GetRefAPI(gameImports_s* import) {
 		trap = import;
@@ -89,6 +92,7 @@ extern "C" {
 		exportFns.passmouseup = Game_OnMouseUp;
 		exportFns.passmousedown = Game_OnMouseDown;
 		exportFns.passmousemove = Game_OnMouseMove;
+		exportFns.passkeypress = Game_OnKeyPress;
 		return &exportFns;
 	}
 };

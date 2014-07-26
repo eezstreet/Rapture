@@ -260,8 +260,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 	// Determine if we're able to reach the entrance, first by working from the entrance's block
 	RVec2<int> currentPos(rtRoomGrid.roomArray[i].x, rtRoomGrid.roomArray[i].y);
 	size_t connectionSize = sizeof(bool) * rtRoomGrid.sizeX * rtRoomGrid.sizeY;
-	bool* bConnects = (bool*)trap->Zone_Alloc(connectionSize*sizeof(bool), "roomgrid");
-	memset(bConnects, false, connectionSize * sizeof(bool));
+	vector<bool> bConnects(connectionSize, false);
 	function<void(RVec2<int>&)> f = [&](RVec2<int>& c) -> void {
 		int index = c.tComponents[1] * rtRoomGrid.sizeX + c.tComponents[0];
 		Room& room = rtRoomGrid.roomArray[index];
@@ -285,8 +284,7 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 	f(currentPos);
 
 	// Lastly, walk from the entrance and link up rooms which can't connect to us.
-	bool* bRanLastStage = (bool*)trap->Zone_Alloc(connectionSize*sizeof(bool), "roomgrid");
-	memset(bRanLastStage, false, connectionSize * sizeof(bool));
+	vector<bool> bRanLastStage(connectionSize, false);
 	// TODO: eliminate code reuse
 	function<void(RVec2<int>&)> g = [&](RVec2<int>& c) -> void {
 		int index = c.tComponents[1] * rtRoomGrid.sizeX + c.tComponents[0];
@@ -348,8 +346,6 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 	};
 	g(currentPos);
 	vConnectables.clear();
-	trap->Zone_FastFree(bRanLastStage, "roomgrid");
-	trap->Zone_FastFree(bConnects, "roomgrid");
 	return true;
 }
 

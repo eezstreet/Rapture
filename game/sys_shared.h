@@ -25,6 +25,7 @@ using namespace std;
 
 #define MAX_HANDLE_STRING	64
 
+extern const string keycodeNames[];
 vector<string>& split(const string& str, const char delim, vector<string>& elems);
 vector<wstring>& split(const wstring& str, const wchar_t delim);
 bool atob(const string& str);
@@ -147,6 +148,7 @@ struct gameExports_s {
 	void (*passmousedown)(int x, int y);
 	void (*passmousemove)(int x, int y);
 
+	void (*passkeypress)(int x);
 };
 
 // sys_main.cpp

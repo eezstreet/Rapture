@@ -70,6 +70,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\game\Shared.cpp" />
     <ClCompile Include="..\e_display.cpp" />
     <ClCompile Include="..\e_fps.cpp" />
     <ClCompile Include="..\e_interface.cpp" />

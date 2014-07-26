@@ -46,6 +46,7 @@ public:
 	GameModule* CreateGameModule(const char* bundle);
 
 	static GameModule* GetGameModule();
+	static GameModule* GetEditorModule();
 	static gameExports_s* GetImport();
 };
 

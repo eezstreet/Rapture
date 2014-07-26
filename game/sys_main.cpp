@@ -270,6 +270,13 @@ GameModule* RaptureGame::GetGameModule() {
 	return nullptr;
 }
 
+GameModule* RaptureGame::GetEditorModule() {
+	if(sys) {
+		return sys->editor;
+	}
+	return nullptr;
+}
+
 gameExports_s* RaptureGame::GetImport() {
 	if(sys) {
 		return sys->trap;
