@@ -1,11 +1,15 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rapture", "Rapture.vcxproj", "{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamex86", "..\gamex86\gamex86.vcxproj", "{70549835-D4E2-4A31-8ED4-5D885CDE6D70}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "editorx86", "..\editor\editorx86\editorx86.vcxproj", "{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game Assets", "..\assets\game_assets\game_assets.vcxproj", "{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,10 @@ Global
 		{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}.Debug|Win32.Build.0 = Debug|Win32
 		{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}.Release|Win32.ActiveCfg = Release|Win32
 		{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}.Release|Win32.Build.0 = Release|Win32
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Debug|Win32.Build.0 = Debug|Win32
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Release|Win32.ActiveCfg = Release|Win32
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}</ProjectGuid>
+    <RootNamespace>game_assets</RootNamespace>
+    <ProjectName>Game Assets</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\LevelMaze.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\Levels.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\LevelWarp.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_E.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrN.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNW.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrW.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_N.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NW.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_S.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_SE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_test.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_W.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WS.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WSE.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1town1.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis0.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis1.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis2.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis3.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis4.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis5.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis6.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis7.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\test.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testvisdown.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testvisup.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testwall.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\editor_flooredit.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\objects\act1\chest-test.psd" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\test-chest.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testchar.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testtile.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisdown_h.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisup.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisup_h.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testwalltile.json" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\console.html" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\colors.css" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.css" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.min.css" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\exocet.css" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\helpers.css" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\editorhotkeys.html" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\hud.html" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\rapture-logo.psd" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\main.html" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\null.html" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jQuery-2.0.3.min.js" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jquery-ui-1.10.4.custom.js" />
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jquery-ui-1.10.4.custom.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\characters\test\test1.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\objects\act1\chest-test.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\test3 - original.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\test3.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\testwalltile.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\testwalltile_trans.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_down.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_down_hi.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_up_hi.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\editor\floor_edit.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\animated-overlay.gif" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_carbon-fiber_10_360f0f_8x9.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_diagonals-thick_10_621715_40x40.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_20_2a2a2a_40x100.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_25_333333_40x100.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_30_cccccc_40x100.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_50_5c5c5c_40x100.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_glass_40_ffc73d_1x400.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_spotlight_10_000000_600x600.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_222222_256x240.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_4b8e0b_256x240.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_a83300_256x240.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_cccccc_256x240.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\alphalogo.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\loading.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consola.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolab.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolai.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolaz.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\segoeui.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\fonts\Exocet1.ttf" />
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\fonts\Exocet2.ttf" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

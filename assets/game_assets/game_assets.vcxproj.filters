@@ -1,0 +1,383 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{5188230f-fc11-4a57-8467-755a4dca2fd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials">
+      <UniqueIdentifier>{9b33af01-afac-4ab8-8229-3a8336525b50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\levels">
+      <UniqueIdentifier>{368311f4-a153-48f9-b329-25baccee5d71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\characters">
+      <UniqueIdentifier>{9caa16d2-cfd1-4cca-b558-60c9bab9c462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\objects">
+      <UniqueIdentifier>{59168ffc-05ff-487b-b482-86b2872942c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\tiles">
+      <UniqueIdentifier>{ac7b2c6c-8cd8-47e9-9a3b-1b0fb073da9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\characters\test">
+      <UniqueIdentifier>{dcff9d6c-e4cc-4e81-a7b2-077f6d086f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\tiles\act1">
+      <UniqueIdentifier>{169d0023-b6c1-477f-838d-a55d9cc3c1eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\tiles\editor">
+      <UniqueIdentifier>{b0daf089-beb3-4b93-bb97-67ea61d6e445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\materials\objects\act1">
+      <UniqueIdentifier>{5b61b1ad-f110-4111-bf59-e3f572f1277d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\levels\preset">
+      <UniqueIdentifier>{4a1a9ece-8c2b-4976-8236-4c8b6d7acd2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\levels\tiles">
+      <UniqueIdentifier>{a67d304e-7035-4486-a7fe-a9491dd20e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui">
+      <UniqueIdentifier>{481a9035-5fe8-46bd-a62d-92435080ccd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\css">
+      <UniqueIdentifier>{6716e579-828e-4b71-9c72-f4821c4b9219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\fonts">
+      <UniqueIdentifier>{fc1aa0d5-1d0b-4d80-b0dd-b8d58f937cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\images">
+      <UniqueIdentifier>{17337821-c2b2-498b-8281-17a0315f1ee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\css\custom-theme">
+      <UniqueIdentifier>{5a881580-1917-4fb1-a2be-6944828d3592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\css\custom-theme\images">
+      <UniqueIdentifier>{168f3fb1-6a5a-48f2-afcd-40108e356594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\ui\scripts">
+      <UniqueIdentifier>{84ae1408-b92a-4ce8-9345-1e72b2d34c78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\fonts">
+      <UniqueIdentifier>{7d313234-e70e-4b52-8e44-8f071b679db0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\editor_flooredit.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testchar.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\test-chest.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testtile.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisdown_h.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisup.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testvisup_h.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\testwalltile.json">
+      <Filter>core\materials</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\objects\act1\chest-test.psd">
+      <Filter>core\materials\objects\act1</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\LevelMaze.json">
+      <Filter>core\levels</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\Levels.json">
+      <Filter>core\levels</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\LevelWarp.json">
+      <Filter>core\levels</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis0.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis1.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis2.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis3.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis4.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis5.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis6.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\special_vis7.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\test.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testvisdown.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testvisup.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\tiles\testwall.json">
+      <Filter>core\levels\tiles</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_E.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrN.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNW.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrNWSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrW.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_etrWSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_N.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NW.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_NWSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_S.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_SE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_test.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_W.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_WSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1town1.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\console.html">
+      <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\editorhotkeys.html">
+      <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\hud.html">
+      <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\main.html">
+      <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\null.html">
+      <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\colors.css">
+      <Filter>core\ui\css</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\exocet.css">
+      <Filter>core\ui\css</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\helpers.css">
+      <Filter>core\ui\css</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.css">
+      <Filter>core\ui\css\custom-theme</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.min.css">
+      <Filter>core\ui\css\custom-theme</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\rapture-logo.psd">
+      <Filter>core\ui\images</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jQuery-2.0.3.min.js">
+      <Filter>core\ui\scripts</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jquery-ui-1.10.4.custom.js">
+      <Filter>core\ui\scripts</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jquery-ui-1.10.4.custom.min.js">
+      <Filter>core\ui\scripts</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\characters\test\test1.png">
+      <Filter>core\materials\characters\test</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\test3 - original.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\test3.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\testwalltile.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\testwalltile_trans.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_down.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_down_hi.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\act1\vis_up_hi.png">
+      <Filter>core\materials\tiles\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\tiles\editor\floor_edit.png">
+      <Filter>core\materials\tiles\editor</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\objects\act1\chest-test.png">
+      <Filter>core\materials\objects\act1</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\animated-overlay.gif">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_carbon-fiber_10_360f0f_8x9.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_diagonals-thick_10_621715_40x40.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_20_2a2a2a_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_25_333333_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_30_cccccc_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_flat_50_5c5c5c_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_glass_40_ffc73d_1x400.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_highlight-soft_80_eeeeee_1x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-bg_spotlight_10_000000_600x600.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_4b8e0b_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_222222_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_a83300_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_cccccc_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\alphalogo.png">
+      <Filter>core\ui\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\loading.png">
+      <Filter>core\ui\images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\fonts\Exocet1.ttf">
+      <Filter>core\ui\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\fonts\Exocet2.ttf">
+      <Filter>core\ui\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consola.ttf">
+      <Filter>core\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolab.ttf">
+      <Filter>core\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolai.ttf">
+      <Filter>core\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\consolaz.ttf">
+      <Filter>core\fonts</Filter>
+    </Font>
+    <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\fonts\segoeui.ttf">
+      <Filter>core\fonts</Filter>
+    </Font>
+  </ItemGroup>
+</Project>
