@@ -12,6 +12,9 @@ int iMovingToVis = -1;
 
 extern int visTouching;
 
+#define MAX_PLAYER_TOUCHME_DIS 0.035f
+#define MIN_PLAYER_MOVE_DIS 0.25f
+
 Player::Player(float _x, float _y) {
 	this->x = _x;	// being weird
 	this->y = _y;
@@ -25,11 +28,12 @@ void Player::think() {
 	pX = x;
 	pY = y;
 
-	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, 0.035f)) {
+	if(bShouldWeBeMoving && bDoWeHaveADestination && origin.Within(dest, MAX_PLAYER_TOUCHME_DIS)) {
 		bShouldWeBeMoving = false;
-		if(ptDestinationEnt != nullptr) {
-			ptDestinationEnt->interact(this);
-		}
+	}
+
+	if(!bShouldWeBeMoving && origin.Within(dest, MIN_PLAYER_MOVE_DIS) && ptDestinationEnt) {
+		ptDestinationEnt->interact(this);
 	}
 
 	if(bShouldWeBeMoving) {
@@ -77,8 +81,11 @@ void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
 	dir.Normalize();
 	dest = destination;
 
-	if(origin.Within(dest, 0.25f)) {
+	if(origin.Within(dest, MIN_PLAYER_MOVE_DIS)) {
 		bShouldWeBeMoving = false;
+		if(thisClient->ptFocusEnt != nullptr) {
+			ptDestinationEnt = thisClient->ptFocusEnt;
+		}
 		// FIXME: use whatever is in our crosshair
 		return;
 	}
