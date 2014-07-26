@@ -40,6 +40,7 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 			vWalkableDirections.push_back(1);
 			vWalkableDirections.push_back(2);
 			vWalkableDirections.push_back(3);
+			vector<int> vWeWouldPrefer;
 			int direction = -1;
 
 			if(currentPos.tComponents[1] <= 0) {
@@ -61,6 +62,21 @@ bool Do_DrunkenStagger(MazeFramework* ptFramework, Map& rtMap, RoomGrid& rtRoomG
 			if(numWalkableDirections <= 0) {
 				R_Error("Maze with grid size 0");
 				break;
+			}
+
+			for(auto it = vWalkableDirections.begin(); it != vWalkableDirections.end(); ++it) {
+				switch(*it) {
+					case 0:
+						break;
+					case 1:
+						break;
+					case 2:
+						break;
+					case 3:
+						break;
+					default:
+						break;
+				}
 			}
 
 			direction = drlgSeed.GenerateRandom(0, vWalkableDirections.size());
