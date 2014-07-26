@@ -246,16 +246,30 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 			vConnectables.push_back(1);
 			vConnectables.push_back(2);
 			vConnectables.push_back(3);
-			if(ptRoom->y <= 0 || rtRoomGrid.roomArray[(ptRoom->y - 1) * rtRoomGrid.sizeX + ptRoom->x].bAreYouReallyReal == false) {
+
+			int iNewIndex[4];
+			iNewIndex[0] = (ptRoom->y - 1) * rtRoomGrid.sizeX + ptRoom->x;
+			iNewIndex[1] = ptRoom->y * rtRoomGrid.sizeX + ptRoom->x - 1;
+			iNewIndex[2] = (ptRoom->y + 1) * rtRoomGrid.sizeX + ptRoom->x;
+			iNewIndex[3] = ptRoom->y * rtRoomGrid.sizeX + ptRoom->x + 1;
+			if(ptRoom->y <= 0 || 
+			   rtRoomGrid.roomArray[iNewIndex[0]].x != ptRoom->x || 
+			   rtRoomGrid.roomArray[iNewIndex[0]].bAreYouReallyReal == false) {
 				VectorErase<int>(vConnectables, 0);
 			}
-			if(ptRoom->x <= 0 || rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x - 1].bAreYouReallyReal == false) {
+			if(ptRoom->x <= 0 || 
+			   rtRoomGrid.roomArray[iNewIndex[1]].y != ptRoom->y ||
+			   rtRoomGrid.roomArray[iNewIndex[1]].bAreYouReallyReal == false) {
 				VectorErase<int>(vConnectables, 1);
 			}
-			if(ptRoom->y >= rtRoomGrid.sizeY || rtRoomGrid.roomArray[(ptRoom->y + 1) * rtRoomGrid.sizeX + ptRoom->x].bAreYouReallyReal == false) {
+			if(ptRoom->y >= rtRoomGrid.sizeY-1 || 
+			   rtRoomGrid.roomArray[iNewIndex[2]].x != ptRoom->x ||
+			   rtRoomGrid.roomArray[iNewIndex[2]].bAreYouReallyReal == false) {
 				VectorErase<int>(vConnectables, 2);
 			}
-			if(ptRoom->x >= rtRoomGrid.sizeX || rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x + 1].bAreYouReallyReal == false) {
+			if(ptRoom->x >= rtRoomGrid.sizeX-1 || 
+			   rtRoomGrid.roomArray[iNewIndex[3]].y != ptRoom->y ||
+			   rtRoomGrid.roomArray[iNewIndex[3]].bAreYouReallyReal == false) {
 				VectorErase<int>(vConnectables, 3);
 			}
 			if(vConnectables.size() <= 0) {
@@ -271,22 +285,22 @@ bool Do_DrunkenStaggerSaturationLink(MazeFramework* ptFramework, Map& rtMap, Roo
 			switch(connection) {
 				default:
 				case 0:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y - 1) * rtRoomGrid.sizeX + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[((ptRoom->y - 1) * rtRoomGrid.sizeX) + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_N);
 					otherRoom->iConnectionFlags |= (1 << ROOM_S);
 					break;
 				case 1:
-					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x - 1];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y * rtRoomGrid.sizeX) + ptRoom->x - 1];
 					ptRoom->iConnectionFlags |= (1 << ROOM_W);
 					otherRoom->iConnectionFlags |= (1 << ROOM_E);
 					break;
 				case 2:
-					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y + 1) * rtRoomGrid.sizeX + ptRoom->x];
+					otherRoom = &rtRoomGrid.roomArray[((ptRoom->y + 1) * rtRoomGrid.sizeX) + ptRoom->x];
 					ptRoom->iConnectionFlags |= (1 << ROOM_S);
 					otherRoom->iConnectionFlags |= (1 << ROOM_N);
 					break;
 				case 3:
-					otherRoom = &rtRoomGrid.roomArray[ptRoom->y * rtRoomGrid.sizeX + ptRoom->x + 1];
+					otherRoom = &rtRoomGrid.roomArray[(ptRoom->y * rtRoomGrid.sizeX) + ptRoom->x + 1];
 					ptRoom->iConnectionFlags |= (1 << ROOM_E);
 					otherRoom->iConnectionFlags |= (1 << ROOM_W);
 					break;
