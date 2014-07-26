@@ -273,6 +273,51 @@
     <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\scripts\jquery-ui-1.10.4.custom.min.js">
       <Filter>core\ui\scripts</Filter>
     </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiN.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNW.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNWE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNWS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNWSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiW.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiWE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiWS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiWSE.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNS.json">
+      <Filter>core\levels\preset</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\characters\test\test1.png">
