@@ -102,8 +102,11 @@ void DungeonManager::Construct(const MapFramework* ptFramework) {
 	}
 
 	// Create the base map
+	/*float powAvg = (ptFramework->iSizeX + ptFramework->iSizeY) / 2;
+	int maxDepth = ceil(log2(ptFramework->iSizeX + ptFramework->iSizeY))/4;*/
+	int maxDepth = 0;
 	Map *theMap = new Map(ptFramework->iWorldspaceX, ptFramework->iWorldspaceY,
-		ptFramework->iSizeX, ptFramework->iSizeY, ptFramework->iAct, 1);
+		ptFramework->iSizeX, ptFramework->iSizeY, ptFramework->iAct, maxDepth);
 	strcpy(theMap->name, ptFramework->name);
 	theMap->ptFramework = ptFramework;
 	for(int i = 0; i < MAX_MAP_LINKS; i++) {

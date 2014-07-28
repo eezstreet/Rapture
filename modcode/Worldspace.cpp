@@ -1,8 +1,8 @@
 #include "Worldspace.h"
 #include "DungeonManager.h"
 
-#define MAX_WORLDSPACE_SIZE	/*32768*/	256
-#define WORLDSPACE_LOG2		/*15*/		2
+#define MAX_WORLDSPACE_SIZE	/*32768*/	2048
+#define WORLDSPACE_LOG2		/*15*/		0
 
 #define TILE_WIDTH		192.0f
 #define TILE_HEIGHT		96.0f
@@ -94,7 +94,6 @@ static vector<VisInfo_t> vis;
 		obj.bIsTile = true;
 		obj.tileData = tile;
 		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - TILE_HEIGHT - tile->ptTile->fDepthScoreOffset);
-		sortedObjects.push_back(obj);
 
 		if(tile->ptTile->name[0] == 'V' && tile->ptTile->name[1] == 'I' && tile->ptTile->name[2] == 'S') {
 			if(tile->ptTile->name[3] >= '0' && tile->ptTile->name[3] <= '7') {
@@ -106,6 +105,8 @@ static vector<VisInfo_t> vis;
 				vis.push_back(visData);
 			}
 		}
+
+		sortedObjects.push_back(obj);
 	}
 
 	// Now we need to sort the stuff that's being rendered.
@@ -202,7 +203,7 @@ void Worldspace::Run() {
 	if(!theMap) {
 		return;
 	}
-	auto ents = theMap->qtEntTree.NodesAt(player->x, player->y); // FIXME
+	auto ents = theMap->qtEntTree.NodesAt(player->x, player->y);
 	for(auto it = ents.begin(); it != ents.end(); ++it) {
 		auto spatialEnt = *it;
 		auto ent = mThinkList.find(spatialEnt->uuid);

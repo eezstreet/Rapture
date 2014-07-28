@@ -61,6 +61,9 @@
     <Filter Include="core\fonts">
       <UniqueIdentifier>{7d313234-e70e-4b52-8e44-8f071b679db0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\ui\images\hud">
+      <UniqueIdentifier>{10e6c965-26c3-4f53-ad3b-6c71698d72cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\editor_flooredit.json">
@@ -318,6 +321,18 @@
     <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\levels\preset\a1sewer_exiNS.json">
       <Filter>core\levels\preset</Filter>
     </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_left.psd">
+      <Filter>core\ui\images\hud</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_right.psd">
+      <Filter>core\ui\images\hud</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel.psd">
+      <Filter>core\ui\images\hud</Filter>
+    </None>
+    <None Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton.psd">
+      <Filter>core\ui\images\hud</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\materials\characters\test\test1.png">
@@ -400,6 +415,21 @@
     </Image>
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\loading.png">
       <Filter>core\ui\images</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_left.PNG">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_right.PNG">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_down.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up.png">
+      <Filter>core\ui\images\hud</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
