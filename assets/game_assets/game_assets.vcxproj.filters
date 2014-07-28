@@ -431,6 +431,21 @@
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up.png">
       <Filter>core\ui\images\hud</Filter>
     </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\miniminipanel_bg.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_down.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_up.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_down_down.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up_down.png">
+      <Filter>core\ui\images\hud</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\fonts\Exocet1.ttf">

@@ -182,9 +182,14 @@
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_cccccc_256x240.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\alphalogo.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\miniminipanel_bg.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_down.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_down_down.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up_down.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_down.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_up.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_left.PNG" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_right.PNG" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\loading.png" />
