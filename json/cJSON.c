@@ -5,7 +5,7 @@
 
 	Based on cJSON by Dave Gamble
 
-    Changes:
+	Changes:
 
   * Cleaned up code formatting to make it much more readable
   * Renamed print to serialize
@@ -183,31 +183,31 @@ static long cJSON_GenerateHashValue( const char *name, const int size ) {
 
 static char* cJSON_strdup(const char* str)
 {
-      size_t len;
-      char* copy;
+	  size_t len;
+	  char* copy;
 
 	  if (!str) {
 		  return 0;
 	  }
 
-      len = strlen(str) + 1;
+	  len = strlen(str) + 1;
 	  copy = (char*)cJSON_malloc(len);
 	  if ( !copy ) {
 		  return 0;
 	  }
-      memcpy(copy,str,len);
-      return copy;
+	  memcpy(copy,str,len);
+	  return copy;
 }
 
 void cJSON_InitHooks(cJSON_Hooks* hooks)
 {
 	if (!hooks)	{/* Reset hooks */
 
-        cJSON_malloc = malloc;
+		cJSON_malloc = malloc;
 		cJSON_realloc = realloc;
-        cJSON_free = free;
-        return;
-    }
+		cJSON_free = free;
+		return;
+	}
 
 	cJSON_malloc = (hooks->malloc_fn) ? hooks->malloc_fn : malloc;
 	cJSON_realloc = (hooks->realloc_fn) ? hooks->realloc_fn : realloc;
@@ -1499,7 +1499,8 @@ static int cJSON_Parse_Value(cJSON *item, cJSON_StringStream *ss)
 	if (!cJSON_SS_PeekChar(ss)) {
 		cJSON_SS_ParseError(ss, "Unexpected EOF");
 	} else {
-		cJSON_SS_ParseError(ss, "Unrecognised character: '%c'", cJSON_SS_PeekChar(ss));	
+		char unkChar = cJSON_SS_PeekChar(ss); // Print the numeric value, too --eez
+		cJSON_SS_ParseError(ss, "Unrecognised character: '%c' (%x)", cJSON_SS_PeekChar(ss), unkChar);
 	}
 	return 0;
 }
@@ -2325,7 +2326,8 @@ static int cJSON_ParsePooled_Value(cJSON *item, cJSON_StringStream *ss)
 	if (!cJSON_SS_PeekChar(ss)) {
 		cJSON_SS_ParseError(ss, "Unexpected EOF");
 	} else {
-		cJSON_SS_ParseError(ss, "Unrecognised character: '%c'", cJSON_SS_PeekChar(ss));	
+		char unkChar = cJSON_SS_PeekChar(ss); // Print the numeric value, too --eez
+		cJSON_SS_ParseError(ss, "Unrecognised character: '%c' (%x)", cJSON_SS_PeekChar(ss), unkChar);	
 	}
 	return 0;
 }

@@ -1,6 +1,142 @@
 #include "sys_local.h"
 
-/* CvarSystem */
+/* CvarSystem: the major handler and dealing of cvars */
+Cvar* CvarSystem::RegisterCvar(Cvar *cvar) {
+	auto it = cvars.find(cvar->name);
+	if(it != cvars.end() && it->second && it->second->registered) {
+		return it->second;
+	}
+	cvar->registered = true;
+	cvars[cvar->name] = cvar;
+	Cmd::AddTabCompletion(cvar->name);
+	return cvar;
+}
+
+Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, char* startValue) {
+	auto it = cvars.find(sName);
+	if(it != cvars.end()) {
+		return it->second;
+	}
+
+	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
+	cvar->name = sName;
+	cvar->description = sDesc;
+	cvar->type = Cvar::CV_STRING;
+
+	auto it2 = cache.find(sName); // Check the cache.
+	if(it2 != cache.end()) {
+		// use from the cache
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
+		} else {
+			cvar->flags = iFlags;
+		}
+		cvar->AssignHardValue((char*)it2->second->initvalue.c_str());
+		Cache_Free(sName);
+	} else {
+		// register a new cvar altogether
+		cvar->flags = iFlags;
+		cvar->AssignHardValue(startValue);
+	}
+
+	cvar->registered = true;
+	return RegisterCvar(cvar);
+}
+
+Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, int startValue) {
+	auto it = cvars.find(sName);
+	if(it != cvars.end()) {
+		return it->second;
+	}
+
+	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
+	cvar->name = sName;
+	cvar->description = sDesc;
+	cvar->type = Cvar::CV_INTEGER;
+
+	auto it2 = cache.find(sName); // Check the cache.
+	if(it2 != cache.end()) {
+		// use from the cache
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
+		} else {
+			cvar->flags = iFlags;
+		}
+		cvar->AssignHardValue(atoi(it2->second->initvalue.c_str()));
+		Cache_Free(sName);
+	} else {
+		// register a new cvar altogether
+		cvar->flags = iFlags;
+		cvar->AssignHardValue(startValue);
+	}
+
+	cvar->registered = true;
+	return RegisterCvar(cvar);
+}
+
+Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, float startValue) {
+	// TODO: generalize most of this code into one func
+	auto it = cvars.find(sName);
+	if(it != cvars.end()) {
+		return it->second;
+	}
+
+	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
+	cvar->name = sName;
+	cvar->description = sDesc;
+	cvar->type = Cvar::CV_FLOAT;
+
+	auto it2 = cache.find(sName); // Check the cache.
+	if(it2 != cache.end()) {
+		// use from the cache
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
+		} else {
+			cvar->flags = iFlags;
+		}
+		cvar->AssignHardValue((float)atof(it2->second->initvalue.c_str()));
+		Cache_Free(sName);
+	} else {
+		// register a new cvar altogether
+		cvar->flags = iFlags;
+		cvar->AssignHardValue(startValue);
+	}
+	cvar->registered = true;
+	return RegisterCvar(cvar);
+}
+
+Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, bool startValue) {
+	auto it = cvars.find(sName);
+	if(it != cvars.end()) {
+		return it->second;
+	}
+	Cvar* cvar = Zone::New<Cvar>(Zone::TAG_CVAR);
+	cvar->name = sName;
+	cvar->description = sDesc;
+	cvar->type = Cvar::CV_BOOLEAN;
+
+
+	auto it2 = cache.find(sName); // Check the cache.
+	if(it2 != cache.end()) {
+		// use from the cache
+		if(it2->second->archive) {
+			cvar->flags = iFlags | (1 << CVAR_ARCHIVE);
+		} else {
+			cvar->flags = iFlags;
+		}
+		cvar->AssignHardValue(atob(it2->second->initvalue));
+		Cache_Free(sName);
+	} else {
+		// register a new cvar altogether
+		cvar->flags = iFlags;
+		cvar->AssignHardValue(startValue);
+	}
+
+
+	cvar->registered = true;
+	return RegisterCvar(cvar);
+}
+
 void CvarSystem::Initialize() {
 	init = true;
 }

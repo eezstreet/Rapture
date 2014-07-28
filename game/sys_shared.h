@@ -20,7 +20,8 @@
 using namespace std;
 
 #ifdef _WIN32
-#pragma warning(disable: 4996)
+#pragma warning(disable: 4996) // X is possibly unsafe
+#pragma warning(error: 4190) // 'X' has C-linkage specified but returns UDT Y
 #endif
 
 #define MAX_HANDLE_STRING	64
@@ -66,90 +67,92 @@ enum cvarFlags_e {
 	CVAR_ANNOUNCE,
 };
 
-struct gameImports_s {
-	// Logging
-	void (*printf)(int iPriority, const char* fmt, ...);
-	void (*error)(const char* fmt, ...);
+extern "C" {
+	struct gameImports_s {
+		// Logging
+		void(*printf)(int iPriority, const char* fmt, ...);
+		void(*error)(const char* fmt, ...);
 
-	// Time
-	int (*GetTicks)();
+		// Time
+		int(*GetTicks)();
 
-	// File I/O
-	File* (*OpenFile)(const char* filename, const char* mode);
-	void (*CloseFile)(File* filehandle);
-	char** (*ListFilesInDir)(const char* dir, const char* extension, int* iNumFiles);
-	void (*FreeFileList)(char** ptFileList, int iNumFiles);
-	string (*ReadPlaintext)(File* filehandle, size_t numChars);
-	size_t (*ReadBinary)(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-	size_t (*GetFileSize)(File* filehandle);
-	
-	// Images
-	Image* (*RegisterImage)(const char* filename);
-	void (*DrawImage)(Image* image, float xPct, float yPct, float wPct, float hPct);
-	void (*DrawImageAbs)(Image* image, int x, int y, int w, int h);
-	void (*DrawImageAspectCorrection)(Image* image, float xPct, float yPct, float wPct, float hPct);
-	void (*DrawImageClipped)(Image* image, float sxPct, float syPct, float swPct, float shPct,
-		float ixPct, float iyPct, float iwPct, float ihPct);
+		// File I/O
+		File* (*OpenFile)(const char* filename, const char* mode);
+		void(*CloseFile)(File* filehandle);
+		char** (*ListFilesInDir)(const char* dir, const char* extension, int* iNumFiles);
+		void(*FreeFileList)(char** ptFileList, int iNumFiles);
+		size_t(*ReadPlaintext)(File* filehandle, size_t numChars, char* chars);
+		size_t(*ReadBinary)(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
+		size_t(*GetFileSize)(File* filehandle);
 
-	// Font/text
-	Font* (*RegisterFont)(const char* sFontFile, int iPointSize);
-	void (*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
-	void (*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-	void (*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
+		// Images
+		Image* (*RegisterImage)(const char* filename);
+		void(*DrawImage)(Image* image, float xPct, float yPct, float wPct, float hPct);
+		void(*DrawImageAbs)(Image* image, int x, int y, int w, int h);
+		void(*DrawImageAspectCorrection)(Image* image, float xPct, float yPct, float wPct, float hPct);
+		void(*DrawImageClipped)(Image* image, float sxPct, float syPct, float swPct, float shPct,
+								float ixPct, float iyPct, float iwPct, float ihPct);
 
-	// UI
-	Menu* (*RegisterStaticMenu)(const char* sMenuFile);
-	void (*KillStaticMenu)(Menu* menu);
-	void (*RunJavaScript)(Menu* menu, const char* sJS);
-	bool (*IsConsoleOpen)();
+		// Font/text
+		Font* (*RegisterFont)(const char* sFontFile, int iPointSize);
+		void(*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
+		void(*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
+		void(*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
 
-	// Materials
-	void (*InitMaterials)();
-	void (*ShutdownMaterials)();
-	Material* (*RegisterMaterial)(const char* name);
-	void (*RenderMaterial)(Material* ptMaterial, int x, int y);
-	void (*RenderMaterialTrans)(Material* ptMaterial, int x, int y);
+		// UI
+		Menu* (*RegisterStaticMenu)(const char* sMenuFile);
+		void(*KillStaticMenu)(Menu* menu);
+		void(*RunJavaScript)(Menu* menu, const char* sJS);
+		bool(*IsConsoleOpen)();
 
-	// Animation
-	AnimationManager* (*GetAnimation)(const char* sUUID, const char* sMaterial);
-	void (*AnimateMaterial)(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
-	bool (*AnimationFinished)(AnimationManager* ptAnims);
-	void (*SetAnimSequence)(AnimationManager* ptAnims, const char* sSequence);
-	const char* (*GetAnimSequence)(AnimationManager* ptAnims);
+		// Materials
+		void(*InitMaterials)();
+		void(*ShutdownMaterials)();
+		Material* (*RegisterMaterial)(const char* name);
+		void(*RenderMaterial)(Material* ptMaterial, int x, int y);
+		void(*RenderMaterialTrans)(Material* ptMaterial, int x, int y);
 
-	// Cvars
-	void (*CvarIntVal)(const char* cvarName, int* value);
-	void (*CvarStrVal)(const char* cvarName, char* value);
-	void (*CvarBoolVal)(const char* cvarName, bool* value);
-	void (*CvarValue)(const char* cvarName, float* value);
-	Cvar* (*RegisterCvarInt)(const string& cvarName, const string& description, int flags, int startingValue);
-	Cvar* (*RegisterCvarFloat)(const string& cvarName, const string& description, int flags, float startingValue);
-	Cvar* (*RegisterCvarBool)(const string& cvarName, const string& description, int flags, bool bStartingValue);
-	Cvar* (*RegisterCvarStr)(const string& cvarName, const string& description, int flags, char* sStartingValue);
+		// Animation
+		AnimationManager* (*GetAnimation)(const char* sUUID, const char* sMaterial);
+		void(*AnimateMaterial)(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
+		bool(*AnimationFinished)(AnimationManager* ptAnims);
+		void(*SetAnimSequence)(AnimationManager* ptAnims, const char* sSequence);
+		const char* (*GetAnimSequence)(AnimationManager* ptAnims);
 
-	// Zone memory
-	void* (*Zone_Alloc)(int iSize, const char* tag);
-	void (*Zone_NewTag)(const char* tag);
-	void (*Zone_Free)(void *memory);
-	void (*Zone_FastFree)(void* memory, const char* tag);
-	void (*Zone_FreeAll)(const char* tag);
-	void* (*Zone_Realloc)(void* memory, size_t iNewSize);
+		// Cvars
+		void(*CvarIntVal)(const char* cvarName, int* value);
+		void(*CvarStrVal)(const char* cvarName, char* value);
+		void(*CvarBoolVal)(const char* cvarName, bool* value);
+		void(*CvarValue)(const char* cvarName, float* value);
+		Cvar* (*RegisterCvarInt)(const char* cvarName, const char* description, int flags, int startingValue);
+		Cvar* (*RegisterCvarFloat)(const char* cvarName, const char* description, int flags, float startingValue);
+		Cvar* (*RegisterCvarBool)(const char* cvarName, const char* description, int flags, bool bStartingValue);
+		Cvar* (*RegisterCvarStr)(const char* cvarName, const char* description, int flags, char* sStartingValue);
 
-	// Global effects
-	void (*FadeFromBlack)(int time);
-};
+		// Zone memory
+		void* (*Zone_Alloc)(int iSize, const char* tag);
+		void(*Zone_NewTag)(const char* tag);
+		void(*Zone_Free)(void *memory);
+		void(*Zone_FastFree)(void* memory, const char* tag);
+		void(*Zone_FreeAll)(const char* tag);
+		void* (*Zone_Realloc)(void* memory, size_t iNewSize);
 
-struct gameExports_s {
-	void (*init)();
-	void (*shutdown)();
-	void (*runactiveframe)();
+		// Global effects
+		void(*FadeFromBlack)(int time);
+	};
 
-	void (*passmouseup)(int x, int y);
-	void (*passmousedown)(int x, int y);
-	void (*passmousemove)(int x, int y);
+	struct gameExports_s {
+		void(*init)();
+		void(*shutdown)();
+		void(*runactiveframe)();
 
-	void (*passkeypress)(int x);
-};
+		void(*passmouseup)(int x, int y);
+		void(*passmousedown)(int x, int y);
+		void(*passmousemove)(int x, int y);
+
+		void(*passkeypress)(int x);
+	};
+}
 
 // sys_main.cpp
 void R_Message(int iPriority, const char *fmt, ...);

@@ -222,10 +222,10 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
 	imp->CvarValue = CvarSystem::EXPORT_Value;
-	imp->RegisterCvarBool = static_cast<Cvar*(*)(const string&, const string&, int, bool)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarFloat = static_cast<Cvar*(*)(const string&, const string&, int, float)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarInt = static_cast<Cvar*(*)(const string&, const string&, int, int)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarStr = static_cast<Cvar*(*)(const string&, const string&, int, char*)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarBool = static_cast<Cvar*(*)(const char*, const char*, int, bool)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarFloat = static_cast<Cvar*(*)(const char*, const char*, int, float)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
+	imp->RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
 	imp->RegisterFont = Font::Register;
 	imp->RenderTextBlended = RenderCode::RenderTextBlended;
 	imp->RenderTextShaded = RenderCode::RenderTextShaded;

@@ -142,8 +142,8 @@ char** FileSystem::EXPORT_ListFilesInDir(const char* filename, const char* ext, 
 	return fs->ListFiles(filename, ext, iNumFiles);
 }
 
-string FileSystem::EXPORT_ReadPlaintext(File* f, size_t numChars) {
-	return f->ReadPlaintext(numChars);
+size_t FileSystem::EXPORT_ReadPlaintext(File* f, size_t numChars, char* chars) {
+	return f->ReadBinary((unsigned char*)chars, numChars, true);
 }
 
 size_t FileSystem::EXPORT_ReadBinary(File* f, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {

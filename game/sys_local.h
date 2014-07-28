@@ -139,7 +139,7 @@ public:
 	void RunCallback();
 
 	template<typename T>
-	static Cvar* Get(const string& sName, const string& sDesc, int iFlags, T startValue) {
+	static Cvar* Get(const char* sName, const char* sDesc, int iFlags, T startValue) {
 		try {
 			auto it = CvarSystem::cvars.find(sName);
 			if(it == CvarSystem::cvars.end()) {
@@ -179,10 +179,10 @@ public:
 	static string CvarSystem::GetFirstCvar(bool& bFoundCommand);
 
 	static Cvar* RegisterCvar(Cvar *cvar);
-	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, char* startValue);
-	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, int startValue);
-	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, float startValue);
-	static Cvar* RegisterCvar(const string& sName, const string& sDesc, int iFlags, bool startValue);
+	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, char* startValue);
+	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, int startValue);
+	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, float startValue);
+	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, bool startValue);
 	static void CacheCvar(const string& sName, const string& sValue, bool bArchive = false);
 	static void Initialize();
 	static void Destroy();
@@ -370,7 +370,7 @@ public:
 	static void EXPORT_Close(File* filehandle);
 	static char** EXPORT_ListFilesInDir(const char* filename, const char* ext, int *iNumFiles);
 	static size_t EXPORT_ReadBinary(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-	static string EXPORT_ReadPlaintext(File* filehandle, size_t numChars);
+	static size_t EXPORT_ReadPlaintext(File* filehandle, size_t numChars, char* chars);
 	static size_t EXPORT_GetFileSize(File* filehandle);
 
 friend class File;
