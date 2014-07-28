@@ -64,6 +64,9 @@ void Game_OnMouseUp(int x, int y) {
 }
 
 void Game_OnMouseDown(int x, int y) {
+	if(x >= (thisClient->screenWidth/2) - 200 && x <= (thisClient->screenWidth/2) + 200 && y >= thisClient->screenHeight - 170) {
+		return;
+	}
 	if(iLoadingScreen == 0) {
 		if(!trap->IsConsoleOpen()) {
 			thisClient->PassMouseDown(x, y);
