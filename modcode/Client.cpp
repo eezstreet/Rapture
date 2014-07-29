@@ -46,7 +46,7 @@ void Client::RunFPS() {
 		fps += frametimes[i];
 	}
 
-	fps /= count;
+	fps /= (float)count;
 	fps = 1000 / fps;
 
 	frametime = frametimes[index];

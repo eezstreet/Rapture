@@ -127,6 +127,27 @@ public:
 		return this;
 	}
 
+	void AllNodes(vector<C*>& in) {
+		if(nodes.size() > 0) {
+			in.insert(in.end(), nodes.begin(), nodes.end());
+		}
+		if(depth == maxDepth) {
+			return;
+		}
+		if(NW) {
+			NW->AllNodes(in);
+		}
+		if(NE) {
+			NE->AllNodes(in);
+		}
+		if(SW) {
+			SW->AllNodes(in);
+		}
+		if(SE) {
+			SE->AllNodes(in);
+		}
+	}
+
 	vector<C*> NodesIn(const U posX, const U posY, const U posW, const U posH) {
 		vector<C*> returnNodes;
 		for(auto it = nodes.begin(); it != nodes.end(); it++) {

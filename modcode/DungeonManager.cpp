@@ -104,7 +104,7 @@ void DungeonManager::Construct(const MapFramework* ptFramework) {
 	// Create the base map
 	/*float powAvg = (ptFramework->iSizeX + ptFramework->iSizeY) / 2;
 	int maxDepth = ceil(log2(ptFramework->iSizeX + ptFramework->iSizeY))/4;*/
-	int maxDepth = 0;
+	int maxDepth = 1;
 	Map *theMap = new Map(ptFramework->iWorldspaceX, ptFramework->iWorldspaceY,
 		ptFramework->iSizeX, ptFramework->iSizeY, ptFramework->iAct, maxDepth);
 	strcpy(theMap->name, ptFramework->name);
@@ -204,7 +204,9 @@ Map* DungeonManager::FindProperMap(int iAct, float x, float y) {
 		return nullptr;
 	}
 	Worldspace* world = &(wActs[iAct]);
-	auto nodes = world->qtMapTree->NodesAt(x, y);
+static vector<Map*> nodes;
+	nodes.clear();
+	nodes = world->qtMapTree->NodesAt(x, y);
 	for(auto it = nodes.begin(); it != nodes.end(); ++it) {
 		if(x >= (*it)->x && x < (*it)->x + (*it)->w &&
 			y >= (*it)->y && y < (*it)->y + (*it)->h) {

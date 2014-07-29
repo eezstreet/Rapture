@@ -317,13 +317,13 @@ const char* btoa(bool b) {
 // http://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
 string trim(const string& str, const string& trim) {
 	const auto strBegin = str.find_first_not_of(trim);
-    if (strBegin == std::string::npos)
-        return ""; // no content
+	if (strBegin == std::string::npos)
+		return ""; // no content
 
-    const auto strEnd = str.find_last_not_of(trim);
-    const auto strRange = strEnd - strBegin + 1;
+	const auto strEnd = str.find_last_not_of(trim);
+	const auto strRange = strEnd - strBegin + 1;
 
-    return str.substr(strBegin, strRange);
+	return str.substr(strBegin, strRange);
 }
 
 // http://stackoverflow.com/questions/12851379/c-how-do-i-convert-hex-integer-to-string
@@ -365,7 +365,7 @@ void stringreplace(string& fullString, const string& sequence, const string& rep
 
 // http://stackoverflow.com/questions/6417817/easy-way-to-remove-extension-from-a-filename
 string stripextension(const string& filename) {
-    size_t lastdot = filename.find_last_of(".");
-    if (lastdot == string::npos) return filename;
-    return filename.substr(0, lastdot); 
+	size_t lastdot = filename.find_last_of(".");
+	if (lastdot == string::npos) return filename;
+	return filename.substr(0, lastdot); 
 }

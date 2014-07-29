@@ -2,7 +2,7 @@
 #include "DungeonManager.h"
 
 #define MAX_WORLDSPACE_SIZE	/*32768*/	2048
-#define WORLDSPACE_LOG2		/*15*/		0
+#define WORLDSPACE_LOG2		/*15*/		4
 
 #define TILE_WIDTH		192.0f
 #define TILE_HEIGHT		96.0f
@@ -188,7 +188,10 @@ void Worldspace::Run() {
 	if(player == nullptr) {
 		return;
 	}
-	auto maps = qtMapTree->NodesAt(player->x, player->y); // FIXME
+
+static vector<Map*> maps;
+	maps.clear();
+	maps = qtMapTree->NodesAt(player->x, player->y);
 	if(maps.size() <= 0) {
 		return;
 	}
@@ -203,8 +206,11 @@ void Worldspace::Run() {
 	if(!theMap) {
 		return;
 	}
-	auto ents = theMap->qtEntTree.NodesAt(player->x, player->y);
-	for(auto it = ents.begin(); it != ents.end(); ++it) {
+	
+static vector<Entity*> vEnts;
+	vEnts.clear();
+	theMap->qtEntTree.AllNodes(vEnts);
+	for(auto it = vEnts.begin(); it != vEnts.end(); ++it) {
 		auto spatialEnt = *it;
 		auto ent = mThinkList.find(spatialEnt->uuid);
 		if(ent != mThinkList.end()) {
