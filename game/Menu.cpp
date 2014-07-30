@@ -161,6 +161,7 @@ returningTable_t tbl_return [] = {
 };
 
 Menu::Menu() {
+	vmState = nullptr;
 }
 
 Menu::Menu(const char *menuName) {
@@ -175,6 +176,7 @@ Menu::Menu(const char *menuName) {
 	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
+	gamemanager = jObj;
 	SetupBaseCommands(&jObj);
 }
 
@@ -225,8 +227,21 @@ pair<bool, JSValue> Menu::ExecuteBaseCommandWithReturn(const string& command, co
 	return make_pair(true, returnValue);
 }
 
+bool Menu::ExecuteVMCommand(const string& command, const JSArray& args) {
+	for(auto it = m_pfVM.begin(); it != m_pfVM.end(); ++it) {
+		if(it->first == command) {
+			vmState = const_cast<JSArray*>(&args);
+			it->second();
+			return true;
+		}
+	}
+	return false;
+}
+
 void Menu::OnMethodCall(WebView* caller, unsigned int remote_caller_id, const WebString& method_name, const JSArray& args) {
 	if(ExecuteBaseCommand(ToString(method_name), args)) {
+		return;
+	} else if(ExecuteVMCommand(ToString(method_name), args)) {
 		return;
 	}
 }
@@ -237,4 +252,69 @@ JSValue Menu::OnMethodCallWithReturnValue(WebView* caller, unsigned int remote_c
 		return method.second;
 	}
 	return JSValue(false);
+}
+
+void Menu::AssignCallback(const char* sCallbackName, menuVMCallback callback) {
+	if(!callback) {
+		R_Message(PRIORITY_WARNING, "WARNING: callback %s with no callback pointer!\n", sCallbackName);
+		return;
+	}
+	m_pfVM[sCallbackName] = callback;
+	gamemanager.SetCustomMethod(WebString(WSLit(sCallbackName)), false);
+}
+
+int Menu::GetVMArgCount() {
+	if(vmState == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMArgCount(): null vmState\n");
+		return -1;
+	}
+	return vmState->size();
+}
+
+const char* Menu::GetVMStringArg(int iArgNum) {
+	if(vmState == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: null vmState\n");
+		return nullptr;
+	}
+	if(iArgNum >= vmState->size()) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: iArgNum >= argCount\n");
+		return nullptr;
+	}
+	return ToString(vmState->At(iArgNum).ToString()).c_str();
+}
+
+int Menu::GetVMIntArg(int iArgNum) {
+	if(vmState == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMIntArg: null vmState\n");
+		return -1;
+	}
+	if(iArgNum >= vmState->size()) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMIntArg: iArgNum >= argCount\n");
+		return -1;
+	}
+	return vmState->At(iArgNum).ToInteger();
+}
+
+double Menu::GetVMDoubleArg(int iArgNum) {
+	if(vmState == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMDoubleArg: null vmState\n");
+		return 0.0;
+	}
+	if(iArgNum >= vmState->size()) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMDoubleArg: iArgNum >= argCount\n");
+		return 0.0;
+	}
+	return vmState->At(iArgNum).ToDouble();
+}
+
+bool Menu::GetVMBoolArg(int iArgNum) {
+	if(vmState == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMBoolArg: null vmState\n");
+		return false;
+	}
+	if(iArgNum >= vmState->size()) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMBoolArg: iArgNum >= argCount\n");
+		return false;
+	}
+	return vmState->At(iArgNum).ToBoolean();
 }

@@ -34,6 +34,7 @@ void Player::think() {
 
 	if(!bShouldWeBeMoving && origin.Within(dest, MIN_PLAYER_MOVE_DIS) && ptDestinationEnt) {
 		ptDestinationEnt->interact(this);
+		ptDestinationEnt = nullptr;
 	}
 
 	if(bShouldWeBeMoving) {

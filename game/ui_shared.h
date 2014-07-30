@@ -16,6 +16,12 @@ namespace UI {
 	Menu* RegisterStaticMenu(const char* menuPath);
 	void KillStaticMenu(Menu* menu);
 	void RunJavaScript(Menu* menu, const char* sJS);
+	void AddJavaScriptCallback(Menu* menu, const char* sCallbackName, void(*ptCallback)());
+	int GetJavaScriptNumArgs(Menu* menu);
+	char* GetJavaScriptStringArgument(Menu* menu, int iArgNum);
+	int GetJavaScriptIntArgument(Menu* menu, int iArgNum);
+	double GetJavaScriptDoubleArgument(Menu* menu, int iArgNum);
+	bool GetJavaScriptBoolArgument(Menu* menu, int iArgNum);
 };
 
 void PushConsoleMessage(string message);

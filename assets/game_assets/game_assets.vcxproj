@@ -190,6 +190,7 @@
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanelpopbutton_up_down.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_down.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\minipanel_button_2_up.png" />
+    <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\npcoptions_bg.png" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_left.PNG" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\hud\orb_right.PNG" />
     <Image Include="..\..\..\..\..\..\..\Rapture\Gamedata\core\ui\images\loading.png" />

@@ -5,6 +5,7 @@
 
 #include "entities\info_player_start.h"
 #include "entities\contain_chest.h"
+#include "entities\npc_test.h"
 
 DungeonManager* ptDungeonManager;
 
@@ -17,6 +18,7 @@ DungeonManager::DungeonManager() {
 	DEF_SPAWN_FUNC(info_player_start);
 	DEF_SPAWN_FUNC(Player);
 	DEF_SPAWN_FUNC(contain_chest);
+	DEF_SPAWN_FUNC(npc_test);
 
 	trap->Zone_NewTag("tiles");
 }

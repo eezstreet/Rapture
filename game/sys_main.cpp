@@ -233,6 +233,12 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
 	imp->RunJavaScript = UI::RunJavaScript;
+	imp->AddJSCallback = UI::AddJavaScriptCallback;
+	imp->GetJSNumArgs = UI::GetJavaScriptNumArgs;
+	imp->GetJSStringArg = UI::GetJavaScriptStringArgument;
+	imp->GetJSIntArg = UI::GetJavaScriptIntArgument;
+	imp->GetJSDoubleArg = UI::GetJavaScriptDoubleArgument;
+	imp->GetJSBoolArg = UI::GetJavaScriptBoolArgument;
 	imp->IsConsoleOpen = IsConsoleOpen;
 	imp->Zone_Alloc = Zone::VMAlloc;
 	imp->Zone_FastFree = Zone::VMFastFree;

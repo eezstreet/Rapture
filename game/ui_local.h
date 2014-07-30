@@ -16,10 +16,19 @@ class Menu : public Awesomium::JSMethodHandler {
 public:
 	typedef void (*menuNonReturning)(const Awesomium::JSArray&);
 	typedef Awesomium::JSValue (*menuReturning)(const Awesomium::JSArray&);
+	typedef void(*menuVMCallback)();
 
 	Awesomium::JSValue window;
+	Awesomium::JSObject gamemanager;
 
 	void RunJavaScript(const char* sJS);
+	void AssignCallback(const char* callbackName, menuVMCallback callback);
+
+	int GetVMArgCount();
+	const char* GetVMStringArg(int iArgNum);
+	int GetVMIntArg(int iArgNum);
+	double GetVMDoubleArg(int iArgNum);
+	bool GetVMBoolArg(int iArgNum);
 
 	Menu();
 	Menu(const char* menu);
@@ -29,13 +38,17 @@ protected:
 	Awesomium::JSValue global;
 	unordered_map<string, menuNonReturning> m_pfNonReturning;
 	unordered_map<string, menuReturning> m_pfReturning;
+	unordered_map<string, menuVMCallback> m_pfVM;
 
 	void OnMethodCall(Awesomium::WebView* caller, unsigned int remote_caller_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args);
 	Awesomium::JSValue OnMethodCallWithReturnValue(Awesomium::WebView* caller, unsigned int remote_caller_id, const Awesomium::WebString& method_name, const Awesomium::JSArray& args);
 
 	bool ExecuteBaseCommand(const string& command, const Awesomium::JSArray& args);
+	bool ExecuteVMCommand(const string& command, const Awesomium::JSArray& args);
 	pair<bool, Awesomium::JSValue> ExecuteBaseCommandWithReturn(const string& command, const Awesomium::JSArray& args);
 	void SetupBaseCommands(Awesomium::JSObject *obj);
+
+	Awesomium::JSArray* vmState;
 };
 
 template<class T>

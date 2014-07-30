@@ -1,6 +1,7 @@
 #include "Client.h"
 #include "Worldspace.h"
 #include "DungeonManager.h"
+#include "NPC.h"
 
 Client* thisClient = nullptr;
 
@@ -19,6 +20,9 @@ Client::Client() {
 	bShouldDrawLabels = false;
 	bStoppedDrawingLabels = false;
 	bEntDrawingLabels = false;
+
+	trap->AddJSCallback(ptHUD, "signalNPCMenuClosed", Client::NPCMenuClosed);
+	trap->AddJSCallback(ptHUD, "npcMenuCallback", Client::NPCPickOption);
 }
 
 Client::~Client() {
@@ -146,9 +150,13 @@ void Client::EnteredArea(const char* sArea) {
 	trap->RunJavaScript(ptHUD, fullName.str().c_str());
 }
 
+static bool bNPCMenuUp = false;
 void Client::PassMouseDown(int x, int y) {
 	cursorX = x;
 	cursorY = y;
+	if(bNPCMenuUp) {
+		return;
+	}
 	if(!trap->IsConsoleOpen()) {
 		ptPlayer->MouseDownEvent(x, y);
 		if(ptFocusEnt) {
@@ -169,4 +177,77 @@ void Client::PassMouseMove(int x, int y) {
 	if(!trap->IsConsoleOpen()) {
 		ptPlayer->MouseMoveEvent(x, y);
 	}
+}
+
+void Client::NPCStartInteraction(Entity* ptNPC, OptionList& rtOptionList) {
+	stringstream jsString;
+
+	if(rtOptionList.size() <= 0) {
+		return;
+	}
+
+	NPC* ptNpc = (NPC*)ptNPC;
+	ptInteractingEnt = ptNPC;
+
+	jsString << "startedNPCInteraction(" << rtOptionList.size() << ", '" << ptNpc->getname() << "'";
+	jsString << ", " << cursorX << ", " << cursorY;
+	for(auto it = rtOptionList.begin(); it != rtOptionList.end(); ++it) {
+		jsString << ", '" << it->first << "'";
+	}
+	jsString << ");";
+	ptCurrentOptionList = &rtOptionList;
+	trap->RunJavaScript(ptHUD, jsString.str().c_str());
+
+	bNPCMenuUp = true;
+}
+
+void Client::NPCPickMenu(int iWhichOption, bool bClosedMenu) {
+	if(!bNPCMenuUp) {
+		return;
+	}
+
+	if(ptInteractingEnt == nullptr) {
+#ifdef WIN32
+		R_Message(PRIORITY_ERROR, "%s %i: !ptInteractingEnt\n", __FILE__, __LINE__);
+#else
+		R_Message(PRIORITY_ERROR, "Lost valid ptInteractingEnt ptr!\n");
+#endif
+		return;
+	}
+
+	if(ptCurrentOptionList == nullptr) {
+#ifdef WIN32
+		R_Message(PRIORITY_ERROR, "%s %i: !ptCurrentOptionList", __FILE__, __LINE__);
+#else
+		R_Message(PRIORITY_ERROR, "Lost valid ptCurrentOptionList ptr!\n");
+#endif
+		return;
+	}
+
+	NPC* ptNPC = (NPC*)ptInteractingEnt;
+	if(bClosedMenu) {
+		// Close the menu
+		NPC::StopInteraction(ptNPC, ptPlayer);
+		ptInteractingEnt = nullptr;
+		trap->RunJavaScript(ptHUD, "closeNPCMenu();");
+		bNPCMenuUp = false;
+		return;
+	}
+
+	assert(iWhichOption < ptCurrentOptionList->size());
+	Option o = ptCurrentOptionList->at(iWhichOption);
+	o.second(ptNPC, ptPlayer);
+}
+
+void Client::NPCMenuClosed() {
+	Client* ptClient = thisClient;
+
+	ptClient->NPCPickMenu(-1, true);
+}
+
+void Client::NPCPickOption() {
+	Client* ptClient = thisClient;
+	int iWhichOption = trap->GetJSIntArg(ptClient->ptHUD, 0);
+
+	ptClient->NPCPickMenu(iWhichOption, false);
 }

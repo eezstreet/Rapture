@@ -88,6 +88,7 @@ bool Actor::Move_NoPathfinding() {
 			   ent->y <= nextFramePosition.tComponents[1] && ent->y + ent->h >= nextFramePosition.tComponents[1]) {
 				if(ptDestinationEnt == ent) {
 					ent->interact(this);
+					ptDestinationEnt = nullptr;
 				}
 				return true;
 			}

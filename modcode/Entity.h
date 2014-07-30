@@ -39,5 +39,8 @@ public:
 	Entity() {
 		iDepthScoreOffset = 0; // This needs to be always 0 (unless specified) otherwise bad things happen
 	}
+
+	static int GetDrawX(Entity* in);
+	static int GetDrawY(Entity* in);
 friend struct Worldspace;
 };

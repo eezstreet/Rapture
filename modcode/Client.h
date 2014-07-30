@@ -1,6 +1,7 @@
 #pragma once
 #include "Local.h"
 #include "Player.h"
+#include "OptionList.h"
 
 class Client {
 private:
@@ -30,6 +31,12 @@ public:
 	void HideLabels();
 	void StartLabelDraw(const char* label);
 	void EnteredArea(const char* area);
+
+	OptionList* ptCurrentOptionList;
+	Entity* ptInteractingEnt;
+	void NPCStartInteraction(Entity* ptNPC, OptionList& rtOptionList);
+	void NPCPickMenu(int whichOption, bool bClosedMenu);
+
 	bool bShouldDrawLabels;
 	bool bStoppedDrawingLabels;
 	bool bEntDrawingLabels; // An entity told us to draw labels, so draw it, damn it.
@@ -47,6 +54,10 @@ public:
 	int screenHeight;
 
 	Player* ptPlayer;
+
+	// HUD callbacks
+	static void NPCMenuClosed();
+	static void NPCPickOption();
 };
 
 extern Client* thisClient;

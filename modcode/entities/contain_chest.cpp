@@ -26,10 +26,8 @@ bool contain_chest::mouseover() {
 }
 
 void contain_chest::render() {
-	int worldX = Worldspace::WorldPlaceToScreenSpaceIX(x, y);
-	int worldY = Worldspace::WorldPlaceToScreenSpaceIY(x, y);
-	int offsetX = ptDungeonManager->GetWorld(iAct)->PlayerOffsetX(thisClient->ptPlayer);
-	int offsetY = ptDungeonManager->GetWorld(iAct)->PlayerOffsetY(thisClient->ptPlayer);
+	int renderPosX = Entity::GetDrawX(this);
+	int renderPosY = Entity::GetDrawY(this);
 
 	if(bIsOpen) {
 		if(!stricmp(trap->GetAnimSequence(ptAnims), "operate")) {
@@ -41,7 +39,7 @@ void contain_chest::render() {
 		}
 	}
 
-	trap->AnimateMaterial(ptAnims, materialHandle, worldX + offsetX + 41, worldY + offsetY + 45, false);
+	trap->AnimateMaterial(ptAnims, materialHandle, renderPosX + 41, renderPosY + 45, false);
 }
 
 void contain_chest::interact(Entity* interacter) { 

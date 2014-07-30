@@ -101,9 +101,15 @@ extern "C" {
 
 		// UI
 		Menu* (*RegisterStaticMenu)(const char* sMenuFile);
-		void(*KillStaticMenu)(Menu* menu);
-		void(*RunJavaScript)(Menu* menu, const char* sJS);
-		bool(*IsConsoleOpen)();
+		void  (*KillStaticMenu)(Menu* menu);
+		void  (*RunJavaScript)(Menu* menu, const char* sJS);
+		bool  (*IsConsoleOpen)();
+		void  (*AddJSCallback)(Menu* menu, const char* sCallbackName, void(*ptCallback)());
+		int   (*GetJSNumArgs)(Menu* ptMenu);
+		char* (*GetJSStringArg)(Menu* ptMenu, int argNum);
+		int   (*GetJSIntArg)(Menu* ptMenu, int argNum);
+		double(*GetJSDoubleArg)(Menu* ptMenu, int argNum);
+		bool  (*GetJSBoolArg)(Menu* ptMenu, int argNum);
 
 		// Materials
 		void(*InitMaterials)();
