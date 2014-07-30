@@ -11,5 +11,6 @@ public:
 
 	static void StopInteraction(Entity* npc, Entity* interacter);
 	static void StopClientFromInteracting(Entity* npc, Entity* interacter);
+	static void OpenSubmenu(OptionList& rtOptionList);
 	Actor* ptInteractingWith;
 };

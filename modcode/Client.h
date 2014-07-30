@@ -35,6 +35,7 @@ public:
 	OptionList* ptCurrentOptionList;
 	Entity* ptInteractingEnt;
 	void NPCStartInteraction(Entity* ptNPC, OptionList& rtOptionList);
+	void NPCChangeMenu(OptionList& rtOptionList);
 	void NPCPickMenu(int whichOption, bool bClosedMenu);
 
 	bool bShouldDrawLabels;

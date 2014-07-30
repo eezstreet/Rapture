@@ -3,8 +3,18 @@
 #include "OptionList.h"
 
 static OptionList test;
+static OptionList testSubmenu;
 void TestInteraction(Entity* a1, Entity* a2) {
 	R_Message(PRIORITY_DEBUG, "Test Interaction Successful\n");
+	NPC::StopClientFromInteracting(a1, a2);
+}
+
+void TestSubmenu(Entity* a1, Entity* a2) {
+	NPC::OpenSubmenu(testSubmenu);
+}
+
+void TestSubmenuBack(Entity* a1, Entity* a2) {
+	NPC::OpenSubmenu(test);
 }
 
 void npc_test::render() {
@@ -21,8 +31,11 @@ void npc_test::think() {
 void npc_test::spawn() {
 	ptInteractingWith = nullptr;
 	test.clear();
-	InsertOption(test, "Test", TestInteraction);
+	InsertOption(test, "Test Interaction", TestInteraction);
+	InsertOption(test, "Test Submenu", TestSubmenu);
 	InsertOption(test, "Cancel", NPC::StopClientFromInteracting);
+	InsertOption(testSubmenu, "Test Interaction 2", TestInteraction);
+	InsertOption(testSubmenu, "Return", TestSubmenuBack);
 }
 
 OptionList* npc_test::getcurrentoptions() {

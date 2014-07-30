@@ -26,3 +26,8 @@ void NPC::StopClientFromInteracting(Entity* npc, Entity* interacter) {
 	// NETWORK FIXME
 	thisClient->NPCPickMenu(-1, true);
 }
+
+void NPC::OpenSubmenu(OptionList& rtOptionList) {
+	// NETWORK FIXME
+	thisClient->NPCChangeMenu(rtOptionList);
+}

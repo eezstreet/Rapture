@@ -201,6 +201,22 @@ void Client::NPCStartInteraction(Entity* ptNPC, OptionList& rtOptionList) {
 	bNPCMenuUp = true;
 }
 
+void Client::NPCChangeMenu(OptionList& rtOptionList) {
+	stringstream jsString;
+
+	if(rtOptionList.size() <= 0) {
+		return;
+	}
+
+	jsString << "changedNPCMenu(" << rtOptionList.size();
+	for(auto it = rtOptionList.begin(); it != rtOptionList.end(); ++it) {
+		jsString << ", '" << it->first << "'";
+	}
+	jsString << ");";
+	ptCurrentOptionList = &rtOptionList;
+	trap->RunJavaScript(ptHUD, jsString.str().c_str());
+}
+
 void Client::NPCPickMenu(int iWhichOption, bool bClosedMenu) {
 	if(!bNPCMenuUp) {
 		return;
