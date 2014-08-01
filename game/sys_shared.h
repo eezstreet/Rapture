@@ -105,11 +105,11 @@ extern "C" {
 		void  (*RunJavaScript)(Menu* menu, const char* sJS);
 		bool  (*IsConsoleOpen)();
 		void  (*AddJSCallback)(Menu* menu, const char* sCallbackName, void(*ptCallback)());
-		int   (*GetJSNumArgs)(Menu* ptMenu);
-		char* (*GetJSStringArg)(Menu* ptMenu, int argNum);
-		int   (*GetJSIntArg)(Menu* ptMenu, int argNum);
-		double(*GetJSDoubleArg)(Menu* ptMenu, int argNum);
-		bool  (*GetJSBoolArg)(Menu* ptMenu, int argNum);
+		unsigned int   (*GetJSNumArgs)(Menu* ptMenu);
+		char* (*GetJSStringArg)(Menu* ptMenu, unsigned int argNum);
+		int   (*GetJSIntArg)(Menu* ptMenu, unsigned int argNum);
+		double(*GetJSDoubleArg)(Menu* ptMenu, unsigned int argNum);
+		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);
 
 		// Materials
 		void(*InitMaterials)();

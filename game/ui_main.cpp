@@ -421,22 +421,22 @@ void UI::AddJavaScriptCallback(Menu* ptMenu, const char* sCallbackName, void(*pt
 	ptMenu->AssignCallback(sCallbackName, ptCallback);
 }
 
-int UI::GetJavaScriptNumArgs(Menu* ptMenu) {
+unsigned int UI::GetJavaScriptNumArgs(Menu* ptMenu) {
 	return ptMenu->GetVMArgCount();
 }
 
-char* UI::GetJavaScriptStringArgument(Menu* ptMenu, int iArgNum) {
+char* UI::GetJavaScriptStringArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return const_cast<char*>(ptMenu->GetVMStringArg(iArgNum));
 }
 
-int UI::GetJavaScriptIntArgument(Menu* ptMenu, int iArgNum) {
+int UI::GetJavaScriptIntArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return ptMenu->GetVMIntArg(iArgNum);
 }
 
-double UI::GetJavaScriptDoubleArgument(Menu* ptMenu, int iArgNum) {
+double UI::GetJavaScriptDoubleArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return ptMenu->GetVMDoubleArg(iArgNum);
 }
 
-bool UI::GetJavaScriptBoolArgument(Menu* ptMenu, int iArgNum) {
+bool UI::GetJavaScriptBoolArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return ptMenu->GetVMBoolArg(iArgNum);
 }
