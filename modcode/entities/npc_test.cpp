@@ -1,5 +1,5 @@
 #include "npc_test.h"
-#include "Client.h"
+#include "Server.h"
 #include "OptionList.h"
 
 static OptionList test;
@@ -14,6 +14,12 @@ void TestSubmenu(Entity* a1, Entity* a2) {
 }
 
 void TestSubmenuBack(Entity* a1, Entity* a2) {
+	NPC::OpenSubmenu(test);
+}
+
+void TestQuestInit(Entity* a1, Entity* a2) {
+	ptServer->ptQuestManager->ChangeQuestState("Test Quest", 1);
+	RemoveOption(test, "Test Quest Init");
 	NPC::OpenSubmenu(test);
 }
 
@@ -32,6 +38,7 @@ void npc_test::spawn() {
 	ptInteractingWith = nullptr;
 	test.clear();
 	InsertOption(test, "Test Interaction", TestInteraction);
+	InsertOption(test, "Test Quest Init", TestQuestInit);
 	InsertOption(test, "Test Submenu", TestSubmenu);
 	InsertOption(test, "Cancel", NPC::StopClientFromInteracting);
 	InsertOption(testSubmenu, "Test Interaction 2", TestInteraction);

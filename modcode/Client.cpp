@@ -4,8 +4,6 @@
 #include "DungeonManager.h"
 #include "NPC.h"
 
-Client* thisClient = nullptr;
-
 Client::Client() {
 	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 18);
 	framecount = 0;
@@ -149,12 +147,6 @@ void Client::EnteredArea(const char* sArea) {
 	stringstream fullName;
 	fullName << "changeDivHTML('ID_zone', \"" << sArea << "\");";
 	trap->RunJavaScript(ptHUD, fullName.str().c_str());
-
-	for(auto it = v_pfQuestEnterLevel.begin(); it != v_pfQuestEnterLevel.end(); ++it) {
-		if(it->first == sArea) {
-			it->second();
-		}
-	}
 }
 
 static bool bNPCMenuUp = false;
@@ -256,46 +248,18 @@ void Client::NPCPickMenu(int iWhichOption, bool bClosedMenu) {
 		bNPCMenuUp = false;
 		return;
 	}
-
+	// NETWORKING FIXME
 	assert(iWhichOption < ptCurrentOptionList->size());
 	Option o = ptCurrentOptionList->at(iWhichOption);
 	o.second(ptNPC, ptPlayer);
 }
 
 void Client::NPCMenuClosed() {
-	Client* ptClient = thisClient;
-
 	ptClient->NPCPickMenu(-1, true);
 }
 
 void Client::NPCPickOption() {
-	Client* ptClient = thisClient;
 	int iWhichOption = trap->GetJSIntArg(ptClient->ptHUD, 0);
 
 	ptClient->NPCPickMenu(iWhichOption, false);
-}
-
-// ---- Quest ----
-void Client::Quest_AddLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback) {
-	pair<string, QuestCallback> theCallback = make_pair(sLevelName, pfCallback);
-	v_pfQuestEnterLevel.push_back(theCallback);
-}
-
-void Client::Quest_RemLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback) {
-	bool bDeleteAll = false;
-	if(pfCallback == nullptr) {
-		bDeleteAll = true;
-	}
-
-	for(auto it = v_pfQuestEnterLevel.begin(); it != v_pfQuestEnterLevel.end(); ++it) {
-		if(it->first != sLevelName) {
-			continue;
-		}
-		if(!bDeleteAll) {
-			if(it->second != pfCallback) {
-				continue;
-			}
-		}
-		it = v_pfQuestEnterLevel.erase(it);
-	}
 }

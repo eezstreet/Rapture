@@ -97,6 +97,8 @@
     <ClCompile Include="..\modcode\Local.cpp" />
     <ClCompile Include="..\modcode\Map.cpp" />
     <ClCompile Include="..\modcode\MapLoader.cpp" />
+    <ClCompile Include="..\modcode\QuestManager.cpp" />
+    <ClCompile Include="..\modcode\quests\a1q1_test.cpp" />
     <ClCompile Include="..\modcode\Seed.cpp" />
     <ClCompile Include="..\modcode\Server.cpp" />
     <ClCompile Include="..\modcode\Worldspace.cpp" />
@@ -126,6 +128,11 @@
     <ClInclude Include="..\modcode\Player.h" />
     <ClInclude Include="..\modcode\PresetFileData.h" />
     <ClInclude Include="..\modcode\QuadTree.h" />
+    <ClInclude Include="..\modcode\Quest.h" />
+    <ClInclude Include="..\modcode\QuestCallbacks.h" />
+    <ClInclude Include="..\modcode\QuestManager.h" />
+    <ClInclude Include="..\modcode\QuestState.h" />
+    <ClInclude Include="..\modcode\quests\a1q1_test.h" />
     <ClInclude Include="..\modcode\Seed.h" />
     <ClInclude Include="..\modcode\Server.h" />
     <ClInclude Include="..\modcode\Tile.h" />

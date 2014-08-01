@@ -22,8 +22,6 @@ private:
 
 	// HUD
 	Menu* ptHUD;
-
-	vector<pair<string, QuestCallback>> v_pfQuestEnterLevel;
 public:
 	Client();
 	~Client();
@@ -63,12 +61,6 @@ public:
 	// HUD callbacks
 	static void NPCMenuClosed();
 	static void NPCPickOption();
-
-	// Quest callbacks
-	void Quest_AddLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback);
-
-
-	void Quest_RemLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback = nullptr);
 };
 
 extern Client* ptClient;
