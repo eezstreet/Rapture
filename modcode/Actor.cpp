@@ -1,4 +1,5 @@
 #include "Actor.h"
+#include "Server.h"
 #include "Worldspace.h"
 #include "DungeonManager.h"
 #include "RVector.h"
@@ -19,8 +20,10 @@ bool Actor::Move() {
 }
 
 bool Actor::Move_NoPathfinding() {
-	Worldspace* ptWorld = ptDungeonManager->GetWorld(iAct);
-	RVec2<float> nextFramePosition((dir.tComponents[0] * fSpeed * thisClient->GetFrametime()) + x, (dir.tComponents[1] * fSpeed * thisClient->GetFrametime()) + y);
+	Worldspace* ptWorld = ptServer->ptDungeonManager->GetWorld(iAct);
+	RVec2<float> nextFramePosition((dir.tComponents[0] * fSpeed * ptServer->GetClient()->GetFrametime()) + x, 
+								   (dir.tComponents[1] * fSpeed * ptServer->GetClient()->GetFrametime()) + y);
+
 	if(nextFramePosition.tComponents[0] <= 0 || nextFramePosition.tComponents[1] <= 0) {
 		// No moving into negative/zero coords
 		return false;
@@ -36,7 +39,7 @@ bool Actor::Move_NoPathfinding() {
 		return true;
 	}
 
-	auto nodes = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesIn(bottomedOutX, bottomedOutY, 2, 2);
+	auto nodes = ptServer->ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtTileTree.NodesIn(bottomedOutX, bottomedOutY, 2, 2);
 	if(nodes.size() <= 0) {
 		// No nodes in this sector = no movement
 		return true;
@@ -74,7 +77,7 @@ bool Actor::Move_NoPathfinding() {
 	}
 
 	// At this point, we should be allowed to move. We now need to check if there's any entities in our path.
-	auto vEntList = ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtEntTree.NodesAt(bottomedOutX, bottomedOutY);
+	auto vEntList = ptServer->ptDungeonManager->FindProperMap(iAct, bottomedOutX, bottomedOutY)->qtEntTree.NodesAt(bottomedOutX, bottomedOutY);
 	if(vEntList.size() > 0) {
 		for(auto it = vEntList.begin(); it != vEntList.end(); ++it) {
 			Entity* ent = *it;

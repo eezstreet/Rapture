@@ -1,5 +1,5 @@
 #include "contain_chest.h"
-#include "Client.h"
+#include "Server.h"
 #include "Worldspace.h"
 #include "DungeonManager.h"
 
@@ -17,8 +17,8 @@ void contain_chest::think() {
 
 bool contain_chest::mouseover() {
 	if(!bIsOpen) {
-		thisClient->StartLabelDraw("Chest");
-		thisClient->ptFocusEnt = this;
+		ptServer->GetClient()->StartLabelDraw("Chest");
+		ptServer->GetClient()->ptFocusEnt = this;
 		return true;
 	} else {
 		return false;

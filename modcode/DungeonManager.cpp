@@ -2,6 +2,7 @@
 #include "MapLoader.h"
 #include "PresetFileData.h"
 #include "DRLG.h"
+#include "Server.h"
 
 #include "entities\info_player_start.h"
 #include "entities\contain_chest.h"
@@ -188,8 +189,7 @@ void DungeonManager::SpawnPlayer(const string& sDungeonName) {
 	wActs[theMap->second->iAct].AddPlayer(ptPlayer);
 	playerEnt->ptContainingTree = theMap->second->qtEntTree.AddNode(playerEnt);
 
-	// networking FIXME
-	thisClient->ptPlayer = ptPlayer;
+	ptServer->GetClient()->ptPlayer = ptPlayer;
 	ptPlayer->SignalZoneChange(ent->x, ent->y, sDungeonName.c_str());
 }
 

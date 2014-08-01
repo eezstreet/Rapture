@@ -48,4 +48,3 @@ public:
 	vector<Entity*> GetEntsAt(float x, float y, int act);
 	Entity* GenerateEntity(const char* entName, float x, float y, int spawnflags, int act);
 };
-extern DungeonManager* ptDungeonManager;

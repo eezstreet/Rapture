@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "Server.h"
 #include "Worldspace.h"
 #include "DungeonManager.h"
 #include "NPC.h"
@@ -89,9 +90,9 @@ void Client::DrawViewportInfo() {
 
 	if(drawWorldXY) {
 		ss << "World Space: ";
-		ss << (Worldspace::ScreenSpaceToWorldPlaceX(cursorX, cursorY, ptDungeonManager->GetWorld(0)->GetFirstPlayer()));
+		ss << (Worldspace::ScreenSpaceToWorldPlaceX(cursorX, cursorY, ptPlayer));
 		ss << "X / ";
-		ss << (Worldspace::ScreenSpaceToWorldPlaceY(cursorX, cursorY, ptDungeonManager->GetWorld(0)->GetFirstPlayer()));
+		ss << (Worldspace::ScreenSpaceToWorldPlaceY(cursorX, cursorY, ptPlayer));
 		ss << "Y      ";
 	}
 	if(ss.str().length() > 0) {
@@ -108,7 +109,7 @@ void Client::Preframe() {
 }
 
 void Client::Frame() {
-	vector<Entity*> vEnts = ptDungeonManager->GetEntsAt(Worldspace::ScreenSpaceToWorldPlaceX(cursorX, cursorY, ptPlayer),
+	vector<Entity*> vEnts = ptServer->ptDungeonManager->GetEntsAt(Worldspace::ScreenSpaceToWorldPlaceX(cursorX, cursorY, ptPlayer),
 		Worldspace::ScreenSpaceToWorldPlaceY(cursorX, cursorY, ptPlayer), ptPlayer->iAct);
 	if(vEnts.empty()) {
 		bShouldDrawLabels = false;
@@ -124,7 +125,7 @@ void Client::Frame() {
 
 	RunFPS();
 
-	ptDungeonManager->GetWorld(ptPlayer->iAct)->Render(this);
+	ptServer->ptDungeonManager->GetWorld(ptPlayer->iAct)->Render(this); // FIXME
 	if(!bShouldDrawLabels && !bStoppedDrawingLabels) {
 		HideLabels();
 	}
@@ -148,6 +149,12 @@ void Client::EnteredArea(const char* sArea) {
 	stringstream fullName;
 	fullName << "changeDivHTML('ID_zone', \"" << sArea << "\");";
 	trap->RunJavaScript(ptHUD, fullName.str().c_str());
+
+	for(auto it = v_pfQuestEnterLevel.begin(); it != v_pfQuestEnterLevel.end(); ++it) {
+		if(it->first == sArea) {
+			it->second();
+		}
+	}
 }
 
 static bool bNPCMenuUp = false;
@@ -266,4 +273,29 @@ void Client::NPCPickOption() {
 	int iWhichOption = trap->GetJSIntArg(ptClient->ptHUD, 0);
 
 	ptClient->NPCPickMenu(iWhichOption, false);
+}
+
+// ---- Quest ----
+void Client::Quest_AddLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback) {
+	pair<string, QuestCallback> theCallback = make_pair(sLevelName, pfCallback);
+	v_pfQuestEnterLevel.push_back(theCallback);
+}
+
+void Client::Quest_RemLevelEntryCallback(const string& sLevelName, const QuestCallback pfCallback) {
+	bool bDeleteAll = false;
+	if(pfCallback == nullptr) {
+		bDeleteAll = true;
+	}
+
+	for(auto it = v_pfQuestEnterLevel.begin(); it != v_pfQuestEnterLevel.end(); ++it) {
+		if(it->first != sLevelName) {
+			continue;
+		}
+		if(!bDeleteAll) {
+			if(it->second != pfCallback) {
+				continue;
+			}
+		}
+		it = v_pfQuestEnterLevel.erase(it);
+	}
 }

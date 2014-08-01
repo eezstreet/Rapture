@@ -1,5 +1,5 @@
 #include "Worldspace.h"
-#include "DungeonManager.h"
+#include "Server.h"
 
 #define MAX_WORLDSPACE_SIZE	/*32768*/	2048
 #define WORLDSPACE_LOG2		/*15*/		4
@@ -151,7 +151,7 @@ static vector<VisInfo_t> vis;
 							ptClient->cursorY < renderY + tile->ptTile->ptiWarp->y + tile->ptTile->ptiWarp->h) {
 								if(visTouching != it->whichVis) {
 									// Tell us to start drawing a label here
-									string nextMapStr = ptDungeonManager->FindNextMapStr(ptPlayer->iAct, ptPlayer->playerNum, it->whichVis);
+									string nextMapStr = ptServer->ptDungeonManager->FindNextMapStr(ptPlayer->iAct, ptPlayer->playerNum, it->whichVis);
 									ptClient->StartLabelDraw(nextMapStr.c_str());
 								}
 								ptClient->bShouldDrawLabels = true;
@@ -280,19 +280,19 @@ int Worldspace::WorldPlaceToScreenSpaceIY(int x, int y) {
 }
 
 float Worldspace::PlayerOffsetX(Player* ptPlayer) {
-	return (thisClient->screenWidth / 2.0f) - (TILE_HEIGHT * ptPlayer->x) - (TILE_HEIGHT * ptPlayer->y);
+	return (ptClient->screenWidth / 2.0f) - (TILE_HEIGHT * ptPlayer->x) - (TILE_HEIGHT * ptPlayer->y);
 }
 
 float Worldspace::PlayerOffsetY(Player* ptPlayer) {
-	return (thisClient->screenHeight / 2.0f) - ((TILE_HEIGHT/2.0f) * ptPlayer->y) + ((TILE_HEIGHT/2.0f) * ptPlayer->x);
+	return (ptClient->screenHeight / 2.0f) - ((TILE_HEIGHT/2.0f) * ptPlayer->y) + ((TILE_HEIGHT/2.0f) * ptPlayer->x);
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceX(int x, int y, Player* ptPlayer) {
 	float plyX = ptPlayer->x;
-	return (x/TILE_WIDTH) - (y/TILE_HEIGHT) + plyX - (thisClient->screenWidth/(TILE_WIDTH*2.0f)) + (thisClient->screenHeight/TILE_WIDTH) + 0.5f;
+	return (x/TILE_WIDTH) - (y/TILE_HEIGHT) + plyX - (ptClient->screenWidth/(TILE_WIDTH*2.0f)) + (ptClient->screenHeight/TILE_WIDTH) + 0.5f;
 }
 
 float Worldspace::ScreenSpaceToWorldPlaceY(int x, int y, Player* ptPlayer) {
 	float plyY = ptPlayer->y;
-	return (y/TILE_HEIGHT) + (x/TILE_WIDTH) - (thisClient->screenWidth/(TILE_WIDTH*2.0f)) + plyY - (thisClient->screenHeight/TILE_WIDTH) - 0.5f;
+	return (y/TILE_HEIGHT) + (x/TILE_WIDTH) - (ptClient->screenWidth/(TILE_WIDTH*2.0f)) + plyY - (ptClient->screenHeight/TILE_WIDTH) - 0.5f;
 }

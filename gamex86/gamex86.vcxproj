@@ -98,6 +98,7 @@
     <ClCompile Include="..\modcode\Map.cpp" />
     <ClCompile Include="..\modcode\MapLoader.cpp" />
     <ClCompile Include="..\modcode\Seed.cpp" />
+    <ClCompile Include="..\modcode\Server.cpp" />
     <ClCompile Include="..\modcode\Worldspace.cpp" />
     <ClCompile Include="..\modcode\Player.cpp" />
   </ItemGroup>
@@ -126,6 +127,7 @@
     <ClInclude Include="..\modcode\PresetFileData.h" />
     <ClInclude Include="..\modcode\QuadTree.h" />
     <ClInclude Include="..\modcode\Seed.h" />
+    <ClInclude Include="..\modcode\Server.h" />
     <ClInclude Include="..\modcode\Tile.h" />
     <ClInclude Include="..\modcode\Warp.h" />
     <ClInclude Include="..\modcode\Worldspace.h" />

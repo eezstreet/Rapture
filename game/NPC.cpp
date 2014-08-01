@@ -1,5 +1,5 @@
 #include "NPC.h"
-#include "Client.h"
+#include "Server.h"
 
 void NPC::interact(Entity* interacter) {
 	if(ptInteractingWith != nullptr) {
@@ -8,12 +8,12 @@ void NPC::interact(Entity* interacter) {
 		return;
 	}
 	ptInteractingWith = (Actor*)interacter;
-	thisClient->NPCStartInteraction(this, *getcurrentoptions());
+	ptServer->GetClient()->NPCStartInteraction(this, *getcurrentoptions());
 }
 
 bool NPC::mouseover() {
-	thisClient->StartLabelDraw(getname().c_str());
-	thisClient->ptFocusEnt = this;
+	ptClient->StartLabelDraw(getname().c_str());
+	ptClient->ptFocusEnt = this;
 	return true;
 }
 
@@ -23,11 +23,9 @@ void NPC::StopInteraction(Entity* npc, Entity* interacter) {
 }
 
 void NPC::StopClientFromInteracting(Entity* npc, Entity* interacter) {
-	// NETWORK FIXME
-	thisClient->NPCPickMenu(-1, true);
+	ptServer->GetClient()->NPCPickMenu(-1, true);
 }
 
 void NPC::OpenSubmenu(OptionList& rtOptionList) {
-	// NETWORK FIXME
-	thisClient->NPCChangeMenu(rtOptionList);
+	ptServer->GetClient()->NPCChangeMenu(rtOptionList);
 }

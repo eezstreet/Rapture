@@ -2,7 +2,7 @@
 #include "RVector.h"
 #include "Local.h"
 #include "DungeonManager.h"
-#include "Client.h"
+#include "Server.h"
 
 static RVec2<float> dest(0,0);
 static bool bShouldWeBeMoving = false;
@@ -43,7 +43,7 @@ void Player::think() {
 }
 
 void Player::spawn() {
-	Worldspace* ptWorld = ptDungeonManager->GetWorld(this->iAct);
+	Worldspace* ptWorld = ptServer->ptDungeonManager->GetWorld(this->iAct);
 	materialHandle = trap->RegisterMaterial("TestCharacter");
 	pX = x;
 	pY = y;
@@ -69,7 +69,7 @@ bool Player::mouseover() {
 }
 
 void Player::MoveToNextVis() {
-	ptDungeonManager->MovePlayerToVis(iAct, playerNum, iMovingToVis);
+	ptServer->ptDungeonManager->MovePlayerToVis(iAct, playerNum, iMovingToVis);
 }
 
 void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
@@ -84,8 +84,8 @@ void Player::MoveToScreenspace(int sx, int sy, bool bStopAtDestination) {
 
 	if(origin.Within(dest, MIN_PLAYER_MOVE_DIS)) {
 		bShouldWeBeMoving = false;
-		if(thisClient->ptFocusEnt != nullptr) {
-			ptDestinationEnt = thisClient->ptFocusEnt;
+		if(ptServer->GetClient()->ptFocusEnt != nullptr) {
+			ptDestinationEnt = ptServer->GetClient()->ptFocusEnt;
 		}
 		// FIXME: use whatever is in our crosshair
 		return;
@@ -131,12 +131,11 @@ Entity* Player::spawnme(float x, float y, int spawnflags, int act) {
 }
 
 void Player::SignalZoneChange(int nX, int nY, const char* newZone) {
-	Worldspace* ptWorld = ptDungeonManager->GetWorld(this->iAct);
+	Worldspace* ptWorld = ptServer->ptDungeonManager->GetWorld(this->iAct);
 	trap->FadeFromBlack(500);
 	x = nX;
 	y = nY;
 	bShouldWeBeMoving = bDoWeHaveADestination = false;
-	// networking FIXME
-	thisClient->EnteredArea(newZone);
+	ptServer->GetClient()->EnteredArea(newZone);
 	ptWorld->ActorMoved(this);
 }

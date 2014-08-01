@@ -1,5 +1,5 @@
 #include "Local.h"
-#include "DungeonManager.h"
+#include "Server.h"
 
 gameImports_s* trap;
 
@@ -16,8 +16,7 @@ void Game_Init() {
 void Game_Shutdown() {
 	trap->printf(PRIORITY_NOTE, "--- Quit Game ---\n");
 	trap->ShutdownMaterials();
-	delete thisClient;
-	delete ptDungeonManager;
+	delete ptServer;
 }
 
 void Game_Load() {
@@ -27,11 +26,9 @@ void Game_Load() {
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
 
-	thisClient = new Client();
-
-	ptDungeonManager = new DungeonManager();
-	ptDungeonManager->StartBuild("Survivor's Camp");
-	ptDungeonManager->SpawnPlayer("Survivor's Camp");
+	ptServer = new Server();
+	ptServer->ptDungeonManager->StartBuild("Survivor's Camp");
+	ptServer->ptDungeonManager->SpawnPlayer("Survivor's Camp");
 
 	iLoadingScreen = 0;
 }
@@ -51,25 +48,30 @@ void Game_Frame() {
 		// In a multiplayer game, we would be looping through all 4 acts and running GetWorld()->Run,
 		// but since we're only concerned about singleplayer, we're going to focus on the one that
 		// our client is on
-		thisClient->Preframe();											// Preframe. We need to keep client/server synchronized
-		ptDungeonManager->GetWorld(thisClient->ptPlayer->iAct)->Run();	// Server frame
-		thisClient->Frame();											// Client frame
+
+		// Preframe. We need to keep client/server synchronized
+		ptClient->Preframe();
+		// Server frame
+		ptServer->ptDungeonManager->GetWorld(ptServer->GetClient()->ptPlayer->iAct)->Run();
+		// Client frame
+		ptClient->Frame();
 	}
 }
 
 void Game_OnMouseUp(int x, int y) {
 	if(iLoadingScreen == 0) {
-		thisClient->PassMouseUp(x, y);
+		// This should be client?
+		ptClient->PassMouseUp(x, y);
 	}
 }
 
 void Game_OnMouseDown(int x, int y) {
-	if(x >= (thisClient->screenWidth/2) - 200 && x <= (thisClient->screenWidth/2) + 200 && y >= thisClient->screenHeight - 170) {
+	if(x >= (ptClient->screenWidth/2) - 200 && x <= (ptClient->screenWidth/2) + 200 && y >= ptClient->screenHeight - 170) {
 		return;
 	}
 	if(iLoadingScreen == 0) {
 		if(!trap->IsConsoleOpen()) {
-			thisClient->PassMouseDown(x, y);
+			ptClient->PassMouseDown(x, y);
 		}
 	}
 }
@@ -77,7 +79,7 @@ void Game_OnMouseDown(int x, int y) {
 void Game_OnMouseMove(int x, int y) {
 	if(iLoadingScreen == 0) {
 		if(!trap->IsConsoleOpen()) {
-			thisClient->PassMouseMove(x, y);
+			ptClient->PassMouseMove(x, y);
 		}
 	}
 }
