@@ -263,7 +263,7 @@ void Menu::AssignCallback(const char* sCallbackName, menuVMCallback callback) {
 	gamemanager.SetCustomMethod(WebString(WSLit(sCallbackName)), false);
 }
 
-int Menu::GetVMArgCount() {
+unsigned int Menu::GetVMArgCount() {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMArgCount(): null vmState\n");
 		return -1;
@@ -271,7 +271,7 @@ int Menu::GetVMArgCount() {
 	return vmState->size();
 }
 
-const char* Menu::GetVMStringArg(int iArgNum) {
+const char* Menu::GetVMStringArg(unsigned int iArgNum) {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: null vmState\n");
 		return nullptr;
@@ -283,7 +283,7 @@ const char* Menu::GetVMStringArg(int iArgNum) {
 	return ToString(vmState->At(iArgNum).ToString()).c_str();
 }
 
-int Menu::GetVMIntArg(int iArgNum) {
+int Menu::GetVMIntArg(unsigned int iArgNum) {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMIntArg: null vmState\n");
 		return -1;
@@ -295,7 +295,7 @@ int Menu::GetVMIntArg(int iArgNum) {
 	return vmState->At(iArgNum).ToInteger();
 }
 
-double Menu::GetVMDoubleArg(int iArgNum) {
+double Menu::GetVMDoubleArg(unsigned int iArgNum) {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMDoubleArg: null vmState\n");
 		return 0.0;
@@ -307,7 +307,7 @@ double Menu::GetVMDoubleArg(int iArgNum) {
 	return vmState->At(iArgNum).ToDouble();
 }
 
-bool Menu::GetVMBoolArg(int iArgNum) {
+bool Menu::GetVMBoolArg(unsigned int iArgNum) {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMBoolArg: null vmState\n");
 		return false;

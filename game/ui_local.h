@@ -24,11 +24,11 @@ public:
 	void RunJavaScript(const char* sJS);
 	void AssignCallback(const char* callbackName, menuVMCallback callback);
 
-	int GetVMArgCount();
-	const char* GetVMStringArg(int iArgNum);
-	int GetVMIntArg(int iArgNum);
-	double GetVMDoubleArg(int iArgNum);
-	bool GetVMBoolArg(int iArgNum);
+	unsigned int GetVMArgCount();
+	const char* GetVMStringArg(unsigned int iArgNum);
+	int GetVMIntArg(unsigned int iArgNum);
+	double GetVMDoubleArg(unsigned int iArgNum);
+	bool GetVMBoolArg(unsigned int iArgNum);
 
 	Menu();
 	Menu(const char* menu);
