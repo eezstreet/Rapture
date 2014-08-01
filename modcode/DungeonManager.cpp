@@ -61,7 +61,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 	// Add tiles to the map
 	if(pfd->head.numTiles > 0) {
 		TileNode* v = (TileNode*)trap->Zone_Alloc(sizeof(TileNode)*pfd->head.numTiles, "tiles");
-		for(int i = 0; i < pfd->head.numTiles; i++) {
+		for(unsigned int i = 0; i < pfd->head.numTiles; i++) {
 			// Construct the tile from the pfd
 			auto tile = pfd->tileBlocks[i];
 			v[i].x = tile.x + in.x; v[i].y = tile.y + in.y;
@@ -78,7 +78,7 @@ void DungeonManager::PresetGeneration(const MapFramework* ptFramework, Map& in) 
 	}
 
 	// Add entities to the map
-	for(int i = 0; i < pfd->head.numEntities; i++) {
+	for(unsigned int i = 0; i < pfd->head.numEntities; i++) {
 		auto loadedEnt = pfd->entities[i];
 		// Spawn an instance of the entity by calling its ::spawnme function
 		Entity* ent = GenerateEntity(loadedEnt.lookup, loadedEnt.x + ptFramework->iWorldspaceX, loadedEnt.y + ptFramework->iWorldspaceY, loadedEnt.spawnflags, ptFramework->iAct);
