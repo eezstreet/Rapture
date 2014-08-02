@@ -64,7 +64,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy ../../Rapture/core C:\Rapture\Gamedata\core /E</Command>
+      <Command>echo D|xcopy $(ProjectDir)core C:\Rapture\Gamedata\core /s /f /i /y /v /c</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets to Gamedata...</Message>
