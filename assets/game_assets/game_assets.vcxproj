@@ -135,7 +135,6 @@
     <None Include="..\..\Rapture\core\materials\editor_flooredit.json" />
     <None Include="..\..\Rapture\core\materials\objects\act1\chest-test.psd" />
     <None Include="..\..\Rapture\core\materials\test-chest.json" />
-    <None Include="..\..\Rapture\core\materials\test.json" />
     <None Include="..\..\Rapture\core\materials\testchar.json" />
     <None Include="..\..\Rapture\core\materials\testtile.json" />
     <None Include="..\..\Rapture\core\materials\testvisdown_h.json" />

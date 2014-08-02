@@ -255,9 +255,6 @@
     <None Include="..\..\Rapture\core\materials\editor_flooredit.json">
       <Filter>core\materials</Filter>
     </None>
-    <None Include="..\..\Rapture\core\materials\test.json">
-      <Filter>core\materials</Filter>
-    </None>
     <None Include="..\..\Rapture\core\materials\testchar.json">
       <Filter>core\materials</Filter>
     </None>
