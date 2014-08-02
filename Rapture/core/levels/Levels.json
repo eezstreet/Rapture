@@ -1,8 +1,76 @@
 // Levels.json, which defines all of the levels in the game
 {
-    "Act 1 - Town" : {
-        "name": "Survivor's Camp",
-	"preset": true,
-	"first": "act1town1"
-    }
+	"Act 1 - Town" : {
+		// Basic properties
+			"name": "Survivor's Camp",
+		"toName": "To the Survivor's Camp",
+		"preset": true,
+		"first": "act1town1",
+		"vis0": "Frozen Sewers Level 1",
+		
+		// Construction
+		"act": 0,
+		"worldX": 0,
+		"worldY": 0,
+		"sizeX": 16,
+		"sizeY": 16
+	},
+	"Act 1 - Sewers 1" : {
+		// Basic properties
+		"name": "Frozen Sewers Level 1",
+		"toName": "To the Frozen Sewers Level 1",
+		"preset": true,
+		"first": "act1sewer_test",
+		"vis0": "Survivor's Camp",
+		"vis1": "Frozen Sewers Level 2",
+		
+		// Construction
+		"act": 0,
+		"worldX": 25,
+		"worldY": 0,
+		"sizeX": 100,
+		"sizeY": 100
+	},
+	"Act 1 - Sewers 2": {
+		// Basic properties
+		"name": "Frozen Sewers Level 2",
+		"toName": "To the Frozen Sewers Level 2",
+		"preset": false,
+		"vis0": "Frozen Sewers Level 1",
+		"vis1": "Frozen Sewers Level 3",
+		
+		// Construction
+		"act": 0,
+		"worldX": 150,
+		"worldY": 1,
+		"sizeX": 100,
+		"sizeY": 100,
+
+		// DRLG
+		"maze": "Act 1 - Frozen Sewers",
+		"parm0": 5,
+		"parm1": 4,
+		"parm2": 2,
+
+		"alwaysPlaceRooms": [
+			{
+				"type": "ROOM_EXIT"
+			}
+		]
+	},
+	"Act 1 - Sewers 3": {
+		// Basic properties
+		"name": "Frozen Sewers Level 3",
+		"toName": "To the Frozen Sewers Level 3",
+		"preset": true,
+		"first": "act1sewer_etrNE",
+		"vis0": "Frozen Sewers Level 2",
+		
+		// Construction
+		"act": 0,
+		"worldX": 275,
+		"worldY": 0,
+		"sizeX": 100,
+		"sizeY": 100
+	}
 }

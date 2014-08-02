@@ -1,0 +1,5 @@
+// Special Tile - Vis. Place on TRT_SPECIAL only.
+// When placed on TRT_SPECIAL over a tile with a vismask, this tile will connect to another level.
+{
+	"name": "VIS5"
+}

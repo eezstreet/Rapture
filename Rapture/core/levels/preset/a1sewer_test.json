@@ -1,0 +1,407 @@
+{
+	"header": {
+		"lookup": "act1sewer_test",
+		"sizeX": 5,
+		"sizeY": 15
+	},
+	"tiles": [
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 1,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 2,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 3,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 4,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 5,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 6,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 7,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 8,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 9,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 10,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 11,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 1,
+			"y": 12,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Vis Down",
+			"x": 1,
+			"y": 13,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 1,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 2,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 3,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 4,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 5,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 6,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 7,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 8,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 9,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 10,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 11,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 12,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 2,
+			"y": 13,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 1,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Vis Up",
+			"x": 3,
+			"y": 2,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 3,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 4,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 5,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 6,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 7,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 8,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 9,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 10,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 11,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 12,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 3,
+			"y": 13,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 1,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 2,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 3,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 4,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 5,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 6,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 7,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 8,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 9,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 10,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 11,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 12,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "Test Floor Tile 01",
+			"x": 4,
+			"y": 13,
+			"renderType": "TRT_FLOOR1",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "VIS0",
+			"x": 3,
+			"y": 2,
+			"renderType": "TRT_SPECIAL",
+			"layerOffset": 0
+		},
+		{
+			"lookup": "VIS1",
+			"x": 1,
+			"y": 13,
+			"renderType": "TRT_SPECIAL",
+			"layerOffset": 0
+		}
+	],
+	"entities": [
+		{
+			"lookup": "info_player_start",
+			"x": 3.5,
+			"y": 2.5,
+			"spawnflags": 1
+		},
+		{
+			"lookup": "info_player_start",
+			"x": 1.5,
+			"y": 14.5,
+			"spawnflags": 2
+		},
+		{
+			"lookup": "contain_chest",
+			"x": 2,
+			"y": 8.5,
+			"spawnflags": 0
+		}
+	]
+}

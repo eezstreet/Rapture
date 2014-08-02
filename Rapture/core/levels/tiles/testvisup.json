@@ -1,0 +1,7 @@
+// Test Tile File
+{
+    "name": "Test Vis Up",
+    "material": "TestVisUpTile",
+	"warp": "Test Warp Up",
+	"vismask": 3858
+}

@@ -1,0 +1,22 @@
+// This defines all the warp tiles in the game. If a tile has VIS0 (or VIS1, etc) TRT_SPECIAL
+// over it, we will use the warp tile.
+{
+	"Test Warp Up": {
+		"name": "Test Warp Up",
+		"baseMaterial": "TestVisUpTile",
+		"highMaterial": "TestVisUpTile_h",
+		"x": 55,
+		"y": 20,
+		"w": 80,
+		"h": 37
+	},
+	"Test Warp Down": {
+		"name": "Test Warp Down",
+		"baseMaterial": "TestVisUpTile",
+		"highMaterial": "TestVisDownTile_h",
+		"x": 55,
+		"y": 20,
+		"w": 80,
+		"h": 37
+	}
+}

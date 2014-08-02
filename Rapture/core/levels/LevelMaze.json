@@ -1,0 +1,10 @@
+// Here we define all of the different variations of mazes.
+{
+	"Act 1 - Frozen Sewers": {
+		"name": "Act 1 - Frozen Sewers",
+		"algorithm": "ALGO_DRUNKEN_STAGGER",
+		"roomSizeX": 10,
+		"roomSizeY": 10,
+		"mazeSet": "a1sewer_"
+	}
+}

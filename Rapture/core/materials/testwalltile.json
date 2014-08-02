@@ -1,0 +1,6 @@
+{
+    "name": "TestWallTile",
+    "diffuseMap": "materials/tiles/act1/testwalltile.png",
+    "transMap": "materials/tiles/act1/testwalltile_trans.png",
+    "yOffset": -288
+}

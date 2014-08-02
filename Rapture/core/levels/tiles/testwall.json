@@ -1,0 +1,14 @@
+// Test Tile File
+{
+    "name": "Test Wall Tile 01",
+    "material": "TestWallTile",
+	"depthoffset": -90,
+	"autotrans": {
+		"x": 47,
+		"y": -236,
+		"w": 98,
+		"h": 230
+	},
+	"lowmask": 1632,
+	"highmask": 1632
+}

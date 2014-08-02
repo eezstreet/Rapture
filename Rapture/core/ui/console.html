@@ -39,7 +39,8 @@
                 color:lime;
                 margin: 0px;
                 bottom: 1px;
-                width:95%;
+				width:98%;
+				white-space: nowrap;
             }
 			.coninput::selection {
 				background-color:white;
@@ -64,7 +65,9 @@
 			}
             
             textarea#conlines {
-                margin: 0px;
+				margin: 0px;
+				left: 1px;
+				right: 1px;
                 width:100%;
                 height: 100%;
                 background-color:rgba(0,0,0,0.3);
@@ -95,18 +98,20 @@
     </head>
     <body>
         <div class="conwindow">
-            <div style="width:100%;position:absolute;bottom:2px;height:100%;">
+            <div style="width:99%;position:absolute;bottom:2px;left:0.5%;height:100%;">
                 <table border="0" style="width:100%;margin:0px;height:100%;">
-                    <tr style="height:100%;bottom:2px;"><td>
+                    <tr style="height:100%;bottom:2px;"><td style="padding-bottom:8px;padding-top:3px;">
                         <textarea readonly wrap="soft" id="conlines"></textarea>
                     </td></tr>
-                    <tr><td style="color:lime;">
+                    <tr><td style="color:lime;margin:0px;padding:0 0px;">
                         <form id="conform">
                             &gt; <input type="text" class="coninput" id="coninput"/>
                         </form>
+						<div style="position:absolute;left:95%;font-size:12px;">
+							<span style="line-height:0px;position:relative;bottom:7px;text-align:right;">Rapture</span>
+						</div>
                     </td></tr>
                 </table>
-                
             </div>
         </div>
     </body>
@@ -143,12 +148,12 @@
                 $("#conform").submit();
                 return false;
             }
-            else if(charCode == 38) {
+            else if(charCode == 33) {
                 event.preventDefault();
                 ConsoleManager.inputBufferUp();
                 return false;
             }
-            else if(charCode == 40) {
+            else if(charCode == 34) {
                 event.preventDefault();
                 ConsoleManager.inputBufferDown();
                 return false;

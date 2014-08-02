@@ -1,0 +1,19 @@
+@font-face
+{
+	font-family: exocet1;
+	src: url(../fonts/Exocet1.ttf);
+}
+
+@font-face
+{
+	font-family: exocet2;
+	src: url(../fonts/Exocet2.ttf);
+}
+
+.exocet {
+	font-family: exocet1, Segoe UI, Verdana
+}
+
+.exocet-clean {
+	font-family: exocet2, Segoe UI, Verdana
+}

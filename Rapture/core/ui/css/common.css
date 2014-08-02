@@ -1,0 +1,26 @@
+
+.invisible {
+	visibility: hidden;
+}
+
+span.customSelect {
+	font-size:11px;
+	background-color: #f5f0de;
+	color:#7c7c7c;
+	padding:5px 7px;
+	border:1px solid #e7dab0;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px 5px;
+}
+span.customSelect.changed {
+	background-color: #f0dea4;
+}
+.customSelectInner {
+	background:url(customSelect-arrow.gif) no-repeat center right;
+}
+
+body {
+	margin: 0px;
+	padding: 0px;
+}

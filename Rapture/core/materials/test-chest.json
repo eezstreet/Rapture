@@ -1,0 +1,30 @@
+{
+	"name": "test-chest",
+	"diffuseMap": "materials/objects/act1/chest-test.png",
+	"sequences": [
+		{
+			"name": "end",
+			"row": 1,
+			"numframes": 1,
+			"loop": true
+		},
+		{
+			"name": "initial",
+			"initial": true,
+			"row": 0,
+			"numframes": 1,
+			"loop": true
+		},
+		{
+			"name": "operate",
+			"row": 2,
+			"numframes": 4,
+			"fps": 5,
+			"loop": false
+		}
+	],
+	"sequenceData": {
+		"rowheight": 41,
+		"framesize": 45
+	}
+}
