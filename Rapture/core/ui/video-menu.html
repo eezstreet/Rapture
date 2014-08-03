@@ -163,6 +163,9 @@
                 autoOpen: false,
                 modal: true,
                 resizable: false,
+                open: function(event, ui) {
+                    UpdateVideoDisplay();
+                },
                 buttons: {
                     OK: function () {
                         ApplyVideoChanges();
