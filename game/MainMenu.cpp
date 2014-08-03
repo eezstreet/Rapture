@@ -7,7 +7,7 @@ MainMenu* MainMenu::singleton = nullptr;
 MainMenu::MainMenu() {
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
 	string mainFileName = "file://" + File::GetFileSearchPath("ui/main.html");
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
+	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
 	// TODO: refactor all of this into a inherited func
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	while(wView->IsLoading())

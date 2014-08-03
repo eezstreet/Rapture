@@ -167,7 +167,7 @@ Menu::Menu() {
 Menu::Menu(const char *menuName) {
 	R_Message(PRIORITY_NOTE, "Loading %s\n", menuName);
 	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
+	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	wView->SetTransparent(true);
 	while(wView->IsLoading())

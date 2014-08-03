@@ -4,7 +4,7 @@ using namespace UI;
 using namespace Awesomium;
 
 WebCore *wc = nullptr;
-static WebSession *sess = nullptr;
+WebSession *sess = nullptr;
 
 vector<Menu*> vmMenus;
 static vector<WebView*> renderables;
@@ -42,12 +42,31 @@ void UI::Initialize() {
 	}
 	lastActiveLayer = 0;
 
+	WebPreferences pref;
+	pref.enable_web_audio = false;
+	pref.enable_web_gl = true;
+	pref.enable_web_security = false;
+	pref.enable_gpu_acceleration = true;
+	pref.allow_scripts_to_access_clipboard = true;
+	pref.allow_universal_access_from_file_url = true;
+	pref.allow_file_access_from_file_url = true;
+
 	R_Message(PRIORITY_NOTE, "Initializing Awesomium Webcore\n");
 	WebConfig x;
 	x.log_level = Awesomium::kLogLevel_Verbose;
+#ifdef _DEBUG
+	// If you have installed the Awesomium SDK, you can use the inspector as long as you have inspector.pak in your Gamedata folder.
+	// This file has not been included on the repository as it isn't needed in most circumstances.
+	// To use it, simply connect to http://127.0.0.1:80 in a web browser while debugging in Visual Studio.
+	x.remote_debugging_port = 80;
+#endif
+	WebStringArray wsa = WebStringArray(1);
+	string option = "--allow-file-access-from-files";
+	wsa[0] = WSLit(option.c_str());
+	x.additional_options = wsa;
 	wc = WebCore::Initialize(x);
 	R_Message(PRIORITY_NOTE, "Creating web session\n");
-	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), WebPreferences());
+	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), pref);
 	R_Message(PRIORITY_NOTE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
 	R_Message(PRIORITY_NOTE, "CreateConsole()\n");

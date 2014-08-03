@@ -37,7 +37,7 @@ void Console::ReplaceConsoleContents() { // Gets called on opening console
 
 Console::Console() {
 	bIsOpen = false;
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer());
+	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
 	wView->SetTransparent(true);
 	BlankConsole();
 	while(wView->IsLoading())

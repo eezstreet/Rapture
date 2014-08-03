@@ -8,7 +8,7 @@
 
 extern Awesomium::WebCore *wc;
 extern Awesomium::WebView* currentFocus; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
-
+extern Awesomium::WebSession* sess;
 void AddRenderable(Awesomium::WebView* wv);
 void RemoveRenderable(Awesomium::WebView* wv);
 
