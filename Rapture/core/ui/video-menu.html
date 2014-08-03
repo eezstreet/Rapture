@@ -1,17 +1,8 @@
 <html>
     <head>
         <title></title>
-        <link rel="stylesheet" href="css/video-menu.css" />
-        <link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.4.custom.css">
-        <link rel="stylesheet" href="css/common.css" />
-        <script type="text/javascript" src="scripts/jQuery-2.0.3.min.js"></script>
-        <script type="text/javascript" src="scripts/jquery-ui-1.10.4.custom.min.js"></script>
-        <script type="text/javascript" src="scripts/video-menu.js"></script>
-        <script>
-            var GameManager;
-        </script>
     </head>
-    <body>
+    <body style="background-color:blue;">
         <div id="apply-warning" title="Warning">
             Due to a bug in SDL, the ''Apply'' button currently doesn't function. Use ''OK'' and restart your game.
         </div>
@@ -21,8 +12,8 @@
             <div>
                 <form style="text-align:center;">
                     <div id="video-advanced" style="position:relative;right:1px;">
-                        <input type="radio" id="video_basic" checked="checked" name="video-advanced"><label for="video_basic" style="font-size:13px;">Basic</label></input>
-                        <input type="radio" id="video_advanced" name="video-advanced"><label for="video_advanced" style="font-size:13px;">Advanced</label></input>
+                        <input type="radio" id="video_basic" checked="checked" name="video-advanced"><label for="video_basic" style="font-size:13px;">Basic</label>
+                        <input type="radio" id="video_advanced" name="video-advanced"><label for="video_advanced" style="font-size:13px;">Advanced</label>
                     </div>
                 </form>
                 <table class="ui-state-default ui-widget-content" style="width:100%;padding:10px;" cellpadding="2">
@@ -77,16 +68,15 @@
                     <tr>
                         <td width="50%">
                             Gamma
-                            <br><div id="slider-gamma"></div></br>
+                            <br><div id="slider-gamma"></div>
                         </td>
                         <td width="50%">
                             <form>
                                 <br>
                                 <div id="video-fullscreen">
-                                    <input type="radio" id="video_fullscreen" checked="checked" name="video-fullscreen"><label for="video_fullscreen" style="padding:3px;font-size:13px;">Fullscreen</label></input>
-                                    <input type="radio" id="video_windowed" name="video-fullscreen"><label for="video_windowed" style="padding:3px;font-size:13px;">Windowed</label></input>
+                                    <input type="radio" id="video_fullscreen" checked="checked" name="video-fullscreen"><label for="video_fullscreen" style="padding:3px;font-size:13px;">Fullscreen</label>
+                                    <input type="radio" id="video_windowed" name="video-fullscreen"><label for="video_windowed" style="padding:3px;font-size:13px;">Windowed</label>
                                 </div>
-                                </br>
                             </form>
                         </td>
                     </tr>
@@ -109,8 +99,8 @@
             function UpdateVideoDisplay() {
                 // Resolution
                 var videoSelected = "#res";
-                var videoWidth = GameManager.getCvarInteger("r_width");
-                var videoHeight = GameManager.getCvarInteger("r_height");
+                var videoWidth = window.top.GameManager.getCvarInteger("r_width");
+                var videoHeight = window.top.GameManager.getCvarInteger("r_height");
 
                 // Select the resolution...
                 selectedResolution = "res";
@@ -140,10 +130,10 @@
                 $("#tabs-resolution").tabs("option", "active", number);
 
                 // Gamma slider
-                $("#slider-gamma").slider("option", "value", GameManager.getCvarFloat("r_gamma"));
+                $("#slider-gamma").slider("option", "value", window.top.GameManager.getCvarFloat("r_gamma"));
 
                 // Fullscreen
-                var bFullscreen = GameManager.getCvarBoolean("r_fullscreen");
+                var bFullscreen = window.top.GameManager.getCvarBoolean("r_fullscreen");
                 var jqRadioButton = $("input:radio[name=video-fullscreen]");
                 if (bFullscreen) {
                     jqRadioButton[0].checked = true;
@@ -159,150 +149,124 @@
                 var resValues = resolution.split("x");
                 var resWidth = resValues[0];
                 var resHeight = resValues[1];
-                GameManager.setCvarInteger("r_width", parseInt(resWidth));
-                GameManager.setCvarInteger("r_height", parseInt(resHeight));
+                window.top.GameManager.setCvarInteger("r_width", parseInt(resWidth));
+                window.top.GameManager.setCvarInteger("r_height", parseInt(resHeight));
 
                 if ($("input:radio[name=video-fullscreen]")[0].checked) {
-                    GameManager.setCvarBoolean("r_fullscreen", true);
+                    window.top.GameManager.setCvarBoolean("r_fullscreen", true);
                 } else {
-                    GameManager.setCvarBoolean("r_fullscreen", false);
+                    window.top.GameManager.setCvarBoolean("r_fullscreen", false);
                 }
             }
 
-            $(document).ready(function (e) {
-                $("#video-options").dialog({
-                    autoOpen: false,
-                    modal: true,
-                    resizable: false,
-                    close: function(event, ui) {
-                        parent.postMessage("closedVideoMenu", "*");
+            $("#video-options").dialog({
+                autoOpen: false,
+                modal: true,
+                resizable: false,
+                buttons: {
+                    OK: function () {
+                        ApplyVideoChanges();
+                        $(this).dialog("close");
                     },
-                    buttons: {
-                        OK: function () {
-                            ApplyVideoChanges();
-                            $(this).dialog("close");
-                        },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        },
-                        Apply: function () {
-                            $("#apply-warning").dialog("open");
-                            //ApplyVideoChanges();
-                            //GameManager.execCommand("vid_restart");
-                        }
+                    Cancel: function () {
+                        $(this).dialog("close");
                     },
-                    width: 500
-                });
-
-                $("#apply-warning").dialog({
-                    autoOpen: false,
-                    modal: true,
-                    resizable: false,
-                    buttons: {
-                        OK: function () { $(this).dialog("close"); }
-                    },
-                });
-
-                $("#open-video-options").click(function () {
-                    UpdateVideoDisplay();
-                    $("#video-options").dialog("open");
-                });
-
-                $("#video-advanced").buttonset();
-                $("#video-fullscreen").buttonset();
-
-                $("#slider-gamma").slider({
-                    min: 0.22,
-                    max: 4.0,
-                    step: 0.1,
-                    slide: function (event, ui) {
-                        GameManager.setCvarFloat("r_gamma", ui.value);
+                    Apply: function () {
+                        $("#apply-warning").dialog("open");
+                        //ApplyVideoChanges();
+                        //GameManager.execCommand("vid_restart");
                     }
-                });
-
-                $("#res-small").selectable({
-                    selecting: function (event, ui) {
-                        if ($("#res-small").length > 1) {
-                            $(ui.selecting).removeClass("ui-selecting");
-                        }
-                        $("#res-large .ui-selected").removeClass("ui-selected");
-                        $("#res-widesmall .ui-selected").removeClass("ui-selected");
-                        $("#res-widelarge .ui-selected").removeClass("ui-selected");
-                        $("#res-widelarge").trigger("unselected");
-                        $("#res-widesmall").trigger("unselected");
-                        $("#res-large").trigger("unselected");
-                    },
-                    selected: function (event, ui) {
-                        selectedResolution = ui.selected.id;
-                    }
-                });
-                $("#res-large").selectable({
-                    selecting: function (event, ui) {
-                        if ($("#res-large").length > 1) {
-                            $(ui.selecting).removeClass("ui-selecting");
-                        }
-                        $("#res-small .ui-selected").removeClass("ui-selected");
-                        $("#res-widesmall .ui-selected").removeClass("ui-selected");
-                        $("#res-widelarge .ui-selected").removeClass("ui-selected");
-                        $("#res-small").trigger("unselected");
-                        $("#res-widesmall").trigger("unselected");
-                        $("#res-widelarge").trigger("unselected");
-
-                    },
-                    selected: function (event, ui) {
-                        selectedResolution = ui.selected.id;
-                    }
-                });
-                $("#res-widesmall").selectable({
-                    selecting: function (event, ui) {
-                        if ($("#res-widesmall").length > 1) {
-                            $(ui.selecting).removeClass("ui-selecting");
-                        }
-                        $("#res-small .ui-selected").removeClass("ui-selected");
-                        $("#res-large .ui-selected").removeClass("ui-selected");
-                        $("#res-widelarge .ui-selected").removeClass("ui-selected");
-                        $("#res-small").trigger("unselected");
-                        $("#res-widelarge").trigger("unselected");
-                        $("#res-large").trigger("unselected");
-                    },
-                    selected: function (event, ui) {
-                        selectedResolution = ui.selected.id;
-                    }
-                });
-                $("#res-widelarge").selectable({
-                    selecting: function (event, ui) {
-                        if ($("#res-widelarge").length > 1) {
-                            $(ui.selecting).removeClass("ui-selecting");
-                        }
-                        $("#res-small .ui-selected").removeClass("ui-selected");
-                        $("#res-widesmall .ui-selected").removeClass("ui-selected");
-                        $("#res-large .ui-selected").removeClass("ui-selected");
-                        $("#res-small").trigger("unselected");
-                        $("#res-widesmall").trigger("unselected");
-                        $("#res-large").trigger("unselected");
-                    },
-                    selected: function (event, ui) {
-                        selectedResolution = ui.selected.id;
-                    }
-                });
-                $("#tabs-resolution").tabs();
+                },
+                width: 500
             });
 
-            // This stupid fucking iframe steals keystrokes on chrome but not on mozilla..
-            jQuery(document).bind('keydown', function (e) {
-                parent.$(document).focus();
-                parent.$(document).trigger(e); // !? wallhax
-                /*var str = "pressedKey ";
-                str = str.concat(e.which.toString());
-                parent.postMessage(str, "*");*/
+            $("#apply-warning").dialog({
+                autoOpen: false,
+                modal: true,
+                resizable: false,
+                buttons: {
+                    OK: function () { $(this).dialog("close"); }
+                },
             });
 
-            window.onmessage = function (e) {
-                if (e.data == "show") {
-                    //UpdateVideoDisplay();
-                    $("#video-options").dialog("open");
+            $("#video-advanced").buttonset();
+            $("#video-fullscreen").buttonset();
+
+            $("#slider-gamma").slider({
+                min: 0.22,
+                max: 4.0,
+                step: 0.1,
+                slide: function (event, ui) {
+                    window.top.GameManager.setCvarFloat("r_gamma", ui.value);
                 }
-            }
+            });
+
+            $("#res-small").selectable({
+                selecting: function (event, ui) {
+                    if ($("#res-small").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                    $("#res-large .ui-selected").removeClass("ui-selected");
+                    $("#res-widesmall .ui-selected").removeClass("ui-selected");
+                    $("#res-widelarge .ui-selected").removeClass("ui-selected");
+                    $("#res-widelarge").trigger("unselected");
+                    $("#res-widesmall").trigger("unselected");
+                    $("#res-large").trigger("unselected");
+                },
+                selected: function (event, ui) {
+                    selectedResolution = ui.selected.id;
+                }
+            });
+            $("#res-large").selectable({
+                selecting: function (event, ui) {
+                    if ($("#res-large").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                    $("#res-small .ui-selected").removeClass("ui-selected");
+                    $("#res-widesmall .ui-selected").removeClass("ui-selected");
+                    $("#res-widelarge .ui-selected").removeClass("ui-selected");
+                    $("#res-small").trigger("unselected");
+                    $("#res-widesmall").trigger("unselected");
+                    $("#res-widelarge").trigger("unselected");
+
+                },
+                selected: function (event, ui) {
+                    selectedResolution = ui.selected.id;
+                }
+            });
+            $("#res-widesmall").selectable({
+                selecting: function (event, ui) {
+                    if ($("#res-widesmall").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                    $("#res-small .ui-selected").removeClass("ui-selected");
+                    $("#res-large .ui-selected").removeClass("ui-selected");
+                    $("#res-widelarge .ui-selected").removeClass("ui-selected");
+                    $("#res-small").trigger("unselected");
+                    $("#res-widelarge").trigger("unselected");
+                    $("#res-large").trigger("unselected");
+                },
+                selected: function (event, ui) {
+                    selectedResolution = ui.selected.id;
+                }
+            });
+            $("#res-widelarge").selectable({
+                selecting: function (event, ui) {
+                    if ($("#res-widelarge").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                    $("#res-small .ui-selected").removeClass("ui-selected");
+                    $("#res-widesmall .ui-selected").removeClass("ui-selected");
+                    $("#res-large .ui-selected").removeClass("ui-selected");
+                    $("#res-small").trigger("unselected");
+                    $("#res-widesmall").trigger("unselected");
+                    $("#res-large").trigger("unselected");
+                },
+                selected: function (event, ui) {
+                    selectedResolution = ui.selected.id;
+                }
+            });
+            $("#tabs-resolution").tabs();
         </script>
     </body>
 </html>

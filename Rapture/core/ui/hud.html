@@ -9,10 +9,12 @@
 		<script type="text/javascript" src="scripts/jQuery-2.0.3.min.js"></script>
 		<script type="text/javascript" src="scripts/jquery-ui-1.10.4.custom.min.js"></script>
 		<script type="text/javascript" src="scripts/jquery.customSelect.min.js"></script>
+		<script type="text/javascript" src="scripts/video-menu.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/exocet.css">
 		<link rel="stylesheet" type="text/css" href="css/helpers.css">
 		<link rel="stylesheet" type="text/css" href="css/colors.css">
 		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/video-menu.css" />
 		<style>
 			body {
 				margin: 0px;
@@ -159,17 +161,12 @@
 			.npcMenuOption:hover {
 				color: #666;
 			}
-
-			.overlayContainer {
-				position: absolute;
-				left:0px;
-				right:0px;
-				bottom:0px;
-				top:0px;
-			}
 		</style>
 	</head>
 	<body>
+		<!--- Overlays --->
+		<div id="ID_overlayContainer">
+		</div>
 		<!--- Special --->
 		<div class="specialZone" id="ID_specialZone">
 			<div class="upperRight">
@@ -303,11 +300,6 @@
 			</div>
 		</div>
 
-		<!--- Overlays --->
-		<div class="overlayContainer" id="ID_overlayContainer" style="display: none;">
-			<iframe src="video-menu.html" frameborder="0" width="100%" height="100%" id="ID_videoMenu"></iframe>
-		</div>
-
 		<script type="text/javascript">
 			// ------ Left/Right Panels ------
 			function clearLeftPanels() {
@@ -434,6 +426,12 @@
 				$(".bottomContainer").click(function () {
 					GameManager.signalNPCMenuClosed();
 				});
+
+				$.ajaxPrefilter("video-menu.html", function (options) {
+				    options.crossDomain = true;
+				});
+
+				$("#ID_overlayContainer").load("video-menu.html");
 			});
 
 			// Utility
@@ -560,9 +558,7 @@
 			});
 
 			$("#escVideo").click(function () {
-				//UpdateVideoDisplay();
-			    $("#ID_overlayContainer").css('display', 'inline');
-				document.getElementById("ID_videoMenu").contentWindow.postMessage("show", "*");
+				$("#video-options").dialog("open");
 			});
 
 			$("#escSound").click(function () {
@@ -602,29 +598,6 @@
 				return preventDrag(e);
 			});
 
-			// Listen to messages
-			var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-			var eventer = window[eventMethod];
-			var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-
-			// Listen to message from child window
-			eventer(messageEvent, function (e) {
-				var key = e.message ? "message" : "data";
-				var data = e[key];
-				//run function//
-				if (data == "closedVideoMenu") {
-					$("#ID_overlayContainer").css('display', 'none');
-				} else if (data.toString().substr(0, 10) == "pressedKey") {
-					var s = data.toString().split(" ");
-					var e = jQuery.Event("keydown");
-					e.which = s[1];
-					alert(e.which.toString());
-					$("input").trigger(e);
-				}
-			}, false);
-
-			// --- Video Menu End ---
-
 			function onKeyDown(e) {
 				if (e.which == 27) {
 					toggleEscape();
@@ -632,7 +605,7 @@
 			}
 
 			jQuery(document).bind('keydown', function (e) {
-				onKeyDown();
+				onKeyDown(e);
 			});
 
 			$("select").customSelect();
