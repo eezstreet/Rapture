@@ -9,11 +9,6 @@ The game is written in C++, while menus are done in HTML/CSS/JS. Minigames such 
 
 If you have any questions or concerns, you may reach me at  e e z s t r e e t @ l i v e . com
 
-= Compiling =
+=== Compiling ===
 
-Please read the COMPILING document for information on compiling. Currently the project is set up for Microsoft Visual Studio 2010/Windows, but I've designed the code to manage other OSes just fine. I plan on utilizing CMake when a proper Mac/Linux port is in the crosshairs.
-
-
-= Team Management =
-
-Currently I'm coding this on my own, but I'd like to set up a team to work on this?
+Please read the COMPILING document for information on compiling. Currently the project is set up for Microsoft Visual Studio 2013/Windows, but I've designed the code to manage other OSes just fine. I plan on utilizing CMake when a proper Mac/Linux port is in the crosshairs.

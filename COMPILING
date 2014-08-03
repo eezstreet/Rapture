@@ -1,7 +1,4 @@
-Requires Microsoft Visual Studio 2010 or later.
-All you need to do currently is open the Rapture/Rapture.sln file with Visual Studio. It'll currently output files to C:\Rapture\Gamedata. You'll need to copy some files from your clone to this directory:
-- Entire "core" folder (game assets) from Rapture/
-- All .dll files from SDL/lib/x86/
-- All files from awesomium/lib/ (except awesomium.lib)
-
-It may take a few seconds longer to load on first run, due to browser caching taking place. It works on Debug and Release builds (+debugging using VS), but doesn't support Edit and Continue for the modcode or the editor projects.
+Requires Visual Studio 2013 or later.
+You will need to download dirent.h and place it in your Visual Studio include folder (normally found at C:\Program Files (x86)\Visual Studio 12.0\VC\include)
+All you need to do then is compile the game under Debug or Release (it works in both) and it should run. The game assets and redistributable game content will be placed in C:\Rapture\Gamedata.
+NOTE: You may need to copy fonts from your cloned/zipped copy of the repository to your game folder, as Windows has special restrictions on .ttf files.
