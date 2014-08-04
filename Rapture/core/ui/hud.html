@@ -1,14 +1,15 @@
 <html>
 	<head>
 		<title></title>
-		<link rel="stylesheet" href="css/custom-theme/jquery-ui-1.10.4.custom.css">
+		<link rel="stylesheet" href="css/custom-theme/jquery-ui.min.css">
+		<link rel="stylesheet" href="css/custom-theme/jquery-ui.structure.min.css" />
+		<link rel="stylesheet" href="css/custom-theme/jquery-ui.theme.min.css" />
 		<script type="text/javascript">
 			var GameManager;
 			var EscapesOn = false;
 		</script>
-		<script type="text/javascript" src="scripts/jQuery-2.0.3.min.js"></script>
-		<script type="text/javascript" src="scripts/jquery-ui-1.10.4.custom.min.js"></script>
-		<script type="text/javascript" src="scripts/jquery.customSelect.min.js"></script>
+		<script type="text/javascript" src="scripts/jQuery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="scripts/video-menu.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/exocet.css">
 		<link rel="stylesheet" type="text/css" href="css/helpers.css">
@@ -161,6 +162,42 @@
 			.npcMenuOption:hover {
 				color: #666;
 			}
+
+			fieldset {
+				border: 0;
+			}
+			select {
+				width: 282px;
+			}
+
+			.ui-selectmenu-menu {
+				border:0;
+				margin:0;
+			}
+
+			.ui-selectmenu-menu .ui-menu {
+				padding: 0px;
+				font-size:10px;
+				height:200px;
+				border:0;
+				margin:0px;
+			}
+
+			.ui-selectmenu-button span.ui-selectmenu-text {
+				background-color:black;
+				font-size:10px;
+				border:0;
+				margin:0;
+				height:11px;
+			}
+
+			#ID_questSelectForm {
+				position:absolute;
+				left:42px;
+				top:335px;
+				padding:0px;
+				margin:0px;
+			}
 		</style>
 	</head>
 	<body>
@@ -217,27 +254,6 @@
 			</div>
 		</div>
 
-		<!--- Left Side Panels --->
-		<div class="leftPanelContainer" id="ID_leftPanel">
-			<div class="leftPanel invisible" id="ID_panelQuestLog">
-				<div class="leftPanelTitle exocet color-white">
-					Quest Log
-				</div>
-				<div class="exocet color-white">
-					<select>
-						<option>Quest A</option>
-					</select>
-				</div>
-			</div>
-		</div>
-
-		<!--- Right Side Panels --->
-		<div class="rightPanelContainer" id="ID_rightPanel">
-			<div class="rightPanel">
-
-			</div>
-		</div>
-
 		<!-- Bottom Section -->
 		<div class="bottomContainer">
 			<div class="bottomRight">
@@ -253,13 +269,13 @@
 								<img src="images/hud/miniminipanel_bg.png" />
 							</div>
 							<div style="top:0px; right:190px; position:absolute;">
-								<img src="images/hud/minipanelpopbutton_down.png" data-mupimg="images/hud/minipanelpopbutton_down.png" class="panelButton" id="ID_panelButton1" data-label="Close Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_down_down.png" width="20" height="15"/>
+								<img src="images/hud/minipanelpopbutton_down.png" data-mupimg="images/hud/minipanelpopbutton_down.png" class="panelButton" id="ID_panelButton1" data-label="Close Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_down_down.png" width="20" height="15" />
 							</div>
 							<div style="top:-19px; position:absolute; right: 125px;">
 								<img src="images/hud/minipanel_button_3_up.png" data-mupimg="images/hud/minipanel_button_3_up.png" class="panelButton" id="ID_panelButton3" data-label="Quest Log" data-mdownimg="images/hud/minipanel_button_3_down.png" width="20" height="20" />
 							</div>
 							<div style="top:-19px; position: absolute; right:105px;">
-								<img src="images/hud/minipanel_button_2_up.png" data-mupimg="images/hud/minipanel_button_2_up.png" class="panelButton" id="ID_panelButton2" data-label="Options [ESC]" data-mdownimg="images/hud/minipanel_button_2_down.png" width="20" height="20"/>
+								<img src="images/hud/minipanel_button_2_up.png" data-mupimg="images/hud/minipanel_button_2_up.png" class="panelButton" id="ID_panelButton2" data-label="Options [ESC]" data-mdownimg="images/hud/minipanel_button_2_down.png" width="20" height="20" />
 							</div>
 						</div>
 						<div id="ID_miniminipanel_off">
@@ -274,6 +290,30 @@
 			<div class="bottomLeft" style="z-index:99 !important">
 				<!-- Bottom Left-->
 				<img src="images/hud/orb_left.png" />
+			</div>
+		</div>
+
+		<!--- Left Side Panels --->
+		<div class="leftPanelContainer" id="ID_leftPanel">
+			<div class="leftPanel exocet" id="ID_panelQuestLog">
+				<div class="leftPanelTitle exocet color-white">
+					Quest Log
+				</div>
+				<form action="#" id="ID_questSelectForm">
+					<fieldset>
+						<select id="ID_questSelect">
+							<option selected="selected">Quest A</option>
+							<option>Quest B</option>
+						</select>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+
+		<!--- Right Side Panels --->
+		<div class="rightPanelContainer" id="ID_rightPanel">
+			<div class="rightPanel">
+
 			</div>
 		</div>
 
@@ -305,7 +345,7 @@
 			function clearLeftPanels() {
 				$("#ID_leftPanel").find('div').each(function () {
 					if ($(this).hasClass("leftPanel")) {
-						$(this).addClass("invisible");
+						$(this).hide();
 					}
 				});
 			}
@@ -313,12 +353,13 @@
 			function clearRightPanels() {
 				$("#ID_rightPanel").find('div').each(function () {
 					if ($(this).hasClass("rightPanel")) {
-						$(this).addClass("invisible");
+						$(this).hide();
 					}
 				});
 			}
 			// ------ Lower Panel ------
 			$(function () {
+				$("#ID_questSelect").selectmenu();
 				$(".panelButton").mouseover(function (e) {
 					var labelValue;
 
@@ -401,13 +442,12 @@
 						return;
 					}
 
-					if (!$("#ID_panelQuestLog").hasClass("invisible")) {
-						// Hide it, and all other classes.
+					if ($("#ID_panelQuestLog").is(":visible")) {
 						clearLeftPanels();
 						return;
 					}
 					clearLeftPanels();
-					$("#ID_panelQuestLog").toggleClass("invisible");
+					$("#ID_panelQuestLog").show();
 				});
 
 				$(".npcMenuOption").mouseover(function () {
@@ -428,9 +468,10 @@
 				});
 
 				$.ajaxPrefilter("video-menu.html", function (options) {
-				    options.crossDomain = true;
+					options.crossDomain = true;
 				});
 
+				$("#ID_panelQuestLog").hide();
 				$("#ID_overlayContainer").load("video-menu.html");
 			});
 
@@ -607,8 +648,6 @@
 			jQuery(document).bind('keydown', function (e) {
 				onKeyDown(e);
 			});
-
-			$("select").customSelect();
 		</script>
 	</body>
 </html>

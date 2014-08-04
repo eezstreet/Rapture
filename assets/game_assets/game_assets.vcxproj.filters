@@ -279,12 +279,6 @@
     <None Include="..\..\Rapture\core\materials\objects\act1\chest-test.psd">
       <Filter>core\materials\objects\act1</Filter>
     </None>
-    <None Include="..\..\Rapture\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.css">
-      <Filter>core\ui\css\custom-theme</Filter>
-    </None>
-    <None Include="..\..\Rapture\core\ui\css\custom-theme\jquery-ui-1.10.4.custom.min.css">
-      <Filter>core\ui\css\custom-theme</Filter>
-    </None>
     <None Include="..\..\Rapture\core\ui\css\colors.css">
       <Filter>core\ui\css</Filter>
     </None>
@@ -318,21 +312,6 @@
     <None Include="..\..\Rapture\core\ui\images\hud\orb_right.psd">
       <Filter>core\ui\images\hud</Filter>
     </None>
-    <None Include="..\..\Rapture\core\ui\scripts\csi.min.js">
-      <Filter>core\ui\scripts</Filter>
-    </None>
-    <None Include="..\..\Rapture\core\ui\scripts\jquery.customSelect.min.js">
-      <Filter>core\ui\scripts</Filter>
-    </None>
-    <None Include="..\..\Rapture\core\ui\scripts\jQuery-2.0.3.min.js">
-      <Filter>core\ui\scripts</Filter>
-    </None>
-    <None Include="..\..\Rapture\core\ui\scripts\jquery-ui-1.10.4.custom.js">
-      <Filter>core\ui\scripts</Filter>
-    </None>
-    <None Include="..\..\Rapture\core\ui\scripts\jquery-ui-1.10.4.custom.min.js">
-      <Filter>core\ui\scripts</Filter>
-    </None>
     <None Include="..\..\Rapture\core\ui\console.html">
       <Filter>core\ui</Filter>
     </None>
@@ -350,6 +329,24 @@
     </None>
     <None Include="..\..\Rapture\core\ui\video-menu.html">
       <Filter>core\ui</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\css\custom-theme\jquery-ui.min.css">
+      <Filter>core\ui\css\custom-theme</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\css\custom-theme\jquery-ui.structure.min.css">
+      <Filter>core\ui\css\custom-theme</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\css\custom-theme\jquery-ui.theme.min.css">
+      <Filter>core\ui\css\custom-theme</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\scripts\jquery-ui.min.js">
+      <Filter>core\ui\scripts</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\scripts\video-menu.js">
+      <Filter>core\ui\scripts</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\scripts\jQuery-2.1.1.min.js">
+      <Filter>core\ui\scripts</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -385,51 +382,6 @@
     </Image>
     <Image Include="..\..\Rapture\core\materials\tiles\editor\floor_edit.png">
       <Filter>core\materials\tiles\editor</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\animated-overlay.gif">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_carbon-fiber_10_360f0f_8x9.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_diagonals-thick_10_621715_40x40.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_20_2a2a2a_40x100.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_25_333333_40x100.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_30_cccccc_40x100.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_50_5c5c5c_40x100.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_glass_40_ffc73d_1x400.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_highlight-soft_80_eeeeee_1x100.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_spotlight_10_000000_600x600.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_4b8e0b_256x240.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_222222_256x240.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_a83300_256x240.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_cccccc_256x240.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
-    </Image>
-    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png">
-      <Filter>core\ui\css\custom-theme\images</Filter>
     </Image>
     <Image Include="..\..\Rapture\core\ui\css\customSelect-arrow.gif">
       <Filter>core\ui\css</Filter>
@@ -481,6 +433,54 @@
     </Image>
     <Image Include="..\..\Rapture\core\ui\images\hud\panel_questlog_bg.png">
       <Filter>core\ui\images\hud</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\animated-overlay.gif">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_carbon-fiber_20_4f1010_8x9.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_diagonals-medium_20_681616_40x40.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_diagonals-medium_55_fbf9ee_40x40.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_0_303030_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_0_aaaaaa_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_75_000000_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_75_2e2e2e_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_flat_100_2b2b2b_40x100.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-bg_glass_95_fef1ec_1x400.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_2e83ff_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_454545_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_888888_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_cd0a0a_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_e3e3e3_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png">
+      <Filter>core\ui\css\custom-theme\images</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
