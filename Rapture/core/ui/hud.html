@@ -146,9 +146,9 @@
 				background-repeat: no-repeat;
 				-moz-background-size:100% 100%;
 				-webkit-background-size:100% 100%;
-                background-size: 100% 100%;
+				background-size: 100% 100%;
 				position: absolute;
-                padding: 20px 40px 20px 40px;
+				padding: 20px 40px 20px 40px;
 				text-align: center;
 			}
 
@@ -195,7 +195,7 @@
 				background-repeat: no-repeat;
 				-moz-background-size: 100% 100%;
 				-webkit-background-size: 100% 100%;
-                background-size: 100% 100%;
+				background-size: 100% 100%;
 			}
 
 			#ID_questSelectForm {
@@ -315,14 +315,14 @@
 
 		<!--- Left Side Panels --->
 		<div class="leftPanelContainer nosel" id="ID_leftPanel">
-            <!-- Quest Log Alert Button -->
+			<!-- Quest Log Alert Button -->
 			<div id="ID_questLogButtonContainer" class="exocet color-white">
 				<div id="ID_questLogButtonDiv">
 					<div id="ID_questLogText">Quest Log</div>
 					<img src="images/hud/newbutton.png" data-mupimg="images/hud/newbutton.png" data-mdownimg="images/hud/newbutton_down.png" class="panelButton" id="ID_questLogButton" data-label="Quest Log" width="35" height="35" />
 				</div>
 			</div>
-            <!-- Quest Log -->
+			<!-- Quest Log -->
 			<div class="leftPanel exocet" id="ID_panelQuestLog">
 				<div class="leftPanelTitle color-white">
 					Quest Log
@@ -467,23 +467,23 @@
 
 
 				function openQuestLog() {
-				    if (EscapesOn) {
-				        return;
-				    }
+					if (EscapesOn) {
+						return;
+					}
 
-				    if ($("#ID_panelQuestLog").is(":visible")) {
-				        GameManager.undefineClickZone("QuestLog");
-				        clearLeftPanels();
-				        return;
-				    }
-				    clearLeftPanels();
-				    $("#ID_panelQuestLog").show();
-				    GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
-                        $("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
-				    $("#ID_questLogButtonDiv").hide();
+					if ($("#ID_panelQuestLog").is(":visible")) {
+						GameManager.undefineClickZone("QuestLog");
+						clearLeftPanels();
+						return;
+					}
+					clearLeftPanels();
+					$("#ID_panelQuestLog").show();
+					GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
+						$("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
+					$("#ID_questLogButtonDiv").hide();
 				}
 				$("#ID_panelButton3").click(function (e) {
-				    openQuestLog();
+					openQuestLog();
 				});
 
 				$(".npcMenuOption").mouseover(function () {
@@ -503,7 +503,7 @@
 					GameManager.signalNPCMenuClosed();
 				});
 
-                // FIXME: not necessary?
+				// FIXME: not necessary?
 				$.ajaxPrefilter("video-menu.html", function (options) {
 					options.crossDomain = true;
 				});
@@ -513,7 +513,7 @@
 
 				$("#ID_overlayContainer").load("video-menu.html");
 				$("#ID_questLogButton").click(function (e) {
-				    openQuestLog();
+					openQuestLog();
 				});
 			});
 
