@@ -22,10 +22,13 @@ Client::Client() {
 
 	trap->AddJSCallback(ptHUD, "signalNPCMenuClosed", Client::NPCMenuClosed);
 	trap->AddJSCallback(ptHUD, "npcMenuCallback", Client::NPCPickOption);
+	trap->AddJSCallback(ptHUD, "defineClickZone", Client::DefineClickZone);
+	trap->AddJSCallback(ptHUD, "undefineClickZone", Client::UndefineClickZone);
 }
 
 Client::~Client() {
 	trap->KillStaticMenu(ptHUD);
+	m_clickZones.clear();
 }
 
 void Client::RunFPS() {
@@ -150,12 +153,25 @@ void Client::EnteredArea(const char* sArea) {
 }
 
 static bool bNPCMenuUp = false;
+static bool bPreventMouseInteraction = false;
 void Client::PassMouseDown(int x, int y) {
 	cursorX = x;
 	cursorY = y;
-	if(bNPCMenuUp) {
+
+	if(bNPCMenuUp == true) {
 		return;
 	}
+
+	// Check and see if we have any HUD-defined areas which we are not allowed to click
+	for(auto it = m_clickZones.begin(); it != m_clickZones.end(); ++it) {
+		ClickZone_t* ptCZ = &it->second;
+		if(x >= ptCZ->x && x <= ptCZ->x + ptCZ->w) {
+			if(y >= ptCZ->y && y <= ptCZ->y + ptCZ->h) {
+				return;
+			}
+		}
+	}
+
 	if(!trap->IsConsoleOpen()) {
 		ptPlayer->MouseDownEvent(x, y);
 		if(ptFocusEnt) {
@@ -262,4 +278,19 @@ void Client::NPCPickOption() {
 	int iWhichOption = trap->GetJSIntArg(ptClient->ptHUD, 0);
 
 	ptClient->NPCPickMenu(iWhichOption, false);
+}
+
+void Client::DefineClickZone() {
+	string sZoneName = trap->GetJSStringArg(ptClient->ptHUD, 0);
+	int x = trap->GetJSIntArg(ptClient->ptHUD, 1);
+	int y = trap->GetJSIntArg(ptClient->ptHUD, 2);
+	int w = trap->GetJSIntArg(ptClient->ptHUD, 3);
+	int h = trap->GetJSIntArg(ptClient->ptHUD, 4);
+	ClickZone_t cz; cz.x = x; cz.y = y; cz.w = w; cz.h = h;
+	ptClient->m_clickZones[sZoneName] = cz;
+}
+
+void Client::UndefineClickZone() {
+	string sZoneName = trap->GetJSStringArg(ptClient->ptHUD, 0);
+	ptClient->m_clickZones.erase(sZoneName);
 }

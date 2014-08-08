@@ -97,8 +97,11 @@
 			.leftPanelContainer {
 				float: left;
 				position: absolute;
-				bottom:50%;
 				left: 0px;
+				bottom:0px;
+				width:400px;
+				height:100%;
+				vertical-align:middle;
 			}
 
 			.rightPanelContainer {
@@ -111,6 +114,11 @@
 			.leftPanel {
 				left: 0px;
 				position: absolute;
+				width:400px;
+				height:600px;
+				display:none;
+				top:50%;
+				margin-top:-300px;
 			}
 
 			.leftPanelTitle {
@@ -121,18 +129,11 @@
 			.rightPanel {
 				right: 0px;
 				position: absolute;
-			}
-
-			#ID_panelQuestLog {
-				position: relative;
-				width: 400px;
-				height: 600px;
-				background-image: url('images/hud/panel_questlog_bg.png');
-				background-repeat: no-repeat;
-				background-size: 100% 100%;
-				-moz-background-size: 100% 100%;
-				-webkit-background-size: 100% 100%;
-				bottom: -300px;
+				width:400px;
+				height:600px;
+				display:none;
+				top:50%;
+				margin-top:-300px;
 			}
 
 			.panelButton {
@@ -191,12 +192,34 @@
 				height:11px;
 			}
 
+			/* Quest Log */
+			#ID_panelQuestLog {
+				background-image: url('images/hud/panel_questlog_bg.png');
+				background-repeat: no-repeat;
+				background-size: 100% 100%;
+				-moz-background-size: 100% 100%;
+				-webkit-background-size: 100% 100%;
+			}
+
 			#ID_questSelectForm {
 				position:absolute;
 				left:42px;
 				top:335px;
 				padding:0px;
 				margin:0px;
+			}
+
+			/* Quest Log Alert Button */
+			#ID_questLogButtonContainer {
+				width: 100%;
+				height: 100%;
+			}
+
+			#ID_questLogButtonDiv {
+				text-align:center;
+				position:absolute;
+				bottom:150px;
+				left:30%;
 			}
 		</style>
 	</head>
@@ -294,16 +317,24 @@
 		</div>
 
 		<!--- Left Side Panels --->
-		<div class="leftPanelContainer" id="ID_leftPanel">
+		<div class="leftPanelContainer nosel" id="ID_leftPanel">
+            <!-- Quest Log Alert Button -->
+			<div id="ID_questLogButtonContainer" class="exocet color-white">
+				<div id="ID_questLogButtonDiv">
+					<div id="ID_questLogText">Quest Log</div>
+					<img src="images/hud/newbutton.png" data-mupimg="images/hud/newbutton.png" data-mdownimg="images/hud/newbutton_down.png" class="panelButton" id="ID_questLogButton" data-label="Quest Log" width="35" height="35" />
+				</div>
+			</div>
+            <!-- Quest Log -->
 			<div class="leftPanel exocet" id="ID_panelQuestLog">
-				<div class="leftPanelTitle exocet color-white">
+				<div class="leftPanelTitle color-white">
 					Quest Log
 				</div>
 				<form action="#" id="ID_questSelectForm">
 					<fieldset>
 						<select id="ID_questSelect">
-							<option selected="selected">Quest A</option>
-							<option>Quest B</option>
+							<optgroup label="Main Quests"></optgroup>
+							<optgroup label="Side Quests"></optgroup>
 						</select>
 					</fieldset>
 				</form>
@@ -311,7 +342,7 @@
 		</div>
 
 		<!--- Right Side Panels --->
-		<div class="rightPanelContainer" id="ID_rightPanel">
+		<div class="rightPanelContainer nosel" id="ID_rightPanel">
 			<div class="rightPanel">
 
 			</div>
@@ -437,17 +468,25 @@
 					toggleEscape();
 				});
 
-				$("#ID_panelButton3").click(function (e) {
-					if (EscapesOn) {
-						return;
-					}
 
-					if ($("#ID_panelQuestLog").is(":visible")) {
-						clearLeftPanels();
-						return;
-					}
-					clearLeftPanels();
-					$("#ID_panelQuestLog").show();
+				function openQuestLog() {
+				    if (EscapesOn) {
+				        return;
+				    }
+
+				    if ($("#ID_panelQuestLog").is(":visible")) {
+				        GameManager.undefineClickZone("QuestLog");
+				        clearLeftPanels();
+				        return;
+				    }
+				    clearLeftPanels();
+				    $("#ID_panelQuestLog").show();
+				    GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
+                        $("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
+				    $("#ID_questLogButtonDiv").hide();
+				}
+				$("#ID_panelButton3").click(function (e) {
+				    openQuestLog();
 				});
 
 				$(".npcMenuOption").mouseover(function () {
@@ -467,12 +506,18 @@
 					GameManager.signalNPCMenuClosed();
 				});
 
+                // FIXME: not necessary?
 				$.ajaxPrefilter("video-menu.html", function (options) {
 					options.crossDomain = true;
 				});
 
 				$("#ID_panelQuestLog").hide();
+				$("#ID_questLogButtonDiv").hide();
+
 				$("#ID_overlayContainer").load("video-menu.html");
+				$("#ID_questLogButton").click(function (e) {
+				    openQuestLog();
+				});
 			});
 
 			// Utility

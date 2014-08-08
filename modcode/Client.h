@@ -5,6 +5,10 @@
 
 typedef int(*QuestCallback)();
 
+typedef struct {
+	int x, y, w, h;
+} ClickZone_t;
+
 class Client {
 private:
 	// Viewport
@@ -22,6 +26,8 @@ private:
 
 	// HUD
 	Menu* ptHUD;
+
+	unordered_map<string, ClickZone_t> m_clickZones;
 public:
 	Client();
 	~Client();
@@ -61,6 +67,8 @@ public:
 	// HUD callbacks
 	static void NPCMenuClosed();
 	static void NPCPickOption();
+	static void DefineClickZone();
+	static void UndefineClickZone();
 };
 
 extern Client* ptClient;
