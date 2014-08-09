@@ -25,7 +25,7 @@ public:
 	void AssignCallback(const char* callbackName, menuVMCallback callback);
 
 	unsigned int GetVMArgCount();
-	const char* GetVMStringArg(unsigned int iArgNum);
+	void GetVMStringArg(unsigned int iArgNum, char* sBuffer, size_t numChars);
 	int GetVMIntArg(unsigned int iArgNum);
 	double GetVMDoubleArg(unsigned int iArgNum);
 	bool GetVMBoolArg(unsigned int iArgNum);

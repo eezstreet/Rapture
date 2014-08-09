@@ -271,16 +271,24 @@ unsigned int Menu::GetVMArgCount() {
 	return vmState->size();
 }
 
-const char* Menu::GetVMStringArg(unsigned int iArgNum) {
+void Menu::GetVMStringArg(unsigned int iArgNum, char* sBuffer, size_t numChars) {
 	if(vmState == nullptr) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: null vmState\n");
-		return nullptr;
+		return;
 	}
 	if(iArgNum >= vmState->size()) {
 		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: iArgNum >= argCount\n");
-		return nullptr;
+		return;
 	}
-	return ToString(vmState->At(iArgNum).ToString()).c_str();
+	if(sBuffer == nullptr) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: null buffer\n");
+		return;
+	}
+	if(numChars <= 0) {
+		R_Message(PRIORITY_ERROR, "Menu::GetVMStringArg: no size\n");
+		return;
+	}
+	strncpy(sBuffer, ToString(vmState->At(iArgNum).ToString()).c_str(), numChars);
 }
 
 int Menu::GetVMIntArg(unsigned int iArgNum) {

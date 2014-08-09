@@ -1,5 +1,6 @@
 #pragma once
 #include "Quest.h"
+#include "Client.h"
 
 enum A1Q1_States {
 	A1Q1_STARTED = 1, // "You have started the test quest."
@@ -12,4 +13,6 @@ public:
 	virtual void Init();
 
 	static void ChangeToState(const int toState);
+
+	static void DescriptionPointer(Client* ptClient);
 };

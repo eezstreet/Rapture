@@ -206,6 +206,18 @@
 				margin:0;
 			}
 
+			.questLogDescription {
+				border: 1px solid #6D6D6D;
+				background-color: #000;
+				font-weight:bold;
+				color: #FFF;
+				font-size:11px;
+				font-family: 'Segoe UI';
+				padding:6px;
+				position:relative;
+				top:10px;
+			}
+
 			/* Quest Log Alert Button */
 			#ID_questLogButtonContainer {
 				width: 100%;
@@ -330,9 +342,8 @@
 				<form action="#" id="ID_questSelectForm">
 					<fieldset>
 						<select id="ID_questSelect">
-							<optgroup label="Main Quests"></optgroup>
-							<optgroup label="Side Quests"></optgroup>
 						</select>
+						<textarea readonly="readonly" rows="5" cols="39" class="questLogDescription" id="ID_questLogDescription">No quest information available.</textarea>
 					</fieldset>
 				</form>
 			</div>
@@ -388,6 +399,9 @@
 			// ------ Lower Panel ------
 			$(function () {
 				$("#ID_questSelect").selectmenu();
+				$("#ID_questSelect").on("selectmenuselect", function (event, ui) {
+					GameManager.changedSelectedQuest(ui.item.value);
+				});
 				$(".panelButton").mouseover(function (e) {
 					var labelValue;
 
@@ -481,6 +495,7 @@
 					GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
 						$("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
 					$("#ID_questLogButtonDiv").hide();
+					$("#ID_questSelectForm").selectmenu("change");
 				}
 				$("#ID_panelButton3").click(function (e) {
 					openQuestLog();
@@ -629,6 +644,41 @@
 
 			function closeNPCMenu() {
 				$("#ID_npcMenu").toggleClass("invisible");
+			}
+
+			// Quest Log
+			function addQuestToList(displayName, questRecord) {
+				var str = '<option value="';
+				str = str.concat(questRecord);
+				str = str.concat('" selected="selected">');
+				str = str.concat(displayName);
+				str = str.concat("</option>");
+				$("#ID_questSelect").append(str);
+				$("#ID_questSelect").selectmenu("refresh", true);
+				GameManager.changedSelectedQuest(questRecord);
+			}
+
+			function showQuestLogDisplay(message, questAffected) {
+				changeDivHTML("ID_questLogText", message);
+				$("#ID_questLogButtonDiv").show();
+			}
+
+			function newQuest(questName, questID) {
+				addQuestToList(questName, questID);
+				showQuestLogDisplay("New Quest", questID);
+			}
+
+			function questUpdate(questID) {
+				showQuestLogDisplay("Quest Update", questID);
+			}
+
+			function questComplete(questID) {
+				// For right now we will just remove the quest from the list...need a better option here
+				showQuestLogDisplay("Quest Complete", questID);
+			}
+
+			function setQuestLogDescriptionText(theText) {
+				$("#ID_questLogDescription").val(theText);
 			}
 
 			// ESC menu

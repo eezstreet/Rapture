@@ -6,6 +6,7 @@
 struct Quest {
 	string sName;
 	vector<QuestState> vStates;
+	int iCurrentState;
 
 	virtual void Init() = 0;
 };

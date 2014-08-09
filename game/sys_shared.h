@@ -106,7 +106,7 @@ extern "C" {
 		bool  (*IsConsoleOpen)();
 		void  (*AddJSCallback)(Menu* menu, const char* sCallbackName, void(*ptCallback)());
 		unsigned int   (*GetJSNumArgs)(Menu* ptMenu);
-		char* (*GetJSStringArg)(Menu* ptMenu, unsigned int argNum);
+		void (*GetJSStringArg)(Menu* ptMenu, unsigned int argNum, char* sBuffer, size_t numChars);
 		int   (*GetJSIntArg)(Menu* ptMenu, unsigned int argNum);
 		double(*GetJSDoubleArg)(Menu* ptMenu, unsigned int argNum);
 		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);

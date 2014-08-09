@@ -24,6 +24,7 @@ Client::Client() {
 	trap->AddJSCallback(ptHUD, "npcMenuCallback", Client::NPCPickOption);
 	trap->AddJSCallback(ptHUD, "defineClickZone", Client::DefineClickZone);
 	trap->AddJSCallback(ptHUD, "undefineClickZone", Client::UndefineClickZone);
+	trap->AddJSCallback(ptHUD, "changedSelectedQuest", Client::ChangedQuestLogSelectedQuest);
 }
 
 Client::~Client() {
@@ -280,8 +281,35 @@ void Client::NPCPickOption() {
 	ptClient->NPCPickMenu(iWhichOption, false);
 }
 
+// Quest log
+void Client::NewQuest(const string& sQuestName, const string& sQuestID, Client::SetDescriptionCallback pfCallback) {
+	stringstream ss;
+	ss << "newQuest('" << sQuestName << "', '" << sQuestID << "');";
+	m_pfQuestDescriptions[sQuestID] = pfCallback;
+
+	trap->RunJavaScript(ptHUD, ss.str().c_str());
+}
+
+void Client::SetQuestLogDescription(const string& sQuestDesc) {
+	stringstream ss;
+	ss << "setQuestLogDescriptionText('" << sQuestDesc << "');" << '\0';
+	trap->RunJavaScript(ptHUD, ss.str().c_str());
+}
+
+void Client::ChangedQuestLogSelectedQuest() {
+	char questID[MAX_HANDLE_STRING];
+	trap->GetJSStringArg(ptClient->ptHUD, 0, questID, sizeof(questID));
+	auto it = ptClient->m_pfQuestDescriptions.find(questID);
+	if(it == ptClient->m_pfQuestDescriptions.end()) {
+		trap->printf(PRIORITY_WARNING, "WARNING: attempted to change to invalid quest ID %s in quest log...\n", questID);
+		return;
+	}
+	it->second(ptClient);
+}
+
 void Client::DefineClickZone() {
-	string sZoneName = trap->GetJSStringArg(ptClient->ptHUD, 0);
+	char sZoneName[MAX_HANDLE_STRING];
+	trap->GetJSStringArg(ptClient->ptHUD, 0, sZoneName, sizeof(sZoneName));
 	int x = trap->GetJSIntArg(ptClient->ptHUD, 1);
 	int y = trap->GetJSIntArg(ptClient->ptHUD, 2);
 	int w = trap->GetJSIntArg(ptClient->ptHUD, 3);
@@ -291,6 +319,7 @@ void Client::DefineClickZone() {
 }
 
 void Client::UndefineClickZone() {
-	string sZoneName = trap->GetJSStringArg(ptClient->ptHUD, 0);
+	char sZoneName[MAX_HANDLE_STRING];
+	trap->GetJSStringArg(ptClient->ptHUD, 0, sZoneName, sizeof(sZoneName));
 	ptClient->m_clickZones.erase(sZoneName);
 }

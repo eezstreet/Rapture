@@ -444,8 +444,8 @@ unsigned int UI::GetJavaScriptNumArgs(Menu* ptMenu) {
 	return ptMenu->GetVMArgCount();
 }
 
-char* UI::GetJavaScriptStringArgument(Menu* ptMenu, unsigned int iArgNum) {
-	return const_cast<char*>(ptMenu->GetVMStringArg(iArgNum));
+void UI::GetJavaScriptStringArgument(Menu* ptMenu, unsigned int iArgNum, char* sBuffer, size_t numChars) {
+	ptMenu->GetVMStringArg(iArgNum, sBuffer, numChars);
 }
 
 int UI::GetJavaScriptIntArgument(Menu* ptMenu, unsigned int iArgNum) {

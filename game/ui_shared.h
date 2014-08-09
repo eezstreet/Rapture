@@ -18,7 +18,7 @@ namespace UI {
 	void RunJavaScript(Menu* menu, const char* sJS);
 	void AddJavaScriptCallback(Menu* menu, const char* sCallbackName, void(*ptCallback)());
 	unsigned int GetJavaScriptNumArgs(Menu* menu);
-	char* GetJavaScriptStringArgument(Menu* menu, unsigned int iArgNum);
+	void GetJavaScriptStringArgument(Menu* menu, unsigned int iArgNum, char* sBuffer, size_t numChars);
 	int GetJavaScriptIntArgument(Menu* menu, unsigned int iArgNum);
 	double GetJavaScriptDoubleArgument(Menu* menu, unsigned int iArgNum);
 	bool GetJavaScriptBoolArgument(Menu* menu, unsigned int iArgNum);

@@ -64,11 +64,21 @@ public:
 
 	Player* ptPlayer;
 
+	// Quest log
+	typedef void(*SetDescriptionCallback)(Client* ptClient);
+private:
+	unordered_map<string, SetDescriptionCallback> m_pfQuestDescriptions;
+public:
+	void NewQuest(const string& questName, const string& questID, SetDescriptionCallback pfSetDescriptionCallback);
+	void SetQuestLogDescription(const string& sDesc);
+	static void ChangedQuestLogSelectedQuest();
+
 	// HUD callbacks
 	static void NPCMenuClosed();
 	static void NPCPickOption();
 	static void DefineClickZone();
 	static void UndefineClickZone();
+	static void SetQuestLogStatus();
 };
 
 extern Client* ptClient;
