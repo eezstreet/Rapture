@@ -232,514 +232,519 @@
 			}
 		</style>
 	</head>
-	<body>
-		<!--- Overlays --->
-		<div id="ID_overlayContainer">
+<body>
+	<!--- Overlays --->
+	<div id="ID_overlayContainer">
+	</div>
+	<!--- Special --->
+	<div class="specialZone" id="ID_specialZone">
+		<div class="upperRight">
+			<!-- Upper Right -->
+			<div class="nosel exocet zoneText" id="ID_zone">NULL</div>
 		</div>
-		<!--- Special --->
-		<div class="specialZone" id="ID_specialZone">
-			<div class="upperRight">
-				<!-- Upper Right -->
-				<div class="nosel exocet zoneText" id="ID_zone">NULL</div>
-			</div>
-			<div style="visibility: hidden; overflow: hidden; display:inline;" id="ID_label">
-				<!-- Labels -->
-				<div class="nosel exocet label">
-					<span class="color-white" id="ID_labeltext"></span>
-				</div>
-			</div>
-			<div id="ID_npcMenu" class="exocet invisible nosel">
-				<!-- NPC labels -->
-				<div id="ID_npcMenuName" style="color: #AD9564;">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption0" class="npcMenuOption" data-npcoption="0">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption1" class="npcMenuOption" data-npcoption="1">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption2" class="npcMenuOption" data-npcoption="2">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption3" class="npcMenuOption" data-npcoption="3">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption4" class="npcMenuOption" data-npcoption="4">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption5" class="npcMenuOption" data-npcoption="5">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption6" class="npcMenuOption" data-npcoption="6">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption7" class="npcMenuOption" data-npcoption="7">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption8" class="npcMenuOption" data-npcoption="8">
-					NULL
-				</div>
-				<div id="ID_npcMenuOption9" class="npcMenuOption" data-npcoption="9">
-					NULL
-				</div>
+		<div style="visibility: hidden; overflow: hidden; display:inline;" id="ID_label">
+			<!-- Labels -->
+			<div class="nosel exocet label">
+				<span class="color-white" id="ID_labeltext"></span>
 			</div>
 		</div>
+		<div id="ID_npcMenu" class="exocet invisible nosel">
+			<!-- NPC labels -->
+			<div id="ID_npcMenuName" style="color: #AD9564;">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption0" class="npcMenuOption" data-npcoption="0">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption1" class="npcMenuOption" data-npcoption="1">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption2" class="npcMenuOption" data-npcoption="2">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption3" class="npcMenuOption" data-npcoption="3">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption4" class="npcMenuOption" data-npcoption="4">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption5" class="npcMenuOption" data-npcoption="5">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption6" class="npcMenuOption" data-npcoption="6">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption7" class="npcMenuOption" data-npcoption="7">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption8" class="npcMenuOption" data-npcoption="8">
+				NULL
+			</div>
+			<div id="ID_npcMenuOption9" class="npcMenuOption" data-npcoption="9">
+				NULL
+			</div>
+		</div>
+	</div>
 
-		<!-- Bottom Section -->
-		<div class="bottomContainer">
-			<div class="bottomRight">
-				<!-- Bottom Right-->
-				<img src="images/hud/orb_right.png" />
-			</div>
-			<div class="bottomMiddle">
-				<!-- Bottom Middle Buttons -->
-				<center>
-					<div style="width: 400px; height: 131px; position: relative;">
-						<div id="ID_miniminipanel_on" class="invisible">
-							<div style="top:-19px; position:absolute;">
-								<img src="images/hud/miniminipanel_bg.png" />
-							</div>
-							<div style="top:0; right:190px; position:absolute;">
-								<img src="images/hud/minipanelpopbutton_down.png" data-mupimg="images/hud/minipanelpopbutton_down.png" class="panelButton" id="ID_panelButton1" data-label="Close Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_down_down.png" width="20" height="15" />
-							</div>
-							<div style="top:-19px; position:absolute; right: 125px;">
-								<img src="images/hud/minipanel_button_3_up.png" data-mupimg="images/hud/minipanel_button_3_up.png" class="panelButton" id="ID_panelButton3" data-label="Quest Log" data-mdownimg="images/hud/minipanel_button_3_down.png" width="20" height="20" />
-							</div>
-							<div style="top:-19px; position: absolute; right:105px;">
-								<img src="images/hud/minipanel_button_2_up.png" data-mupimg="images/hud/minipanel_button_2_up.png" class="panelButton" id="ID_panelButton2" data-label="Options [ESC]" data-mdownimg="images/hud/minipanel_button_2_down.png" width="20" height="20" />
-							</div>
+	<!-- Bottom Section -->
+	<div class="bottomContainer">
+		<div class="bottomRight">
+			<!-- Bottom Right-->
+			<img src="images/hud/orb_right.png" />
+		</div>
+		<div class="bottomMiddle">
+			<!-- Bottom Middle Buttons -->
+			<center>
+				<div style="width: 400px; height: 131px; position: relative;">
+					<div id="ID_miniminipanel_on" class="invisible">
+						<div style="top:-19px; position:absolute;">
+							<img src="images/hud/miniminipanel_bg.png" />
 						</div>
-						<div id="ID_miniminipanel_off">
-							<div style="top:0; right:190px; position: absolute;">
-								<img src="images/hud/minipanelpopbutton_up.png" data-mupimg="images/hud/minipanelpopbutton_up.png" class="panelButton" id="ID_panelButton0" data-label="Open Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_up_down.png" width="20" height="15" />
-							</div>
+						<div style="top:0; right:190px; position:absolute;">
+							<img src="images/hud/minipanelpopbutton_down.png" data-mupimg="images/hud/minipanelpopbutton_down.png" class="panelButton" id="ID_panelButton1" data-label="Close Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_down_down.png" width="20" height="15" />
 						</div>
-						<img src="images/hud/minipanel.png" />
+						<div style="top:-19px; position:absolute; right: 125px;">
+							<img src="images/hud/minipanel_button_3_up.png" data-mupimg="images/hud/minipanel_button_3_up.png" class="panelButton" id="ID_panelButton3" data-label="Quest Log" data-mdownimg="images/hud/minipanel_button_3_down.png" width="20" height="20" />
+						</div>
+						<div style="top:-19px; position: absolute; right:105px;">
+							<img src="images/hud/minipanel_button_2_up.png" data-mupimg="images/hud/minipanel_button_2_up.png" class="panelButton" id="ID_panelButton2" data-label="Options [ESC]" data-mdownimg="images/hud/minipanel_button_2_down.png" width="20" height="20" />
+						</div>
 					</div>
-				</center>
-			</div>
-			<div class="bottomLeft" style="z-index:99 !important">
-				<!-- Bottom Left-->
-				<img src="images/hud/orb_left.png" />
-			</div>
-		</div>
-
-		<!--- Left Side Panels --->
-		<div class="leftPanelContainer nosel" id="ID_leftPanel">
-			<!-- Quest Log Alert Button -->
-			<div id="ID_questLogButtonContainer" class="exocet color-white">
-				<div id="ID_questLogButtonDiv">
-					<div id="ID_questLogText">Quest Log</div>
-					<img src="images/hud/newbutton.png" data-mupimg="images/hud/newbutton.png" data-mdownimg="images/hud/newbutton_down.png" class="panelButton" id="ID_questLogButton" data-label="Quest Log" width="35" height="35" />
+					<div id="ID_miniminipanel_off">
+						<div style="top:0; right:190px; position: absolute;">
+							<img src="images/hud/minipanelpopbutton_up.png" data-mupimg="images/hud/minipanelpopbutton_up.png" class="panelButton" id="ID_panelButton0" data-label="Open Mini Panel" data-mdownimg="images/hud/minipanelpopbutton_up_down.png" width="20" height="15" />
+						</div>
+					</div>
+					<img src="images/hud/minipanel.png" />
 				</div>
+			</center>
+		</div>
+		<div class="bottomLeft" style="z-index:99 !important">
+			<!-- Bottom Left-->
+			<img src="images/hud/orb_left.png" />
+		</div>
+	</div>
+
+	<!--- Left Side Panels --->
+	<div class="leftPanelContainer nosel" id="ID_leftPanel">
+		<!-- Quest Log Alert Button -->
+		<div id="ID_questLogButtonContainer" class="exocet color-white">
+			<div id="ID_questLogButtonDiv">
+				<div id="ID_questLogText">Quest Log</div>
+				<img src="images/hud/newbutton.png" data-mupimg="images/hud/newbutton.png" data-mdownimg="images/hud/newbutton_down.png" class="panelButton" id="ID_questLogButton" data-label="Quest Log" width="35" height="35" />
 			</div>
-			<!-- Quest Log -->
-			<div class="leftPanel exocet" id="ID_panelQuestLog">
-				<div class="leftPanelTitle color-white">
-					Quest Log
+		</div>
+		<!-- Quest Log -->
+		<div class="leftPanel exocet" id="ID_panelQuestLog">
+			<div class="leftPanelTitle color-white">
+				Quest Log
+			</div>
+			<form action="#" id="ID_questSelectForm">
+				<fieldset>
+					<select id="ID_questSelect"></select>
+					<textarea readonly="readonly" rows="5" cols="39" class="questLogDescription" id="ID_questLogDescription">No quest information available.</textarea>
+				</fieldset>
+			</form>
+			<div style="position:absolute; bottom: 15px; right: 98px;">
+                <img src="images/hud/common/button_exit.png" data-mupimg="images/hud/common/button_exit.png" data-mdownimg="images/hud/common/button_exit_dn.png" class="panelButton" id="ID_questLogCloseButton" data-label="Close Quest Log" width="32" height="32">
+			</div>
+		</div>
+	</div>
+
+	<!--- Right Side Panels --->
+	<div class="rightPanelContainer nosel" id="ID_rightPanel">
+		<div class="rightPanel">
+
+		</div>
+	</div>
+
+	<!--- Options/ESC Menu --->
+	<div class="escMenuContainer invisible" id="escMenu">
+		<div class="escMenu">
+			<center style="font-size:24px;padding:10px;">
+				<div class="exocet" style="padding:2px;">
+					<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escContinue">Continue</a>
 				</div>
-				<form action="#" id="ID_questSelectForm">
-					<fieldset>
-						<select id="ID_questSelect">
-						</select>
-						<textarea readonly="readonly" rows="5" cols="39" class="questLogDescription" id="ID_questLogDescription">No quest information available.</textarea>
-					</fieldset>
-				</form>
-			</div>
+				<div class="exocet" style="padding:2px;">
+					<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escVideo">Video Options</a>
+				</div>
+				<div class="exocet" style="padding:2px;">
+					<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escSound">Sound Options</a>
+				</div>
+				<div class="exocet" style="padding:2px;">
+					<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escControls">Controls</a>
+				</div>
+				<div class="exocet" style="padding:2px;">
+					<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escExit">Exit</a>
+				</div>
+			</center>
 		</div>
+	</div>
 
-		<!--- Right Side Panels --->
-		<div class="rightPanelContainer nosel" id="ID_rightPanel">
-			<div class="rightPanel">
+	<script type="text/javascript">
+		// ------ Left/Right Panels ------
+		function clearLeftPanels() {
+			$("#ID_leftPanel").find('div').each(function () {
+				if ($(this).hasClass("leftPanel")) {
+					$(this).hide();
+				}
+			});
+		}
 
-			</div>
-		</div>
+		function clearRightPanels() {
+			$("#ID_rightPanel").find('div').each(function () {
+				if ($(this).hasClass("rightPanel")) {
+					$(this).hide();
+				}
+			});
+		}
+		// ------ Lower Panel ------
+		$(function () {
+			$("#ID_questSelect").selectmenu();
+			$("#ID_questSelect").on("selectmenuselect", function (event, ui) {
+				GameManager.changedSelectedQuest(ui.item.value);
+			});
+			$(".panelButton").mouseover(function (e) {
+				var labelValue;
 
-		<!--- Options/ESC Menu --->
-		<div class="escMenuContainer invisible" id="escMenu">
-			<div class="escMenu">
-				<center style="font-size:24px;padding:10px;">
-					<div class="exocet" style="padding:2px;">
-						<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escContinue">Continue</a>
-					</div>
-					<div class="exocet" style="padding:2px;">
-						<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escVideo">Video Options</a>
-					</div>
-					<div class="exocet" style="padding:2px;">
-						<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escSound">Sound Options</a>
-					</div>
-					<div class="exocet" style="padding:2px;">
-						<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escControls">Controls</a>
-					</div>
-					<div class="exocet" style="padding:2px;">
-						<a href="#" class="color-white nosel option" style="text-decoration:none;" id="escExit">Exit</a>
-					</div>
-				</center>
-			</div>
-		</div>
-
-		<script type="text/javascript">
-			// ------ Left/Right Panels ------
-			function clearLeftPanels() {
-				$("#ID_leftPanel").find('div').each(function () {
-					if ($(this).hasClass("leftPanel")) {
-						$(this).hide();
-					}
-				});
-			}
-
-			function clearRightPanels() {
-				$("#ID_rightPanel").find('div').each(function () {
-					if ($(this).hasClass("rightPanel")) {
-						$(this).hide();
-					}
-				});
-			}
-			// ------ Lower Panel ------
-			$(function () {
-				$("#ID_questSelect").selectmenu();
-				$("#ID_questSelect").on("selectmenuselect", function (event, ui) {
-					GameManager.changedSelectedQuest(ui.item.value);
-				});
-				$(".panelButton").mouseover(function (e) {
-					var labelValue;
-
-					if (EscapesOn) {
-						return;
-					}
-
-					e = e || window.event;
-					labelValue = e.target.dataset["label"];
-					startLabelDraw(labelValue, e.clientX + 5, e.clientY - 25);
-				});
-
-				$(".panelButton").mousedown(function (e) {
-					var imgValue;
-
-					if (EscapesOn) {
-						return;
-					}
-
-					e = e || window.event;
-					imgValue = e.target.dataset["mdownimg"];
-
-					e.target.setAttribute("src", imgValue);
-				});
-
-				$(".panelButton").mouseup(function (e) {
-					var imgValue;
-
-					if (EscapesOn) {
-						return;
-					}
-
-					e = e || window.event;
-					imgValue = e.target.dataset["mupimg"];
-
-					e.target.setAttribute("src", imgValue);
-				});
-
-				$(".panelButton").mouseout(function (e) {
-					if (EscapesOn) {
-						return;
-					}
-
-					stopLabelDraw();
-				});
-
-				function flipMiniPanelState() {
-					$("#ID_miniminipanel_on").toggleClass("invisible");
-					$("#ID_miniminipanel_off").toggleClass("invisible");
+				if (EscapesOn) {
+					return;
 				}
 
-				$("#ID_panelButton0").click(function (e) {
-					if (EscapesOn) {
-						return;
-					}
-
-					flipMiniPanelState();
-					startLabelDraw("Close mini panel", e.clientX + 5, e.clientY - 25);
-				});
-
-				$("#ID_panelButton1").click(function (e) {
-					if (EscapesOn) {
-						return;
-					}
-
-					flipMiniPanelState();
-					startLabelDraw("Open mini panel", e.clientX + 5, e.clientY - 25);
-				});
-
-				$("#ID_panelButton2").click(function (e) {
-					if (EscapesOn) {
-						return;
-					}
-
-					toggleEscape();
-				});
-
-
-				function openQuestLog() {
-					if (EscapesOn) {
-						return;
-					}
-
-					if ($("#ID_panelQuestLog").is(":visible")) {
-						GameManager.undefineClickZone("QuestLog");
-						clearLeftPanels();
-						return;
-					}
-					clearLeftPanels();
-					$("#ID_panelQuestLog").show();
-					GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
-						$("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
-					$("#ID_questLogButtonDiv").hide();
-					$("#ID_questSelectForm").selectmenu("change");
-				}
-				$("#ID_panelButton3").click(function (e) {
-					openQuestLog();
-				});
-
-				$(".npcMenuOption").mouseover(function () {
-					$(this).toggleClass("color-gray");
-				});
-
-				$(".npcMenuOption").click(function (e) {
-					var targetID;
-
-					e = e || window.event;
-					targetID = e.target.dataset["npcoption"];
-
-					GameManager.npcMenuCallback(targetID.toString());
-				});
-
-				$(".bottomContainer").click(function () {
-					GameManager.signalNPCMenuClosed();
-				});
-
-				// FIXME: not necessary?
-				$.ajaxPrefilter("video-menu.html", function (options) {
-					options.crossDomain = true;
-				});
-
-				$("#ID_panelQuestLog").hide();
-				$("#ID_questLogButtonDiv").hide();
-
-				$("#ID_overlayContainer").load("video-menu.html");
-				$("#ID_questLogButton").click(function (e) {
-					openQuestLog();
-				});
+				e = e || window.event;
+				labelValue = e.target.dataset["label"];
+				startLabelDraw(labelValue, e.clientX + 5, e.clientY - 25);
 			});
 
-			// Utility
-			function changeDivHTML(div, value) {
-				var tehDiv = document.getElementById(div);
-				tehDiv.innerHTML = value;
-			}
+			$(".panelButton").mousedown(function (e) {
+				var imgValue;
 
-			// Labels
-			function startLabelDraw(label, cursorX, cursorY) {
-				var labelDiv = document.getElementById('ID_label');
-				var labelText = document.getElementById('ID_labeltext');
-				labelDiv.setAttribute("style", "position: absolute; visibility: visible;");
-				labelDiv.style.left = cursorX;
-				labelDiv.style.top = cursorY - 10;
-				labelText.innerHTML = label;
-			}
-
-			function stopLabelDraw() {
-				var labelDiv = document.getElementById('ID_label');
-				labelDiv.setAttribute("style", "visibility: hidden;");
-			}
-
-			function toggleEscape() {
-				if (EscapesOn == false) {
-					EscapesOn = true;
-				} else {
-					EscapesOn = false;
+				if (EscapesOn) {
+					return;
 				}
+
+				e = e || window.event;
+				imgValue = e.target.dataset["mdownimg"];
+
+				e.target.setAttribute("src", imgValue);
+			});
+
+			$(".panelButton").mouseup(function (e) {
+				var imgValue;
+
+				if (EscapesOn) {
+					return;
+				}
+
+				e = e || window.event;
+				imgValue = e.target.dataset["mupimg"];
+
+				e.target.setAttribute("src", imgValue);
+			});
+
+			$(".panelButton").mouseout(function (e) {
+				if (EscapesOn) {
+					return;
+				}
+
 				stopLabelDraw();
-				clearLeftPanels();
-				clearRightPanels();
-				$("#escMenu").toggleClass("invisible");
-				GameManager.execCommand("blockvminput");
-			}
-
-			// NPC menu
-			function startedNPCInteraction() {
-				var numOptions = arguments[0];
-				var npcName = arguments[1];
-				var cursorX = arguments[2];
-				var cursorY = arguments[3];
-				var menuElement = document.getElementById("ID_npcMenu");
-
-				menuElement.style.left = cursorX + 20;
-				menuElement.style.top = cursorY - 20;
-
-				document.getElementById("ID_npcMenuName").innerHTML = npcName;
-
-
-				// For now, we can display 10 options on the NPC menu itself. Raise as necessary.
-				for (var i = 0; i < 10; i++) {
-					var divText = "#ID_npcMenuOption";
-					divText = divText.concat(i.toString());
-
-					$(divText).css('display', 'none'); // Hide all of them
-				}
-
-				for (var i = 4; i < numOptions + 4; i++) {
-					var correctedOption = i - 4;
-					var thisOption = arguments[i];
-					var jqDivText = "#ID_npcMenuOption";
-					var divText = "ID_npcMenuOption";
-					var correctedOptionStr = correctedOption.toString();
-
-					jqDivText = jqDivText.concat(correctedOptionStr);
-					divText = divText.concat(correctedOptionStr);
-
-					changeDivHTML(divText, thisOption);
-					$(jqDivText).css('display', 'block'); // Show this option
-
-					$(jqDivText).click(function (e) {
-						GameManager.npcCallback(correctedOption);
-					});
-				}
-
-				clearLeftPanels();
-				clearRightPanels();
-
-				$("#ID_npcMenu").toggleClass("invisible");
-			}
-
-			function changedNPCMenu() {
-				var numOptions = arguments[0];
-
-				// Hide all of the options first
-				for (var i = 0; i < 10; i++) {
-					var divText = "#ID_npcMenuOption";
-					divText = divText.concat(i.toString());
-
-					$(divText).css('display', 'none');
-				}
-
-				for (var i = 1; i < numOptions + 1; i++) {
-					var correctedOption = i - 1;
-					var thisOption = arguments[i];
-					var jqDivText = "#ID_npcMenuOption";
-					var divText = "ID_npcMenuOption";
-					var correctedOptionStr = correctedOption.toString();
-
-					jqDivText = jqDivText.concat(correctedOptionStr);
-					divText = divText.concat(correctedOptionStr);
-
-					changeDivHTML(divText, thisOption);
-					$(jqDivText).css('display', 'block');
-
-					$(jqDivText).click(function (e) {
-						GameManager.npcCallback(correctedOption);
-					});
-				}
-			}
-
-			function closeNPCMenu() {
-				$("#ID_npcMenu").toggleClass("invisible");
-			}
-
-			// Quest Log
-			function addQuestToList(displayName, questRecord) {
-				var str = '<option value="';
-				str = str.concat(questRecord);
-				str = str.concat('" selected="selected">');
-				str = str.concat(displayName);
-				str = str.concat("</option>");
-				$("#ID_questSelect").append(str);
-				$("#ID_questSelect").selectmenu("refresh", true);
-				GameManager.changedSelectedQuest(questRecord);
-			}
-
-			function showQuestLogDisplay(message, questAffected) {
-				changeDivHTML("ID_questLogText", message);
-				$("#ID_questLogButtonDiv").show();
-			}
-
-			function newQuest(questName, questID) {
-				addQuestToList(questName, questID);
-				showQuestLogDisplay("New Quest", questID);
-			}
-
-			function questUpdate(questID) {
-				showQuestLogDisplay("Quest Update", questID);
-			}
-
-			function questComplete(questID) {
-				// For right now we will just remove the quest from the list...need a better option here
-				showQuestLogDisplay("Quest Complete", questID);
-			}
-
-			function setQuestLogDescriptionText(theText) {
-				$("#ID_questLogDescription").val(theText);
-			}
-
-			// ESC menu
-			function quit() {
-				GameManager.execCommand("mainmenu");
-			}
-
-			$("a.option").hover(function () {
-				$(this).toggleClass("color-darkred");
 			});
 
-			$("#escVideo").click(function () {
-				$("#video-options").dialog("open");
+			function flipMiniPanelState() {
+				$("#ID_miniminipanel_on").toggleClass("invisible");
+				$("#ID_miniminipanel_off").toggleClass("invisible");
+			}
+
+			$("#ID_panelButton0").click(function (e) {
+				if (EscapesOn) {
+					return;
+				}
+
+				flipMiniPanelState();
+				startLabelDraw("Close mini panel", e.clientX + 5, e.clientY - 25);
 			});
 
-			$("#escSound").click(function () {
+			$("#ID_panelButton1").click(function (e) {
+				if (EscapesOn) {
+					return;
+				}
+
+				flipMiniPanelState();
+				startLabelDraw("Open mini panel", e.clientX + 5, e.clientY - 25);
 			});
 
-			$("#escControls").click(function () {
-			});
+			$("#ID_panelButton2").click(function (e) {
+				if (EscapesOn) {
+					return;
+				}
 
-			$("#escContinue").click(function () {
 				toggleEscape();
 			});
 
-			$("#escExit").click(function () {
+
+			function openQuestLog() {
+				if (EscapesOn) {
+					return;
+				}
+
+				if ($("#ID_panelQuestLog").is(":visible")) {
+					GameManager.undefineClickZone("QuestLog");
+					clearLeftPanels();
+					return;
+				}
+				clearLeftPanels();
+				$("#ID_panelQuestLog").show();
+				GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
+					$("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
+				$("#ID_questLogButtonDiv").hide();
+				$("#ID_questSelectForm").selectmenu("change");
+			}
+			$("#ID_panelButton3").click(function (e) {
+				openQuestLog();
+			});
+
+			$(".npcMenuOption").mouseover(function () {
+				$(this).toggleClass("color-gray");
+			});
+
+			$(".npcMenuOption").click(function (e) {
+				var targetID;
+
+				e = e || window.event;
+				targetID = e.target.dataset["npcoption"];
+
+				GameManager.npcMenuCallback(targetID.toString());
+			});
+
+			$(".bottomContainer").click(function () {
+				GameManager.signalNPCMenuClosed();
+			});
+
+			// FIXME: not necessary?
+			$.ajaxPrefilter("video-menu.html", function (options) {
+				options.crossDomain = true;
+			});
+
+			$("#ID_panelQuestLog").hide();
+			$("#ID_questLogButtonDiv").hide();
+
+			$("#ID_overlayContainer").load("video-menu.html");
+			$("#ID_questLogButton").click(function (e) {
+				openQuestLog();
+			});
+			$("#ID_questLogCloseButton").click(function (e) {
+			    openQuestLog();
+			});
+		});
+
+		// Utility
+		function changeDivHTML(div, value) {
+			var tehDiv = document.getElementById(div);
+			tehDiv.innerHTML = value;
+		}
+
+		// Labels
+		function startLabelDraw(label, cursorX, cursorY) {
+			var labelDiv = document.getElementById('ID_label');
+			var labelText = document.getElementById('ID_labeltext');
+			labelDiv.setAttribute("style", "position: absolute; visibility: visible;");
+			labelDiv.style.left = cursorX;
+			labelDiv.style.top = cursorY - 10;
+			labelText.innerHTML = label;
+		}
+
+		function stopLabelDraw() {
+			var labelDiv = document.getElementById('ID_label');
+			labelDiv.setAttribute("style", "visibility: hidden;");
+		}
+
+		function toggleEscape() {
+			if (EscapesOn == false) {
+				EscapesOn = true;
+			} else {
+				EscapesOn = false;
+			}
+			stopLabelDraw();
+			clearLeftPanels();
+			clearRightPanels();
+			$("#escMenu").toggleClass("invisible");
+			GameManager.execCommand("blockvminput");
+		}
+
+		// NPC menu
+		function startedNPCInteraction() {
+			var numOptions = arguments[0];
+			var npcName = arguments[1];
+			var cursorX = arguments[2];
+			var cursorY = arguments[3];
+			var menuElement = document.getElementById("ID_npcMenu");
+
+			menuElement.style.left = cursorX + 20;
+			menuElement.style.top = cursorY - 20;
+
+			document.getElementById("ID_npcMenuName").innerHTML = npcName;
+
+
+			// For now, we can display 10 options on the NPC menu itself. Raise as necessary.
+			for (var i = 0; i < 10; i++) {
+				var divText = "#ID_npcMenuOption";
+				divText = divText.concat(i.toString());
+
+				$(divText).css('display', 'none'); // Hide all of them
+			}
+
+			for (var i = 4; i < numOptions + 4; i++) {
+				var correctedOption = i - 4;
+				var thisOption = arguments[i];
+				var jqDivText = "#ID_npcMenuOption";
+				var divText = "ID_npcMenuOption";
+				var correctedOptionStr = correctedOption.toString();
+
+				jqDivText = jqDivText.concat(correctedOptionStr);
+				divText = divText.concat(correctedOptionStr);
+
+				changeDivHTML(divText, thisOption);
+				$(jqDivText).css('display', 'block'); // Show this option
+
+				$(jqDivText).click(function (e) {
+					GameManager.npcCallback(correctedOption);
+				});
+			}
+
+			clearLeftPanels();
+			clearRightPanels();
+
+			$("#ID_npcMenu").toggleClass("invisible");
+		}
+
+		function changedNPCMenu() {
+			var numOptions = arguments[0];
+
+			// Hide all of the options first
+			for (var i = 0; i < 10; i++) {
+				var divText = "#ID_npcMenuOption";
+				divText = divText.concat(i.toString());
+
+				$(divText).css('display', 'none');
+			}
+
+			for (var i = 1; i < numOptions + 1; i++) {
+				var correctedOption = i - 1;
+				var thisOption = arguments[i];
+				var jqDivText = "#ID_npcMenuOption";
+				var divText = "ID_npcMenuOption";
+				var correctedOptionStr = correctedOption.toString();
+
+				jqDivText = jqDivText.concat(correctedOptionStr);
+				divText = divText.concat(correctedOptionStr);
+
+				changeDivHTML(divText, thisOption);
+				$(jqDivText).css('display', 'block');
+
+				$(jqDivText).click(function (e) {
+					GameManager.npcCallback(correctedOption);
+				});
+			}
+		}
+
+		function closeNPCMenu() {
+			$("#ID_npcMenu").toggleClass("invisible");
+		}
+
+		// Quest Log
+		function addQuestToList(displayName, questRecord) {
+			var str = '<option value="';
+			str = str.concat(questRecord);
+			str = str.concat('" selected="selected">');
+			str = str.concat(displayName);
+			str = str.concat("</option>");
+			$("#ID_questSelect").append(str);
+			$("#ID_questSelect").selectmenu("refresh", true);
+			GameManager.changedSelectedQuest(questRecord);
+		}
+
+		function showQuestLogDisplay(message, questAffected) {
+			changeDivHTML("ID_questLogText", message);
+			$("#ID_questLogButtonDiv").show();
+		}
+
+		function newQuest(questName, questID) {
+			addQuestToList(questName, questID);
+			showQuestLogDisplay("New Quest", questID);
+		}
+
+		function questUpdate(questID) {
+			showQuestLogDisplay("Quest Update", questID);
+		}
+
+		function questComplete(questID) {
+			// For right now we will just remove the quest from the list...need a better option here
+			showQuestLogDisplay("Quest Complete", questID);
+		}
+
+		function setQuestLogDescriptionText(theText) {
+			$("#ID_questLogDescription").val(theText);
+		}
+
+		// ESC menu
+		function quit() {
+			GameManager.execCommand("mainmenu");
+		}
+
+		$("a.option").hover(function () {
+			$(this).toggleClass("color-darkred");
+		});
+
+		$("#escVideo").click(function () {
+			$("#video-options").dialog("open");
+		});
+
+		$("#escSound").click(function () {
+		});
+
+		$("#escControls").click(function () {
+		});
+
+		$("#escContinue").click(function () {
+			toggleEscape();
+		});
+
+		$("#escExit").click(function () {
+			toggleEscape();
+			quit();
+		});
+
+		function preventDrag(e) {
+			if (e.stopPropagation) e.stopPropagation();
+			if (e.preventDefault) e.preventDefault();
+			e.cancelBubble = true;
+			e.returnValue = false;
+			return false;
+		}
+
+		$(document).mousedown(function (e) {
+			if (!e) {
+				e = window.event;
+			}
+			return preventDrag(e);
+		});
+
+		$(document).mousemove(function (e) {
+			if (!e) {
+				e = window.event;
+			}
+			return preventDrag(e);
+		});
+
+		function onKeyDown(e) {
+			if (e.which == 27) {
 				toggleEscape();
-				quit();
-			});
-
-			function preventDrag(e) {
-				if (e.stopPropagation) e.stopPropagation();
-				if (e.preventDefault) e.preventDefault();
-				e.cancelBubble = true;
-				e.returnValue = false;
-				return false;
 			}
+		}
 
-			$(document).mousedown(function (e) {
-				if (!e) {
-					e = window.event;
-				}
-				return preventDrag(e);
-			});
-
-			$(document).mousemove(function (e) {
-				if (!e) {
-					e = window.event;
-				}
-				return preventDrag(e);
-			});
-
-			function onKeyDown(e) {
-				if (e.which == 27) {
-					toggleEscape();
-				}
-			}
-
-			jQuery(document).bind('keydown', function (e) {
-				onKeyDown(e);
-			});
-		</script>
-	</body>
+		jQuery(document).bind('keydown', function (e) {
+			onKeyDown(e);
+		});
+	</script>
+</body>
 </html>

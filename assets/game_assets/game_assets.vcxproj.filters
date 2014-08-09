@@ -64,6 +64,9 @@
     <Filter Include="core\ui\images\hud">
       <UniqueIdentifier>{10e6c965-26c3-4f53-ad3b-6c71698d72cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\ui\images\hud\common">
+      <UniqueIdentifier>{02d218bb-0261-4eeb-b7f5-1327ac1aa83b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Rapture\core\levels\LevelMaze.json">
@@ -348,6 +351,12 @@
     <None Include="..\..\Rapture\core\ui\scripts\jQuery-2.1.1.min.js">
       <Filter>core\ui\scripts</Filter>
     </None>
+    <None Include="..\..\Rapture\core\ui\images\hud\common\button_blank.psd">
+      <Filter>core\ui\images\hud\common</Filter>
+    </None>
+    <None Include="..\..\Rapture\core\ui\images\hud\common\button_exit.psd">
+      <Filter>core\ui\images\hud\common</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Rapture\core\materials\characters\test\test1.png">
@@ -481,6 +490,12 @@
     </Image>
     <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png">
       <Filter>core\ui\css\custom-theme\images</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\images\hud\common\button_exit.png">
+      <Filter>core\ui\images\hud\common</Filter>
+    </Image>
+    <Image Include="..\..\Rapture\core\ui\images\hud\common\button_exit_dn.png">
+      <Filter>core\ui\images\hud\common</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

@@ -152,6 +152,8 @@
     <None Include="..\..\Rapture\core\ui\css\video-menu.css" />
     <None Include="..\..\Rapture\core\ui\editorhotkeys.html" />
     <None Include="..\..\Rapture\core\ui\hud.html" />
+    <None Include="..\..\Rapture\core\ui\images\hud\common\button_blank.psd" />
+    <None Include="..\..\Rapture\core\ui\images\hud\common\button_exit.psd" />
     <None Include="..\..\Rapture\core\ui\images\hud\minipanel.pcx" />
     <None Include="..\..\Rapture\core\ui\images\hud\minipanel.psd" />
     <None Include="..\..\Rapture\core\ui\images\hud\minipanelpopbutton.psd" />
@@ -195,6 +197,8 @@
     <Image Include="..\..\Rapture\core\ui\css\custom-theme\images\ui-icons_ffffff_256x240.png" />
     <Image Include="..\..\Rapture\core\ui\css\customSelect-arrow.gif" />
     <Image Include="..\..\Rapture\core\ui\images\alphalogo.png" />
+    <Image Include="..\..\Rapture\core\ui\images\hud\common\button_exit.png" />
+    <Image Include="..\..\Rapture\core\ui\images\hud\common\button_exit_dn.png" />
     <Image Include="..\..\Rapture\core\ui\images\hud\miniminipanel_bg.png" />
     <Image Include="..\..\Rapture\core\ui\images\hud\minipanel.png" />
     <Image Include="..\..\Rapture\core\ui\images\hud\minipanelpopbutton_down.png" />
