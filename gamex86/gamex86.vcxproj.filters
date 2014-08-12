@@ -105,6 +105,9 @@
     <ClCompile Include="..\modcode\quests\a1q1_test.cpp">
       <Filter>Source Files\quests</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\SaveGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h">
@@ -204,6 +207,9 @@
       <Filter>Header Files\quests</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\QuestCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\SaveGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -99,6 +99,7 @@
     <ClCompile Include="..\modcode\MapLoader.cpp" />
     <ClCompile Include="..\modcode\QuestManager.cpp" />
     <ClCompile Include="..\modcode\quests\a1q1_test.cpp" />
+    <ClCompile Include="..\modcode\SaveGame.cpp" />
     <ClCompile Include="..\modcode\Seed.cpp" />
     <ClCompile Include="..\modcode\Server.cpp" />
     <ClCompile Include="..\modcode\Worldspace.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\modcode\QuestManager.h" />
     <ClInclude Include="..\modcode\QuestState.h" />
     <ClInclude Include="..\modcode\quests\a1q1_test.h" />
+    <ClInclude Include="..\modcode\SaveGame.h" />
     <ClInclude Include="..\modcode\Seed.h" />
     <ClInclude Include="..\modcode\Server.h" />
     <ClInclude Include="..\modcode\Tile.h" />

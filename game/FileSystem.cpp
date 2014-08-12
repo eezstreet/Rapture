@@ -154,6 +154,10 @@ size_t FileSystem::EXPORT_GetFileSize(File* f) {
 	return f->GetSize();
 }
 
+size_t FileSystem::EXPORT_Write(File* f, const char* text) {
+	return f->WritePlaintext(text);
+}
+
 File* File::Open(const string& fileName, const string& mode) {
 	// Trim off any leading (or trailing) whitespace
 	string fixedName = trim(fileName);

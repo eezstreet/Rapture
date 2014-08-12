@@ -206,6 +206,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->GetFileSize = FileSystem::EXPORT_GetFileSize;
 	imp->ListFilesInDir = FileSystem::EXPORT_ListFilesInDir;
 	imp->FreeFileList = FileSystem::FreeFileList;
+	imp->WriteFile = FileSystem::EXPORT_Write;
 	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
 	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
 	imp->RegisterImage = RenderCode::RegisterImage;

@@ -78,6 +78,7 @@ extern "C" {
 
 		// File I/O
 		File* (*OpenFile)(const char* filename, const char* mode);
+		size_t (*WriteFile)(File* filehandle, const char* text);
 		void(*CloseFile)(File* filehandle);
 		char** (*ListFilesInDir)(const char* dir, const char* extension, int* iNumFiles);
 		void(*FreeFileList)(char** ptFileList, int iNumFiles);

@@ -373,6 +373,7 @@ public:
 	static size_t EXPORT_ReadBinary(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
 	static size_t EXPORT_ReadPlaintext(File* filehandle, size_t numChars, char* chars);
 	static size_t EXPORT_GetFileSize(File* filehandle);
+	static size_t EXPORT_Write(File* filehandle, const char* text);
 
 friend class File;
 };

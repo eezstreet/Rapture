@@ -32,6 +32,10 @@ public:
 	void EnteredArea(const string& sLevel);
 	void ChangeQuestState(const string& sQuestName, const int iNewState);
 
+	// Semi-hacky but needed for savegame
+	unordered_map<string, int>::iterator GetStateStartIterator() { return m_QuestState.begin(); };
+	unordered_map<string, int>::iterator GetStateEndIterator() { return m_QuestState.end(); };
+
 	QuestManager();
 	~QuestManager();
 friend struct Quest;

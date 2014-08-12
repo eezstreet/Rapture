@@ -1,5 +1,6 @@
 #include "Local.h"
 #include "Server.h"
+#include "SaveGame.h"
 
 gameImports_s* trap;
 
@@ -14,9 +15,12 @@ void Game_Init() {
 }
 
 void Game_Shutdown() {
+	SaveGame* ptSave = SaveGame::NewSingleplayerSave(ptServer, ptServer->GetClient());
+
 	trap->printf(PRIORITY_NOTE, "--- Quit Game ---\n");
 	trap->ShutdownMaterials();
 	delete ptServer;
+	delete ptSave;
 }
 
 void Game_Load() {
