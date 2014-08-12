@@ -487,6 +487,8 @@
 					return;
 				}
 
+				GameManager.undefineClickZone("QuestLogButton");
+
 				if ($("#ID_panelQuestLog").is(":visible")) {
 					GameManager.undefineClickZone("QuestLog");
 					clearLeftPanels();
@@ -666,6 +668,9 @@
 		function showQuestLogDisplay(message, questAffected) {
 			changeDivHTML("ID_questLogText", message);
 			$("#ID_questLogButtonDiv").show();
+
+			GameManager.defineClickZone("QuestLogButton", $("#ID_questLogButtonDiv").offset().left, $("#ID_questLogButtonDiv").offset().top,
+					$("#ID_questLogButtonDiv").width(), $("#ID_questLogButtonDiv").height());
 		}
 
 		function newQuest(questName, questID) {
