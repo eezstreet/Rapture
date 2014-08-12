@@ -143,16 +143,17 @@ public:
 		try {
 			auto it = CvarSystem::cvars.find(sName);
 			if(it == CvarSystem::cvars.end()) {
-				throw out_of_range("not registered");
+				throw string("not registered");
 			}
 			Cvar* cv = it->second;
 			if(!cv->registered) {
-				throw out_of_range("not registered");
+				throw string("not registered");
 			}
 			return cv;
 		}
-		catch( out_of_range e ) {
+		catch( string e ) {
 			// register a new cvar
+			R_Message(PRIORITY_MESSAGE, "%s %s\n", sName, e);
 			return CvarSystem::RegisterCvar(sName, sDesc, iFlags, startValue);
 		}
 	}
