@@ -13,9 +13,10 @@ Cvar* r_imgdebug = nullptr;
 
 static int fadeTime = 0;
 static int initialFadeTime = 0;
+static bool bShouldWeFade = false;
+static Uint32 iCurrentTime = 0;
 
 namespace RenderCode {
-
 	static SDL_Window *window;
 	SDL_Renderer *renderer;
 	static bool screenshotQueued = false;
@@ -167,6 +168,13 @@ namespace RenderCode {
 	void BlankFrame() {
 		SDL_RenderClear(renderer);
 		textFieldCount = 0;
+		
+		iCurrentTime = SDL_GetTicks();
+		if(fadeTime > iCurrentTime) {
+			bShouldWeFade = true;
+		} else if(bShouldWeFade) {
+			bShouldWeFade = false;
+		}
 	}
 
 	static void CreateScreenshot(const string& filename) {
@@ -330,14 +338,13 @@ namespace RenderCode {
 		rect.x = x; rect.y = y; rect.w = w; rect.h = h;
 
 		// Handle fade to black
-		Uint32 time = SDL_GetTicks();
-		if(fadeTime > time) {
-			int color = 255-((fadeTime-time)/((float)initialFadeTime-fadeTime)*-255);
+		if(bShouldWeFade) {
+			int color = 255 - ((fadeTime - iCurrentTime) / ((float)initialFadeTime - fadeTime)*-255);
 			SDL_SetTextureColorMod(image, color, color, color);
 		} else {
 			SDL_SetTextureColorMod(image, 255, 255, 255);
 		}
-
+		
 		// Copy the texture
 		SDL_RenderCopy(renderer, image, nullptr, &rect);
 #ifdef _DEBUG
@@ -353,14 +360,13 @@ namespace RenderCode {
 		}
 
 		// Handle fade to black
-		Uint32 time = SDL_GetTicks();
-		if(fadeTime > time) {
-			int color = 255-((fadeTime-time)/((float)initialFadeTime-fadeTime)*-255);
+		if(bShouldWeFade) {
+			int color = 255-((fadeTime-iCurrentTime)/((float)initialFadeTime-fadeTime)*-255);
 			SDL_SetTextureColorMod(image, color, color, color);
 		} else {
 			SDL_SetTextureColorMod(image, 255, 255, 255);
 		}
-
+		
 		SDL_RenderCopy(renderer, image, ipos, spos);
 #ifdef _DEBUG
 		if(r_imgdebug->Bool()) {
@@ -558,6 +564,7 @@ namespace RenderCode {
 	void FadeFromBlack(int ms) {
 		initialFadeTime = SDL_GetTicks();
 		fadeTime = initialFadeTime + ms;
+		bShouldWeFade = true;
 	}
 
 	void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency) {

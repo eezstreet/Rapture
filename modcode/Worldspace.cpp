@@ -64,8 +64,7 @@ static queue<TileNode*> mapTiles;
 static queue<Entity*> mapEnts;
 	theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapTiles);
 	theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapEnts);
-	//auto mapTiles = theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
-	//auto mapEnts = theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
+
 	// Chuck entities into the list of stuff that needs sorted
 	while(mapEnts.empty() == false) {
 		auto ent = mapEnts.front();
