@@ -217,6 +217,24 @@ public:
 		return returnNodes;
 	}
 
+	void NodesIn(const U posX, const U posY, const U posW, const U posH, queue<C*>* in) {
+		for(auto it = nodes.begin(); it != nodes.end(); ++it) {
+			auto node = *it;
+			const U posAbsX = posX + posW;
+			const U posAbsY = posY + posH;
+			if(node->x >= posX && node->x <= posAbsX &&
+			   node->y >= posY && node->y <= posAbsY) {
+				in->push(node);
+			}
+		}
+		if(depth != maxDepth) {
+			NW->NodesIn(posX, posY, posW, posH, in);
+			NE->NodesIn(posX, posY, posW, posH, in);
+			SW->NodesIn(posX, posY, posW, posH, in);
+			SE->NodesIn(posX, posY, posW, posH, in);
+		}
+	}
+
 	void NodesIn(const U posX, const U posY, const U posW, const U posH, vector<C*>& in) {
 		for(auto it = nodes.begin(); it != nodes.end(); it++) {
 			auto node = *it;

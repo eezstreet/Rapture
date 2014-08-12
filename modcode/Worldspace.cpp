@@ -44,7 +44,6 @@ void Worldspace::Render(Client* ptClient) {
 		bool bIsTile;
 	};
 static vector<RenderObject> sortedObjects;	// Static so that we aren't allocating/freeing memory over and over
-	reverse(sortedObjects.begin(), sortedObjects.end());
 	sortedObjects.clear();
 
 	Player* ptPlayer = ptClient->ptPlayer;
@@ -61,25 +60,23 @@ static vector<RenderObject> sortedObjects;	// Static so that we aren't allocatin
 	float fBoundsY = Worldspace::ScreenSpaceToWorldPlaceY(-TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer);
 	float fBoundsW = Worldspace::ScreenSpaceToWorldPlaceX(ptClient->screenWidth + TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer) - fBoundsX;
 	float fBoundsH = Worldspace::ScreenSpaceToWorldPlaceY(ptClient->screenWidth + TILE_WIDTH, ptClient->screenHeight + TILE_WIDTH, ptClient->ptPlayer) - fBoundsY;
-static vector<TileNode*> mapTiles;
-static vector<Entity*> mapEnts;
-	mapTiles.clear();
-	mapEnts.clear();
-	theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, mapTiles);
-	theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, mapEnts);
+static queue<TileNode*> mapTiles;
+static queue<Entity*> mapEnts;
+	theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapTiles);
+	theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapEnts);
 	//auto mapTiles = theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
 	//auto mapEnts = theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH);
 	// Chuck entities into the list of stuff that needs sorted
-	for(auto it = mapEnts.begin(); it != mapEnts.end(); ++it) {
-		auto ent = *it;
-		auto foundEnt = mRenderList.find(ent->uuid);
-		if(foundEnt != mRenderList.end()) {
+	while(mapEnts.empty() == false) {
+		auto ent = mapEnts.front();
+		if(ent->bShouldWeRender != false) {
 			RenderObject obj;
 			obj.bIsTile = false;
 			obj.entData = ent;
-			obj.fDepthScore = 10 * WorldPlaceToScreenSpaceFY(foundEnt->second->x, foundEnt->second->y);
+			obj.fDepthScore = 10 * WorldPlaceToScreenSpaceFY(ent->x, ent->y);
 			sortedObjects.push_back(obj);
 		}
+		mapEnts.pop();
 	}
 
 	// Now chuck tiles into the pot too
@@ -89,25 +86,26 @@ static vector<Entity*> mapEnts;
 	};
 static vector<VisInfo_t> vis;
 	vis.clear();
-	for(auto it = mapTiles.begin(); it != mapTiles.end(); ++it) {
-		TileNode* tile = *it;
+	while(mapTiles.empty() == false) {
+		TileNode* ptTile = mapTiles.front();
 		RenderObject obj;
 		obj.bIsTile = true;
-		obj.tileData = tile;
-		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(tile->x, tile->y) - TILE_HEIGHT - tile->ptTile->fDepthScoreOffset);
+		obj.tileData = ptTile;
+		obj.fDepthScore = 10.0f * (WorldPlaceToScreenSpaceFY(ptTile->x, ptTile->y) - TILE_HEIGHT - ptTile->ptTile->fDepthScoreOffset);
 
-		if(tile->ptTile->name[0] == 'V' && tile->ptTile->name[1] == 'I' && tile->ptTile->name[2] == 'S') {
-			if(tile->ptTile->name[3] >= '0' && tile->ptTile->name[3] <= '7') {
+		if(ptTile->ptTile->name[0] == 'V' && ptTile->ptTile->name[1] == 'I' && ptTile->ptTile->name[2] == 'S') {
+			if(ptTile->ptTile->name[3] >= '0' && ptTile->ptTile->name[3] <= '7') {
 				// A vis tile. Let's do this..
 				VisInfo_t visData;
-				visData.x = tile->x;
-				visData.y = tile->y;
-				visData.whichVis = tile->ptTile->name[3] - '0';
+				visData.x = ptTile->x;
+				visData.y = ptTile->y;
+				visData.whichVis = ptTile->ptTile->name[3] - '0';
 				vis.push_back(visData);
 			}
 		}
 
 		sortedObjects.push_back(obj);
+		mapTiles.pop();
 	}
 
 	// Now we need to sort the stuff that's being rendered.
