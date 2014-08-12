@@ -25,6 +25,9 @@ Client::Client() {
 	trap->AddJSCallback(ptHUD, "defineClickZone", Client::DefineClickZone);
 	trap->AddJSCallback(ptHUD, "undefineClickZone", Client::UndefineClickZone);
 	trap->AddJSCallback(ptHUD, "changedSelectedQuest", Client::ChangedQuestLogSelectedQuest);
+
+	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("r_height", &screenHeight);
 }
 
 Client::~Client() {
@@ -105,9 +108,6 @@ void Client::DrawViewportInfo() {
 void Client::Preframe() {
 	bEntDrawingLabels = false;
 	ptFocusEnt = nullptr;
-
-	trap->CvarIntVal("r_width", &screenWidth);
-	trap->CvarIntVal("r_height", &screenHeight);
 }
 
 void Client::Frame() {

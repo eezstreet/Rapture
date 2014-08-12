@@ -52,13 +52,7 @@ void Player::spawn() {
 }
 
 void Player::render() {
-	int screenWidth = 0;
-	int screenHeight = 0;
-
-	trap->CvarIntVal("r_width", &screenWidth);
-	trap->CvarIntVal("r_height", &screenHeight);
-
-	trap->RenderMaterial(materialHandle, (screenWidth / 2) - 32, (screenHeight / 2) - 64);
+	trap->RenderMaterial(materialHandle, (ptClient->screenWidth / 2) - 32, (ptClient->screenHeight / 2) - 64);
 }
 
 void Player::interact(Entity* interacter) {

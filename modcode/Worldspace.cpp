@@ -44,6 +44,7 @@ void Worldspace::Render(Client* ptClient) {
 		bool bIsTile;
 	};
 static vector<RenderObject> sortedObjects;	// Static so that we aren't allocating/freeing memory over and over
+	reverse(sortedObjects.begin(), sortedObjects.end());
 	sortedObjects.clear();
 
 	Player* ptPlayer = ptClient->ptPlayer;
