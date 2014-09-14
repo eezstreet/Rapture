@@ -153,7 +153,7 @@ public:
 		}
 		catch( string e ) {
 			// register a new cvar
-			R_Message(PRIORITY_MESSAGE, "%s %s\n", sName, e);
+			R_Message(PRIORITY_MESSAGE, "%s %s\n", sName, e.c_str());
 			return CvarSystem::RegisterCvar(sName, sDesc, iFlags, startValue);
 		}
 	}
