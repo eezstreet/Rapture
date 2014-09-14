@@ -489,6 +489,9 @@ private:
 	int iHiddenMask;
 	int iShutdownMask;
 	int iMessageMask;
+
+	bool bSetup;
+	vector<pair<int, string>> vPreSetupMessages;
 public:
 	Dispatch(const int _iHiddenMask, const int _iShutdownMask, const int _iMessageMask);
 	void CatchError();

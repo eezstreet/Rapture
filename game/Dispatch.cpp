@@ -6,7 +6,8 @@ Dispatch::Dispatch(const int _iHiddenMask, const int _iShutdownMask, const int _
 iHiddenMask(_iHiddenMask),
 iShutdownMask(_iShutdownMask),
 iMessageMask(_iMessageMask),
-ptLogFile(nullptr){
+ptLogFile(nullptr),
+bSetup(false){
 }
 
 Dispatch::~Dispatch() {
@@ -38,6 +39,11 @@ void Dispatch::Setup() {
 	if(!ptLogFile) {
 		return;
 	}
+	bSetup = true;
+
+	for(auto it = vPreSetupMessages.begin(); it != vPreSetupMessages.end(); ++it) {
+		PrintMessage(it->first, it->second.c_str());
+	}
 }
 
 void Dispatch::CatchError() {
@@ -46,6 +52,10 @@ void Dispatch::CatchError() {
 }
 
 void Dispatch::PrintMessage(const int iPriority, const char* message) {
+	if(!bSetup) {
+		vPreSetupMessages.push_back(make_pair(iPriority, message));
+	}
+
 	if(iPriority < 0 && iPriority >= PRIORITY_MAX) {
 		return;
 	}
