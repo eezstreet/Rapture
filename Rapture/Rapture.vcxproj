@@ -106,7 +106,10 @@
     <ClCompile Include="..\game\Material.cpp" />
     <ClCompile Include="..\game\MaterialHandler.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
+    <ClCompile Include="..\game\RenderCode.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
+    <ClCompile Include="..\game\RendGL.cpp" />
+    <ClCompile Include="..\game\RendSDL.cpp" />
     <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\game\Sequence.cpp" />
     <ClCompile Include="..\game\sys_cmds.cpp" />

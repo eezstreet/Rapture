@@ -9,7 +9,7 @@ WebSession *sess = nullptr;
 vector<Menu*> vmMenus;
 static vector<WebView*> renderables;
 #define NUM_UI_VISIBLE	8
-static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
+static RenderTexture* uiTextures[NUM_UI_VISIBLE];
 static int lastActiveLayer;
 
 void AddRenderable(WebView* wv) {
@@ -37,8 +37,7 @@ RightClickCallback rccb = nullptr;
 void UI::Initialize() {
 	R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
 	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
-		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+		uiTextures[i] = (RenderTexture*)RenderCode::CreateFullscreenTexture();
 	}
 	lastActiveLayer = 0;
 
@@ -75,7 +74,7 @@ void UI::Initialize() {
 
 void UI::Shutdown() {
 	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
-		SDL_DestroyTexture(uiTextures[i]);
+		RenderCode::DestroyTexture(uiTextures[i]);
 	}
 	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
 		Menu* vmMenu = (*it);
@@ -92,9 +91,8 @@ void UI::Update() {
 
 void UI::Restart() {
 	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
-		SDL_DestroyTexture(uiTextures[i]);
-		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+		RenderCode::DestroyTexture(uiTextures[i]);
+		uiTextures[i] = (RenderTexture*)RenderCode::CreateFullscreenTexture();
 	}
 }
 
@@ -105,19 +103,17 @@ void UI::Render() {
 			return;
 		}
 		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
-		SDL_Texture* tex = uiTextures[lastActiveLayer];
+		RenderTexture* tex = uiTextures[lastActiveLayer];
 		if(bmp->is_dirty()) {
 			// If it's not dirty, then we don't need to re-render
 			unsigned char* pixels;
 			int pitch;
-			if(SDL_LockTexture(tex, nullptr, (void**)&pixels, &pitch) < 0) {
-				R_Message(PRIORITY_ERROR, "Failed to lock texture: %s\n", SDL_GetError());
-				return;
-			}
-			bmp->CopyTo(pixels, pitch, 4, false, false);
-			SDL_UnlockTexture(tex);
+			
+			RenderCode::LockTexture(tex, (void**)&pixels, &pitch, true);
+			bmp->CopyTo(pixels, pitch, 4, true, false);
+			RenderCode::UnlockTexture(tex);
 		}
-		RenderCode::BlendTexture((void*)tex);
+		RenderCode::BlendTexture(tex);
 		//SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 		//RenderCode::AddSurface((void*)x);
 		lastActiveLayer++;

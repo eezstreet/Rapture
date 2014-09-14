@@ -164,6 +164,7 @@ void RaptureGame::RunLoop() {
 	Input->InputFrame();
 	UI::Update();
 
+	RenderCode::BeginFrame();
 	RenderCode::BlankFrame();
 
 	// Do gamecode
@@ -173,7 +174,7 @@ void RaptureGame::RunLoop() {
 
 	// Do rendering
 	UI::Render();
-	RenderCode::Display();
+	RenderCode::EndFrame();
 }
 
 /* Deal with the commandline arguments */
@@ -209,11 +210,11 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->WriteFile = FileSystem::EXPORT_Write;
 	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
 	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
-	imp->RegisterImage = RenderCode::RegisterImage;
-	imp->DrawImage = RenderCode::DrawImage;
-	imp->DrawImageAbs = static_cast<void(*)(Image*, int, int, int, int)>(RenderCode::DrawImageAbs);
-	imp->DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
-	imp->DrawImageClipped = RenderCode::DrawImageClipped;
+	//imp->RegisterImage = RenderCode::RegisterImage;
+	//imp->DrawImage = RenderCode::DrawImage;
+	//imp->DrawImageAbs = static_cast<void(*)(Image*, int, int, int, int)>(RenderCode::DrawImageAbs);
+	//imp->DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
+	//imp->DrawImageClipped = RenderCode::DrawImageClipped;
 	imp->InitMaterials = RenderCode::InitMaterials;
 	imp->ShutdownMaterials = RenderCode::ShutdownMaterials;
 	imp->RegisterMaterial = RenderCode::RegisterMaterial;
@@ -228,9 +229,9 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
 	imp->RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
 	imp->RegisterFont = Font::Register;
-	imp->RenderTextBlended = RenderCode::RenderTextBlended;
-	imp->RenderTextShaded = RenderCode::RenderTextShaded;
-	imp->RenderTextSolid = RenderCode::RenderTextSolid;
+	//imp->RenderTextBlended = RenderCode::RenderTextBlended;
+	//imp->RenderTextShaded = RenderCode::RenderTextShaded;
+	//imp->RenderTextSolid = RenderCode::RenderTextSolid;
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
 	imp->RunJavaScript = UI::RunJavaScript;

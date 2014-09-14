@@ -31,20 +31,20 @@ void AnimationManager::PushFrame() {
 	}
 }
 
-void AnimationManager::DrawActiveFrame(SDL_Texture* in, SDL_Rect* pos) {
+void AnimationManager::DrawActiveFrame(RenderTexture* in, SDL_Rect* pos) {
 	auto seq = ptSequences->find(sCurrentSequence);
 	if(seq == ptSequences->end()) {
 		R_Error("AnimationManager::DrawActiveFrame: bad sequence %s", sCurrentSequence.c_str());
 		return;
 	}
 
-	RenderCode::DrawImageAbsClipped((Image*)in, pos->x, pos->y, 
-		iCurrentFrame * ptSeqData->framesize, seq->second.rowNum * ptSeqData->rowheight,
-		ptSeqData->framesize, ptSeqData->rowheight);
+	//RenderCode::DrawImageAbsClipped(in, pos->x, pos->y, 
+	//	iCurrentFrame * ptSeqData->framesize, seq->second.rowNum * ptSeqData->rowheight,
+	//	ptSeqData->framesize, ptSeqData->rowheight);
 }
 
 void AnimationManager::DrawAnimated(Material* ptMaterial, int x, int y, bool bTransMap) {
-	SDL_Texture* ptTexture;
+	RenderTexture* ptTexture;
 	PushFrame();
 	if(!ptMaterial->bLoadedResources) {
 		ptMaterial->LoadResources();

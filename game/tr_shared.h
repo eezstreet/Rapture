@@ -1,16 +1,18 @@
 #pragma once
 #include "sys_shared.h"
 
+typedef struct RenderTexture;
+
 // Renderer.cpp
 namespace RenderCode {
 	void Initialize();
 	void Exit(const bool bSilent = false);
 	void Restart();
 	void BlankFrame();
-	void Display();
+	void BeginFrame();
+	void EndFrame();
 	
-	void AddSurface(void* surf);
-	void BlendTexture(void* tex);
+	void BlendTexture(RenderTexture* tex);
 	void QueueScreenshot(const string& fileName, const string& extension);
 
 	Image* RegisterImage(const char* name);
@@ -33,7 +35,6 @@ namespace RenderCode {
 	void RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
 	void RenderTextBlended(Font* font, const char* text, int r, int g, int b);
 
-	void* GetRenderer();
 	void FadeFromBlack(int ms);
 
 	void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
@@ -41,4 +42,10 @@ namespace RenderCode {
 	bool AnimationFinished(AnimationManager* ptAnim);
 	void SetAnimSequence(AnimationManager* ptAnims, const char* sSequence);
 	const char* GetAnimSequence(AnimationManager* ptAnims);
+
+	RenderTexture* CreateFullscreenTexture();
+	RenderTexture* TextureFromPixels(void* ptPixels, int width, int height, void* extra);
+	void DestroyTexture(RenderTexture* texture);
+	void LockTexture(RenderTexture* ptvTexture, void** pixels, int* span, bool bWriteOnly);
+	void UnlockTexture(RenderTexture* ptvTexture);
 };

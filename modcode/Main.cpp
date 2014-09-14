@@ -49,9 +49,7 @@ void Game_Frame() {
 		iLoadingScreen = 0;
 	}
 	else {
-		// In a multiplayer game, we would be looping through all 4 acts and running GetWorld()->Run,
-		// but since we're only concerned about singleplayer, we're going to focus on the one that
-		// our client is on
+		// TODO: loop through all player-filled acts
 
 		// Preframe. We need to keep client/server synchronized
 		ptClient->Preframe();

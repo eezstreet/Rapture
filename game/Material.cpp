@@ -17,7 +17,7 @@ void Material::SendToRenderer(int x, int y) {
 		LoadResources();
 	}
 
-	RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+	//RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
 }
 
 void Material::SendToRendererTransparency(int x, int y) {
@@ -27,9 +27,9 @@ void Material::SendToRendererTransparency(int x, int y) {
 	}
 
 	if(bHasTransparencyMap) {
-		RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
+		//RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
 	} else {
-		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+		//RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
 	}
 }
 
@@ -48,8 +48,8 @@ void Material::LoadResources() {
 		return;
 	}
 	bLoadedIncorrectly = false;
-	ptResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-	SDL_SetTextureBlendMode(ptResource, SDL_BLENDMODE_BLEND);
+	ptResource = RenderCode::TextureFromPixels(temp->pixels, temp->w, temp->h, temp);
+	RenderCode::BlendTexture(ptResource);
 	SDL_FreeSurface(temp);
 
 	if(bHasTransparencyMap) {
@@ -58,8 +58,8 @@ void Material::LoadResources() {
 			R_Message(PRIORITY_WARNING, "WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
 			bHasTransparencyMap = false;
 		} else {
-			ptTransResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-			SDL_SetTextureBlendMode(ptTransResource, SDL_BLENDMODE_BLEND);
+			ptTransResource = RenderCode::TextureFromPixels(temp->pixels, temp->w, temp->h, temp);
+			RenderCode::BlendTexture(ptTransResource);
 			SDL_FreeSurface(temp);
 		}
 	}
@@ -69,7 +69,10 @@ void Material::FreeResources() {
 	if(!bLoadedResources) {
 		return;
 	}
-	SDL_DestroyTexture(ptResource);
+	delete ptResource;
+	if(ptTransResource) {
+		delete ptTransResource;
+	}
 	bLoadedResources = false;
 	bLoadedIncorrectly = false;
 }
