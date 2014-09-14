@@ -52,6 +52,8 @@ void Dispatch::CatchError() {
 }
 
 void Dispatch::PrintMessage(const int iPriority, const char* message) {
+	static bool bLastHadNewline = true;
+	bool bThisHasNewline = false;
 	if(!bSetup) {
 		vPreSetupMessages.push_back(make_pair(iPriority, message));
 	}
@@ -66,15 +68,54 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 	}
 
 	if(ptLogFile != nullptr) {
-		string input = message;
+		stringstream input;
+		string in = message;
 #ifdef WIN32
 		size_t pos = 0;
-		while((pos = input.find('\n', pos)) != string::npos) {
-			input.replace(pos, 1, "\r\n");
+		while((pos = in.find('\n', pos)) != string::npos) {
+			in.replace(pos, 1, "\r\n");
 			pos += 2;
+			bThisHasNewline = true;
 		}
 #endif
-		ptLogFile->WritePlaintext(input);
+
+		if(bLastHadNewline) {
+			// Insert the time
+			auto ticks = SDL_GetTicks();
+			input << setfill('0') << setw(2) << floor(ticks / 3600000) << ":"; // Hours
+			input << setfill('0') << setw(2) << floor(ticks / 60000) << ":"; // Minutes
+			input << setfill('0') << setw(2) << floor(ticks / 1000) << " "; // Seconds
+
+			// Insert the message type
+			switch(iPriority) {
+				default:
+				case PRIORITY_NOTE:
+					input << "[NOTE]\t\t";
+					break;
+				case PRIORITY_DEBUG:
+					input << "[DEBUG]\t\t";
+					break;
+				case PRIORITY_MESSAGE:
+					input << "[MESSAGE]\t";
+					break;
+				case PRIORITY_WARNING:
+					input << "[WARNING]\t";
+					break;
+				case PRIORITY_ERROR:
+					input << "[ERROR]\t";
+					break;
+				case PRIORITY_ERRFATAL:
+					input << "[FATAL]\t\t";
+					break;
+			}
+		}
+
+		// Lastly, insert the message itself
+		input << in;
+
+		// Now write to log
+		bLastHadNewline = bThisHasNewline;
+		ptLogFile->WritePlaintext(input.str());
 	} else {
 		printf(message);
 	}
