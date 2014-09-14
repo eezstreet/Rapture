@@ -79,8 +79,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\game\Entity.cpp" />
-    <ClCompile Include="..\game\OptionList.cpp" />
     <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\modcode\Actor.cpp" />
@@ -91,12 +89,14 @@
     <ClCompile Include="..\modcode\entities\contain_chest.cpp" />
     <ClCompile Include="..\modcode\entities\info_player_start.cpp" />
     <ClCompile Include="..\modcode\entities\npc_test.cpp" />
+    <ClCompile Include="..\modcode\Entity.cpp" />
     <ClCompile Include="..\modcode\Json.cpp" />
     <ClCompile Include="..\modcode\Main.cpp" />
     <ClCompile Include="..\modcode\Local.cpp" />
     <ClCompile Include="..\modcode\Map.cpp" />
     <ClCompile Include="..\modcode\MapLoader.cpp" />
     <ClCompile Include="..\modcode\NPC.cpp" />
+    <ClCompile Include="..\modcode\OptionList.cpp" />
     <ClCompile Include="..\modcode\QuestManager.cpp" />
     <ClCompile Include="..\modcode\quests\a1q1_test.cpp" />
     <ClCompile Include="..\modcode\SaveGame.cpp" />
@@ -107,7 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RVector.h" />
-    <ClInclude Include="..\game\OptionList.h" />
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\json\cJSON.h" />
     <ClInclude Include="..\modcode\Actor.h" />
@@ -126,6 +125,7 @@
     <ClInclude Include="..\modcode\MapLoader.h" />
     <ClInclude Include="..\modcode\MazeFramework.h" />
     <ClInclude Include="..\modcode\NPC.h" />
+    <ClInclude Include="..\modcode\OptionList.h" />
     <ClInclude Include="..\modcode\Player.h" />
     <ClInclude Include="..\modcode\PresetFileData.h" />
     <ClInclude Include="..\modcode\QuadTree.h" />
