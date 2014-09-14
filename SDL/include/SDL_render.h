@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -51,7 +51,6 @@
 #include "SDL_stdinc.h"
 #include "SDL_rect.h"
 #include "SDL_video.h"
-#include "SDL_vertex.h"
 
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
@@ -597,7 +596,7 @@ extern DECLSPEC void SDLCALL SDL_RenderGetScale(SDL_Renderer * renderer,
  *
  *  \return 0 on success, or -1 on error
  */
-extern DECLSPEC int SDL_SetRenderDrawColor(SDL_Renderer * renderer,
+extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
                                            Uint8 r, Uint8 g, Uint8 b,
                                            Uint8 a);
 
@@ -613,7 +612,7 @@ extern DECLSPEC int SDL_SetRenderDrawColor(SDL_Renderer * renderer,
  *
  *  \return 0 on success, or -1 on error
  */
-extern DECLSPEC int SDL_GetRenderDrawColor(SDL_Renderer * renderer,
+extern DECLSPEC int SDLCALL SDL_GetRenderDrawColor(SDL_Renderer * renderer,
                                            Uint8 * r, Uint8 * g, Uint8 * b,
                                            Uint8 * a);
 
@@ -858,42 +857,6 @@ extern DECLSPEC int SDLCALL SDL_GL_BindTexture(SDL_Texture *texture, float *texw
  *  \return 0 on success, or -1 if the operation is not supported
  */
 extern DECLSPEC int SDLCALL SDL_GL_UnbindTexture(SDL_Texture *texture);
-
-
-/**
- *  \brief Render a set of vertex, optionally using a texture and indices into the vertex array
- *
- *  \param texture  (optional) The SDL texture to unbind
- *  \param vertices  An array of SDL_Vertex elements to be rendered
- *  \param num_vertices  Number of elements in the vertices array
- *  \param indices (optional) An array of integers indices into the vertices array, if NULL all vertices will be rendered in sequential order
- *  \param num_indices  Number of elements in the indices array (ignored if indices is NULL)
- *  \param translation (optional) A translation vector that will be applied to the vertices prior to rendering
- *
- *  \return 0 on success, or -1 if the operation is not supported
- */
-extern DECLSPEC int SDL_RenderGeometry(SDL_Renderer * renderer, SDL_Texture *texture, SDL_Vertex *vertices, int num_vertices, int* indices, int num_indices, const SDL_Vector2f *translation);
-
-/**
- *  \brief Enable the Scissor Region
- *
- *  \return 0 on success, or -1 if the operation is not supported
- */
-extern DECLSPEC int SDL_EnableScissor(SDL_Renderer * renderer);
-
-/**
- *  \brief Disable the Scissor Region
- *
- *  \return 0 on success, or -1 if the operation is not supported
- */
-extern DECLSPEC int SDL_DisableScissor(SDL_Renderer * renderer);
-
-/**
- *  \brief Set the scissor region
- *
- *  \return 0 on success, or -1 if the operation is not supported or region is NULL
- */
-extern DECLSPEC int SDL_ScissorRegion(SDL_Renderer * renderer, const SDL_Rect *region);
 
 
 /* Ends C function definitions when using C++ */
