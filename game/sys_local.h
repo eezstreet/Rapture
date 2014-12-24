@@ -153,7 +153,7 @@ public:
 		}
 		catch( string e ) {
 			// register a new cvar
-			R_Message(PRIORITY_MESSAGE, "%s %s\n", sName, e);
+			R_Message(PRIORITY_MESSAGE, "%s %s\n", sName, e.c_str());
 			return CvarSystem::RegisterCvar(sName, sDesc, iFlags, startValue);
 		}
 	}
@@ -489,6 +489,9 @@ private:
 	int iHiddenMask;
 	int iShutdownMask;
 	int iMessageMask;
+
+	bool bSetup;
+	vector<pair<int, string>> vPreSetupMessages;
 public:
 	Dispatch(const int _iHiddenMask, const int _iShutdownMask, const int _iMessageMask);
 	void CatchError();

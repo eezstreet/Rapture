@@ -84,15 +84,6 @@
     <ClCompile Include="..\game\Shared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\NPC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\OptionList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\modcode\entities\npc_test.cpp">
       <Filter>Source Files\entities</Filter>
     </ClCompile>
@@ -106,6 +97,15 @@
       <Filter>Source Files\quests</Filter>
     </ClCompile>
     <ClCompile Include="..\modcode\SaveGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\NPC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\OptionList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,14 +182,8 @@
     <ClInclude Include="..\modcode\Seed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\OptionList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\modcode\entities\npc_test.h">
       <Filter>Header Files\entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\NPC.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\Server.h">
       <Filter>Header Files</Filter>
@@ -210,6 +204,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\SaveGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\NPC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\OptionList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
