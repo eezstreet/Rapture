@@ -11,6 +11,9 @@ bSetup(false){
 }
 
 Dispatch::~Dispatch() {
+	if (!ptLogFile) {
+		return;
+	}
 	ptLogFile->Close();
 	ptLogFile = nullptr;
 }
