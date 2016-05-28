@@ -204,5 +204,22 @@
             document.getElementById("conlines").value = document.getElementById("conlines").value.concat(newLine);
             $('#conlines').scrollTop($('#conlines')[0].scrollHeight - $('#conlines').height());
         }
+        
+        function EXPORT_IncreaseTextSize(newSize) {
+            if(newSize <= 0) {
+                // Increase by one point size
+                newSize = parseInt(document.coninput.style.fontSize) + 1;
+            }
+            //EXPORT_SendNewLine("text size = " + document.getElementById("conlines").style.fontSize);
+            //document.coninput.style.fontSize = newSize;
+        }
+        
+        function EXPORT_DecreaseTextSize(newSize) {
+            if(newsize <= 0) {
+                // Decrease by one point size
+                newSize = parseInt(document.coninput.style.fontSize) - 1;
+            }
+            //document.coninput.style.fontSize = newSize;
+        }
 	</script>
 </html>

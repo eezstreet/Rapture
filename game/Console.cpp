@@ -9,6 +9,34 @@ using namespace Awesomium;
 Console* Console::singleton = nullptr;
 string Console::conLines = "";
 
+void Console::Sizeup(vector<string>& args) {
+	Console* con = Console::GetSingleton();
+	string arg = "0";
+	if (args.size() > 1) {
+		arg = args[1];
+	}
+	JSArray outArgs = con->window.ToObject().GetMethodNames();
+	for (int i = 0; i < outArgs.size(); i++) {
+		JSValue val = outArgs[i];
+		char text[1024] = { 0 };
+		val.ToString().ToUTF8(text, sizeof(text));
+		text[val.ToString().length()] = '\n';
+		text[val.ToString().length() + 1] = '\0';
+		R_Message(PRIORITY_DEBUG, text);
+	}
+}
+
+void Console::Sizedn(vector<string>& args) {
+	Console* con = Console::GetSingleton();
+	string arg = "0";
+	if (args.size() > 1) {
+		arg = args[1];
+	}
+	JSArray outArgs;
+	outArgs.Push(WSLit(arg.c_str()));
+	con->window.ToObject().Invoke(WSLit("EXPORT_DecreaseTextSize"), outArgs);
+}
+
 const int Console::GetLineCount() {
 	JSArray args; // don't care/garbage
 
@@ -58,6 +86,9 @@ Console::Console() {
 	obj.SetCustomMethod(WSLit("tabComplete"), false);
 
 	window = wView->ExecuteJavascriptWithResult(WSLit("window"), WSLit(""));
+
+	Cmd::AddCommand("sizeup", Console::Sizeup);
+	Cmd::AddCommand("sizedn", Console::Sizedn);
 }
 
 Console::~Console() {

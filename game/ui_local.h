@@ -96,6 +96,9 @@ public:
 	bool IsOpen() const { return bIsOpen; }
 	void BlankConsole();
 	static void PushConsoleMessage(string message);
+
+	static void Sizeup(vector<string>& args);
+	static void Sizedn(vector<string>& args);
 };
 
 class MainMenu : public SingletonMenu<MainMenu>, public Menu {

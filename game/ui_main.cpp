@@ -106,7 +106,7 @@ void UI::Render() {
 		}
 		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
 		SDL_Texture* tex = uiTextures[lastActiveLayer];
-		if(bmp->is_dirty()) {
+		if(bmp != nullptr && bmp->is_dirty()) {
 			// If it's not dirty, then we don't need to re-render
 			unsigned char* pixels;
 			int pitch;
