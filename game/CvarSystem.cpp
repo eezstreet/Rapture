@@ -1,6 +1,12 @@
 #include "sys_local.h"
 
-/* CvarSystem: the major handler and dealing of cvars */
+/*
+ * The CvarSystem is a global class (FIXME: should be namespace?) that is in charge of managing all of our Cvars.
+ * FIXME: Should be named CvarManager?
+ */
+
+// Registers a Cvar from a Cvar object.
+// If there is a registered Cvar, it won't register two of them.
 Cvar* CvarSystem::RegisterCvar(Cvar *cvar) {
 	auto it = cvars.find(cvar->name);
 	if(it != cvars.end() && it->second && it->second->registered) {
@@ -12,6 +18,7 @@ Cvar* CvarSystem::RegisterCvar(Cvar *cvar) {
 	return cvar;
 }
 
+// Registers a Cvar by creating a new Cvar object (a string-based one).
 Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, char* startValue) {
 	auto it = cvars.find(sName);
 	if(it != cvars.end()) {
@@ -43,6 +50,7 @@ Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags,
 	return RegisterCvar(cvar);
 }
 
+// Registers a Cvar by creating a new Cvar object (an integer-based one)
 Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, int startValue) {
 	auto it = cvars.find(sName);
 	if(it != cvars.end()) {
@@ -74,6 +82,7 @@ Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags,
 	return RegisterCvar(cvar);
 }
 
+// Registers a new Cvar by creating a new Cvar object (a floating point one)
 Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, float startValue) {
 	// TODO: generalize most of this code into one func
 	auto it = cvars.find(sName);
@@ -105,6 +114,7 @@ Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags,
 	return RegisterCvar(cvar);
 }
 
+// Register a boolean Cvar by creating a new Cvar object.
 Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags, bool startValue) {
 	auto it = cvars.find(sName);
 	if(it != cvars.end()) {
@@ -137,16 +147,20 @@ Cvar* CvarSystem::RegisterCvar(const char* sName, const char* sDesc, int iFlags,
 	return RegisterCvar(cvar);
 }
 
+// FIXME: remove
 void CvarSystem::Initialize() {
 	init = true;
 }
 
+// Shuts down the Cvar manager by archiving any cvars flagged with CVAR_ARCHIVE and clearing the cvar cache.
 void CvarSystem::Destroy() {
 	ArchiveCvars();
 	cvars.clear();
 	init = false;
 }
 
+// Caches a Cvar to be created later.
+// Cvars are only cached in one place: the command-line.
 void CvarSystem::CacheCvar(const string& sName, const string& sValue, bool bArchive) {
 	// check and make sure the cvar isn't already cached
 	auto it = cache.find(sName);
@@ -163,6 +177,7 @@ void CvarSystem::CacheCvar(const string& sName, const string& sValue, bool bArch
 	R_Message(PRIORITY_NOTE, "Caching cvar %s\n", sName.c_str());
 }
 
+// Removes a cvar from the cache.
 void CvarSystem::Cache_Free(const string& sName) {
 	auto it = cache.find(sName);
 	if(it == cache.end())
@@ -171,6 +186,7 @@ void CvarSystem::Cache_Free(const string& sName) {
 	cache.erase(sName);
 }
 
+// Creates the configuration file which is loaded later.
 void CvarSystem::ArchiveCvars() {
 	File* ff = File::Open("raptureconfig.cfg", "w");
 	if(!ff)
@@ -202,6 +218,7 @@ void CvarSystem::ArchiveCvars() {
 	Zone::FastFree(ff, "files");
 }
 
+// Returns the string value of a Cvar.
 string CvarSystem::GetStringValue(const char* sName) {
 	if(!Cvar::Exists(sName)) { // use cache
 		return ""; // FIXME
@@ -211,6 +228,7 @@ string CvarSystem::GetStringValue(const char* sName) {
 	}
 }
 
+// Returns the integer value of a cvar.
 int CvarSystem::GetIntegerValue(const char* sName) {
 	if(!Cvar::Exists(sName)) { // use cache
 		return 0; // FIXME
@@ -220,6 +238,7 @@ int CvarSystem::GetIntegerValue(const char* sName) {
 	}
 }
 
+// Returns the floating point value of a cvar.
 float CvarSystem::GetFloatValue(const char* sName) {
 	if(!Cvar::Exists(sName)) {
 		return 0.0f; // FIXME
@@ -229,6 +248,7 @@ float CvarSystem::GetFloatValue(const char* sName) {
 	}
 }
 
+// Returns the boolean value of a cvar.
 bool CvarSystem::GetBooleanValue(const char* sName) {
 	if(!Cvar::Exists(sName)) {
 		return false; // FIXME
@@ -238,6 +258,7 @@ bool CvarSystem::GetBooleanValue(const char* sName) {
 	}
 }
 
+// Retrieves the first registered Cvar.
 // Used by list command
 string CvarSystem::GetFirstCvar(bool& bFoundCommand) {
 	auto it = cvars.begin();
@@ -249,6 +270,7 @@ string CvarSystem::GetFirstCvar(bool& bFoundCommand) {
 	return it->first;
 }
 
+// Retrieves the next registered cvar.
 string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand) {
 	auto it = cvars.find(previous);
 	if(it == cvars.end()) {
@@ -264,6 +286,7 @@ string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand) {
 	return it->first;
 }
 
+// Prints out a list of all of the registered Cvars.
 void CvarSystem::ListCvars() {
 	bool bFoundCommand = true;
 	for(string s = GetFirstCvar(bFoundCommand); bFoundCommand; s = GetNextCvar(s, bFoundCommand)) {
@@ -271,6 +294,7 @@ void CvarSystem::ListCvars() {
 	}
 }
 
+// This function is 
 bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& VArguments) {
 	auto cv = cvars.find(sName);
 	if(cv == cvars.end()) {
@@ -319,6 +343,7 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 	return true;
 }
 
+// Exported to the UI
 void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 	if(!Cvar::Exists(name)) {
 		value = nullptr;
@@ -337,6 +362,7 @@ void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
 	*value = retVal;
 }
 
+// Exported to the UI
 void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 	if(!Cvar::Exists(name)) {
 		value = nullptr;
@@ -355,6 +381,7 @@ void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
 	*value = retVal;
 }
 
+// Exported to the UI
 void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 	if(!Cvar::Exists(name)) {
 		value = nullptr;
@@ -373,6 +400,7 @@ void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
 	strcpy(value, retVal.c_str());
 }
 
+// Exported to the UI
 void CvarSystem::EXPORT_Value(const char* name, float* value) {
 	if(!Cvar::Exists(name)) {
 		value = nullptr;

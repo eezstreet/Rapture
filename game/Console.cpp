@@ -4,7 +4,7 @@
 
 using namespace Awesomium;
 
-/* Manipulation of text box information */
+/* REFACTOR ME */
 
 Console* Console::singleton = nullptr;
 string Console::conLines = "";

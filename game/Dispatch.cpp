@@ -1,7 +1,19 @@
 #include "sys_local.h"
 
+/*
+ * The Dispatch global object (ptDispatch) literally dispatches messages.
+ * Each message sent to the dispatch system is logged to an external logfile named by the date and time the engine was started.
+ * Each message is also given a priority.
+ * The dispatch system has three bitmasks which do different behavior based on which type of messages come through:
+ * 1. Any messages with priority which matches the Hidden bitmask are never logged nor acted upon.
+ * 2. Any messages with priority which matches the Shutdown bitmask will cause the engine to shut down.
+ * 3. Any messages with priority that matches the Message bitmask will cause a console message to appear.
+ */
+
 Dispatch* ptDispatch = nullptr;
 
+// Initializes the dispatch system.
+// This should be initialized first, so that we can catch any R_Messages that get sent.
 Dispatch::Dispatch(const int _iHiddenMask, const int _iShutdownMask, const int _iMessageMask) :
 iHiddenMask(_iHiddenMask),
 iShutdownMask(_iShutdownMask),
@@ -10,6 +22,7 @@ ptLogFile(nullptr),
 bSetup(false){
 }
 
+// Destroys the dispatch system.
 Dispatch::~Dispatch() {
 	if (!ptLogFile) {
 		return;
@@ -18,6 +31,8 @@ Dispatch::~Dispatch() {
 	ptLogFile = nullptr;
 }
 
+// Since some messages may have been sent (but not properly dealt with), we should probably deal with those now.
+// The setup function will simultaneously register the needed cvars and also dispatch any messages which are not handled yet.
 void Dispatch::Setup() {
 	Cvar* com_dispatchHiddenMask = Cvar::Get<int>("com_dispatchHiddenMask", "Hide messages with these priorities", (1 << CVAR_ARCHIVE), 
 		(1 << PRIORITY_NONE) 
@@ -49,11 +64,13 @@ void Dispatch::Setup() {
 	}
 }
 
+// This (dumbly-named) function closes the logfile.
 void Dispatch::CatchError() {
 	ptLogFile->Close();
 	ptLogFile = nullptr;
 }
 
+// This (dumbly-named) function dispatches a message with specified priority.
 void Dispatch::PrintMessage(const int iPriority, const char* message) {
 	static bool bLastHadNewline = true;
 	bool bThisHasNewline = false;
@@ -158,6 +175,7 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 	}
 }
 
+// Changes the hidden bitmask
 void Dispatch::ChangeHiddenMask(int newValue) {
 	if(!ptDispatch) {
 		return;
@@ -165,6 +183,7 @@ void Dispatch::ChangeHiddenMask(int newValue) {
 	ptDispatch->iHiddenMask = newValue;
 }
 
+// Changes the shutdown bitmask
 void Dispatch::ChangeShutdownMask(int newValue) {
 	if(!ptDispatch) {
 		return;
@@ -172,6 +191,7 @@ void Dispatch::ChangeShutdownMask(int newValue) {
 	ptDispatch->iShutdownMask = newValue;
 }
 
+// Changes the message mask
 void Dispatch::ChangeMessageMask(int newValue) {
 	if(!ptDispatch) {
 		return;

@@ -1,8 +1,13 @@
 #include "sys_local.h"
 
+/**
+ * The engine-local `Cmd` namespace is responsible for all things related to console commands.
+ * Commands are not objects in the Rapture engine.
+ */
 namespace Cmd {
 	static unordered_map<string, conCmd_t> cmdlist;
 
+	// 
 	static string GetFirstCommand(bool& bFoundCommand) {
 		auto it = cmdlist.begin();
 		if(it == cmdlist.end())
@@ -12,6 +17,7 @@ namespace Cmd {
 		return it->first;
 	}
 
+	// Gets the next command in the command list.
 	static string GetNextCommand(string lastCommand, bool& bFoundCommand) {
 		auto it = cmdlist.find(lastCommand);
 		if(it == cmdlist.end()) {
@@ -31,6 +37,7 @@ namespace Cmd {
 		return it->first;
 	}
 
+	// Lists all commands that are registered.
 	void ListCommands() {
 		bool bFoundCommand = true;
 		for(string s = GetFirstCommand(bFoundCommand); bFoundCommand; s = GetNextCommand(s, bFoundCommand)) {
@@ -38,11 +45,12 @@ namespace Cmd {
 		}
 	}
 
-	string sLastTriedToComplete = "";
+	// Processes something that we've tried to enter in the console.
+	// Also prints a message when the result is not found.
 	void ProcessCommand(const char *cmd) {
 		// in the future, mods will add more to this list
 		vector<string> arguments = Tokenize(cmd);
-		sLastTriedToComplete = "";
+		static string sLastTriedToComplete = "";
 		auto it = cmdlist.find(arguments[0]);
 		if(it != cmdlist.end()) {
 			auto command = (*it).second;
@@ -55,24 +63,30 @@ namespace Cmd {
 		R_Message(PRIORITY_MESSAGE, "unknown cmd '%s'\n", arguments[0].c_str());
 	}
 
+	// Adds something to the tab completion vector.
+	// This can be either a cvar or a command.
 	static vector<string> vTabCompletion;
 	void AddTabCompletion(const string& cmdName) {
 		vTabCompletion.push_back(cmdName);
 	}
 
+	// Adds a formally-recognized command to the engine.
 	void AddCommand(const string& cmdName, conCmd_t cmd) {
 		AddTabCompletion(cmdName);
 		cmdlist[cmdName] = cmd;
 	}
 
+	// Removes a command from the engine.
 	void RemoveCommand(string cmdName) {
 		cmdlist.erase(cmdName);
 	}
 
+	// Clears all commands that have been registered.
 	void ClearCommandList() { 
 		cmdlist.clear(); 
 	}
 
+	// Tab-completes a string based on information 
 	string TabComplete(const string& input) {
 		vector<string> vValid;
 		for(auto it = vTabCompletion.begin(); it != vTabCompletion.end(); ++it) {
