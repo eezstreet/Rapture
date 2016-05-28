@@ -1,4 +1,8 @@
 Requires Visual Studio 2013 or later.
 You will need to download dirent.h and place it in your Visual Studio include folder (normally found at C:\Program Files (x86)\Visual Studio 12.0\VC\include)
-All you need to do then is compile the game under Debug or Release (it works in both) and it should run. The game assets and redistributable game content will be placed in C:\Rapture\Gamedata.
-NOTE: You may need to copy fonts from your cloned/zipped copy of the repository to your game folder, as Windows has special restrictions on .ttf files.
+Next you will need to create a new environment variable that represents the install directory of your game.
+Very simply, enter this in cmd.exe:
+`set RAPTURE_INSTALL=C:\Rapture\Gamedata`
+You can change this install directory to anything you would like.
+Next you simply compile on either Debug or Release.
+If Visual Studio does not copy the .ttf fonts correctly, you may need to do so manually. I dunno, Windows is weird with those files.

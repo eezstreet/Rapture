@@ -39,15 +39,15 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>C:\Rapture\Gamedata\</OutDir>
+    <OutDir>$(RAPTURE_INSTALL)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>C:\Rapture\$(Configuration)\</IntDir>
+    <IntDir>$(RAPTURE_INSTALL)\..\$(Configuration)\</IntDir>
     <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>C:\Rapture\Gamedata\</OutDir>
-    <IntDir>C:\Rapture\$(Configuration)\</IntDir>
+    <OutDir>$(RAPTURE_INSTALL)\</OutDir>
+    <IntDir>$(RAPTURE_INSTALL)\..\$(Configuration)\</IntDir>
     <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -64,7 +64,7 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>echo D|xcopy $(ProjectDir)core C:\Rapture\Gamedata\core /s /f /i /y /v /c</Command>
+      <Command>copyfiles.bat Debug</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets to Gamedata...</Message>
@@ -88,6 +88,10 @@
       <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>copyfiles.bat Release</Command>
+      <Message>Copying assets to Gamedata...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game\AnimationManager.cpp" />
