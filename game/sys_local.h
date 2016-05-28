@@ -135,6 +135,8 @@ public:
 	inline float DefaultValue() { return v.defaultVal; }
 	inline bool DefaultBool() { return b.defaultVal; }
 
+	string TypeToString();
+
 	void AddCallback(void* function);
 	void RunCallback();
 
@@ -202,6 +204,7 @@ public:
 	static float GetFloatValue(const char* sName);
 	static bool GetBooleanValue(const char* sName);
 
+	static bool CompareCvars(pair<string, Cvar*> pFirst, pair<string, Cvar*> pSecond);
 	static void ListCvars();
 
 	static bool ProcessCvarCommand(const string& sName, const vector<string>& VArguments);

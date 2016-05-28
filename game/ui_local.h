@@ -6,11 +6,14 @@
 #include <Awesomium/STLHelpers.h>
 #include <Awesomium/BitmapSurface.h>
 
-extern Awesomium::WebCore *wc;
-extern Awesomium::WebView* currentFocus; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
-extern Awesomium::WebSession* sess;
-void AddRenderable(Awesomium::WebView* wv);
-void RemoveRenderable(Awesomium::WebView* wv);
+namespace UI {
+	extern Awesomium::WebCore *wc;
+	extern Awesomium::WebView* currentFocus;
+	extern Awesomium::WebSession* sess;
+
+	void StartDrawingMenu(Menu* menu);
+	void StopDrawingMenu(Menu* menu);
+};
 
 class Menu : public Awesomium::JSMethodHandler {
 public:
@@ -33,6 +36,8 @@ public:
 	Menu();
 	Menu(const char* menu);
 	~Menu();
+
+	Awesomium::WebView* GetWebView() { return wView; }
 protected:
 	Awesomium::WebView* wView;
 	Awesomium::JSValue global;

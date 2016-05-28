@@ -224,3 +224,19 @@ void Cvar::RunCallback() {
 			break;
 	}
 }
+
+// Returns the type of the cvar as a string
+string Cvar::TypeToString() {
+	switch (type) {
+		case CV_STRING:
+			return "string";
+		case CV_INTEGER:
+			return "integer";
+		case CV_FLOAT:
+			return "float";
+		case CV_BOOLEAN:
+			return "boolean";
+		default:
+			return "unknown";
+	}
+}

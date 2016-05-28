@@ -164,15 +164,16 @@ Menu::Menu() {
 	vmState = nullptr;
 }
 
+// ugly :s
 Menu::Menu(const char *menuName) {
 	R_Message(PRIORITY_NOTE, "Loading %s\n", menuName);
 	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
+	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	wView->SetTransparent(true);
 	while(wView->IsLoading())
-		wc->Update();
-	AddRenderable(wView);
+		UI::wc->Update();
+	UI::StartDrawingMenu(this);
 	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
@@ -184,7 +185,7 @@ Menu::~Menu() {
 	if(!wView) {
 		return; // don't.
 	}
-	RemoveRenderable(wView);
+	UI::StopDrawingMenu(this);
 	wView->Destroy();
 	wView = nullptr;
 }

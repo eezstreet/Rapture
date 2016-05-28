@@ -69,12 +69,37 @@ void Sys_SendToClipboard(string text) {
 	CloseClipboard();
 }
 
+
+
+//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+//(from http://stackoverflow.com/questions/1387064/how-to-get-the-error-message-from-the-error-code-returned-by-getlasterror)
+std::string GetLastErrorAsString()
+{
+	//Get the error message, if any.
+	DWORD errorMessageID = ::GetLastError();
+	if (errorMessageID == 0)
+		return std::string(); //No error message has been recorded
+
+	LPSTR messageBuffer = nullptr;
+	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+	std::string message(messageBuffer, size);
+
+	//Free the buffer.
+	LocalFree(messageBuffer);
+
+	return message;
+}
+
+
+
 ptModule Sys_LoadLibrary(string name) {
 	name.append(".dll");
 	string filepath = File::GetFileSearchPath(name);
 	ptModule hLib = (ptModule)LoadLibrary(filepath.c_str());
 	if(!hLib) {
-		R_Message(PRIORITY_ERROR, "module load failure: %i\n", GetLastError());
+		R_Message(PRIORITY_ERROR, "module load failure: %s (%i)\n", GetLastErrorAsString().c_str(), GetLastError());
 	}
 	return hLib;
 }

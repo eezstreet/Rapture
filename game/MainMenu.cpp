@@ -7,14 +7,14 @@ MainMenu* MainMenu::singleton = nullptr;
 MainMenu::MainMenu() {
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
 	string mainFileName = "file://" + File::GetFileSearchPath("ui/main.html");
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
+	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
 	// TODO: refactor all of this into a inherited func
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	while(wView->IsLoading())
-		wc->Update();
+		UI::wc->Update();
 	R_Message(PRIORITY_NOTE, "done.\n");
-	AddRenderable(wView);
-	currentFocus = wView;
+	UI::StartDrawingMenu(this);
+	UI::currentFocus = wView;
 	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
@@ -22,10 +22,10 @@ MainMenu::MainMenu() {
 }
 
 MainMenu::~MainMenu() {
-	RemoveRenderable(wView);
+	UI::StopDrawingMenu(this);
 	wView->Destroy();
 	wView = nullptr;
-	currentFocus = nullptr;
+	UI::currentFocus = nullptr;
 }
 
 MainMenu::MainMenu(MainMenu& other) {

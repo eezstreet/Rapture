@@ -286,12 +286,72 @@ string CvarSystem::GetNextCvar(const string& previous, bool& bFoundCommand) {
 	return it->first;
 }
 
+// Sorting function for the cvars
+bool CvarSystem::CompareCvars(pair<string, Cvar*> pFirst, pair<string, Cvar*> pSecond) {
+	return pFirst.first.compare(pSecond.first) < 0;
+}
+
 // Prints out a list of all of the registered Cvars.
 void CvarSystem::ListCvars() {
 	bool bFoundCommand = true;
-	for(string s = GetFirstCvar(bFoundCommand); bFoundCommand; s = GetNextCvar(s, bFoundCommand)) {
-		R_Message(PRIORITY_MESSAGE, "%s\n", s.c_str());
+	vector<pair<string, Cvar*>> vValues(cvars.begin(), cvars.end());
+	sort(vValues.begin(), vValues.end(), CvarSystem::CompareCvars);
+
+	int maxNameSize = 0;	// Size of the name
+	int maxSize = 6;		// Floating point = ##.### = 6 characters
+
+	// We need to do a pass here to determine the longest cvar value length
+	for (auto value = vValues.begin(); value != vValues.end(); ++value) {
+		size_t namelen = value->first.length();
+		if (namelen > maxNameSize) {
+			maxNameSize = namelen;
+		}
+
+		if (value->second->GetType() == Cvar::CV_STRING) {
+			size_t len = strlen(value->second->String());
+			if (maxSize < len) {
+				maxSize = len;
+			}
+		}
 	}
+
+	if (maxNameSize <= 0) {
+		R_Message(PRIORITY_MESSAGE, "No cvars found.\n");
+		return;
+	}
+
+	for (auto value = vValues.begin(); value != vValues.end(); ++value) {
+		switch (value->second->GetType()) {
+			default:
+				R_Message(PRIORITY_MESSAGE, "%-*s = %-*s | %s (unknown)\n", 
+					maxNameSize, value->first.c_str(), maxSize, value->second->String(), value->second->GetDescription().c_str());
+				break;
+			case Cvar::CV_STRING:
+				R_Message(PRIORITY_MESSAGE, "%-*s = %-*s | %s (string)\n",
+					maxNameSize, value->first.c_str(), maxSize, value->second->String(), value->second->GetDescription().c_str());
+				break;
+			case Cvar::CV_INTEGER:
+				R_Message(PRIORITY_MESSAGE, "%-*s = %-*i | %s (integer)\n",
+					maxNameSize, value->first.c_str(), maxSize, value->second->Integer(), value->second->GetDescription().c_str());
+				break;
+			case Cvar::CV_FLOAT:
+				R_Message(PRIORITY_MESSAGE, "%-*s = %-*.3f | %s (floating-point)\n",
+					maxNameSize, value->first.c_str(), maxSize, value->second->Value(), value->second->GetDescription().c_str());
+				break;
+			case Cvar::CV_BOOLEAN:
+				if (value->second->Bool()) {
+					R_Message(PRIORITY_MESSAGE, "%-*s = %-*s | %s (boolean)\n",
+						maxNameSize, value->first.c_str(), maxSize, "true", value->second->GetDescription().c_str());
+				}
+				else {
+					R_Message(PRIORITY_MESSAGE, "%-*s = %-*s | %s (boolean)\n",
+						maxNameSize, value->first.c_str(), maxSize, "false", value->second->GetDescription().c_str());
+				}
+				break;
+		}
+	}
+	// Close it off with a nice little line at the bottom
+	R_Message(PRIORITY_MESSAGE, "-------------------------------\n");
 }
 
 // This function is 

@@ -3,33 +3,37 @@
 using namespace UI;
 using namespace Awesomium;
 
-WebCore *wc = nullptr;
-WebSession *sess = nullptr;
-
-vector<Menu*> vmMenus;
-static vector<WebView*> renderables;
 #define NUM_UI_VISIBLE	8
-static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
-static int lastActiveLayer;
 
-void AddRenderable(WebView* wv) {
-	renderables.push_back(wv);
-}
+namespace UI {
+	static vector<Menu*> vmMenus;
+	static vector<WebView*> vDrawMenus;
+	static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
+	static int lastActiveLayer;
+	WebView* currentFocus = nullptr;
+	WebCore* wc = nullptr;
+	WebSession* sess = nullptr;
 
-void RemoveRenderable(WebView* wv) {
-	for(auto it = renderables.begin(); it != renderables.end(); ++it) {
-		if(*it == wv) {
-			renderables.erase(it);
-			break;
+	void StartDrawingMenu(Menu* menu) {
+		vDrawMenus.push_back(menu->GetWebView());
+	}
+
+	void StopDrawingMenu(Menu* menu) {
+		for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it) {
+			if (*it == menu->GetWebView()) {
+				vDrawMenus.erase(it);
+				break;
+			}
 		}
 	}
+
+	void PipeMouseMovementToWebView(WebView* wv, int x, int y);
+	void PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down);
 }
 
 bool IsConsoleOpen() {
 	return Console::GetSingleton()->IsOpen();
 }
-
-WebView* currentFocus = nullptr; // If this is non-null, then we only pipe input to that object, otherwise we do this for all renderables
 
 RightClickCallback rccb = nullptr;
 
@@ -98,19 +102,29 @@ void UI::Restart() {
 	}
 }
 
+// This gets called every frame, to render all of the UI elements.
 void UI::Render() {
 	lastActiveLayer = 0;
-	for_each(renderables.begin(), renderables.end(), [](WebView* wv) {
-		if(lastActiveLayer >= NUM_UI_VISIBLE) {
+	for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it, lastActiveLayer++) {
+		WebView* wv = *it;
+
+		// We can't draw more than a certain number of menus on the screen at once.
+		if (lastActiveLayer >= NUM_UI_VISIBLE) {
 			return;
 		}
+
 		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
+		if (bmp == nullptr) {
+			// Sometimes (rarely) happens
+			continue;
+		}
+
 		SDL_Texture* tex = uiTextures[lastActiveLayer];
-		if(bmp != nullptr && bmp->is_dirty()) {
-			// If it's not dirty, then we don't need to re-render
+		if (bmp->is_dirty()) {
+			// If it's not dirty then we don't need to re-render
 			unsigned char* pixels;
 			int pitch;
-			if(SDL_LockTexture(tex, nullptr, (void**)&pixels, &pitch) < 0) {
+			if (SDL_LockTexture(tex, nullptr, (void**)&pixels, &pitch) < 0) {
 				R_Message(PRIORITY_ERROR, "Failed to lock texture: %s\n", SDL_GetError());
 				return;
 			}
@@ -118,10 +132,7 @@ void UI::Render() {
 			SDL_UnlockTexture(tex);
 		}
 		RenderCode::BlendTexture((void*)tex);
-		//SDL_Surface *x = SDL_CreateRGBSurfaceFrom((void*)bmp->buffer(), bmp->width(), bmp->height(), 32, bmp->row_span(), 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-		//RenderCode::AddSurface((void*)x);
-		lastActiveLayer++;
-	});
+	}
 }
 
 void UI::RunJavaScript(Menu* ptMenu, const char* sJS) {
@@ -273,11 +284,13 @@ int SDL_ScancodeToAwesomium(SDL_Keycode key) {
 }
 
 void InjectAKeyboardEvent(Awesomium::WebKeyboardEvent e) {
-	if(currentFocus != nullptr)
+	if (currentFocus != nullptr) {
 		currentFocus->InjectKeyboardEvent(e);
-	else
-		for(auto it = renderables.begin(); it != renderables.end(); ++it)
+	} else {
+		for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it) {
 			(*it)->InjectKeyboardEvent(e);
+		}
+	}
 }
 
 static int lastKeyboard = 0;
@@ -363,7 +376,7 @@ void UI::TextEvent(char* text) {
 	InjectAKeyboardEvent(e);
 }
 
-void PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down) {
+void UI::PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down) {
 	if(buttonId == SDL_BUTTON_LEFT) {
 		if(down)
 			wv->InjectMouseDown(Awesomium::kMouseButton_Left);
@@ -395,13 +408,13 @@ void UI::MouseButtonEvent(unsigned int buttonId, bool down) {
 		}
 	}
 	else {
-		for(auto it = renderables.begin(); it != renderables.end(); ++it) {
+		for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it) {
 			PipeMouseInputToWebView(*it, buttonId, down);
 		}
 	}
 }
 
-void PipeMouseMovementToWebView(WebView* wv, int x, int y) {
+void UI::PipeMouseMovementToWebView(WebView* wv, int x, int y) {
 	if(wv)
 		wv->InjectMouseMove(x, y);
 }
@@ -410,8 +423,8 @@ void UI::MouseMoveEvent(int x, int y) {
 	if(currentFocus)
 		currentFocus->InjectMouseMove(x, y);
 	else {
-		for(auto it = renderables.begin(); it != renderables.end(); ++it) {
-			(*it)->InjectMouseMove(x,y);
+		for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it) {
+			UI::PipeMouseMovementToWebView(*it, x, y);
 		}
 	}
 }

@@ -65,11 +65,11 @@ void Console::ReplaceConsoleContents() { // Gets called on opening console
 
 Console::Console() {
 	bIsOpen = false;
-	wView = wc->CreateWebView(r_width->Integer(), r_height->Integer(), sess);
+	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
 	wView->SetTransparent(true);
 	BlankConsole();
 	while(wView->IsLoading())
-		wc->Update();
+		UI::wc->Update();
 	global = wView->CreateGlobalJavascriptObject(WSLit(("ConsoleManager")));
 	wView->set_js_method_handler(this);
 
@@ -92,10 +92,10 @@ Console::Console() {
 }
 
 Console::~Console() {
-	RemoveRenderable(wView);
+	UI::StopDrawingMenu(this);
 	wView->Destroy();
 	wView = nullptr;
-	currentFocus = prevFocus;
+	UI::currentFocus = prevFocus;
 	bIsOpen = false;
 }
 
@@ -116,9 +116,9 @@ void Console::Show(){
 	bIsOpen = true;
 	string conFileName = "file://" + File::GetFileSearchPath("ui/console.html");
 	wView->LoadURL(WebURL(WSLit(conFileName.c_str())));
-	AddRenderable(wView);
-	prevFocus = currentFocus;
-	currentFocus = wView;
+	UI::StartDrawingMenu(this);
+	prevFocus = UI::currentFocus;
+	UI::currentFocus = wView;
 	rccb = /*FIXME*/ nullptr;
 	// HACK: Sometimes doesn't work on first focus, so we need to do this twice
 	wView->Focus();
@@ -132,12 +132,12 @@ void Console::Hide() {
 	bIsOpen = false;
 	// Blanking the console prevents the game from drawing the console while it's onscreen, but it doesn't kill the webview as we need it later
 	BlankConsole();
-	RemoveRenderable(wView);
-	currentFocus = prevFocus;
-	if(currentFocus) {
+	UI::StopDrawingMenu(this);
+	UI::currentFocus = prevFocus;
+	if(UI::currentFocus) {
 		// HACK: Sometimes doesn't work on first focus, so we need to do this twice
-		currentFocus->Focus();
-		currentFocus->Focus();
+		UI::currentFocus->Focus();
+		UI::currentFocus->Focus();
 	}
 	rccb = nullptr;
 }
@@ -145,7 +145,7 @@ void Console::Hide() {
 void Console::BlankConsole() {
 	string conFileName = "file://" + File::GetFileSearchPath("ui/null.html");
 	wView->LoadURL(WebURL(WSLit(conFileName.c_str())));
-	wc->Update();
+	UI::wc->Update();
 }
 
 void Console::OnMethodCall(Awesomium::WebView* caller, unsigned int remote_caller_id, 
