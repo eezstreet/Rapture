@@ -6,7 +6,7 @@ gameImports_s* trap;
 
 static gameExports_s exportFns;
 static int iLoadingScreen = 0;
-static Image* ptLoadScreenImage = nullptr;
+static Texture* ptLoadScreenImage = nullptr;
 
 void Game_Init() {
 	trap->printf(PRIORITY_NOTE, "--- New Game ---\n");
@@ -92,6 +92,7 @@ void Game_OnKeyPress(int x) {
 }
 
 extern "C" {
+	// FIXME: not UNIX compatible!!
 	__declspec(dllexport) gameExports_s* GetRefAPI(gameImports_s* import) {
 		trap = import;
 

@@ -114,28 +114,28 @@ void Cmd_Zoneinfo_f(vector<string>& args) {
 
 void Cmd_Screenshot_f(vector<string>& args) {
 	if(args.size() >= 2) {
-		RenderCode::QueueScreenshot(args[1], ".bmp");
+		Video::QueueScreenshot(args[1].c_str(), ".bmp");
 	}
 	else {
-		RenderCode::QueueScreenshot("", ".bmp");
+		Video::QueueScreenshot("", ".bmp");
 	}
 }
 
 void Cmd_ScreenshotJPEG_f(vector<string>& args) {
 	if(args.size() >= 2) {
-		RenderCode::QueueScreenshot(args[1], ".jpg");
+		Video::QueueScreenshot(args[1].c_str(), ".jpg");
 	}
 	else {
-		RenderCode::QueueScreenshot("", ".jpg");
+		Video::QueueScreenshot("", ".jpg");
 	}
 }
 
 void Cmd_ScreenshotPCX_f(vector<string>& args) {
 	if(args.size() >= 2) {
-		RenderCode::QueueScreenshot(args[1], ".pcx");
+		Video::QueueScreenshot(args[1].c_str(), ".pcx");
 	}
 	else {
-		RenderCode::QueueScreenshot("", ".pcx");
+		Video::QueueScreenshot("", ".pcx");
 	}
 }
 
@@ -149,7 +149,7 @@ void Cmd_Echo_f(vector<string>& args) {
 }
 
 void Cmd_VidRestart_f(vector<string>& args) {
-	RenderCode::Restart();
+	Video::Restart();
 }
 
 extern bool bVMInputBlocked;

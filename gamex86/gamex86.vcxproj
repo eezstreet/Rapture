@@ -88,6 +88,8 @@
     <ClCompile Include="..\modcode\DungeonManager.cpp" />
     <ClCompile Include="..\modcode\entities\contain_chest.cpp" />
     <ClCompile Include="..\modcode\entities\info_player_start.cpp" />
+    <ClCompile Include="..\modcode\entities\level_ambient.cpp" />
+    <ClCompile Include="..\modcode\entities\level_light.cpp" />
     <ClCompile Include="..\modcode\entities\npc_test.cpp" />
     <ClCompile Include="..\modcode\Entity.cpp" />
     <ClCompile Include="..\modcode\Json.cpp" />
@@ -116,6 +118,8 @@
     <ClInclude Include="..\modcode\DungeonManager.h" />
     <ClInclude Include="..\modcode\entities\contain_chest.h" />
     <ClInclude Include="..\modcode\entities\info_player_start.h" />
+    <ClInclude Include="..\modcode\entities\level_ambient.h" />
+    <ClInclude Include="..\modcode\entities\level_light.h" />
     <ClInclude Include="..\modcode\entities\npc_test.h" />
     <ClInclude Include="..\modcode\Entity.h" />
     <ClInclude Include="..\modcode\Json.h" />

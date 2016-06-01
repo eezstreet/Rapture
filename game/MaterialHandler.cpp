@@ -1,4 +1,4 @@
-#include "tr_local.h"
+#include "sys_local.h"
 #include "../json/cJSON.h"
 
 MaterialHandler* mats = nullptr;
@@ -42,6 +42,15 @@ void MaterialHandler::LoadMaterial(const char* matfile) {
 		mat->bHasTransparencyMap = false;
 	} else {
 		strcpy(mat->transResourceFile, cJSON_ToString(child));
+		mat->bHasTransparencyMap = true;
+	}
+
+	child = cJSON_GetObjectItem(json, "depthMap");
+	if (!child) {
+		mat->bHasDepthMap = false;
+	}
+	else {
+		strcpy(mat->depthResourceFile, cJSON_ToString(child));
 		mat->bHasTransparencyMap = true;
 	}
 
@@ -123,4 +132,18 @@ Material* MaterialHandler::GetMaterial(const char* material) {
 		return nullptr;
 	}
 	return found->second;
+}
+
+Material* MaterialHandler::RegisterMaterial(const char* material) {
+	return mats->GetMaterial(material);
+}
+
+void MaterialHandler::InitMaterials() {
+	R_Message(PRIORITY_NOTE, "Initializing materials...\n");
+	mats = new MaterialHandler();
+}
+
+void MaterialHandler::ShutdownMaterials() {
+	R_Message(PRIORITY_NOTE, "Freeing materials...\n");
+	delete mats;
 }

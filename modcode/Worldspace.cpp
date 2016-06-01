@@ -7,7 +7,25 @@
 #define TILE_WIDTH		192.0f
 #define TILE_HEIGHT		96.0f
 
+struct RenderObject {
+	union {
+		Entity* entData;
+		TileNode* tileData;
+	};
+	float fDepthScore;
+	bool bIsTile;
+};
+
+struct VisInfo_t {
+	int x, y;
+	int whichVis;
+};
+
+static queue<TileNode*> mapTiles;
+static queue<Entity*> mapEnts;
 int visTouching = -1;
+static vector<VisInfo_t> vis;
+static vector<RenderObject> sortedObjects;	// Only static so we don't need to reallocate space every frame
 
 Worldspace::Worldspace() {
 	qtMapTree = new QuadTree<Map, int>(0, 0, MAX_WORLDSPACE_SIZE, MAX_WORLDSPACE_SIZE, 0, WORLDSPACE_LOG2, nullptr);
@@ -35,15 +53,6 @@ void Worldspace::SpawnEntity(Entity* ent, bool bShouldRender, bool bShouldThink,
 }
 
 void Worldspace::Render(Client* ptClient) {
-	struct RenderObject {
-		union {
-			Entity* entData;
-			TileNode* tileData;
-		};
-		float fDepthScore;
-		bool bIsTile;
-	};
-static vector<RenderObject> sortedObjects;	// Static so that we aren't allocating/freeing memory over and over
 	sortedObjects.clear();
 
 	Player* ptPlayer = ptClient->ptPlayer;
@@ -55,17 +64,15 @@ static vector<RenderObject> sortedObjects;	// Static so that we aren't allocatin
 		return;
 	}
 
-	// mega ultra hack
+	// Get all of the chunks that are within the screen space
 	float fBoundsX = Worldspace::ScreenSpaceToWorldPlaceX(-TILE_WIDTH, ptClient->screenWidth + TILE_WIDTH, ptClient->ptPlayer);
 	float fBoundsY = Worldspace::ScreenSpaceToWorldPlaceY(-TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer);
 	float fBoundsW = Worldspace::ScreenSpaceToWorldPlaceX(ptClient->screenWidth + TILE_WIDTH, -TILE_WIDTH, ptClient->ptPlayer) - fBoundsX;
 	float fBoundsH = Worldspace::ScreenSpaceToWorldPlaceY(ptClient->screenWidth + TILE_WIDTH, ptClient->screenHeight + TILE_WIDTH, ptClient->ptPlayer) - fBoundsY;
-static queue<TileNode*> mapTiles;
-static queue<Entity*> mapEnts;
 	theMap->qtTileTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapTiles);
 	theMap->qtEntTree.NodesIn(fBoundsX, fBoundsY, fBoundsW, fBoundsH, &mapEnts);
 
-	// Chuck entities into the list of stuff that needs sorted
+	// Calculate depthscore of entities
 	while(mapEnts.empty() == false) {
 		auto ent = mapEnts.front();
 		if(ent->bShouldWeRender != false) {
@@ -78,13 +85,11 @@ static queue<Entity*> mapEnts;
 		mapEnts.pop();
 	}
 
-	// Now chuck tiles into the pot too
-	struct VisInfo_t {
-		int x, y;
-		int whichVis;
-	};
-static vector<VisInfo_t> vis;
 	vis.clear();
+
+	// Do two things here:
+	// 1. Make note of any vis tiles that we find
+	// 2. Calculate the depthscore of each tile
 	while(mapTiles.empty() == false) {
 		TileNode* ptTile = mapTiles.front();
 		RenderObject obj;
@@ -107,13 +112,25 @@ static vector<VisInfo_t> vis;
 		mapTiles.pop();
 	}
 
-	// Now we need to sort the stuff that's being rendered.
+	// Sort objects by depth score
 	sort(sortedObjects.begin(), sortedObjects.end(), [](RenderObject a, RenderObject b) -> bool {
 		if(a.fDepthScore < b.fDepthScore) {
 			return true;
 		}
 		return false;
 	});
+
+	// Normalize the depth score. We want values between 0 and 1.0.
+	// Objects at index 0 always have the lowest depth score
+	// Objects at index (size-1) always have the highest depth score
+	if (sortedObjects.size() > 0) {
+		float low = sortedObjects[0].fDepthScore;
+		float high = sortedObjects[sortedObjects.size() - 1].fDepthScore;
+		for (auto it = sortedObjects.begin(); it != sortedObjects.end(); ++it) {
+			it->fDepthScore = (it->fDepthScore - low) / (high - low);
+		}
+	}
+
 
 	visTouching = -1;
 	bool bHaveWeRenderedPlayer = false;

@@ -5,10 +5,12 @@ using namespace Awesomium;
 
 #define NUM_UI_VISIBLE	8
 
+RightClickCallback rccb = nullptr;
+
 namespace UI {
 	static vector<Menu*> vmMenus;
 	static vector<WebView*> vDrawMenus;
-	static SDL_Texture* uiTextures[NUM_UI_VISIBLE];
+	static Texture* uiTextures[NUM_UI_VISIBLE];
 	static int lastActiveLayer;
 	WebView* currentFocus = nullptr;
 	WebCore* wc = nullptr;
@@ -29,118 +31,108 @@ namespace UI {
 
 	void PipeMouseMovementToWebView(WebView* wv, int x, int y);
 	void PipeMouseInputToWebView(WebView* wv, unsigned int buttonId, bool down);
-}
 
-bool IsConsoleOpen() {
-	return Console::GetSingleton()->IsOpen();
-}
+	/* UI Class */
+	void Initialize() {
+		R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
+		for (int i = 0; i < NUM_UI_VISIBLE; i++) {
+			uiTextures[i] = Video::RegisterBlankTexture(Video::GetWidth(), Video::GetHeight());
+		}
+		lastActiveLayer = 0;
 
-RightClickCallback rccb = nullptr;
+		WebPreferences pref;
+		pref.enable_web_audio = false;
+		pref.enable_web_gl = true;
+		pref.enable_web_security = false;
+		pref.enable_gpu_acceleration = true;
+		pref.allow_scripts_to_access_clipboard = true;
+		pref.allow_universal_access_from_file_url = true;
+		pref.allow_file_access_from_file_url = true;
 
-/* UI Class */
-void UI::Initialize() {
-	R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
-	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
-		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
-	}
-	lastActiveLayer = 0;
-
-	WebPreferences pref;
-	pref.enable_web_audio = false;
-	pref.enable_web_gl = true;
-	pref.enable_web_security = false;
-	pref.enable_gpu_acceleration = true;
-	pref.allow_scripts_to_access_clipboard = true;
-	pref.allow_universal_access_from_file_url = true;
-	pref.allow_file_access_from_file_url = true;
-
-	R_Message(PRIORITY_NOTE, "Initializing Awesomium Webcore\n");
-	WebConfig x;
-	x.log_level = Awesomium::kLogLevel_Verbose;
+		R_Message(PRIORITY_NOTE, "Initializing Awesomium Webcore\n");
+		WebConfig x;
+		x.log_level = Awesomium::kLogLevel_Verbose;
 #ifdef _DEBUG
-	// If you have installed the Awesomium SDK, you can use the inspector as long as you have inspector.pak in your Gamedata folder.
-	// This file has not been included on the repository as it isn't needed in most circumstances.
-	// To use it, simply connect to http://127.0.0.1:80 in a web browser while debugging in Visual Studio.
-	x.remote_debugging_port = 80;
+		// If you have installed the Awesomium SDK, you can use the inspector as long as you have inspector.pak in your Gamedata folder.
+		// This file has not been included on the repository as it isn't needed in most circumstances.
+		// To use it, simply connect to http://127.0.0.1:80 in a web browser while debugging in Visual Studio.
+		x.remote_debugging_port = 80;
 #endif
-	WebStringArray wsa = WebStringArray(1);
-	string option = "--allow-file-access-from-files";
-	wsa[0] = WSLit(option.c_str());
-	x.additional_options = wsa;
-	wc = WebCore::Initialize(x);
-	R_Message(PRIORITY_NOTE, "Creating web session\n");
-	sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), pref);
-	R_Message(PRIORITY_NOTE, "creating main menu webview\n");
-	MainMenu::GetSingleton();
-	R_Message(PRIORITY_NOTE, "CreateConsole()\n");
-	Console::GetSingleton();
-}
-
-void UI::Shutdown() {
-	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
-		SDL_DestroyTexture(uiTextures[i]);
+		WebStringArray wsa = WebStringArray(1);
+		string option = "--allow-file-access-from-files";
+		wsa[0] = WSLit(option.c_str());
+		x.additional_options = wsa;
+		wc = WebCore::Initialize(x);
+		R_Message(PRIORITY_NOTE, "Creating web session\n");
+		sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), pref);
+		R_Message(PRIORITY_NOTE, "creating main menu webview\n");
+		MainMenu::GetSingleton();
+		R_Message(PRIORITY_NOTE, "CreateConsole()\n");
+		Console::GetSingleton();
 	}
-	for(auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
-		Menu* vmMenu = (*it);
-		delete vmMenu;
+
+	void Shutdown() {
+		for (auto it = vmMenus.begin(); it != vmMenus.end(); ++it) {
+			Menu* vmMenu = (*it);
+			delete vmMenu;
+		}
+		vmMenus.clear();
+		Console::DestroySingleton();
+		WebCore::Shutdown();
 	}
-	vmMenus.clear();
-	Console::DestroySingleton();
-	WebCore::Shutdown();
-}
 
-void UI::Update() {
-	wc->Update();
-}
+	void Update() {
+		wc->Update();
+	}
 
-void UI::Restart() {
-	for(int i = 0; i < NUM_UI_VISIBLE; i++) {
+	void Restart() {
+		// FIXME
+		/*for(int i = 0; i < NUM_UI_VISIBLE; i++) {
 		SDL_DestroyTexture(uiTextures[i]);
 		uiTextures[i] = SDL_CreateTexture((SDL_Renderer*)RenderCode::GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-			CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+		CvarSystem::GetIntegerValue("r_width"), CvarSystem::GetIntegerValue("r_height"));
+		}*/
 	}
-}
 
-// This gets called every frame, to render all of the UI elements.
-void UI::Render() {
-	lastActiveLayer = 0;
-	for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it, lastActiveLayer++) {
-		WebView* wv = *it;
+	// This gets called every frame, to render all of the UI elements.
+	void Render() {
+		lastActiveLayer = 0;
+		for (auto it = vDrawMenus.begin(); it != vDrawMenus.end(); ++it, lastActiveLayer++) {
+			WebView* wv = *it;
 
-		// We can't draw more than a certain number of menus on the screen at once.
-		if (lastActiveLayer >= NUM_UI_VISIBLE) {
-			return;
-		}
-
-		BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
-		if (bmp == nullptr) {
-			// Sometimes (rarely) happens
-			continue;
-		}
-
-		SDL_Texture* tex = uiTextures[lastActiveLayer];
-		if (bmp->is_dirty()) {
-			// If it's not dirty then we don't need to re-render
-			unsigned char* pixels;
-			int pitch;
-			if (SDL_LockTexture(tex, nullptr, (void**)&pixels, &pitch) < 0) {
-				R_Message(PRIORITY_ERROR, "Failed to lock texture: %s\n", SDL_GetError());
+			// We can't draw more than a certain number of menus on the screen at once.
+			if (lastActiveLayer >= NUM_UI_VISIBLE) {
 				return;
 			}
-			bmp->CopyTo(pixels, pitch, 4, false, false);
-			SDL_UnlockTexture(tex);
-		}
-		RenderCode::BlendTexture((void*)tex);
-	}
-}
 
-void UI::RunJavaScript(Menu* ptMenu, const char* sJS) {
-	if(!ptMenu) {
-		return;
+			BitmapSurface* bmp = (BitmapSurface*)(wv->surface());
+			if (bmp == nullptr) {
+				// Sometimes (rarely) happens
+				continue;
+			}
+
+			Texture* tex = uiTextures[lastActiveLayer];
+			if (bmp->is_dirty()) {
+				// If it's not dirty then we don't need to re-render
+				unsigned char* pixels;
+				int pitch;
+				if (Video::LockStreamingTexture(tex, 0, 0, 0, 0, (void**)&pixels, &pitch) < 0) {
+					return;
+				}
+				bmp->CopyTo(pixels, pitch, 4, false, false);
+				Video::UnlockStreamingTexture(tex);
+			}
+			Video::BlendTexture(tex);
+		}
 	}
-	///R_Message(PRIORITY_DEBUG, "Executing JavaScript: %s\n", sJS);
-	ptMenu->RunJavaScript(sJS);
+
+	void RunJavaScript(Menu* ptMenu, const char* sJS) {
+		if (!ptMenu) {
+			return;
+		}
+		///R_Message(PRIORITY_DEBUG, "Executing JavaScript: %s\n", sJS);
+		ptMenu->RunJavaScript(sJS);
+	}
 }
 
 /* Input */
@@ -293,7 +285,7 @@ void InjectAKeyboardEvent(Awesomium::WebKeyboardEvent e) {
 	}
 }
 
-static int lastKeyboard = 0;
+static Uint32 lastKeyboard = 0;
 void UI::KeyboardEvent(SDL_Keysym keysym, bool bIsKeyDown, char* text) {
 	if(keysym.scancode == SDL_SCANCODE_GRAVE && lastKeyboard < SDL_GetTicks()-200) {
 		if(bIsKeyDown) {
@@ -471,4 +463,8 @@ double UI::GetJavaScriptDoubleArgument(Menu* ptMenu, unsigned int iArgNum) {
 
 bool UI::GetJavaScriptBoolArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return ptMenu->GetVMBoolArg(iArgNum);
+}
+
+bool IsConsoleOpen() {
+	return Console::GetSingleton()->IsOpen();
 }

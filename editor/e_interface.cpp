@@ -22,7 +22,7 @@ int WorldPlaceToScreenSpaceIY(int x, int y) {
 float CameraOffsetX() {
 	int screenWidth = 0;
 
-	trap->CvarIntVal("r_width", &screenWidth);
+	trap->CvarIntVal("vid_width", &screenWidth);
 
 	return (screenWidth / 2) - (96.0f * fCameraOffsetX) - (96.0f * fCameraOffsetY);
 }
@@ -30,7 +30,7 @@ float CameraOffsetX() {
 float CameraOffsetY() {
 	int screenHeight = 0;
 
-	trap->CvarIntVal("r_height", &screenHeight);
+	trap->CvarIntVal("vid_height", &screenHeight);
 
 	return (screenHeight / 2) - (48.0f * fCameraOffsetY) + (48.0f * fCameraOffsetX);
 }

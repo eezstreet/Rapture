@@ -101,6 +101,7 @@
     <ClCompile Include="..\game\CvarSystem.cpp" />
     <ClCompile Include="..\game\Dispatch.cpp" />
     <ClCompile Include="..\game\FileSystem.cpp" />
+    <ClCompile Include="..\game\Font.cpp" />
     <ClCompile Include="..\game\FontManager.cpp" />
     <ClCompile Include="..\game\FrameCapper.cpp" />
     <ClCompile Include="..\game\GameModule.cpp" />
@@ -115,6 +116,7 @@
     <ClCompile Include="..\game\Sequence.cpp" />
     <ClCompile Include="..\game\Cmd.cpp" />
     <ClCompile Include="..\game\RaptureGame.cpp" />
+    <ClCompile Include="..\game\Video.cpp" />
     <ClCompile Include="..\game\Win32.cpp" />
     <ClCompile Include="..\game\Timer.cpp" />
     <ClCompile Include="..\game\UI.cpp" />

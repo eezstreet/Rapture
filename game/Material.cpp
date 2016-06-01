@@ -1,15 +1,10 @@
-#include "tr_local.h"
+#include "sys_local.h"
 
 Material::Material() {
 	bLoadedResources = false;
 	bLoadedIncorrectly = false;
 	bHasTransparencyMap = false;
-}
-
-Material::~Material() {
-	if(bLoadedResources) {
-		FreeResources();
-	}
+	bHasDepthMap = false;
 }
 
 void Material::SendToRenderer(int x, int y) {
@@ -17,7 +12,7 @@ void Material::SendToRenderer(int x, int y) {
 		LoadResources();
 	}
 
-	RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+	Video::DrawImageAbs(ptResource, x + xOffset, y + yOffset, 0, 0);
 }
 
 void Material::SendToRendererTransparency(int x, int y) {
@@ -27,9 +22,9 @@ void Material::SendToRendererTransparency(int x, int y) {
 	}
 
 	if(bHasTransparencyMap) {
-		RenderCode::DrawImageAbs((Image*)ptTransResource, x + xOffset, y + yOffset);
+		Video::DrawImageAbs(ptTransResource, x + xOffset, y + yOffset, 0, 0);
 	} else {
-		RenderCode::DrawImageAbs((Image*)ptResource, x + xOffset, y + yOffset);
+		Video::DrawImageAbs(ptTransResource, x + xOffset, y + yOffset, 0, 0);
 	}
 }
 
@@ -39,8 +34,9 @@ void Material::LoadResources() {
 		return;
 	}
 	bLoadedResources = true;
+
 	// Load diffuse map
-	SDL_Surface* temp = IMG_Load(File::GetFileSearchPath(resourceFile).c_str());
+	Texture* temp = Video::RegisterTexture(resourceFile);
 	if(!temp) {
 		R_Message(PRIORITY_WARNING, "WARNING: %s: could not load diffuse map '%s'\n", name, resourceFile);
 		bLoadedResources = false;
@@ -48,28 +44,37 @@ void Material::LoadResources() {
 		return;
 	}
 	bLoadedIncorrectly = false;
-	ptResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-	SDL_SetTextureBlendMode(ptResource, SDL_BLENDMODE_BLEND);
-	SDL_FreeSurface(temp);
+	ptResource = temp;
 
 	if(bHasTransparencyMap) {
-		temp = IMG_Load(File::GetFileSearchPath(transResourceFile).c_str());
+		temp = Video::RegisterTexture(transResourceFile);
 		if(!temp) {
 			R_Message(PRIORITY_WARNING, "WARNING: %s: could not load trans map '%s'\n", name, transResourceFile);
 			bHasTransparencyMap = false;
 		} else {
-			ptTransResource = SDL_CreateTextureFromSurface((SDL_Renderer*)RenderCode::GetRenderer(), temp);
-			SDL_SetTextureBlendMode(ptTransResource, SDL_BLENDMODE_BLEND);
-			SDL_FreeSurface(temp);
+			ptTransResource = temp;
 		}
 	}
-}
 
-void Material::FreeResources() {
-	if(!bLoadedResources) {
-		return;
+	if (bHasDepthMap) {
+		temp = Video::RegisterTexture(depthResourceFile);
+		if (!temp) {
+			R_Message(PRIORITY_WARNING, "WARNING: %s: could not load depth map '%s'\n", name, depthResourceFile);
+			bHasDepthMap = false;
+		}
+		else {
+			ptDepthResource = temp;
+		}
 	}
-	SDL_DestroyTexture(ptResource);
-	bLoadedResources = false;
-	bLoadedIncorrectly = false;
+
+	if (bHasNormalMap) {
+		temp = Video::RegisterTexture(normlResourceFile);
+		if (!temp) {
+			R_Message(PRIORITY_WARNING, "WARNING: %s: could not load normal map '%s'\n", name, normlResourceFile);
+			bHasNormalMap = false;
+		}
+		else {
+			ptNormalResource = temp;
+		}
+	}
 }

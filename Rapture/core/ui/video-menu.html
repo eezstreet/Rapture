@@ -99,8 +99,8 @@
             function UpdateVideoDisplay() {
                 // Resolution
                 var videoSelected = "#res";
-                var videoWidth = window.top.GameManager.getCvarInteger("r_width");
-                var videoHeight = window.top.GameManager.getCvarInteger("r_height");
+                var videoWidth = window.top.GameManager.getCvarInteger("vid_width");
+                var videoHeight = window.top.GameManager.getCvarInteger("vid_height");
 
                 // Select the resolution...
                 selectedResolution = "res";
@@ -149,8 +149,8 @@
                 var resValues = resolution.split("x");
                 var resWidth = resValues[0];
                 var resHeight = resValues[1];
-                window.top.GameManager.setCvarInteger("r_width", parseInt(resWidth));
-                window.top.GameManager.setCvarInteger("r_height", parseInt(resHeight));
+                window.top.GameManager.setCvarInteger("vid_width", parseInt(resWidth));
+                window.top.GameManager.setCvarInteger("vid_height", parseInt(resHeight));
 
                 if ($("input:radio[name=video-fullscreen]")[0].checked) {
                     window.top.GameManager.setCvarBoolean("r_fullscreen", true);

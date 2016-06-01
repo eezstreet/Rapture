@@ -64,8 +64,11 @@ void Console::ReplaceConsoleContents() { // Gets called on opening console
 }
 
 Console::Console() {
+	int renderWidth = 0, renderHeight = 0;
+	bool bFullscreen = false;
 	bIsOpen = false;
-	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
+	Video::GetWindowInfo(&renderWidth, &renderHeight, &bFullscreen);
+	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
 	wView->SetTransparent(true);
 	BlankConsole();
 	while(wView->IsLoading())

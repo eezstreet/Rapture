@@ -290,3 +290,27 @@ string File::GetFileSearchPath(const string& fileName) {
 	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
 	return "";
 }
+
+static string path;
+char* File::GetFileSearchPathISO(const char* szPath) {
+	// Get a file's search path without opening the file itself.
+	// This is extremely handy in the case of Awesomium, where it handles files on its own.
+
+	// Trim off any leading (or trailing) whitespace
+	string fixedName = trim(szPath);
+	// Now make sure we start with a '/'
+	if (fixedName[0] != '/')
+		fixedName = '/' + fixedName;
+	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
+	for (auto it = fs->searchpaths.begin(); it != fs->searchpaths.end(); ++it) {
+		path = *it + fixedName;
+		FILE* f = fopen(path.c_str(), "r");
+		if (f) {
+			fclose(f);
+			reverse(fs->searchpaths.begin(), fs->searchpaths.end());
+			return (char*)path.c_str();
+		}
+	}
+	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
+	return "";
+}

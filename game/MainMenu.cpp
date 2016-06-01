@@ -5,9 +5,13 @@ using namespace Awesomium;
 MainMenu* MainMenu::singleton = nullptr;
 
 MainMenu::MainMenu() {
+	int renderWidth = 0, renderHeight = 0;
+	bool bFullscreen = false;
+	Video::GetWindowInfo(&renderWidth, &renderHeight, &bFullscreen);
+
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
 	string mainFileName = "file://" + File::GetFileSearchPath("ui/main.html");
-	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
+	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
 	// TODO: refactor all of this into a inherited func
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	while(wView->IsLoading())

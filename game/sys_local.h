@@ -186,6 +186,18 @@ public:
 	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, int startValue);
 	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, float startValue);
 	static Cvar* RegisterCvar(const char* sName, const char* sDesc, int iFlags, bool startValue);
+	static Cvar* RegisterStringVar(const char* sName, const char* sDesc, char* defaultValue, int iFlags) { 
+		return RegisterCvar(sName, sDesc, iFlags, defaultValue);
+	}
+	static Cvar* RegisterIntegerVar(const char* sName, const char* sDesc, int defaultValue, int iFlags) {
+		return RegisterCvar(sName, sDesc, iFlags, defaultValue);
+	}
+	static Cvar* RegisterFloatVar(const char* sName, const char* sDesc, float defaultValue, int iFlags) {
+		return RegisterCvar(sName, sDesc, iFlags, defaultValue);
+	}
+	static Cvar* RegisterBooleanVar(const char* sName, const char* sDesc, bool defaultValue, int iFlags) {
+		return RegisterCvar(sName, sDesc, iFlags, defaultValue);
+	}
 	static void CacheCvar(const string& sName, const string& sValue, bool bArchive = false);
 	static void Initialize();
 	static void Destroy();
@@ -203,6 +215,11 @@ public:
 	static int GetIntegerValue(const char* sName);
 	static float GetFloatValue(const char* sName);
 	static bool GetBooleanValue(const char* sName);
+
+	static char* GetStringValue(Cvar* pCvar) { return pCvar->String(); }
+	static int GetIntegerValue(Cvar* pCvar) { return pCvar->Integer(); }
+	static float GetFloatValue(Cvar* pCvar) { return pCvar->Value(); }
+	static bool GetBooleanValue(Cvar* pCvar) { return pCvar->Bool(); }
 
 	static bool CompareCvars(pair<string, Cvar*> pFirst, pair<string, Cvar*> pSecond);
 	static void ListCvars();
@@ -327,7 +344,9 @@ class File {
 	string searchpath;
 public:
 	static File* Open(const string &file, const string& mode);
+	static File* Open(const char* szFile, const char* szMode) { return Open(string(szFile), string(szMode)); }
 	void Close();
+	static void CloseFile(File* pFile) { pFile->Close(); }
 	string ReadPlaintext(size_t numchar = 0);
 	size_t ReadBinary(unsigned char* bytes, size_t numbytes, const bool bDontResetCursor);
 	wstring ReadUnicode(size_t numchars = 0);
@@ -336,9 +355,11 @@ public:
 	size_t WritePlaintext(const string& text) { return fwrite(text.c_str(), sizeof(char), text.length(), handle); }
 	size_t WriteUnicode(const wstring& text) { return fwrite(text.c_str(), sizeof(wchar_t), text.length(), handle); }
 	size_t WriteBinary(void* bytes, size_t numbytes) { return fwrite(bytes, sizeof(unsigned char), numbytes, handle); }
+	static void WriteFilePlaintext(File* pFile, const char* text) { pFile->WritePlaintext(text); }
 	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
 	size_t Tell() { return ftell(handle); }
 	static string GetFileSearchPath(const string& fileName);
+	static char* GetFileSearchPathISO(const char* fileName);
 	bool Exists(const string &file);
 friend class File;
 };
@@ -449,6 +470,8 @@ public:
 	FontManager();
 	~FontManager();
 
+	static TTF_Font* GetFontTTF(Font* ptFont);
+
 	Font* RegisterFont(const char* sFontFile, int iPointSize);
 };
 extern FontManager* FontMan;
@@ -524,16 +547,115 @@ public:
 
 void setGameQuitting(const bool b);
 
-
 //
-// sys_cmds.cpp
+// CmdSystem.cpp
 //
 
 void Sys_InitCommands();
 
+// AnimationHandler.cpp
+// Materials may or may not have an animation assigned to them.
+struct Sequence {
+	char name[64];
+	bool bLoop;
+	int rowNum;
+	int frameCount;
+	int fps;
+	bool bInitial;
+
+	void Parse(void* in);
+};
+
+struct SequenceData {
+	char startingSequence[64];
+	int rowheight;
+	int framesize;
+	int longestSequence;
+};
+
+class AnimationManager {
+private:
+	static unordered_map<string, AnimationManager*> mAnimInstances;
+	unordered_map<string, Sequence>* ptSequences;
+	int lastFrameTime;
+	SequenceData* ptSeqData;
+public:
+	static AnimationManager* GetAnimInstance(const char* sRef, const char* sMaterial);
+	static void SetAnimSequence(AnimationManager* ptAnims, const char* szSequence) { ptAnims->SetSequence(szSequence); }
+	static const char* GetAnimSequence(AnimationManager* ptAnims) { return ptAnims->GetCurrentSequence(); }
+	static bool AnimationFinished(AnimationManager* ptAnims) { return ptAnims->Finished(); }
+	static void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
+	static void KillAnimInstance(const char* sRef);
+	static void ShutdownAnims();
+	static void Animate();
+
+	string sCurrentSequence;
+	int iCurrentFrame;
+	AnimationManager(unordered_map<string, Sequence>* ptSequenceSet, SequenceData* ptSeqData);
+	void PushFrame();
+	void DrawActiveFrame(Texture* in, SDL_Rect* pos);
+	void DrawAnimated(Material* ptMaterial, int x, int y, bool bTransparentMap);
+	bool Finished();
+	void SetSequence(const char* sSequence);
+	const char* GetCurrentSequence();
+};
+
+
+// MaterialHandler.cpp
+// Anything that exists in the world uses a Material.
+// Images and the like do not use Materials since they do not exist in the world.
+class Material {
+private:
+	bool bLoadedResources;		// Have we loaded resources? (images, etc)
+	bool bLoadedIncorrectly;	// If we loaded, did we load correctly?
+	bool bHasTransparencyMap;	// Does it have a transparency map?
+	bool bHasDepthMap;			// Does it have a depth map?
+	bool bHasNormalMap;			// Does it have a normal map?
+	void LoadResources();
+
+	int xOffset, yOffset;
+
+	char name[64];
+	char resourceFile[64];
+	char transResourceFile[64];
+	char depthResourceFile[64];
+	char normlResourceFile[64];
+	Texture* ptResource;
+	Texture* ptTransResource;
+	Texture* ptDepthResource;
+	Texture* ptNormalResource;
+
+	int iNumSequences;
+	unordered_map<string, Sequence> mSequences;
+	SequenceData sd;
+public:
+	Material();
+	~Material();
+	void SendToRenderer(int x, int y);
+	void SendToRendererTransparency(int x, int y);
+	static void SendMaterialToRenderer(Material* mat, int x, int y) { if (mat) { mat->SendToRenderer(x, y); } }
+	static void SendTransMaterialToRenderer(Material* mat, int x, int y) { if (mat) { mat->SendToRendererTransparency(x, y); } }
+	friend class AnimationManager;
+	friend class MaterialHandler;
+};
+
+class MaterialHandler {
+private:
+	unordered_map<string, Material*> materials;
+	void LoadMaterial(const char* materialFile);
+public:
+	Material* GetMaterial(const char* material);
+	static Material* RegisterMaterial(const char* material);
+	static void InitMaterials();
+	static void ShutdownMaterials();
+	~MaterialHandler();
+	MaterialHandler();
+};
+
+extern MaterialHandler* mats;
 
 //
-// sys_<platform>.cpp
+// <Platform>.cpp
 //
 char* Sys_FS_GetHomepath();
 char* Sys_FS_GetBasepath();

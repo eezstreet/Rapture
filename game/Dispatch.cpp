@@ -169,9 +169,8 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 
 	if(iShutdownMask & (1 << iPriority) || iPriority == PRIORITY_ERRFATAL) {
 		// PRIORITY_ERRFATAL always shuts down the game
-		ptLogFile->Close();
+		// We might get multiple successive ERRFATALs in one frame, so we don't want to close the logfile just yet.
 		setGameQuitting(true);
-		ptLogFile = nullptr;
 	}
 }
 

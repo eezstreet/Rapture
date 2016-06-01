@@ -50,6 +50,7 @@ class Menu;
 class Material;
 class Cvar;
 class AnimationManager;
+class Texture;
 
 enum {
 	PRIORITY_NONE,
@@ -88,18 +89,18 @@ extern "C" {
 		size_t(*GetFileSize)(File* filehandle);
 
 		// Images
-		Image* (*RegisterImage)(const char* filename);
-		void(*DrawImage)(Image* image, float xPct, float yPct, float wPct, float hPct);
-		void(*DrawImageAbs)(Image* image, int x, int y, int w, int h);
-		void(*DrawImageAspectCorrection)(Image* image, float xPct, float yPct, float wPct, float hPct);
-		void(*DrawImageClipped)(Image* image, float sxPct, float syPct, float swPct, float shPct,
+		Texture* (*RegisterImage)(const char* filename);
+		void (*DrawImage)(Texture* image, float xPct, float yPct, float wPct, float hPct);
+		void (*DrawImageAbs)(Texture* image, int x, int y, int w, int h);
+		void (*DrawImageAspectCorrection)(Texture* image, float xPct, float yPct, float wPct, float hPct);
+		void (*DrawImageClipped)(Texture* image, float sxPct, float syPct, float swPct, float shPct,
 								float ixPct, float iyPct, float iwPct, float ihPct);
 
 		// Font/text
 		Font* (*RegisterFont)(const char* sFontFile, int iPointSize);
-		void(*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
-		void(*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-		void(*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
+		void (*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
+		void (*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
+		void (*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
 
 		// UI
 		Menu* (*RegisterStaticMenu)(const char* sMenuFile);

@@ -108,6 +108,12 @@
     <ClCompile Include="..\modcode\OptionList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\modcode\entities\level_ambient.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modcode\entities\level_light.cpp">
+      <Filter>Source Files\entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\json\cJSON.h">
@@ -211,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="..\modcode\OptionList.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\entities\level_ambient.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\modcode\entities\level_light.h">
+      <Filter>Header Files\entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

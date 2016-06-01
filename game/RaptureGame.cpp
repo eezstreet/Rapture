@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 	try {
 		sys = new RaptureGame(argc, argv);
 		FrameCapper fc;
-		while(!sys->bHasFinished) {
+		while(!sys->bHasFinished && !bStartupQuit) {
 			fc.StartFrame();
 			sys->RunLoop();
 			fc.EndFrame();
@@ -126,7 +126,10 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	// Init hunk memory
 
 	// Init the renderer
-	RenderCode::Initialize();
+	if (!Video::Init()) {
+		return;
+	}
+
 
 	// Init rand (cuz we will DEFINITELY need it ;D
 
@@ -150,11 +153,12 @@ RaptureGame::~RaptureGame() {
 
 	delete FontMan;
 	DeleteInput();
-	RenderCode::Exit();
+	AnimationManager::ShutdownAnims();
 	CvarSystem::Destroy();
 	delete ptDispatch;
 	FileSystem::Shutdown();
 	Zone::Shutdown();
+	Video::Shutdown();
 }
 
 /* Run every frame */
@@ -164,7 +168,8 @@ void RaptureGame::RunLoop() {
 	Input->InputFrame();
 	UI::Update();
 
-	RenderCode::BlankFrame();
+	Video::ClearFrame();
+	AnimationManager::Animate();
 
 	// Do gamecode
 	if(game || editor) {
@@ -173,7 +178,7 @@ void RaptureGame::RunLoop() {
 
 	// Do rendering
 	UI::Render();
-	RenderCode::Display();
+	Video::RenderFrame();
 }
 
 /* Deal with the commandline arguments */
@@ -209,16 +214,16 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->WriteFile = FileSystem::EXPORT_Write;
 	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
 	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
-	imp->RegisterImage = RenderCode::RegisterImage;
-	imp->DrawImage = RenderCode::DrawImage;
-	imp->DrawImageAbs = static_cast<void(*)(Image*, int, int, int, int)>(RenderCode::DrawImageAbs);
-	imp->DrawImageAspectCorrection = RenderCode::DrawImageAspectCorrection;
-	imp->DrawImageClipped = RenderCode::DrawImageClipped;
-	imp->InitMaterials = RenderCode::InitMaterials;
-	imp->ShutdownMaterials = RenderCode::ShutdownMaterials;
-	imp->RegisterMaterial = RenderCode::RegisterMaterial;
-	imp->RenderMaterial = RenderCode::SendMaterialToRenderer;
-	imp->RenderMaterialTrans = RenderCode::SendMaterialToRendererTrans;
+	imp->RegisterImage = Video::RegisterTexture;
+	imp->DrawImage = Video::DrawImage;
+	imp->DrawImageAbs = Video::DrawImageAbs;
+	imp->DrawImageAspectCorrection = Video::DrawImageAspectCorrection;
+	imp->DrawImageClipped = Video::DrawImageClipped;
+	imp->InitMaterials = MaterialHandler::InitMaterials;
+	imp->ShutdownMaterials = MaterialHandler::ShutdownMaterials;
+	imp->RegisterMaterial = MaterialHandler::RegisterMaterial;
+	imp->RenderMaterial = Material::SendMaterialToRenderer;
+	imp->RenderMaterialTrans = Material::SendTransMaterialToRenderer;
 	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
@@ -228,9 +233,9 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
 	imp->RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
 	imp->RegisterFont = Font::Register;
-	imp->RenderTextBlended = RenderCode::RenderTextBlended;
-	imp->RenderTextShaded = RenderCode::RenderTextShaded;
-	imp->RenderTextSolid = RenderCode::RenderTextSolid;
+	imp->RenderTextBlended = Video::RenderTextBlended;
+	imp->RenderTextShaded = Video::RenderTextShaded;
+	imp->RenderTextSolid = Video::RenderTextSolid;
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
 	imp->RunJavaScript = UI::RunJavaScript;
@@ -247,12 +252,12 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->Zone_FreeAll = Zone::VMFreeAll;
 	imp->Zone_NewTag = Zone::NewTag;
 	imp->Zone_Realloc = Zone::Realloc;
-	imp->FadeFromBlack = RenderCode::FadeFromBlack;
-	imp->AnimateMaterial = RenderCode::AnimateMaterial;
-	imp->GetAnimation = RenderCode::GetAnimation;
-	imp->AnimationFinished = RenderCode::AnimationFinished;
-	imp->SetAnimSequence = RenderCode::SetAnimSequence;
-	imp->GetAnimSequence = RenderCode::GetAnimSequence;
+	imp->FadeFromBlack = Video::FadeFromBlack;
+	imp->AnimateMaterial = AnimationManager::AnimateMaterial;
+	imp->GetAnimation = AnimationManager::GetAnimInstance;
+	imp->AnimationFinished = AnimationManager::AnimationFinished;
+	imp->SetAnimSequence = AnimationManager::SetAnimSequence;
+	imp->GetAnimSequence = AnimationManager::GetAnimSequence;
 }
 
 /* Started a new game (probably from the menu) */

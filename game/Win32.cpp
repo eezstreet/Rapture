@@ -141,7 +141,7 @@ void Sys_Error(const char* error, ...) {
 	R_Message(PRIORITY_ERRFATAL, text);
 	R_Message(PRIORITY_MESSAGE, "\n");
 
-	RenderCode::Exit(true);
+	Video::Shutdown();
 
 	setGameQuitting(false);
 	throw false;

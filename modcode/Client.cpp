@@ -26,8 +26,8 @@ Client::Client() {
 	trap->AddJSCallback(ptHUD, "undefineClickZone", Client::UndefineClickZone);
 	trap->AddJSCallback(ptHUD, "changedSelectedQuest", Client::ChangedQuestLogSelectedQuest);
 
-	trap->CvarIntVal("r_width", &screenWidth);
-	trap->CvarIntVal("r_height", &screenHeight);
+	trap->CvarIntVal("vid_width", &screenWidth);
+	trap->CvarIntVal("vid_height", &screenHeight);
 }
 
 Client::~Client() {

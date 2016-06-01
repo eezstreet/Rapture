@@ -166,9 +166,13 @@ Menu::Menu() {
 
 // ugly :s
 Menu::Menu(const char *menuName) {
+	int renderWidth = 0, renderHeight = 0;
+	bool bFullscreen = false;
+	Video::GetWindowInfo(&renderWidth, &renderHeight, &bFullscreen);
+
 	R_Message(PRIORITY_NOTE, "Loading %s\n", menuName);
 	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
-	wView = UI::wc->CreateWebView(r_width->Integer(), r_height->Integer(), UI::sess);
+	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
 	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
 	wView->SetTransparent(true);
 	while(wView->IsLoading())
