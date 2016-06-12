@@ -23,7 +23,11 @@ void FreeComponentView();
 void TextView();
 
 // view_preview.cpp
+void InitPreviewMenu();
 void PreView();
+void AlterPreviewImage(SDL_Surface* pImage);
+void ResetPreviewImage();
+
 
 // view_assetproperties.cpp
 void AssetPropertiesView();
@@ -53,6 +57,10 @@ public:
 };
 extern AssetFile* currentFile;
 
+// font.cpp
+void ImportFontFileTTF(uint8_t** fontData, uint64_t* decompressedSize, int ptSize, int index);
+void PreviewFont(uint8_t* fontData, uint64_t decompSize, int ptSize, int style, int face);
+
 
 // platform.cpp
 typedef enum {
@@ -66,3 +74,10 @@ typedef enum {
 void DisplayMessageBox(const char* title, const char* msg, int type);
 const char* OpenFileDialog(const char* filter, int flags);
 const char* SaveAsDialog(const char* filter, const char* extension);
+
+// spritesheet.cpp
+void ImportImage(uint32_t** pixels, uint32_t* width, uint32_t* height);
+void ImportRGBASprite(uint32_t** pixels, int numDirections, uint32_t* frameWidth, uint32_t* frameHeight, uint32_t* totalWidth, uint32_t* totalHeight);
+void ImportMonochromeSprite(uint16_t** pixels, int numDirections, uint32_t* frameWidth, uint32_t* frameHeight, uint32_t* totalWidth, uint32_t* totalHeight);
+void ExportRGBASprite(uint32_t* pixels, uint32_t width, uint32_t height);
+void ExportMonochromeSprite(uint16_t* pixels, uint32_t width, uint32_t height);

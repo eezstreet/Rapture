@@ -23,16 +23,16 @@ ComponentMaterial* LoadMaterialComponent(std::ifstream& infile, uint64_t decompS
 		}
 	}
 	if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
-		size_t normalSize = mat->head.width * mat->head.height * sizeof(uint32_t);
+		size_t normalSize = mat->head.normalWidth * mat->head.normalHeight * sizeof(uint32_t);
 		if (normalSize > 0) {
 			mat->normalPixels = (uint32_t*)malloc(normalSize);
 			infile.read((char*)mat->normalPixels, normalSize);
 		}
 	}
 	if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
-		size_t depthSize = mat->head.width * mat->head.height * sizeof(uint8_t);
+		size_t depthSize = mat->head.depthWidth * mat->head.depthHeight * sizeof(uint16_t);
 		if (depthSize > 0) {
-			mat->depthPixels = (uint8_t*)malloc(depthSize);
+			mat->depthPixels = (uint16_t*)malloc(depthSize);
 			infile.read((char*)mat->depthPixels, depthSize);
 		}
 	}
@@ -109,16 +109,25 @@ ComponentTile* LoadTileComponent(std::ifstream& infile, uint64_t decompSize) {
 void WriteMaterialComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
 	ComponentMaterial* mat = ptComponent->data.materialComponent;
 	if (mat != nullptr) {
-		size_t imageSize = mat->head.width * mat->head.height;
+		size_t imageSize;
 		outfile.write((const char*)&mat->head, sizeof(ComponentMaterial::MaterialHeader));
-		if (mat->head.mapsPresent & (1 << Maptype_Diffuse) && imageSize > 0) {
-			outfile.write((const char*)mat->diffusePixels, imageSize * sizeof(uint32_t));
+		if (mat->head.mapsPresent & (1 << Maptype_Diffuse)) {
+			imageSize = mat->head.width * mat->head.height * sizeof(uint32_t);
+			if (imageSize > 0) {
+				outfile.write((const char*)mat->diffusePixels, imageSize);
+			}
 		}
-		if (mat->head.mapsPresent & (1 << Maptype_Normal) && imageSize > 0) {
-			outfile.write((const char*)mat->normalPixels, imageSize * sizeof(uint32_t));
+		if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
+			imageSize = mat->head.normalWidth * mat->head.normalHeight * sizeof(uint32_t);
+			if (imageSize > 0) {
+				outfile.write((const char*)mat->normalPixels, imageSize);
+			}
 		}
-		if (mat->head.mapsPresent & (1 << Maptype_Depth) && imageSize > 0) {
-			outfile.write((const char*)mat->depthPixels, imageSize * sizeof(uint8_t));
+		if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
+			imageSize = mat->head.depthWidth * mat->head.depthHeight * sizeof(uint16_t);
+			if (imageSize > 0) {
+				outfile.write((const char*)mat->depthPixels, imageSize);
+			}
 		}
 	}
 }
@@ -189,7 +198,7 @@ AssetFile::AssetFile(const char* path) {
 	std::ifstream infile;
 
 	hasErrors = false;
-	infile.open(path);
+	infile.open(path, std::ios::binary);
 
 	infile.read((char*)&asset.head, sizeof(asset.head));
 	
@@ -311,7 +320,7 @@ AssetFile::AssetFile(const char* path) {
 
 void AssetFile::SaveFile(const char* destination) {
 	std::ofstream outfile;
-	outfile.open(destination);
+	outfile.open(destination, std::ios::binary);
 
 	outfile.write((const char*)&asset.head, sizeof(asset.head));
 
@@ -423,6 +432,7 @@ AssetFile::AssetFile(const char* name, const char* author, const char* dlc) {
 }
 
 AssetFile::~AssetFile() {
+	ResetPreviewImage();
 	for (auto it = decompressedAssets.begin(); it != decompressedAssets.end(); ++it) {
 		switch (it->meta.componentType) {
 			case Asset_Undefined:

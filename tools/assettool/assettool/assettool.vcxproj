@@ -39,7 +39,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\..\SDL\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>..\..\..\SDL\include;..\..\..\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -88,7 +88,9 @@
     <ClCompile Include="assettool.cpp" />
     <ClCompile Include="component.cpp" />
     <ClCompile Include="file.cpp" />
+    <ClCompile Include="font.cpp" />
     <ClCompile Include="imgui_impl_sdl.cpp" />
+    <ClCompile Include="spritesheet.cpp" />
     <ClCompile Include="view_assetproperties.cpp" />
     <ClCompile Include="view_component.cpp" />
     <ClCompile Include="view_preview.cpp" />

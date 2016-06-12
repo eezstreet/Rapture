@@ -83,5 +83,11 @@
     <ClCompile Include="windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="spritesheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -129,6 +129,10 @@ struct ComponentMaterial {
 		uint8_t				mapsPresent;					// A bitmask containing the maps that are present (diffuse, normal, ...)
 		uint32_t			width;							// Total width in pixels
 		uint32_t			height;							// Total height in pixels
+		uint32_t			depthWidth;						// Total width of depth map in pixels
+		uint32_t			depthHeight;					// Total height of depth map in pixels
+		uint32_t			normalWidth;					// Total width of normal map in pixels
+		uint32_t			normalHeight;					// Total height of normal map in pixels
 		uint32_t			xoffset;						// Number of pixels to offset by in the X axis when rendering
 		uint32_t			yoffset;						// Number of pixels to offset by in the y axis when rendering
 		uint8_t				numDirections;					// Number of directions this material has
@@ -139,7 +143,7 @@ struct ComponentMaterial {
 	MaterialHeader		head;
 	uint32_t*			diffusePixels;					// Pixels in the diffuse map
 	uint32_t*			normalPixels;					// Pixels in the normal map
-	uint8_t*			depthPixels;					// Pixels in the depth map
+	uint16_t*			depthPixels;					// Pixels in the depth map
 };
 
 /* Everything specific to Image components */

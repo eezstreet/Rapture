@@ -51,6 +51,12 @@ static bool newAssetFile = false;
 static bool openAssetFile = false;
 static bool closeAssetFile = false;
 static bool continueWithoutSaving = false;
+
+const char* dlc_packages[] = {
+	"FreeDLC",
+	"BaseGame",
+	"UserMod"
+};
 void MainView() {
 	bool about = false;
 	const char* file;
@@ -193,16 +199,15 @@ void MainView() {
 				componentViewVisible = true;
 			}
 		}
+		else {
+			openAssetFile = false;
+		}
 	}
 
 	if (ImGui::BeginPopupModal("New Asset File", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::InputText("Name of Asset File", nameBuffer, ASSET_NAMELEN);
 		ImGui::InputText("Author (your name)", authorBuffer, AUTHOR_NAMELEN);
-		const char* dlc_packages[] = {
-			"FreeDLC",
-			"BaseGame",
-			"UserMod"
-		};
+		
 		static int dlc_current = 1;
 		ImGui::ListBox("DLC", &dlc_current, dlc_packages, 3, 8);
 		
@@ -303,6 +308,8 @@ int main(int argc, char** argv) {
 	ImGui_ImplSdl_Init(window);
 
 	ImVec4 clear_color = ImColor(114, 144, 154);
+
+	InitPreviewMenu();
 
 	while (!done) {
 		SDL_Event event;
