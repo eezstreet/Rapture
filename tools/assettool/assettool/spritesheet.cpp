@@ -35,7 +35,7 @@ void ImportImage(uint32_t** pixels, uint32_t* width, uint32_t* height) {
 	}
 
 	size_t imgTotalSize = *width * *height * sizeof(uint32_t);
-	*pixels = (uint32_t*)malloc(*width * *height * imgTotalSize);
+	*pixels = (uint32_t*)malloc(imgTotalSize);
 	memcpy(*pixels, newSurf->pixels, imgTotalSize);
 
 	SDL_UnlockSurface(newSurf);

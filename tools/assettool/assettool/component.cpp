@@ -1,6 +1,7 @@
 #include "assettool.h"
 #include <SDL_ttf.h>
 #include <string>
+#include <fstream>
 
 const char* ComponentTypeToString(ComponentType t) {
 	switch (t) {
@@ -27,6 +28,56 @@ const char* ComponentTypeToString(ComponentType t) {
 static void DrawNumberedCheckbox(int number, uint32_t* field) {
 	std::string s = std::to_string(number + 1);
 	ImGui::CheckboxFlags(s.c_str(), (unsigned int*)field, (1 << number));
+}
+
+static void DrawDataComponent(void** component, uint64_t* decompressedSize) {
+	if (ImGui::Button("Import Data")) {
+		const char* path = OpenFileDialog("All Files\0*.*", 0);
+		if (path[0] == '\0') {
+			return;	// User canceled dialog box
+		}
+
+		std::ifstream infile(path, std::ios::binary);
+		if (infile.bad()) {
+			DisplayMessageBox("Import Error", "Couldn't import file (is it in use? no permission?", MESSAGEBOX_ERROR);
+			infile.close();
+			return;
+		}
+		std::streampos fileSize = infile.tellg();
+		infile.seekg(0, std::ios::end);
+		fileSize = infile.tellg() - fileSize;
+		infile.clear();
+		infile.seekg(0, std::ios::beg);
+
+		*decompressedSize = fileSize;
+		if (*component) {
+			free(*component);
+		}
+		*component = malloc(*decompressedSize);
+		infile.read((char*)*component, *decompressedSize);
+		infile.close();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Export Data")) {
+		if (*component == nullptr || *decompressedSize <= 0) {
+			DisplayMessageBox("No Data", "There's no data to export", MESSAGEBOX_INFO);
+			return;
+		}
+
+		const char* path = SaveAsDialog("All Files\0*.*", "");
+		if (path[0] == '\0') {
+			return;
+		}
+
+		std::ofstream outfile(path, std::ios::binary);
+		if (outfile.bad()) {
+			DisplayMessageBox("Export Error", "Couldn't export the data. Try running as administrator?", MESSAGEBOX_ERROR);
+			return;
+		}
+
+		outfile.write((char*)*component, *decompressedSize);
+		outfile.close();
+	}
 }
 
 char textureBuffer[32967];
@@ -317,13 +368,18 @@ void DrawComponentData(int currentSelectedComponent) {
 	ImGui::BeginGroup();
 	switch (comp.meta.componentType) {
 		case Asset_Undefined:
+			DrawDataComponent(&comp.data.undefinedComponent, &comp.meta.decompressedSize);
+			currentFile->decompressedAssets[currentSelectedComponent].data.undefinedComponent = comp.data.undefinedComponent;
+			break;
 		case Asset_Data:
-			// Don't draw anything at all in this panel
+			DrawDataComponent((void**)&comp.data.dataComponent, &comp.meta.decompressedSize);
+			currentFile->decompressedAssets[currentSelectedComponent].data.dataComponent = comp.data.dataComponent;
 			break;
 		case Asset_Font:
 			if (comp.data.fontComponent) {
 				DrawFontData(comp.data.fontComponent, &comp.meta.decompressedSize);
 			}
+			currentFile->decompressedAssets[currentSelectedComponent].data.fontComponent = comp.data.fontComponent;
 			break;
 		case Asset_Material:
 			if (comp.data.materialComponent) {
