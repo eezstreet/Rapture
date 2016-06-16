@@ -19,7 +19,10 @@ void ImportImage(uint32_t** pixels, uint32_t* width, uint32_t* height) {
 		return; // User canceled dialog box
 	}
 
-	SDL_Surface* newSurf = IMG_Load(path);
+	// The image is not always in RGBA format, big example is GIF (web color) or PNG (backwards)
+	SDL_Surface* imgSurf = IMG_Load(path);
+	SDL_Surface* newSurf = SDL_ConvertSurfaceFormat(imgSurf, SDL_PIXELFORMAT_RGBA8888, 0);
+
 	if (newSurf == nullptr) {
 		DisplayMessageBox("Error", "Could not open image file", MESSAGEBOX_ERROR);
 		return;
@@ -41,6 +44,7 @@ void ImportImage(uint32_t** pixels, uint32_t* width, uint32_t* height) {
 	SDL_UnlockSurface(newSurf);
 
 	SDL_FreeSurface(newSurf);
+	SDL_FreeSurface(imgSurf);
 }
 
 void ImportRGBASprite(uint32_t** pixels, int numDirections, uint32_t* frameWidth, uint32_t* frameHeight, uint32_t* totalWidth, uint32_t* totalHeight) {
