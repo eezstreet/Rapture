@@ -7,9 +7,9 @@ const char* ComponentTypeToString(ComponentType t) {
 	switch (t) {
 		default:
 		case Asset_Undefined:
-			return "Unknown Type";
+			return "Unspecified Type";
 		case Asset_Data:
-			return "Data";
+			return "Plaintext";
 		case Asset_Composition:
 			return "Composition";
 		case Asset_Font:
