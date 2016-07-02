@@ -18,15 +18,30 @@ Screenshot::Screenshot(const char* szName) {
 
 Screenshot::~Screenshot() {
 	// When the screenshot object dies, we write it to the disk. Clever, no?
-	File* f = trap->OpenFile(this->name, "wb+");
-	trap->WritePlaintext(f, "blah");
-	trap->CloseFile(f);
+	const char* mode = "wb+";
+	File* f = trap->OpenFileSync(this->name, mode);
 
-	// Now we want the full path
-	char* fullPath = trap->FileSearchPath(this->name);
-	SDL_SaveBMP(screenSurf, fullPath);
+	SDL_RWops* rw = SDL_AllocRW();
+	SDL_SaveBMP_RW(screenSurf, rw, 0);
+
+	// Figure out how big from the rwops
+	size_t fileSize;
+	SDL_RWseek(rw, 0, RW_SEEK_SET);	// Make sure that we start at the beginning
+	SDL_RWseek(rw, 0, RW_SEEK_END); 
+	fileSize = SDL_RWtell(rw);
+
+	void* mem = malloc(fileSize);
+	SDL_RWseek(rw, 0, RW_SEEK_SET);	// Reset again from the beginning
+	SDL_RWread(rw, mem, 1, fileSize);
+	SDL_RWclose(rw);
+	SDL_FreeRW(rw);
+
+	// Write using Rapture FIO
+	trap->WriteFileSync(f, mem, fileSize);
+	trap->CloseFileSync(f);
 
 	SDL_FreeSurface(screenSurf);
+	free(mem);
 }
 
 Screenshot::Screenshot(const Screenshot& other) {

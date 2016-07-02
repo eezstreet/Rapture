@@ -1,32 +1,32 @@
 #include "tr_local.h"
 
-Texture::Texture(const char* szTexture) : bValid(false) {
-	char* path = trap->FileSearchPath(szTexture);
-	if (strlen(path) <= 0) {
-		return;
+/* Class methods */
+Texture::Texture(const unsigned int nW, const unsigned int nH, uint32_t* pixels) : bValid(false) {
+	if (pixels != nullptr) {
+		// It's not a streaming texture
+		SDL_Surface* texSurf = SDL_CreateRGBSurfaceFrom(pixels, nW, nH, 32, nW * sizeof(*pixels),
+			0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+		ptTexture = SDL_CreateTextureFromSurface(renderer, texSurf);
+		SDL_FreeSurface(texSurf);
+		bValid = true;
 	}
-
-	SDL_Surface* temp = IMG_Load(path);
-	if (temp == nullptr) {
-		return;
+	else {
+		ptTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, nW, nH);
+		bValid = true;
 	}
-
-	SDL_Surface* temp2 = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA4444, 0);
-	ptTexture = SDL_CreateTextureFromSurface(renderer, temp2);
-
-	SDL_FreeSurface(temp);
-	SDL_FreeSurface(temp2);
-	bValid = true;
 }
 
-Texture::Texture(const unsigned int nW, const unsigned int nH) : bValid(false) {
-	ptTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, nW, nH);
+Texture::Texture(const unsigned int nW, const unsigned int nH, uint16_t* pixels) : bValid(false) {
+	// Never a streaming texture
+	SDL_Surface* texSurf = SDL_CreateRGBSurfaceFrom(pixels, nW, nH, 16, nW * sizeof(*pixels),
+		0xFFFF, 0xFFFF, 0xFFFF, 0x0000);
+	ptTexture = SDL_CreateTextureFromSurface(renderer, texSurf);
+	SDL_FreeSurface(texSurf);
 	bValid = true;
 }
 
 Texture::Texture(const Texture& other) {
 	this->ptTexture = other.ptTexture;
-	strcpy(this->name, other.name);
 }
 
 Texture::~Texture() {
@@ -148,60 +148,25 @@ void Texture::DrawAbsClipped(int sX, int sY, int sW, int sH, int iX, int iY, int
 	DrawImageClipped(&scnRect, &imgRect);
 }
 
-// Render Exports are really just wrappers for a lot of the texture functions
-Texture* RenderExport::RegisterTexture(const char* szTexture) {
-	return ptTexMan->RegisterTexture(szTexture);
+/* Static methods */
+Texture* Texture::RegisterStreamingTexture(const unsigned int nW, const unsigned int nH) {
+	return new Texture(nW, nH);
 }
 
-Texture* RenderExport::RegisterBlankTexture(const unsigned int nW, const unsigned int nH) {
-	return ptTexMan->RegisterTexture(new Texture(nW, nH));
-}
-
-int RenderExport::LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch) {
-	if (ptTexture != nullptr) {
-		return ptTexture->Lock(nX, nY, nW, nH, pixels, pitch);
+int Texture::LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch) {
+	if (ptTexture == nullptr) {
+		return -1;
 	}
-	return -1;
+	return ptTexture->Lock(nX, nY, nW, nH, pixels, pitch);
 }
 
-void RenderExport::UnlockStreamingTexture(Texture* ptTexture) {
-	if (ptTexture != nullptr) {
-		ptTexture->Unlock();
+void Texture::UnlockStreamingTexture(Texture* ptTexture) {
+	if (ptTexture == nullptr) {
+		return;
 	}
+	ptTexture->Unlock();
 }
 
-void RenderExport::BlendTexture(Texture* ptTexture) {
-	if (ptTexture != nullptr) {
-		ptTexture->Blend();
-	}
-}
-
-void RenderExport::DrawImageAbs(Texture* ptTexture, int nX, int nY, int nW, int nH) {
-	if (ptTexture != nullptr) {
-		ptTexture->DrawAbs(nX, nY, nW, nH);
-	}
-}
-
-void RenderExport::DrawImageAbsClipped(Texture* ptTexture, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH) {
-	if (ptTexture != nullptr) {
-		ptTexture->DrawAbsClipped(sX, sY, sW, sH, iX, iY, iW, iH);
-	}
-}
-
-void RenderExport::DrawImage(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct) {
-	if (ptTexture != nullptr) {
-		ptTexture->DrawImage(xPct, yPct, wPct, hPct);
-	}
-}
-
-void RenderExport::DrawImageAspectCorrection(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct) {
-	if (ptTexture != nullptr) {
-		ptTexture->DrawImageAspectCorrection(xPct, yPct, wPct, hPct);
-	}
-}
-
-void RenderExport::DrawImageClipped(Texture* ptTexture, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
-	if (ptTexture != nullptr) {
-		ptTexture->DrawImageClipped(sxPct, syPct, swPct, shPct, ixPct, iyPct, iwPct, ihPct);
-	}
+void Texture::DeleteStreamingTexture(Texture* ptTexture) {
+	delete ptTexture;
 }

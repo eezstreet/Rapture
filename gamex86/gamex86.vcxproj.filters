@@ -63,9 +63,6 @@
     <ClCompile Include="..\modcode\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\modcode\Json.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\modcode\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -163,9 +160,6 @@
     </ClInclude>
     <ClInclude Include="..\modcode\entities\info_player_start.h">
       <Filter>Header Files\entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\modcode\Json.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\modcode\Local.h">
       <Filter>Header Files</Filter>

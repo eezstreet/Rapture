@@ -27,7 +27,7 @@ Dispatch::~Dispatch() {
 	if (!ptLogFile) {
 		return;
 	}
-	ptLogFile->Close();
+	File::CloseSync(ptLogFile);
 	ptLogFile = nullptr;
 }
 
@@ -53,7 +53,7 @@ void Dispatch::Setup() {
 	time_t theTime = time(nullptr);
 
 	strftime(fileName, sizeof(fileName), "logs/rapturelog_%Y-%m-%d_%H-%M-%S.log", localtime(&theTime));
-	ptLogFile = File::Open(fileName, "wb+");
+	ptLogFile = File::OpenSync(fileName, "wb+");
 	if(!ptLogFile) {
 		return;
 	}
@@ -66,7 +66,7 @@ void Dispatch::Setup() {
 
 // This (dumbly-named) function closes the logfile.
 void Dispatch::CatchError() {
-	ptLogFile->Close();
+	File::CloseSync(ptLogFile);
 	ptLogFile = nullptr;
 }
 
@@ -135,7 +135,8 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 
 		// Now write to log
 		bLastHadNewline = bThisHasNewline;
-		ptLogFile->WritePlaintext(input.str());
+
+		File::WriteSync(ptLogFile, (void*)input.str().c_str(), input.str().length());
 	} else {
 		printf(message);
 	}

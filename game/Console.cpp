@@ -117,8 +117,7 @@ Console& Console::operator=(Console& other) {
 
 void Console::Show(){
 	bIsOpen = true;
-	string conFileName = "file://" + File::GetFileSearchPath("ui/console.html");
-	wView->LoadURL(WebURL(WSLit(conFileName.c_str())));
+	wView->LoadURL(WebURL(WSLit("asset://menus/console")));
 	UI::StartDrawingMenu(this);
 	prevFocus = UI::currentFocus;
 	UI::currentFocus = wView;
@@ -146,8 +145,7 @@ void Console::Hide() {
 }
 
 void Console::BlankConsole() {
-	string conFileName = "file://" + File::GetFileSearchPath("ui/null.html");
-	wView->LoadURL(WebURL(WSLit(conFileName.c_str())));
+	wView->LoadURL(WebURL(WSLit("asset://menus/null")));
 	UI::wc->Update();
 }
 

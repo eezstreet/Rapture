@@ -33,7 +33,7 @@ static void DisplayDataTop() {
 
 	ss << GetFileName();
 	ss << "            ";
-	trap->RenderTextShaded(ptSegoe, ss.str().c_str(), 0, 0, 0, 255, 255, 255);
+	//trap->RenderTextShaded(ptSegoe, ss.str().c_str(), 0, 0, 0, 255, 255, 255);
 }
 
 void DisplayData() {
@@ -41,5 +41,5 @@ void DisplayData() {
 }
 
 void InitDisplay() {
-	ptSegoe = trap->RegisterFont("fonts/segoeui.ttf", 14);
+	//ptSegoe = trap->RegisterFont("fonts/segoeui.ttf", 14);
 }

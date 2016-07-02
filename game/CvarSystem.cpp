@@ -188,9 +188,7 @@ void CvarSystem::Cache_Free(const string& sName) {
 
 // Creates the configuration file which is loaded later.
 void CvarSystem::ArchiveCvars() {
-	File* ff = File::Open("raptureconfig.cfg", "w");
-	if(!ff)
-		return; // also should not happen
+	File* ff = File::OpenSync("raptureconfig.cfg", "w");
 	for(auto it = cvars.begin(); it != cvars.end(); ++it) {
 		Cvar* cv = it->second;
 		if(cv->flags & (1 << CVAR_ARCHIVE)) {
@@ -198,7 +196,7 @@ void CvarSystem::ArchiveCvars() {
 			ss << "seta " << cv->name << " ";
 			switch(cv->type) {
 				case Cvar::CV_BOOLEAN:
-					ss << btoa(cv->b.currentVal);
+					ss << boolalpha << cv->b.currentVal;
 					break;
 				case Cvar::CV_FLOAT:
 					ss << cv->v.currentVal;
@@ -211,11 +209,10 @@ void CvarSystem::ArchiveCvars() {
 					break;
 			}
 			ss << ";\r\n";
-			ff->WritePlaintext(ss.str());
+			File::WriteSync(ff, (void*)ss.str().c_str(), ss.str().length());
 		}
 	}
-	ff->Close();
-	Zone::FastFree(ff, "files");
+	File::CloseSync(ff);
 }
 
 // Returns the string value of a Cvar.

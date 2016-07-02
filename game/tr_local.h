@@ -34,9 +34,6 @@ public:
 
 	void ClearFrame() { pExports->ClearFrame(); }
 	void RenderFrame() { pExports->DrawActiveFrame(); }
-
-	Texture* RegisterTexture(const char* szTextureName) { return pExports->RegisterTexture(szTextureName); }
-	Texture* RegisterBlankTexture(const unsigned int nW, const unsigned int nH) { return pExports->RegisterBlankTexture(nW, nH); }
 };
 
 void CreateConsole();

@@ -171,9 +171,8 @@ Menu::Menu(const char *menuName) {
 	Video::GetWindowInfo(&renderWidth, &renderHeight, &bFullscreen);
 
 	R_Message(PRIORITY_NOTE, "Loading %s\n", menuName);
-	string mainFileName = "file://" + File::GetFileSearchPath(menuName);
 	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
-	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
+	wView->LoadURL(WebURL(WSLit(menuName)));
 	wView->SetTransparent(true);
 	while(wView->IsLoading())
 		UI::wc->Update();

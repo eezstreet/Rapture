@@ -81,3 +81,6 @@ void ImportRGBASprite(uint32_t** pixels, int numDirections, uint32_t* frameWidth
 void ImportMonochromeSprite(uint16_t** pixels, int numDirections, uint32_t* frameWidth, uint32_t* frameHeight, uint32_t* totalWidth, uint32_t* totalHeight);
 void ExportRGBASprite(uint32_t* pixels, uint32_t width, uint32_t height);
 void ExportMonochromeSprite(uint16_t* pixels, uint32_t width, uint32_t height);
+
+// mime.cpp
+void TryGuessMimeType(char*& mimeType, const char* extension);

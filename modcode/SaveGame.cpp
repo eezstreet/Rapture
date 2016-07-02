@@ -15,7 +15,7 @@ SaveGame::SaveGame(const Server* ptServer, const Client* ptClient, const Player*
 		return; // TODO
 	}
 	// Save all files as "test.sav" for now.
-	File* ptFile = trap->OpenFile("save/test.sav", "wb");
+	File* ptFile = trap->OpenFileSync("save/test.sav", "wb");
 	if(ptFile == nullptr) {
 		R_Error("Couldn't open save file \"save/test.sav\"\n");
 		return;
@@ -63,6 +63,6 @@ SaveGame::SaveGame(const Server* ptServer, const Client* ptClient, const Player*
 	}
 
 	const char* sFileContents = cJSON_Stream_Finalize(ptStream);
-	trap->WriteFile(ptFile, sFileContents);
-	trap->CloseFile(ptFile);
+	trap->WriteFileSync(ptFile, (void*)sFileContents, strlen(sFileContents));
+	trap->CloseFileSync(ptFile);
 }

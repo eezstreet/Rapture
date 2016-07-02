@@ -155,16 +155,9 @@ namespace Video {
 		}
 	}
 
-	Texture* RegisterTexture(const char* szTexture) {
+	Texture* RegisterStreamingTexture(const unsigned int nW, const unsigned int nH) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			return pRenderer->RegisterTexture(szTexture);
-		}
-		return nullptr;
-	}
-
-	Texture* RegisterBlankTexture(const unsigned int nW, const unsigned int nH) {
-		if (pRenderer && pRenderer->AreExportsValid()) {
-			return pRenderer->RegisterBlankTexture(nW, nH);
+			return pRenderer->pExports->RegisterStreamingTexture(nW, nH);
 		}
 		return nullptr;
 	}
@@ -182,40 +175,47 @@ namespace Video {
 		}
 	}
 
-	void BlendTexture(Texture* ptTexture) {
+	void DeleteStreamingTexture(Texture* ptTexture) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->BlendTexture(ptTexture);
+			pRenderer->pExports->DeleteStreamingTexture(ptTexture);
 		}
 	}
 
 	// Texture Drawing
-	void DrawImage(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct) {
+	Material* RegisterMaterial(const char* szMaterial) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->DrawImage(ptTexture, xPct, yPct, wPct, hPct);
+			return pRenderer->pExports->RegisterMaterial(szMaterial);
+		}
+		return nullptr;
+	}
+
+	void DrawMaterial(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->DrawMaterial(ptMaterial, xPct, yPct, wPct, hPct);
 		}
 	}
 
-	void DrawImageAspectCorrection(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct) {
+	void DrawMaterialAspectCorrection(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->DrawImageAspectCorrection(ptTexture, xPct, yPct, wPct, hPct);
+			pRenderer->pExports->DrawMaterialAspectCorrection(ptMaterial, xPct, yPct, wPct, hPct);
 		}
 	}
 
-	void DrawImageClipped(Texture* ptTexture, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
+	void DrawMaterialClipped(Material* ptMaterial, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->DrawImageClipped(ptTexture, sxPct, syPct, swPct, shPct, ixPct, iyPct, iwPct, ihPct);
+			pRenderer->pExports->DrawMaterialClipped(ptMaterial, sxPct, syPct, swPct, shPct, ixPct, iyPct, iwPct, ihPct);
 		}
 	}
 
-	void DrawImageAbs(Texture* ptTexture, int nX, int nY, int nW, int nH) {
+	void DrawMaterialAbs(Material* ptMaterial, int nX, int nY, int nW, int nH) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->DrawImageAbs(ptTexture, nX, nY, nW, nH);
+			pRenderer->pExports->DrawMaterialAbs(ptMaterial, nX, nY, nW, nH);
 		}
 	}
 
-	void DrawImageAbsClipped(Texture* ptTexture, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH) {
+	void DrawMaterialAbsClipped(Material* ptMaterial, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->DrawImageAbsClipped(ptTexture, sX, sY, sW, sH, iX, iY, iW, iH);
+			pRenderer->pExports->DrawMaterialAbsClipped(ptMaterial, sX, sY, sW, sH, iX, iY, iW, iH);
 		}
 	}
 

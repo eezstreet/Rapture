@@ -13,6 +13,14 @@ namespace UI {
 
 	void StartDrawingMenu(Menu* menu);
 	void StopDrawingMenu(Menu* menu);
+
+	class UIDataSource : public Awesomium::DataSource {
+	public:
+		UIDataSource();
+		virtual ~UIDataSource();
+
+		virtual void OnRequest(int request_id, const Awesomium::WebString& path);
+	};
 };
 
 class Menu : public Awesomium::JSMethodHandler {

@@ -32,7 +32,7 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 		R_Message(PRIORITY_WARNING, "JSON_ParseFile: bad filename sent\n");
 		return false;
 	}
-	File* file = trap->OpenFile(filename, "rb");
+	File* file = trap->OpenFileSync(filename, "rb");
 	if(!file) {
 		R_Message(PRIORITY_WARNING, "JSON_ParseFile: could not open file %s\n", filename);
 		return false;
@@ -40,7 +40,7 @@ bool JSON_ParseFile(char *filename, const unordered_map<const char*, jsonParseFu
 	size_t numChars = trap->GetFileSize(file);
 	char* s = (char*)trap->Zone_Alloc(numChars * sizeof(char), "files");
 	trap->ReadPlaintext(file, numChars, s);
-	trap->CloseFile(file);
+	trap->CloseFileAsync(file, nullptr);
 
 	char error[1024] = {0};
 	cJSON* root = cJSON_ParsePooled(s, error, sizeof(error));

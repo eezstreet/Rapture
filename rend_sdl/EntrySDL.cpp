@@ -63,8 +63,6 @@ void RenderExport::Initialize() {
 	renderSurf = SDL_CreateRGBSurface(0, nWidth, nHeight, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	renderTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, nWidth, nHeight);
 
-	ptTexMan = new TextureManager();
-
 	fade.bShouldWeFade = false;
 
 	ptText = new TextManager();
@@ -77,7 +75,6 @@ void RenderExport::Initialize() {
 }
 
 void RenderExport::Shutdown() {
-	delete ptTexMan;
 	delete ptText;
 
 	SDL_DestroyTexture(renderTex);
@@ -167,17 +164,17 @@ extern "C" {
 		renderExport.ClearFrame = RenderExport::ClearFrame;
 		renderExport.DrawActiveFrame = RenderExport::DrawActiveFrame;
 
-		renderExport.RegisterTexture = RenderExport::RegisterTexture;
-		renderExport.RegisterBlankTexture = RenderExport::RegisterBlankTexture;
-		renderExport.LockStreamingTexture = RenderExport::LockStreamingTexture;
-		renderExport.UnlockStreamingTexture = RenderExport::UnlockStreamingTexture;
-		renderExport.BlendTexture = RenderExport::BlendTexture;
+		renderExport.RegisterMaterial = Material::Register;
+		renderExport.DrawMaterial = Material::DrawMaterial;
+		renderExport.DrawMaterialAspectCorrection = Material::DrawMaterialAspectCorrection;
+		renderExport.DrawMaterialClipped = Material::DrawMaterialClipped;
+		renderExport.DrawMaterialAbs = Material::DrawMaterialAbs;
+		renderExport.DrawMaterialAbsClipped = Material::DrawMaterialAbsClipped;
 
-		renderExport.DrawImage = RenderExport::DrawImage;
-		renderExport.DrawImageAspectCorrection = RenderExport::DrawImageAspectCorrection;
-		renderExport.DrawImageClipped = RenderExport::DrawImageClipped;
-		renderExport.DrawImageAbs = RenderExport::DrawImageAbs;
-		renderExport.DrawImageAbsClipped = RenderExport::DrawImageAbsClipped;
+		renderExport.RegisterStreamingTexture = Texture::RegisterStreamingTexture;
+		renderExport.LockStreamingTexture = Texture::LockStreamingTexture;
+		renderExport.UnlockStreamingTexture = Texture::UnlockStreamingTexture;
+		renderExport.DeleteStreamingTexture = Texture::DeleteStreamingTexture;
 
 		renderExport.QueueScreenshot = RenderExport::QueueScreenshot;
 

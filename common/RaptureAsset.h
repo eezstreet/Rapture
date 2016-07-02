@@ -54,7 +54,7 @@ v1 - Base type
 /* Forward Declarations */
 struct AssetHeader;
 struct AssetComponent;
-typedef char* ComponentData;
+struct ComponentData;
 struct ComponentMaterial;
 struct ComponentImage;
 struct ComponentFont;
@@ -115,6 +115,15 @@ struct AssetComponent {
 		ComponentComp*		compComponent;				// A component that contains an animation for a material
 		ComponentTile*		tileComponent;				// A component that contains data on a level tile
 	} data;
+};
+
+/* Everything specific to Data Components */
+struct ComponentData {
+	struct DataHeader {
+		char				mime[64];					// The MIME type of the data
+	};
+	DataHeader				head;
+	char*					data;
 };
 
 /* Everything specific to Material Components */

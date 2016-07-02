@@ -94,28 +94,26 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\game\AnimationManager.cpp" />
+    <ClCompile Include="..\game\AsyncTask.cpp" />
     <ClCompile Include="..\game\CmdSystem.cpp" />
     <ClCompile Include="..\game\Console.cpp" />
     <ClCompile Include="..\game\Cvar.cpp" />
     <ClCompile Include="..\game\CvarSystem.cpp" />
     <ClCompile Include="..\game\Dispatch.cpp" />
+    <ClCompile Include="..\game\File.cpp" />
     <ClCompile Include="..\game\FileSystem.cpp" />
-    <ClCompile Include="..\game\Font.cpp" />
-    <ClCompile Include="..\game\FontManager.cpp" />
     <ClCompile Include="..\game\FrameCapper.cpp" />
     <ClCompile Include="..\game\GameModule.cpp" />
     <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
-    <ClCompile Include="..\game\Material.cpp" />
-    <ClCompile Include="..\game\MaterialHandler.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
+    <ClCompile Include="..\game\Resource.cpp" />
     <ClCompile Include="..\game\Shared.cpp" />
-    <ClCompile Include="..\game\Sequence.cpp" />
     <ClCompile Include="..\game\Cmd.cpp" />
     <ClCompile Include="..\game\RaptureGame.cpp" />
+    <ClCompile Include="..\game\UIDataSource.cpp" />
     <ClCompile Include="..\game\Video.cpp" />
     <ClCompile Include="..\game\Win32.cpp" />
     <ClCompile Include="..\game\Timer.cpp" />
@@ -124,6 +122,7 @@
     <ClCompile Include="..\json\cJSON.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\RaptureAsset.h" />
     <ClInclude Include="..\game\sys_local.h" />
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\game\tr_local.h" />

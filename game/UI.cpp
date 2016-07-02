@@ -12,6 +12,7 @@ namespace UI {
 	static vector<WebView*> vDrawMenus;
 	static Texture* uiTextures[NUM_UI_VISIBLE];
 	static int lastActiveLayer;
+	static UIDataSource* src = nullptr;
 	WebView* currentFocus = nullptr;
 	WebCore* wc = nullptr;
 	WebSession* sess = nullptr;
@@ -36,9 +37,11 @@ namespace UI {
 	void Initialize() {
 		R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
 		for (int i = 0; i < NUM_UI_VISIBLE; i++) {
-			uiTextures[i] = Video::RegisterBlankTexture(Video::GetWidth(), Video::GetHeight());
+			uiTextures[i] = Video::RegisterStreamingTexture(Video::GetWidth(), Video::GetHeight());
 		}
 		lastActiveLayer = 0;
+
+		src = new UIDataSource();
 
 		WebPreferences pref;
 		pref.enable_web_audio = false;
@@ -65,6 +68,7 @@ namespace UI {
 		wc = WebCore::Initialize(x);
 		R_Message(PRIORITY_NOTE, "Creating web session\n");
 		sess = wc->CreateWebSession(WSLit((CvarSystem::GetStringValue("fs_homepath") + "/session/").c_str()), pref);
+		sess->AddDataSource(WSLit("Rapture"), src);
 		R_Message(PRIORITY_NOTE, "creating main menu webview\n");
 		MainMenu::GetSingleton();
 		R_Message(PRIORITY_NOTE, "CreateConsole()\n");
@@ -79,6 +83,8 @@ namespace UI {
 		vmMenus.clear();
 		Console::DestroySingleton();
 		WebCore::Shutdown();
+
+		delete src;
 	}
 
 	void Update() {
@@ -122,7 +128,7 @@ namespace UI {
 				bmp->CopyTo(pixels, pitch, 4, false, false);
 				Video::UnlockStreamingTexture(tex);
 			}
-			Video::BlendTexture(tex);
+			//Video::BlendTexture(tex);
 		}
 	}
 

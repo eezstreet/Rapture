@@ -64,20 +64,24 @@ void Cmd_Seta_f(vector<string>& args) {
 }
 
 void Cmd_Exec_f(vector<string>& args) {
+	// Callbacks aren't acceptable here, we need to run their logic in the same thread.
 	if(args.size() < 2) {
 		R_Message(PRIORITY_MESSAGE, "usage: exec <filename.cfg>\n");
 		return;
 	}
-	File* p = File::Open(args[1], "rb+");
-	if(p == nullptr) {
-		R_Message(PRIORITY_MESSAGE, "could not exec %s\n", args[1].c_str());
+
+	File* p = File::OpenSync(args[1].c_str());
+	if (p == nullptr) {
+		R_Message(PRIORITY_WARNING, "could not exec %s\n", args[1].c_str());
 		return;
 	}
-	R_Message(PRIORITY_NOTE, "executing %s\n", args[1].c_str());
-	string text = p->ReadPlaintext();
-	p->Close();
-	Zone::FastFree(p, "files");
+	R_Message(PRIORITY_MESSAGE, "executing %s\n", args[1].c_str());
 
+	char fileBuffer[32968];
+	File::ReadSync(p, fileBuffer, sizeof(fileBuffer));
+	File::CloseSync(p);
+	
+	string text = fileBuffer;
 	if(text.length() > 0) {
 		vector<string> lines;
 		split(text, ';', lines);

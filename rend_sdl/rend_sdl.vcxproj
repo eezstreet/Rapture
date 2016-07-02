@@ -75,10 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EntrySDL.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Screenshot.cpp" />
     <ClCompile Include="TextManager.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -44,7 +44,7 @@ void Player::think() {
 
 void Player::spawn() {
 	Worldspace* ptWorld = ptServer->ptDungeonManager->GetWorld(this->iAct);
-	materialHandle = trap->RegisterMaterial("TestCharacter");
+	//materialHandle = trap->RegisterMaterial("TestCharacter");
 	pX = x;
 	pY = y;
 	pathfinding = PATHFIND_NONE;	// FIXME
@@ -52,7 +52,7 @@ void Player::spawn() {
 }
 
 void Player::render() {
-	trap->RenderMaterial(materialHandle, (ptClient->screenWidth / 2) - 32, (ptClient->screenHeight / 2) - 64);
+	//trap->RenderMaterial(materialHandle, (ptClient->screenWidth / 2) - 32, (ptClient->screenHeight / 2) - 64);
 }
 
 void Player::interact(Entity* interacter) {

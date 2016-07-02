@@ -15,20 +15,6 @@ namespace RenderExport {
 	void ClearFrame();
 	void DrawActiveFrame();
 
-	// Texture Manipulation
-	Texture* RegisterTexture(const char* szTexture);
-	Texture* RegisterBlankTexture(const unsigned int nW, const unsigned int nH);
-	int LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
-	void UnlockStreamingTexture(Texture* ptTexture);
-	void BlendTexture(Texture* ptTexture);
-
-	// Texture Drawing
-	void DrawImageAbs(Texture* ptTexture, int nX, int nY, int nW, int nH);
-	void DrawImageAbsClipped(Texture* ptTexture, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
-	void DrawImage(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void DrawImageAspectCorrection(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void DrawImageClipped(Texture* ptTexture, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
-
 	// Screenshots
 	void QueueScreenshot(const char* szFileName, const char* szExtension);
 
@@ -45,6 +31,36 @@ namespace RenderExport {
 	void WindowHeightChanged(int newHeight);
 }
 
+class Material {
+private:
+	static unordered_map<string, Material*> umMaterials;
+	
+	ComponentMaterial::MaterialHeader matHeader;
+	Texture* diffuseTexture;
+	Texture* normalTexture;	// not used on SDL renderer?
+	Texture* depthTexture;	// not used on SDL renderer?
+
+	bool bValid;
+public:
+	Material(const char* szURI);
+	~Material();
+	Material(Material& other);
+	void Draw(float xPct, float yPct, float wPct, float hPct);
+	void DrawAspectCorrection(float xPct, float yPct, float wPct, float hPct);
+	void DrawClipped(float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+	void DrawAbs(int nX, int nY, int nW, int nH);
+	void DrawAbsClipped(int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+	bool Valid() { return bValid; }
+
+	static Material* Register(const char* szURI);
+	static void DrawMaterial(Material* pMat, float xPct, float yPct, float wPct, float hPct);
+	static void DrawMaterialAspectCorrection(Material* pMat, float xPct, float yPct, float wPct, float hPct);
+	static void DrawMaterialClipped(Material* pMat, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+	static void DrawMaterialAbs(Material* pMat, int nX, int nY, int nW, int nH);
+	static void DrawMaterialAbsClipped(Material* pMat, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+	static void KillAllMaterials();
+};
+
 class TextManager {
 private:
 	vector<SDL_Texture*> vTextFields;
@@ -60,28 +76,13 @@ public:
 };
 extern TextManager* ptText;
 
-class TextureManager {
-private:
-	unordered_map<string, Texture*> umTextureMap;
-	int nLastUnnamed = 0;
-public:
-	TextureManager();
-	~TextureManager();
-	TextureManager(const TextureManager& other);
-
-	Texture* RegisterTexture(const char* name);
-	Texture* RegisterTexture(Texture* newTexture);
-};
-extern TextureManager* ptTexMan;
-
 class Texture {
 private:
 	SDL_Texture* ptTexture;
-	char name[64];
 	bool bValid;
 public:
-	Texture(const char* name);
-	Texture(const unsigned int nW, const unsigned nH);
+	Texture(const unsigned int nW, const unsigned int nH, uint32_t* pixels = nullptr);
+	Texture(const unsigned int nW, const unsigned int nH, uint16_t* pixels);
 	Texture(const Texture& other);
 	~Texture();
 
@@ -98,7 +99,11 @@ public:
 	void DrawImageClipped(SDL_Rect* spos, SDL_Rect* ipos);
 	void DrawAbs(int nX, int nY, int nW, int nH);
 	void DrawAbsClipped(int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
-friend class TextureManager;
+
+	static Texture* RegisterStreamingTexture(const unsigned int nW, const unsigned int nH);
+	static int LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
+	static void UnlockStreamingTexture(Texture* ptTexture);
+	static void DeleteStreamingTexture(Texture* pTexture);
 };
 
 struct Screenshot {

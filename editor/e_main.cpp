@@ -14,8 +14,6 @@ void Editor_Load() {
 	InitFPS();
 	InitDisplay();
 
-	trap->InitMaterials();
-
 	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame?", 0, 1);
 
 	eCurMode = EMODE_TILES;
@@ -31,7 +29,6 @@ void Editor_Init() {
 void Editor_Shutdown() {
 	trap->printf(PRIORITY_NOTE, "--- Editor Exit ---\n");
 	trap->KillStaticMenu(hotkeyDisplay);
-	trap->ShutdownMaterials();
 }
 
 void Editor_Frame() {

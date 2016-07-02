@@ -5,7 +5,7 @@
 #include "NPC.h"
 
 Client::Client() {
-	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 18);
+//	ptConsolasFont = trap->RegisterFont("fonts/consola.ttf", 18);
 	framecount = 0;
 	framelast = 0;
 	frametime = 0;
@@ -101,7 +101,7 @@ void Client::DrawViewportInfo() {
 		ss << "Y      ";
 	}
 	if(ss.str().length() > 0) {
-		trap->RenderTextShaded(ptConsolasFont, ss.str().c_str(), 255, 255, 255, 127, 127, 127);
+//		trap->RenderTextShaded(ptConsolasFont, ss.str().c_str(), 255, 255, 255, 127, 127, 127);
 	}
 }
 

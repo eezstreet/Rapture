@@ -28,18 +28,6 @@ bool contain_chest::mouseover() {
 void contain_chest::render() {
 	int renderPosX = Entity::GetDrawX(this);
 	int renderPosY = Entity::GetDrawY(this);
-
-	if(bIsOpen) {
-		if(!stricmp(trap->GetAnimSequence(ptAnims), "operate")) {
-			if(trap->AnimationFinished(ptAnims)) {
-				trap->SetAnimSequence(ptAnims, "end");
-			}
-		} else if(stricmp(trap->GetAnimSequence(ptAnims), "end")) {
-			trap->SetAnimSequence(ptAnims, "operate");
-		}
-	}
-
-	trap->AnimateMaterial(ptAnims, materialHandle, renderPosX + 41, renderPosY + 45, false);
 }
 
 void contain_chest::interact(Entity* interacter) { 
@@ -70,9 +58,6 @@ Entity* contain_chest::spawnme(float x, float y, int spawnflags, int act) {
 	ent->spawnflags = spawnflags;
 	ent->uuid = genuuid();
 	ent->classname = "contain_chest";
-
-	ent->materialHandle = trap->RegisterMaterial("test-chest");
-	ent->ptAnims = trap->GetAnimation(ent->uuid.c_str(), "test-chest");
 
 	ent->bShouldWeCollide = true;	// We can't collide with a chest once it's open, though.
 	ent->bShouldWeRender = true;

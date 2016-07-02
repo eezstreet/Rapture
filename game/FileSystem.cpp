@@ -1,316 +1,445 @@
 #include "sys_local.h"
+#include <thread>
+#include <vector>
+#include <concurrentqueue.h>
 
-FileSystem::FileSystem() {}
-FileSystem::~FileSystem() {
-	Zone::FreeAll("files");
-	files.clear();
-}
+MutexVariable<unordered_map<string, RaptureAsset*>> m_openedAssets;
 
-Cvar* fs_core;
-Cvar* fs_homepath;
-Cvar* fs_modlist;
-Cvar* fs_basepath;
+namespace Filesystem {
+	/* Cvars */
+	Cvar* fs_core = nullptr;
+	Cvar* fs_homepath = nullptr;
+	Cvar* fs_basepath = nullptr;
+	Cvar* fs_game = nullptr;
 
-static FileSystem* fs;
+	Cvar* fs_multithreaded = nullptr;
+	Cvar* fs_threads = nullptr;
 
-void FileSystem::Init() {
-	R_Message(PRIORITY_MESSAGE, "fs_init\n");
-	fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; contains all essential game data.", (1 << CVAR_ROM), "core");
-	fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "homepath", (1 << CVAR_ROM), Sys_FS_GetBasepath());
-	fs_modlist = CvarSystem::RegisterCvar("fs_modlist", "List of active mods", (1 << CVAR_ROM), "");
-	fs_basepath = CvarSystem::RegisterCvar("fs_basepath", "Directory to gamedata", (1 << CVAR_ROM), Sys_FS_GetBasepath());
+	/* Parallelism */
+	using namespace moodycamel;
+	ConcurrentQueue<AsyncFileTask> qFileTasks;
+	ConcurrentQueue<AsyncResourceTask> qResourceTasks;
+	MutexVariable<vector<File*>> vOpenFiles;
+	vector<thread*> vWorkerThreads;
+	bool thread_die = false;
+	
+	/* Resolution */
+	unordered_map<string, string> m_assetList;
 
-	fs = new FileSystem();
-	// the order of these searchpaths matters!
-	// These were originally reversed, but reading is done more often than writing, and it resulted in a lot of reversing
-	// I figured this would be a nice little optimization
-	fs->CreateModSearchPaths(fs_basepath->String(), fs_modlist->String());
-	fs->AddCoreSearchPath(fs_basepath->String(), fs_core->String());
-	fs->AddSearchPath(fs_basepath->String());
-	fs->AddSearchPath(fs_homepath->String());
-	fs->PrintSearchPaths();
-}
-
-void FileSystem::Shutdown() {
-	delete fs;
-}
-
-void FileSystem::CreateModSearchPaths(const string& basepath, const string& modlist) {
-	if(modlist.length() < 1) {
-		return; // blank modlist
-	}
-	vector<string> mods;
-	split(modlist, ';', mods);
-	for(auto it = mods.begin(); it != mods.end(); ++it) {
-		fs->AddCoreSearchPath(fs_basepath->String(), *it);
-	}
-}
-
-void FileSystem::PrintSearchPaths() {
-	R_Message(PRIORITY_NOTE, "All search paths:\n");
-	for_each(searchpaths.begin(), searchpaths.end(), [](string& s) {
-		R_Message(PRIORITY_NOTE, "%s\n", s.c_str());
-	});
-}
-
-// Make sure to free mem after this call!
-char** FileSystem::ListFiles(const string& dir, const char* extension, int* iNumFiles) {
-	DIR* xdir;
-	struct dirent *ent;
-	string fixedDir;
-	vector<string> fileNames;
-
-	if(!iNumFiles) {
-		return nullptr;
-	}
-	*iNumFiles = 0;
-	if(strlen(extension) <= 0) {
-		return nullptr;
-	}
-
-	if(dir.back() == '\\' || dir.back() == '/') {
-		fixedDir = dir;
-	} else {
-		fixedDir = dir + '/';
-	}
-	auto x = fs->GetSearchPaths();
-	for(auto it = x.begin(); it != x.end(); ++it) {
-		string compString = *it + '/' + dir; // hm, this'll be searchpath + search dir
-		if((xdir = opendir(compString.c_str())) != nullptr) {
-			// loop through all files
-			while(1) {
-				ent = readdir(xdir);
-				if(ent == nullptr) {
+	vector<string> vSearchPaths;
+	
+	/* What each worker thread is running */
+	void worker_thread() {
+		while (!thread_die) {
+			// Do a file task and then a resource task each step
+			AsyncFileTask FTask;
+			if (qFileTasks.try_dequeue(FTask)) {
+				switch (FTask.type) {
+				case AsyncFileTask::Task_Open:
+					FTask.pFile->DequeOpen((fileOpenedCallback)FTask.callback);
+					break;
+				case AsyncFileTask::Task_Close:
+					FTask.pFile->DequeClose((fileClosedCallback)FTask.callback);
+					break;
+				case AsyncFileTask::Task_Read:
+					FTask.pFile->DequeRead(FTask.data, FTask.dataSize, (fileReadCallback)FTask.callback);
+					break;
+				case AsyncFileTask::Task_Write:
+					FTask.pFile->DequeRead(FTask.data, FTask.dataSize, (fileWrittenCallback)FTask.callback);
 					break;
 				}
-				if(!checkExtension(ent->d_name, extension)) {
-					continue;
-				}
-				stringstream fName;
-				fName << fixedDir << ent->d_name;
-				fName << '\0';
-				fileNames.push_back(fName.str());
-				(*iNumFiles)++;
 			}
-			closedir(xdir);
+			
+			AsyncResourceTask RTask;
+			if (qResourceTasks.try_dequeue(RTask)) {
+				switch (RTask.type) {
+					case AsyncResourceTask::Task_Request:
+						RTask.pResource->DequeRetrieve((assetRequestCallback)RTask.callback);
+						break;
+				}
+			}
 		}
 	}
 
-	if(*iNumFiles == 0) {
+	/* Create the thread pool */
+	void InitThreadPool(int numThreads) {
+		// Make sure we have a valid multithreading value
+		if (!fs_multithreaded->Bool()) {
+			return;
+		}
+		if (numThreads <= 0) {
+			fs_multithreaded->SetValue(false);
+			return;
+		}
+
+		// Create threadpool
+		for (int i = 0; i < numThreads; i++) {
+			thread* workerThread = new thread(worker_thread);
+			vWorkerThreads.push_back(workerThread);
+		}
+	}
+
+	/* Shutdown the thread pool */
+	void ShutdownThreadPool() {
+		if (!fs_multithreaded->Bool()) {
+			return;
+		}
+
+		// Kill all the threads once their tasks are done
+		thread_die = true;
+		
+		// Additionally, close any open file handles
+		vector<File*> vOpenFiles_ = vOpenFiles.GetVar();
+		size_t numOpen = vOpenFiles_.size();
+		if (numOpen) {
+			R_Message(PRIORITY_WARNING, "%i unclosed file handles", numOpen);
+		}
+
+		for (auto it = vOpenFiles_.begin(); it != vOpenFiles_.end(); ++it) {
+			QueueFileClose(*it, nullptr);
+		}
+		vOpenFiles.Descope();
+
+		// Wait for all of the threads to die
+		for (auto it = vWorkerThreads.begin(); it != vWorkerThreads.end(); ++it) {
+			(*it)->join();
+		}
+		vWorkerThreads.clear();
+	}
+
+	/* Resize the thread pool (done via cvar callback) */
+	void ResizeThreadPool(int newValue) {
+		ShutdownThreadPool();
+		InitThreadPool(newValue);
+	}
+
+	/* Create a list of asset files and list their absolute path */
+	void CreateAssetList() {
+		DIR* dir;
+		dirent* ent;
+		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			string path = *it + "/";
+			if ((dir = opendir(path.c_str())) != nullptr) {
+				while ((ent = readdir(dir)) != nullptr) {
+					FILE* fp = fopen(ent->d_name, "rb+");
+					if (fp == nullptr) {
+						continue;
+					}
+					char buffer[4] = { 0 };
+					fread(buffer, 1, 4, fp);
+					if (buffer[0] == 'R' && buffer[1] == 'A'
+						&& buffer[2] == 'S' && buffer[3] == 'S') {
+						AssetHeader head;
+						fseek(fp, 0, SEEK_SET);
+						fread(&head, sizeof(head), 1, fp);
+						m_assetList[head.assetName] = string(ent->d_name);
+					}
+					fclose(fp);
+				}
+				closedir(dir);
+			}
+		}
+	}
+
+	/* Init the filesystem */
+	void Init() {
+		Zone::NewTag("files");
+
+		// Initialize cvars and parallelism
+		fs_core = CvarSystem::RegisterCvar("fs_core", "Core directory; this gets loaded as a last resort.", (1 << CVAR_ROM), "core");
+		fs_homepath = CvarSystem::RegisterCvar("fs_homepath", "User homepath directory to write logs, screenshots, etc.", (1 << CVAR_ROM), Sys_FS_GetBasepath() /*Sys_FS_GetHomepath()*/);
+		fs_basepath = CvarSystem::RegisterCvar("fs_basepath", "Directory to gamedata", (1 << CVAR_ROM), Sys_FS_GetBasepath());
+		fs_game = CvarSystem::RegisterCvar("fs_game", "Which mod to use (core is still loaded)", (1 << CVAR_ROM), "");
+		fs_multithreaded = CvarSystem::RegisterCvar("fs_multithreaded", "Whether to use a multithreaded filesystem", (1 << CVAR_ROM), true);
+		fs_threads = CvarSystem::RegisterCvar("fs_threads", "How many threads to use. 2 is best for most systems; 4 is best for RAID or SSD drives.", 0, 2);
+
+		fs_threads->AddCallback(ResizeThreadPool);
+
+		InitThreadPool(fs_threads->Integer());
+
+		// Initialize searchpaths
+		vSearchPaths.push_back(string(fs_basepath->String()) + "/" + string(fs_core->String()));
+		vSearchPaths.push_back(string(fs_basepath->String()) + "/" + string(fs_game->String()));
+		vSearchPaths.push_back(string(fs_homepath->String()) + "/" + string(fs_core->String()));
+		vSearchPaths.push_back(string(fs_homepath->String()) + "/" + string(fs_game->String()));
+		// FIXME: probably include working directory as a searchpath, but that's what fs_basepath defaults to
+
+		R_Message(PRIORITY_MESSAGE, "Searchpaths:\n");
+		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			R_Message(PRIORITY_MESSAGE, "%s\n", it->c_str());
+		}
+
+		// Construct list of assets
+		CreateAssetList();
+		R_Message(PRIORITY_MESSAGE, "Assets:\n");
+		for (auto it = m_assetList.begin(); it != m_assetList.end(); ++it) {
+			R_Message(PRIORITY_MESSAGE, "%s: %s\n", it->first.c_str(), it->second.c_str());
+		}
+	}
+
+	/* Shutdown the filesystem */
+	void Exit() {
+		Zone::FreeAll("files");
+
+		ShutdownThreadPool();
+	}
+
+	/* Loads up a RaptureAsset and stores it in zone memory */
+	/* TODO: move to hunk */
+	void LoadRaptureAsset(RaptureAsset** ptAsset, const string& assetName) {
+		RaptureAsset* pAsset = *ptAsset;
+		auto assetPath = m_assetList[assetName];
+		FILE* fp = fopen(assetPath.c_str(), "rb+");
+		if (fp == nullptr) {
+			R_Message(PRIORITY_ERRFATAL, "Could not load asset %s - try running as administrator\n", assetName.c_str());
+			return;
+		}
+		fread(pAsset, sizeof(AssetHeader), 1, fp);
+
+		if (pAsset->head.version != RASS_VERSION) {
+			R_Message(PRIORITY_WARNING, "Asset file with bad version (found %i, expected %i)\n", pAsset->head.version, RASS_VERSION);
+			fclose(fp);
+			return;
+		}
+
+		// TODO: compression
+		if (pAsset->head.compressionType != Compression_None) {
+			R_Message(PRIORITY_WARNING, "Compression not supported (found in asset %s)\n", pAsset->head.assetName);
+			fclose(fp);
+			return;
+		}
+
+		// TODO: DLC check
+
+		pAsset->components = (AssetComponent*)Zone::Alloc(sizeof(AssetComponent), "files");
+		for (int i = 0; i < pAsset->head.numberComponents; i++) {
+			AssetComponent* comp = &pAsset->components[i];
+			fread(&comp->meta, sizeof(comp->meta), 1, fp);
+
+			switch (comp->meta.componentType) {
+				case Asset_Undefined:
+					comp->data.undefinedComponent = Zone::Alloc(comp->meta.decompressedSize, "files");
+					fread(comp->data.undefinedComponent, 1, comp->meta.decompressedSize, fp);
+					break;
+				case Asset_Data:
+					if (comp->meta.componentVersion == COMP_DATA_VERSION) {
+						comp->data.dataComponent = (ComponentData*)Zone::Alloc(sizeof(ComponentData), "files");
+						fread(comp->data.dataComponent, sizeof(ComponentData::DataHeader), 1, fp);
+						ComponentData* data = comp->data.dataComponent;
+						data->data = (char*)Zone::Alloc(comp->meta.decompressedSize, "files");
+						fread(data->data, sizeof(char), comp->meta.decompressedSize, fp);
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Data component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_DATA_VERSION);
+					}
+					break;
+				case Asset_Material:
+					if (comp->meta.componentVersion == COMP_MATERIAL_VERSION) {
+						comp->data.materialComponent = (ComponentMaterial*)Zone::Alloc(sizeof(ComponentMaterial), "files");
+						fread(comp->data.materialComponent, sizeof(ComponentMaterial::MaterialHeader), 1, fp);
+						ComponentMaterial* mat = comp->data.materialComponent;
+						if (mat->head.mapsPresent & (1 << Maptype_Diffuse)) {
+							size_t diffuseSize = sizeof(uint32_t) * mat->head.width * mat->head.height;
+							mat->diffusePixels = (uint32_t*)Zone::Alloc(diffuseSize, "materials");
+							fread(mat->diffusePixels, sizeof(uint32_t), mat->head.width * mat->head.height, fp);
+						}
+						if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
+							size_t depthSize = sizeof(uint16_t) * mat->head.depthWidth * mat->head.depthHeight;
+							mat->depthPixels = (uint16_t*)Zone::Alloc(depthSize, "materials");
+							fread(mat->depthPixels, sizeof(uint16_t), mat->head.depthWidth * mat->head.depthHeight, fp);
+						}
+						if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
+							size_t normalSize = sizeof(uint32_t) * mat->head.normalWidth * mat->head.normalHeight;
+							mat->normalPixels = (uint32_t*)Zone::Alloc(normalSize, "materials");
+							fread(mat->normalPixels, sizeof(uint32_t), mat->head.normalWidth * mat->head.normalHeight, fp);
+						}
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Material component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_MATERIAL_VERSION);
+					}
+					break;
+				case Asset_Image:
+					if (comp->meta.componentVersion == COMP_IMAGE_VERSION) {
+						comp->data.imageComponent = (ComponentImage*)Zone::Alloc(sizeof(ComponentImage), "files");
+						fread(comp->data.imageComponent, sizeof(ComponentImage::ImageHeader), 1, fp);
+						size_t pixelSize = sizeof(uint32_t) * comp->data.imageComponent->head.width * comp->data.imageComponent->head.height;
+						comp->data.imageComponent->pixels = (uint32_t*)Zone::Alloc(pixelSize, "images");
+						fread(comp->data.imageComponent->pixels, pixelSize, 1, fp);
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Image component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_IMAGE_VERSION);
+					}
+					break;
+				case Asset_Font:
+					if (comp->meta.componentVersion == COMP_FONT_VERSION) {
+						comp->data.fontComponent = (ComponentFont*)Zone::Alloc(sizeof(ComponentFont), "files");
+						fread(comp->data.fontComponent, sizeof(ComponentFont::FontHeader), 1, fp);
+						comp->data.fontComponent->fontData = (uint8_t*)Zone::Alloc(comp->meta.decompressedSize, "font");
+						fread(comp->data.fontComponent->fontData, 1, comp->meta.decompressedSize, fp);
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Font component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_FONT_VERSION);
+					}
+					break;
+				case Asset_Level:
+					if (comp->meta.componentVersion == COMP_LEVEL_VERSION) {
+						comp->data.levelComponent = (ComponentLevel*)Zone::Alloc(sizeof(ComponentLevel), "files");
+						fread(comp->data.levelComponent, sizeof(ComponentLevel::LevelHeader), 1, fp);
+						comp->data.levelComponent->tiles = (ComponentLevel::TileEntry*)Zone::Alloc(sizeof(ComponentLevel::TileEntry), "files");
+						fread(comp->data.levelComponent->tiles, sizeof(ComponentLevel::TileEntry), comp->data.levelComponent->head.numTiles, fp);
+						comp->data.levelComponent->ents = (ComponentLevel::EntityEntry*)Zone::Alloc(sizeof(ComponentLevel::EntityEntry), "files");
+						fread(comp->data.levelComponent->ents, sizeof(ComponentLevel::EntityEntry), comp->data.levelComponent->head.numEntities, fp);
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Level component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_LEVEL_VERSION);
+					}
+					break;
+				case Asset_Composition:
+					if (comp->meta.componentVersion == COMP_ANIM_VERSION) {
+						return; // not complete in RAT
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Comp component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_ANIM_VERSION);
+					}
+					break;
+				case Asset_Tile:
+					if (comp->meta.componentVersion == COMP_TILE_VERSION) {
+						comp->data.tileComponent = (ComponentTile*)Zone::Alloc(sizeof(ComponentTile), "files");
+						fread(comp->data.tileComponent, sizeof(ComponentTile), 1, fp);
+					}
+					else {
+						R_Message(PRIORITY_WARNING, "Tile component '%s' in %s has invalid version (expected %i, found %i)\n",
+							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_TILE_VERSION);
+					}
+					break;
+			}
+		}
+	}
+
+	/* Find a component residing within an asset file */
+	AssetComponent* FindComponentByName(RaptureAsset* pAsset, const char* compName) {
+		int i;
+		if (pAsset == nullptr) {
+			return nullptr;
+		}
+		
+		for (i = 0; i < pAsset->head.numberComponents; i++) {
+			AssetComponent* assetComp = &pAsset->components[i];
+			if (!stricmp(assetComp->meta.componentName, compName)) {
+				return assetComp;
+			}
+		}
 		return nullptr;
 	}
 
-	char** ptStrList = (char**)Zone::Alloc(sizeof(char*) * (*iNumFiles), Zone::TAG_FILES);
-	int i = 0;
-	for(auto it = fileNames.begin(); it != fileNames.end(); ++it) {
-		ptStrList[i] = (char*)Zone::Alloc(it->length(), Zone::TAG_FILES);
-		strcpy(ptStrList[i], it->c_str());
-		i++;
-	}
-	return ptStrList;
-}
-
-void FileSystem::FreeFileList(char** ptFileList, int iNumItems) {
-	if(ptFileList == nullptr) {
-		return;
-	}
-	for(int i = 0; i < iNumItems; i++) {
-		Zone::FastFree(ptFileList[i], "files");
-	}
-	Zone::FastFree(ptFileList, "files");
-}
-
-void FileSystem::RecursivelyTouch(const string& path) {
-	size_t lastPos = 0;
-	size_t nextSlash = 0;
-	while((nextSlash = path.find_first_of('/', lastPos)) != path.npos) {
-		const string s = path.substr(0, nextSlash+1);
-		Sys_FS_MakeDirectory(s.c_str());
-		lastPos = nextSlash+1;
-	}
-}
-
-File* FileSystem::EXPORT_OpenFile(const char* filename, const char* mode) {
-	return File::Open(filename, mode);
-}
-
-void FileSystem::EXPORT_Close(File* filehandle) {
-	filehandle->Close();
-}
-
-char** FileSystem::EXPORT_ListFilesInDir(const char* filename, const char* ext, int *iNumFiles) {
-	return fs->ListFiles(filename, ext, iNumFiles);
-}
-
-size_t FileSystem::EXPORT_ReadPlaintext(File* f, size_t numChars, char* chars) {
-	return f->ReadBinary((unsigned char*)chars, numChars, true);
-}
-
-size_t FileSystem::EXPORT_ReadBinary(File* f, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {
-	return f->ReadBinary(bytes, numBytes, bDontResetCursor);
-}
-
-size_t FileSystem::EXPORT_GetFileSize(File* f) {
-	return f->GetSize();
-}
-
-size_t FileSystem::EXPORT_Write(File* f, const char* text) {
-	return f->WritePlaintext(text);
-}
-
-File* File::Open(const string& fileName, const string& mode) {
-	// Trim off any leading (or trailing) whitespace
-	string fixedName = trim(fileName);
-	// Replace all instances of \\ with / (Windows fix)
-	stringreplace(fixedName, "\\", "/");
-	// Now make sure we start with a '/'
-	if(fixedName[0] != '/') {
-		fixedName = '/' + fixedName;
-	}
-
-	// If a file has been opened before, we can open it again using the same search path as we did previously.
-	bool bWeAreReading = false;
-	if(mode.find('w') == string::npos && mode.find('a') == string::npos) {
-		// We don't do this when writing (because we always write to homepath)
-		auto it = fs->files.find(fixedName);
-		bWeAreReading = true;
-		if(it != fs->files.end()) {
-			string path = it->second->searchpath + fixedName;
-			if(it->second->handle) return nullptr;
-			it->second->handle = fopen(path.c_str(), mode.c_str());
-			return it->second;
+	/* These two resolution functions are used by other processes */
+	string ResolveFilePath(const string& file, const string& mode) {
+		if (mode.find('w') != mode.npos) {
+			// Written file path, so just append the filename to homepath
+			string s = fs_homepath->String();
+			s += file;
+			return s;
 		}
-	}
-
-	// If we are writing, we need to reverse the searchpath list (so we write to homepath first)
-	vector<string> searchpaths = fs->GetSearchPaths();
-	if(!bWeAreReading) {
-		reverse(searchpaths.begin(), searchpaths.end());
-	}
-
-	for(auto it = searchpaths.begin(); it != searchpaths.end(); ++it) {
-		// if file found in this search path, good to go
-		string path = *it + fixedName;
-		if(!bWeAreReading) {
-			// If we are writing, make sure that the folder exists
-			fs->RecursivelyTouch(path);
+		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			string fullPath = (*it) + '/' + file;
+			FILE* fp = fopen(fullPath.c_str(), "rb+");
+			if (fp != nullptr) {
+				fclose(fp);
+				return fullPath;
+			}
 		}
-		FILE* file = fopen(path.c_str(), mode.c_str());
-		if(file) {
-			File *F = (File*)Zone::New<File>(Zone::TAG_FILES);
-			F->searchpath = *it;
-			F->handle = file;
-			fs->files[fixedName] = F;
-			return F;
-		}
-	}
-
-	return nullptr;
-}
-
-void File::Close() {
-	if(!handle) { return; }
-	fflush(handle);
-	fclose(handle);
-	handle = nullptr;
-}
-
-string File::ReadPlaintext(size_t numChars) {
-	if(!handle) { return ""; }
-	if(numChars == 0) { // reset the cursor to beginning of file and read whole thing
-		fseek(handle, 0L, SEEK_SET);
-		numChars = GetSize();
-	}
-	if(numChars == 0) { // blank!
 		return "";
 	}
-	char* buf = (char*)Zone::Alloc(sizeof(char)*numChars+1, Zone::TAG_FILES);
-	fread(buf, sizeof(char), numChars, handle);
-	buf[numChars] = '\0';
-	string retval = buf;
-	Zone::FastFree(buf, "files");
-	return retval;
-}
 
-size_t File::ReadBinary(unsigned char* bytes, size_t numBytes, const bool bDontResetCursor) {
-	if(!handle) return 0;
-	if(numBytes == 0 && !bDontResetCursor) { // reset cursor to beginning of file and read whole thing
-		fseek(handle, 0L, SEEK_SET);
-		numBytes = GetSize()/sizeof(unsigned char);
-	} else if(numBytes == 0) { // DONT reset cursor, but read the whole thing
-		int s = ftell(handle);
-		fseek(handle, 0L, SEEK_SET);
-		size_t totalChars = GetSize();
-		fseek(handle, s, SEEK_SET);
-		numBytes = totalChars - s;
+	string ResolveAssetPath(const string& assetName_) {
+		string assetName = assetName_;
+		transform(assetName.begin(), assetName.end(), assetName.begin(), ::tolower);
+
+		auto it = m_assetList.find(assetName);
+		if (it == m_assetList.end()) {
+			R_Message(PRIORITY_WARNING, "Couldn't find asset with name '%s'\n", assetName_.c_str());
+			return "";
+		}
+		return it->second;
 	}
-	return fread(bytes, sizeof(unsigned char), numBytes, handle);
-}
 
-wstring File::ReadUnicode(size_t numChars) {
-	if(!handle) return L"";
-	if(numChars == 0) { // reset cursor to beginning of file and read whole string
-		fseek(handle, 0L, SEEK_SET);
-		numChars = GetSize()/sizeof(wchar_t);
+	const char* ResolveFilePath(const char* file, const char* mode) {
+		return ResolveFilePath(string(file), string(mode)).c_str();
 	}
-	wchar_t *buf = (wchar_t*)Zone::Alloc(sizeof(wchar_t)*numChars, Zone::TAG_FILES);
-	fread(buf, sizeof(wchar_t), numChars, handle);
-	wstring retval = buf;
-	Zone::FastFree(buf, "files");
-	return retval;
-}
 
-size_t File::GetSize() {
-	size_t currentPos = ftell(handle);
-	fseek(handle, 0L, SEEK_END);
-	size_t size = ftell(handle);
-	fseek(handle, currentPos, SEEK_SET);
-	return size;
-}
+	const char* ResolveAssetPath(const char* assetName) {
+		return ResolveAssetPath(string(assetName)).c_str();
+	}
 
-string File::GetFileSearchPath(const string& fileName) {
-	// Get a file's search path without opening the file itself.
-	// This is extremely handy in the case of Awesomium, where it handles files on its own.
-
-	// Trim off any leading (or trailing) whitespace
-	string fixedName = trim(fileName);
-	// Now make sure we start with a '/'
-	if(fixedName[0] != '/')
-		fixedName = '/' + fixedName;
-	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-	for(auto it = fs->searchpaths.begin(); it != fs->searchpaths.end(); ++it) {
-		string path = *it + fixedName;
-		FILE* f = fopen(path.c_str(), "r");
-		if(f) {
-			fclose(f);
-			reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-			return path;
+	/* Queue up different commands */
+	void QueueFileOpen(File* pFile, fileOpenedCallback callback) {
+		if (pFile == nullptr) {
+			return;
+		}
+		if (fs_multithreaded->Bool()) {
+			AsyncFileTask task = { AsyncFileTask::Task_Open, pFile, callback };
+			qFileTasks.enqueue(task);
+		}
+		else {
+			pFile->DequeOpen(callback);
 		}
 	}
-	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-	return "";
-}
 
-static string path;
-char* File::GetFileSearchPathISO(const char* szPath) {
-	// Get a file's search path without opening the file itself.
-	// This is extremely handy in the case of Awesomium, where it handles files on its own.
-
-	// Trim off any leading (or trailing) whitespace
-	string fixedName = trim(szPath);
-	// Now make sure we start with a '/'
-	if (fixedName[0] != '/')
-		fixedName = '/' + fixedName;
-	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-	for (auto it = fs->searchpaths.begin(); it != fs->searchpaths.end(); ++it) {
-		path = *it + fixedName;
-		FILE* f = fopen(path.c_str(), "r");
-		if (f) {
-			fclose(f);
-			reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-			return (char*)path.c_str();
+	void QueueFileRead(File* pFile, void* data, size_t dataSize, fileReadCallback callback) {
+		if (pFile == nullptr) {
+			return;
+		}
+		if (fs_multithreaded->Bool()) {
+			AsyncFileTask task = { AsyncFileTask::Task_Read, pFile, callback, data, dataSize };
+			qFileTasks.enqueue(task);
+		}
+		else {
+			pFile->DequeRead(data, dataSize, callback);
 		}
 	}
-	reverse(fs->searchpaths.begin(), fs->searchpaths.end());
-	return "";
+
+	void QueueFileWrite(File* pFile, void* data, size_t dataSize, fileWrittenCallback callback) {
+		if (pFile == nullptr) {
+			return;
+		}
+		if (fs_multithreaded->Bool()) {
+			AsyncFileTask task = { AsyncFileTask::Task_Write, pFile, callback, data, dataSize };
+			qFileTasks.enqueue(task);
+		}
+		else {
+			pFile->DequeWrite(data, dataSize, callback);
+		}
+	}
+
+	void QueueFileClose(File* pFile, fileClosedCallback callback) {
+		if (pFile == nullptr) {
+			return;
+		}
+		if (fs_multithreaded->Bool()) {
+			AsyncFileTask task = { AsyncFileTask::Task_Close, pFile, callback };
+			qFileTasks.enqueue(task);
+		}
+		else {
+			pFile->DequeClose(callback);
+		}
+	}
+
+	void QueueResource(Resource* pRes, assetRequestCallback callback) {
+		if (pRes == nullptr) {
+			return;
+		}
+		if (fs_multithreaded->Bool()) {
+			AsyncResourceTask task = { AsyncResourceTask::Task_Request, pRes, callback };
+			qResourceTasks.enqueue(task);
+		}
+		else {
+			pRes->DequeRetrieve(callback);
+		}
+	}
 }

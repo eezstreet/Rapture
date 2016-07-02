@@ -15,6 +15,7 @@ BobaFett (cJSON)
 Awesomium LLC
 SDL Community
 imgui (used in the asset tool)
+github/cameron314 (concurrentqueue)
 
 Snippets:
 LazyFoo'

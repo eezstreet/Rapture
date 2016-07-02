@@ -150,7 +150,7 @@ void Worldspace::Render(Client* ptClient) {
 						&& halfWidth < renderX + tile->ptTile->iAutoTransX + tile->ptTile->iAutoTransW
 						&& halfHeight > renderY + tile->ptTile->iAutoTransY
 						&& halfHeight < renderY + tile->ptTile->iAutoTransY + tile->ptTile->iAutoTransH) {
-							trap->RenderMaterialTrans(tile->ptTile->materialHandle, renderX, renderY);
+						// trap->RenderMaterialTrans(tile->ptTile->materialHandle, renderX, renderY);
 							continue;
 					}
 				}
@@ -171,7 +171,7 @@ void Worldspace::Render(Client* ptClient) {
 								}
 								ptClient->bShouldDrawLabels = true;
 								visTouching = it->whichVis;
-								trap->RenderMaterial(tile->ptTile->ptiWarp->ptHighMaterial, renderX, renderY);
+								//trap->RenderMaterial(tile->ptTile->ptiWarp->ptHighMaterial, renderX, renderY);
 								bHaveWeAlreadyRendered = true;
 								break;
 						}
@@ -180,10 +180,10 @@ void Worldspace::Render(Client* ptClient) {
 				if(bHaveWeAlreadyRendered) {
 					continue;
 				}
-				trap->RenderMaterial(tile->ptTile->ptiWarp->ptDownMaterial, renderX, renderY);
+				//trap->RenderMaterial(tile->ptTile->ptiWarp->ptDownMaterial, renderX, renderY);
 				continue;
 			}
-			trap->RenderMaterial(tile->ptTile->materialHandle, renderX, renderY);
+			//trap->RenderMaterial(tile->ptTile->materialHandle, renderX, renderY);
 		} else {
 			// Each entity has its own render function, so call that
 			auto ent = mRenderList.find(obj.entData->uuid);

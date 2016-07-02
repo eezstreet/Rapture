@@ -10,10 +10,9 @@ MainMenu::MainMenu() {
 	Video::GetWindowInfo(&renderWidth, &renderHeight, &bFullscreen);
 
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
-	string mainFileName = "file://" + File::GetFileSearchPath("ui/main.html");
 	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
 	// TODO: refactor all of this into a inherited func
-	wView->LoadURL(WebURL(WSLit(mainFileName.c_str())));
+	wView->LoadURL(WebURL(WSLit("asset://menus/main")));
 	while(wView->IsLoading())
 		UI::wc->Update();
 	R_Message(PRIORITY_NOTE, "done.\n");

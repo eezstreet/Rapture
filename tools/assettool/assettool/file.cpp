@@ -6,8 +6,11 @@
 
 // Reading each type of component
 ComponentData* LoadDataComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentData* data = (ComponentData*)malloc(decompSize);
-	infile.read((char*)data, decompSize);
+	ComponentData* data = new ComponentData();
+	infile.read((char*)&data->head, sizeof(data->head));
+	if (decompSize > 0) {
+		infile.read(data->data, decompSize);
+	}
 	return data;
 }
 
@@ -106,6 +109,14 @@ ComponentTile* LoadTileComponent(std::ifstream& infile, uint64_t decompSize) {
 }
 
 // Writing each type of component
+void WriteDataComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
+	ComponentData* data = ptComponent->data.dataComponent;
+	outfile.write((const char*)&data->head, sizeof(data->head));
+	if (ptComponent->meta.decompressedSize > 0) {
+		outfile.write(data->data, ptComponent->meta.decompressedSize);
+	}
+}
+
 void WriteMaterialComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
 	ComponentMaterial* mat = ptComponent->data.materialComponent;
 	if (mat != nullptr) {
@@ -249,10 +260,7 @@ AssetFile::AssetFile(const char* path) {
 				else if (comp.meta.componentVersion > COMP_DATA_VERSION) {
 					DisplayMessageBox("Outdated Tool", "The RAT detected a data component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
 				}
-				if (comp.meta.decompressedSize > 0) {
-					comp.data.dataComponent = (ComponentData*)malloc(comp.meta.decompressedSize);
-					infile.read((char*)comp.data.dataComponent, comp.meta.decompressedSize);
-				}
+				comp.data.dataComponent = LoadDataComponent(infile, comp.meta.decompressedSize);
 				break;
 			case Asset_Material:
 				if (comp.meta.componentVersion < COMP_MATERIAL_VERSION) {
@@ -334,9 +342,7 @@ void AssetFile::SaveFile(const char* destination) {
 				}
 				break;
 			case Asset_Data:
-				if (it->data.dataComponent != nullptr) {
-					outfile.write((const char*)it->data.dataComponent, it->meta.decompressedSize);
-				}
+				WriteDataComponent(outfile, &(*it));
 				break;
 			case Asset_Material:
 				WriteMaterialComponent(outfile, &(*it));
@@ -373,7 +379,9 @@ void AssetFile::AddNewComponent(ComponentType t, const char* name) {
 			break;
 		case Asset_Data:
 			comp.meta.componentVersion = COMP_DATA_VERSION;
-			comp.data.dataComponent = nullptr;
+			comp.data.dataComponent = new ComponentData();
+			strcpy(comp.data.dataComponent->head.mime, "text/plain");
+			comp.data.dataComponent->data = nullptr;
 			break;
 		case Asset_Material:
 			comp.meta.componentVersion = COMP_MATERIAL_VERSION;

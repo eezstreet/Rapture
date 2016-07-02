@@ -27,7 +27,7 @@ void npc_test::render() {
 	int renderPosX = Entity::GetDrawX(this);
 	int renderPosY = Entity::GetDrawY(this);
 
-	trap->RenderMaterial(materialHandle, renderPosX + 35, renderPosY - 25);
+	//trap->RenderMaterial(materialHandle, renderPosX + 35, renderPosY - 25);
 }
 
 void npc_test::think() {
@@ -61,7 +61,7 @@ Entity* npc_test::spawnme(float x, float y, int act, int spawnflags) {
 	ent->uuid = genuuid();
 	ent->classname = "npc_test";
 
-	ent->materialHandle = trap->RegisterMaterial("TestCharacter");
+	//ent->materialHandle = trap->RegisterMaterial("TestCharacter");
 
 	ent->bShouldWeCollide = false; // Don't worry about colliding with NPCs
 	ent->bShouldWeRender = true;

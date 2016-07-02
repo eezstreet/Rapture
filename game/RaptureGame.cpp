@@ -112,7 +112,7 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	CvarSystem::Initialize();
 
 	// Init filesystem
-	FileSystem::Init();
+	Filesystem::Init();
 
 	// Setup the dispatch system
 	ptDispatch->Setup();
@@ -137,9 +137,6 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	SDL_SetEventFilter(RaptureInputCallback, nullptr);
 	InitInput();
 
-	// Load font
-	FontMan = new FontManager();
-
 	// Init UI
 	UI::Initialize();
 }
@@ -151,12 +148,10 @@ RaptureGame::~RaptureGame() {
 		delete game;
 	}
 
-	delete FontMan;
 	DeleteInput();
-	AnimationManager::ShutdownAnims();
 	CvarSystem::Destroy();
 	delete ptDispatch;
-	FileSystem::Shutdown();
+	Filesystem::Exit();
 	Zone::Shutdown();
 	Video::Shutdown();
 }
@@ -169,7 +164,6 @@ void RaptureGame::RunLoop() {
 	UI::Update();
 
 	Video::ClearFrame();
-	AnimationManager::Animate();
 
 	// Do gamecode
 	if(game || editor) {
@@ -205,25 +199,44 @@ extern bool IsConsoleOpen();
 void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->printf = R_Message;
 	imp->error = R_Error;
+
 	imp->GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
-	imp->OpenFile = FileSystem::EXPORT_OpenFile;
-	imp->CloseFile = FileSystem::EXPORT_Close;
-	imp->GetFileSize = FileSystem::EXPORT_GetFileSize;
-	imp->ListFilesInDir = FileSystem::EXPORT_ListFilesInDir;
-	imp->FreeFileList = FileSystem::FreeFileList;
-	imp->WriteFile = FileSystem::EXPORT_Write;
-	imp->ReadPlaintext = FileSystem::EXPORT_ReadPlaintext;
-	imp->ReadBinary = FileSystem::EXPORT_ReadBinary;
-	imp->RegisterImage = Video::RegisterTexture;
-	imp->DrawImage = Video::DrawImage;
-	imp->DrawImageAbs = Video::DrawImageAbs;
-	imp->DrawImageAspectCorrection = Video::DrawImageAspectCorrection;
-	imp->DrawImageClipped = Video::DrawImageClipped;
-	imp->InitMaterials = MaterialHandler::InitMaterials;
-	imp->ShutdownMaterials = MaterialHandler::ShutdownMaterials;
-	imp->RegisterMaterial = MaterialHandler::RegisterMaterial;
-	imp->RenderMaterial = Material::SendMaterialToRenderer;
-	imp->RenderMaterialTrans = Material::SendTransMaterialToRenderer;
+
+	imp->OpenFileSync = File::OpenSync;
+	imp->ReadFileSync = File::ReadSync;
+	imp->WriteFileSync = File::WriteSync;
+	imp->CloseFileSync = File::CloseSync;
+	imp->OpenFileAsync = File::OpenAsync;
+	imp->ReadFileAsync = File::ReadAsync;
+	imp->WriteFileAsync = File::WriteAsync;
+	imp->CloseFileAsync = File::CloseAsync;
+	imp->FileOpened = File::AsyncOpened;
+	imp->FileRead = File::AsyncRead;
+	imp->FileWritten = File::AsyncWritten;
+	imp->FileClosed = File::AsyncClosed;
+	imp->FileBad = File::AsyncBad;
+
+	imp->ResourceAsync = Resource::ResourceAsync;
+	imp->ResourceAsyncURI = Resource::ResourceAsyncURI;
+	imp->ResourceSync = Resource::ResourceSync;
+	imp->ResourceSyncURI = Resource::ResourceSyncURI;
+	imp->FreeResource = Resource::FreeResource;
+	imp->GetAssetComponent = Resource::GetAssetComponent;
+	imp->ResourceRetrieved = Resource::ResourceRetrieved;
+	imp->ResourceBad = Resource::ResourceBad;
+
+	imp->RegisterMaterial = Video::RegisterMaterial;
+	imp->DrawMaterial = Video::DrawMaterial;
+	imp->DrawMaterialAspectCorrection = Video::DrawMaterialAspectCorrection;
+	imp->DrawMaterialClipped = Video::DrawMaterialClipped;
+	imp->DrawMaterialAbs = Video::DrawMaterialAbs;
+	imp->DrawMaterialAbsClipped = Video::DrawMaterialAbsClipped;
+
+	imp->RegisterStreamingTexture = Video::RegisterStreamingTexture;
+	imp->LockStreamingTexture = Video::LockStreamingTexture;
+	imp->UnlockStreamingTexture = Video::UnlockStreamingTexture;
+	imp->DeleteStreamingTexture = Video::DeleteStreamingTexture;
+
 	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
@@ -232,12 +245,9 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterCvarFloat = static_cast<Cvar*(*)(const char*, const char*, int, float)>(CvarSystem::RegisterCvar);
 	imp->RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
 	imp->RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
-	imp->RegisterFont = Font::Register;
-	imp->RenderTextBlended = Video::RenderTextBlended;
-	imp->RenderTextShaded = Video::RenderTextShaded;
-	imp->RenderTextSolid = Video::RenderTextSolid;
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
+
 	imp->RunJavaScript = UI::RunJavaScript;
 	imp->AddJSCallback = UI::AddJavaScriptCallback;
 	imp->GetJSNumArgs = UI::GetJavaScriptNumArgs;
@@ -245,19 +255,17 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->GetJSIntArg = UI::GetJavaScriptIntArgument;
 	imp->GetJSDoubleArg = UI::GetJavaScriptDoubleArgument;
 	imp->GetJSBoolArg = UI::GetJavaScriptBoolArgument;
+
 	imp->IsConsoleOpen = IsConsoleOpen;
+
 	imp->Zone_Alloc = Zone::VMAlloc;
 	imp->Zone_FastFree = Zone::VMFastFree;
 	imp->Zone_Free = Zone::Free;
 	imp->Zone_FreeAll = Zone::VMFreeAll;
 	imp->Zone_NewTag = Zone::NewTag;
 	imp->Zone_Realloc = Zone::Realloc;
+
 	imp->FadeFromBlack = Video::FadeFromBlack;
-	imp->AnimateMaterial = AnimationManager::AnimateMaterial;
-	imp->GetAnimation = AnimationManager::GetAnimInstance;
-	imp->AnimationFinished = AnimationManager::AnimationFinished;
-	imp->SetAnimSequence = AnimationManager::SetAnimSequence;
-	imp->GetAnimSequence = AnimationManager::GetAnimSequence;
 }
 
 /* Started a new game (probably from the menu) */

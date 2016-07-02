@@ -9,7 +9,7 @@ const char* ComponentTypeToString(ComponentType t) {
 		case Asset_Undefined:
 			return "Unspecified Type";
 		case Asset_Data:
-			return "Plaintext";
+			return "Raw";
 		case Asset_Composition:
 			return "Composition";
 		case Asset_Font:
@@ -30,7 +30,7 @@ static void DrawNumberedCheckbox(int number, uint32_t* field) {
 	ImGui::CheckboxFlags(s.c_str(), (unsigned int*)field, (1 << number));
 }
 
-static void DrawDataComponent(void** component, uint64_t* decompressedSize) {
+static void DrawUndefinedComponent(void** component, uint64_t* decompressedSize) {
 	if (ImGui::Button("Import Data")) {
 		const char* path = OpenFileDialog("All Files\0*.*", 0);
 		if (path[0] == '\0') {
@@ -78,6 +78,64 @@ static void DrawDataComponent(void** component, uint64_t* decompressedSize) {
 		outfile.write((char*)*component, *decompressedSize);
 		outfile.close();
 	}
+}
+
+static void DrawDataComponent(ComponentData* pDataComponent, uint64_t* decompressedSize) {
+	ImGui::TextWrapped("Import a file to auto-guess MIME type");
+	if (ImGui::Button("Import Data")) {
+		const char* path = OpenFileDialog("All Files\0*.*", 0);
+		if (path[0] == '\0') {
+			return;	// User canceled dialog box
+		}
+
+		std::ifstream infile(path, std::ios::binary);
+		if (infile.bad()) {
+			DisplayMessageBox("Import Error", "Couldn't import file (is it in use? no permission?", MESSAGEBOX_ERROR);
+			infile.close();
+			return;
+		}
+		std::streampos fileSize = infile.tellg();
+		infile.seekg(0, std::ios::end);
+		fileSize = infile.tellg() - fileSize;
+		infile.clear();
+		infile.seekg(0, std::ios::beg);
+
+		*decompressedSize = fileSize;
+		if (pDataComponent->data) {
+			free(pDataComponent->data);
+		}
+		pDataComponent->data = (char*)malloc(*decompressedSize);
+		infile.read(pDataComponent->data, *decompressedSize);
+		infile.close();
+
+		// Try to guess the mime type
+		std::string stlpath(path);
+		std::string ext = stlpath.substr(stlpath.find_last_of('.'));
+		char* mime = pDataComponent->head.mime;
+		TryGuessMimeType(mime, ext.c_str());
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Export Data")) {
+		if (!pDataComponent->data || *decompressedSize <= 0) {
+			DisplayMessageBox("No Data", "There's no data to export", MESSAGEBOX_INFO);
+			return;
+		}
+
+		const char* path = SaveAsDialog("All Files\0*.*", "");
+		if (path[0] == '\0') {
+			return;
+		}
+
+		std::ofstream outfile(path, std::ios::binary);
+		if (outfile.bad()) {
+			DisplayMessageBox("Export Error", "Couldn't export the data. Try running as administrator?", MESSAGEBOX_ERROR);
+			return;
+		}
+
+		outfile.write(pDataComponent->data, *decompressedSize);
+		outfile.close();
+	}
+	ImGui::InputText("MIME Type", pDataComponent->head.mime, sizeof(pDataComponent->head.mime));
 }
 
 char textureBuffer[32967];
@@ -368,11 +426,11 @@ void DrawComponentData(int currentSelectedComponent) {
 	ImGui::BeginGroup();
 	switch (comp.meta.componentType) {
 		case Asset_Undefined:
-			DrawDataComponent(&comp.data.undefinedComponent, &comp.meta.decompressedSize);
+			DrawUndefinedComponent(&comp.data.undefinedComponent, &comp.meta.decompressedSize);
 			currentFile->decompressedAssets[currentSelectedComponent].data.undefinedComponent = comp.data.undefinedComponent;
 			break;
 		case Asset_Data:
-			DrawDataComponent((void**)&comp.data.dataComponent, &comp.meta.decompressedSize);
+			DrawDataComponent(comp.data.dataComponent, &comp.meta.decompressedSize);
 			currentFile->decompressedAssets[currentSelectedComponent].data.dataComponent = comp.data.dataComponent;
 			break;
 		case Asset_Font:

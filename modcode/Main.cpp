@@ -6,11 +6,9 @@ gameImports_s* trap;
 
 static gameExports_s exportFns;
 static int iLoadingScreen = 0;
-static Texture* ptLoadScreenImage = nullptr;
 
 void Game_Init() {
 	trap->printf(PRIORITY_NOTE, "--- New Game ---\n");
-	ptLoadScreenImage = trap->RegisterImage("ui/images/loading");
 	iLoadingScreen = 1;
 }
 
@@ -18,14 +16,11 @@ void Game_Shutdown() {
 	SaveGame* ptSave = SaveGame::NewSingleplayerSave(ptServer, ptServer->GetClient());
 
 	trap->printf(PRIORITY_NOTE, "--- Quit Game ---\n");
-	trap->ShutdownMaterials();
 	delete ptServer;
 	delete ptSave;
 }
 
 void Game_Load() {
-	trap->InitMaterials();
-
 	trap->RegisterCvarInt("cg_drawfps", "Draw FPS ingame? (1 = FPS, 2 = MS, 3 = both)", (1 << CVAR_ARCHIVE), 0);
 	trap->RegisterCvarBool("cg_drawxy", "Draw mouse X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
 	trap->RegisterCvarBool("cg_drawworldxy", "Draw world X/Y coordinates?", (1 << CVAR_ARCHIVE), false);
@@ -40,7 +35,7 @@ void Game_Load() {
 void Game_Frame() {
 	if(iLoadingScreen == 1) {
 		// Force it to draw the loading screen
-		trap->DrawImageAspectCorrection(ptLoadScreenImage, 37.5, 37.5, 25, 25);
+		//trap->DrawImageAspectCorrection(ptLoadScreenImage, 37.5, 37.5, 25, 25);
 		iLoadingScreen++;
 	}
 	else if(iLoadingScreen == 2) {

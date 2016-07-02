@@ -4,6 +4,7 @@
 #include "ui_shared.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <RaptureAsset.h>
 
 #define R_Error Sys_Error
 
@@ -334,72 +335,155 @@ namespace Hunk {
 	void Shutdown();
 };
 
+//
+//
+//
+
+template<typename T>
+class MutexVariable {
+	T var;
+	mutex mut;
+public:
+	bool GetVar(T& x) { if (!mut.try_lock()) return false; x = var; return true; }
+	T& GetVar() { mut.lock(); return var; }
+	void Descope() { mut.unlock(); }
+	MutexVariable<T>() {}
+	MutexVariable<T>(T& other) { var = other; }
+};
 
 //
 // FileSystem.cpp
 //
 
-class File {
-	FILE* handle;
-	string searchpath;
-public:
-	static File* Open(const string &file, const string& mode);
-	static File* Open(const char* szFile, const char* szMode) { return Open(string(szFile), string(szMode)); }
-	void Close();
-	static void CloseFile(File* pFile) { pFile->Close(); }
-	string ReadPlaintext(size_t numchar = 0);
-	size_t ReadBinary(unsigned char* bytes, size_t numbytes, const bool bDontResetCursor);
-	wstring ReadUnicode(size_t numchars = 0);
-	size_t GetSize();
-	inline size_t GetUnicodeSize() { return GetSize()/2; }
-	size_t WritePlaintext(const string& text) { return fwrite(text.c_str(), sizeof(char), text.length(), handle); }
-	size_t WriteUnicode(const wstring& text) { return fwrite(text.c_str(), sizeof(wchar_t), text.length(), handle); }
-	size_t WriteBinary(void* bytes, size_t numbytes) { return fwrite(bytes, sizeof(unsigned char), numbytes, handle); }
-	static void WriteFilePlaintext(File* pFile, const char* text) { pFile->WritePlaintext(text); }
-	bool Seek(long offset, int origin) { if(fseek(handle, offset, origin)) return true; return false; }
-	size_t Tell() { return ftell(handle); }
-	static string GetFileSearchPath(const string& fileName);
-	static char* GetFileSearchPathISO(const char* fileName);
-	bool Exists(const string &file);
-friend class File;
+namespace Filesystem {
+	extern Cvar* fs_core;
+	extern Cvar* fs_homepath;
+	extern Cvar* fs_basepath;
+	extern Cvar* fs_game;
+
+	extern Cvar* fs_multithreaded;
+	extern Cvar* fs_threads;
+
+	void Init();
+	void Exit();
+
+	string ResolveFilePath(const string& file, const string& mode);
+	string ResolveAssetPath(const string& assetName);
+	const char* ResolveFilePath(const char* file, const char* mode);
+	const char* ResolveAssetPath(const char* assetName);
+
+	void LoadRaptureAsset(RaptureAsset** pAsset, const string& assetName);
+	AssetComponent* FindComponentByName(RaptureAsset* pAsset, const char* compName);
+
+	void QueueFileOpen(File* pFile, fileOpenedCallback callback);
+	void QueueFileRead(File* pFile, void* data, size_t dataSize, fileReadCallback callback);
+	void QueueFileWrite(File* pFile, void* data, size_t dataSize, fileWrittenCallback callback);
+	void QueueFileClose(File* pFile, fileClosedCallback callback);
+
+	void QueueResource(Resource* pRes, assetRequestCallback callback);
 };
 
-class FileSystem {
-	///////////////
-	// Class Properties
-	// and methods
-	///////////////
+/* A File is something which we pull from the hard drive */
+class File {
 private:
-	vector<string> searchpaths;
-	unordered_map<string, File*> files;
-	void RecursivelyTouch(const string& path);
+	string path;
+	string mode;
+	FILE* fp;
 
+	enum Flags {
+		File_Opened		= 1,
+		File_Read		= 2,
+		File_Written	= 4,
+		File_Closed		= 8,
+		File_Bad		= 16
+	};
+	uint8_t flags;
+
+	File();
 public:
-	void AddSearchPath(const string& searchpath) { string s = searchpath; stringreplace(s, "\\", "/"); searchpaths.push_back(s); }
-	inline void AddCoreSearchPath(const string& basepath, const string& core) { AddSearchPath(basepath + '/' + core); }
-	void CreateModSearchPaths(const string& basepath, const string& modlist);
-	FileSystem();
-	~FileSystem();
-	inline vector<string>& GetSearchPaths() { return searchpaths; }
-	void PrintSearchPaths();
-	static char** ListFiles(const string& dir, const char* extension, int* iNumFiles);
-	static void FreeFileList(char** ptFileList, int iNumItems);
+	File(const File& other);
 
-	////////////
-	// Static Methods
-	////////////
-	static void Init();
-	static void Shutdown();
+	static File*	OpenAsync(const char* file, const char* mode = "rb+", fileOpenedCallback callback = nullptr);
+	static void		ReadAsync(File* pFile, void* data, size_t dataSize, fileReadCallback callback = nullptr);
+	static void		WriteAsync(File* pFile, void* data, size_t dataSize, fileWrittenCallback callback = nullptr);
+	static void		CloseAsync(File* pFile, fileClosedCallback callback = nullptr);
 
-	static File* EXPORT_OpenFile(const char* filename, const char* mode);
-	static void EXPORT_Close(File* filehandle);
-	static char** EXPORT_ListFilesInDir(const char* filename, const char* ext, int *iNumFiles);
-	static size_t EXPORT_ReadBinary(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-	static size_t EXPORT_ReadPlaintext(File* filehandle, size_t numChars, char* chars);
-	static size_t EXPORT_GetFileSize(File* filehandle);
-	static size_t EXPORT_Write(File* filehandle, const char* text);
+	static bool		AsyncOpened(File* pFile);
+	static bool		AsyncRead(File* pFile);
+	static bool		AsyncWritten(File* pFile);
+	static bool		AsyncClosed(File* pFile);
+	static bool		AsyncBad(File* pFile);
 
-friend class File;
+	static File*	OpenSync(const char* file, const char* mode = "rb+");
+	static bool		ReadSync(File* pFile, void* data, size_t dataSize);
+	static bool		WriteSync(File* pFile, void* data, size_t dataSize);
+	static bool		CloseSync(File* pFile);
+
+	void DequeOpen(fileOpenedCallback callback);
+	void DequeRead(void* data, size_t dataSize, fileReadCallback callback);
+	void DequeWrite(void* data, size_t dataSize, fileWrittenCallback callback);
+	void DequeClose(fileClosedCallback callback);
+
+	const char* GetFileMode() { return mode.c_str(); }
+	const char* GetFilePath() { return path.c_str(); }
+	const FILE* GetFilePointer() { return fp; }
+};
+
+/* A resource is something that is streamed from an asset file */
+class Resource {
+	AssetComponent component;
+	bool bRetrieved;
+	bool bBad;
+
+	string szAssetFile;
+	string szComponent;
+
+	Resource();
+public:
+	static Resource* ResourceAsync(const char* asset, const char* component, assetRequestCallback callback = nullptr);
+	static Resource* ResourceAsyncURI(const char* uri, assetRequestCallback callback = nullptr);
+	static Resource* ResourceSync(const char* asset, const char* component);
+	static Resource* ResourceSyncURI(const char* uri);
+	static void FreeResource(Resource* pResource);
+
+	void DequeRetrieve(assetRequestCallback callback);
+
+	bool Retrieved();
+	bool Bad();
+	static bool ResourceRetrieved(Resource* pResource) { return pResource->Retrieved(); }
+	static bool ResourceBad(Resource* pResource) { return pResource->Bad(); }
+
+	AssetComponent* GetAssetComponent() { return &component; }
+	static AssetComponent* GetAssetComponent(Resource* pRes) { return pRes->GetAssetComponent(); }
+};
+
+struct AsyncFileTask {
+	enum TaskType {
+		Task_Open,
+		Task_Read,
+		Task_Write,
+		Task_Close
+	};
+
+	TaskType type;
+	File* pFile;
+	void* callback;
+	void* data;
+	size_t	dataSize;
+
+	AsyncFileTask& operator=(const AsyncFileTask& rhs);
+};
+
+struct AsyncResourceTask {
+	enum TaskType {
+		Task_Request
+	};
+
+	TaskType type;
+	Resource* pResource;
+	void* callback;
+
+	AsyncResourceTask& operator=(const AsyncResourceTask& rhs);
 };
 
 //
@@ -444,38 +528,6 @@ extern InputManager *Input;
 void InitInput();
 void DeleteInput();
 extern const string keycodeNames[];
-
-
-//
-// FontManager.cpp
-//
-
-class Font {
-private:
-	TTF_Font* ptFont;
-
-	void LoadFont(const char* sFontFile, int iPointSize);
-public:
-	Font();
-	~Font();
-
-	TTF_Font* GetFont() { return ptFont; }
-
-	static Font* Register(const char* sFontFile, int iPointSize);
-friend class FontManager;
-};
-
-class FontManager {
-public:
-	FontManager();
-	~FontManager();
-
-	static TTF_Font* GetFontTTF(Font* ptFont);
-
-	Font* RegisterFont(const char* sFontFile, int iPointSize);
-};
-extern FontManager* FontMan;
-
 
 //
 // Timer.cpp
@@ -552,107 +604,6 @@ void setGameQuitting(const bool b);
 //
 
 void Sys_InitCommands();
-
-// AnimationHandler.cpp
-// Materials may or may not have an animation assigned to them.
-struct Sequence {
-	char name[64];
-	bool bLoop;
-	int rowNum;
-	int frameCount;
-	int fps;
-	bool bInitial;
-
-	void Parse(void* in);
-};
-
-struct SequenceData {
-	char startingSequence[64];
-	int rowheight;
-	int framesize;
-	int longestSequence;
-};
-
-class AnimationManager {
-private:
-	static unordered_map<string, AnimationManager*> mAnimInstances;
-	unordered_map<string, Sequence>* ptSequences;
-	int lastFrameTime;
-	SequenceData* ptSeqData;
-public:
-	static AnimationManager* GetAnimInstance(const char* sRef, const char* sMaterial);
-	static void SetAnimSequence(AnimationManager* ptAnims, const char* szSequence) { ptAnims->SetSequence(szSequence); }
-	static const char* GetAnimSequence(AnimationManager* ptAnims) { return ptAnims->GetCurrentSequence(); }
-	static bool AnimationFinished(AnimationManager* ptAnims) { return ptAnims->Finished(); }
-	static void AnimateMaterial(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
-	static void KillAnimInstance(const char* sRef);
-	static void ShutdownAnims();
-	static void Animate();
-
-	string sCurrentSequence;
-	int iCurrentFrame;
-	AnimationManager(unordered_map<string, Sequence>* ptSequenceSet, SequenceData* ptSeqData);
-	void PushFrame();
-	void DrawActiveFrame(Texture* in, SDL_Rect* pos);
-	void DrawAnimated(Material* ptMaterial, int x, int y, bool bTransparentMap);
-	bool Finished();
-	void SetSequence(const char* sSequence);
-	const char* GetCurrentSequence();
-};
-
-
-// MaterialHandler.cpp
-// Anything that exists in the world uses a Material.
-// Images and the like do not use Materials since they do not exist in the world.
-class Material {
-private:
-	bool bLoadedResources;		// Have we loaded resources? (images, etc)
-	bool bLoadedIncorrectly;	// If we loaded, did we load correctly?
-	bool bHasTransparencyMap;	// Does it have a transparency map?
-	bool bHasDepthMap;			// Does it have a depth map?
-	bool bHasNormalMap;			// Does it have a normal map?
-	void LoadResources();
-
-	int xOffset, yOffset;
-
-	char name[64];
-	char resourceFile[64];
-	char transResourceFile[64];
-	char depthResourceFile[64];
-	char normlResourceFile[64];
-	Texture* ptResource;
-	Texture* ptTransResource;
-	Texture* ptDepthResource;
-	Texture* ptNormalResource;
-
-	int iNumSequences;
-	unordered_map<string, Sequence> mSequences;
-	SequenceData sd;
-public:
-	Material();
-	~Material();
-	void SendToRenderer(int x, int y);
-	void SendToRendererTransparency(int x, int y);
-	static void SendMaterialToRenderer(Material* mat, int x, int y) { if (mat) { mat->SendToRenderer(x, y); } }
-	static void SendTransMaterialToRenderer(Material* mat, int x, int y) { if (mat) { mat->SendToRendererTransparency(x, y); } }
-	friend class AnimationManager;
-	friend class MaterialHandler;
-};
-
-class MaterialHandler {
-private:
-	unordered_map<string, Material*> materials;
-	void LoadMaterial(const char* materialFile);
-public:
-	Material* GetMaterial(const char* material);
-	static Material* RegisterMaterial(const char* material);
-	static void InitMaterials();
-	static void ShutdownMaterials();
-	~MaterialHandler();
-	MaterialHandler();
-};
-
-extern MaterialHandler* mats;
 
 //
 // <Platform>.cpp

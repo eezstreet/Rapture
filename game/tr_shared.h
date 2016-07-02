@@ -5,6 +5,7 @@ struct SDL_Window;
 typedef struct _TTF_Font TTF_Font;
 
 class Texture;
+class Material;
 
 // Stuff that gets exported FROM the renderer
 struct renderExports_s {
@@ -17,19 +18,19 @@ struct renderExports_s {
 	void		(*ClearFrame)();
 	void		(*DrawActiveFrame)();
 
-	// Texture manipulation
-	Texture*	(*RegisterTexture)(const char* szTexturePath);
-	Texture*	(*RegisterBlankTexture)(unsigned int nWidth, unsigned int nHeight);
+	// Material manipulation
+	Material*	(*RegisterMaterial)(const char* URI);
+	void		(*DrawMaterial)(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+	void		(*DrawMaterialAspectCorrection)(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+	void		(*DrawMaterialClipped)(Material* ptMaterial, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+	void		(*DrawMaterialAbs)(Material* ptMaterial, int nX, int nY, int nW, int nH);
+	void		(*DrawMaterialAbsClipped)(Material* ptMaterial, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+
+	// Streaming textures
+	Texture*	(*RegisterStreamingTexture)(unsigned int nWidth, unsigned int nHeight);
 	int			(*LockStreamingTexture)(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 	void		(*UnlockStreamingTexture)(Texture* ptTexture);
-	void		(*BlendTexture)(Texture* ptTexture);
-
-	// Texture drawing
-	void		(*DrawImage)(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void		(*DrawImageAspectCorrection)(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void		(*DrawImageClipped)(Texture* ptTexture, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
-	void		(*DrawImageAbs)(Texture* ptTexture, int nX, int nY, int nW, int nH);
-	void		(*DrawImageAbsClipped)(Texture* ptTexture, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+	void		(*DeleteStreamingTexture)(Texture* ptTexture);
 
 	// Screenshots
 	void		(*QueueScreenshot)(const char* szFileName, const char* szExtension);
@@ -51,6 +52,35 @@ struct renderExports_s {
 struct renderImports_s {
 	// Dispatch
 	void			(*Print)(int priority, const char* fmt, ...);
+
+	// Asynchronous File Operations
+	File*			(*OpenFileAsync)(const char* file, const char* mode, fileOpenedCallback callback);
+	void			(*ReadFileAsync)(File* pFile, void* data, size_t dataSize, fileReadCallback callback);
+	void			(*WriteFileAsync)(File* pFile, void* data, size_t dataSize, fileWrittenCallback callback);
+	void			(*CloseFileAsync)(File* pFile, fileClosedCallback callback);
+	bool			(*AsyncFileOpened)(File* pFile);
+	bool			(*AsyncFileRead)(File* pFile);
+	bool			(*AsyncFileWritten)(File* pFile);
+	bool			(*AsyncFileClosed)(File* pFile);
+	bool			(*AsyncFileBad)(File* pFile);
+
+	// Synchronous File Operations
+	File*			(*OpenFileSync)(const char* file, const char* mode);
+	bool			(*ReadFileSync)(File* pFile, void* data, size_t dataSize);
+	bool			(*WriteFileSync)(File* pFile, void* data, size_t dataSize);
+	bool			(*CloseFileSync)(File* pFile);
+
+	// Resources
+	Resource*		(*ResourceAsync)(const char* asset, const char* component, assetRequestCallback callback);
+	Resource*		(*ResourceAsyncURI)(const char* uri, assetRequestCallback callback);
+	Resource*		(*ResourceSync)(const char* asset, const char* component);
+	Resource*		(*ResourceSyncURI)(const char* uri);
+	void			(*FreeResource)(Resource* pResource);
+	AssetComponent*	(*ResourceComponent)(Resource* pResource);
+
+	// Other file operations
+	const char*		(*ResolveFilePath)(const char* file, const char* mode);
+	const char*		(*ResolveAssetPath)(const char* assetName);
 	
 	// Video
 	void			(*GetRenderProperties)(int* renderWidth, int* renderHeight, bool* fullscreen);
@@ -66,15 +96,6 @@ struct renderImports_s {
 	int				(*CvarIntegerValue)(Cvar* cvar);
 	float			(*CvarFloatValue)(Cvar* cvar);
 	bool			(*CvarBooleanValue)(Cvar* cvar);
-
-	// Files
-	File*			(*OpenFile)(const char* szFileName, const char* szMode);
-	void			(*CloseFile)(File* pFile);
-	void			(*WritePlaintext)(File* pFile, const char* text);
-	char*			(*FileSearchPath)(const char* szFileName);
-
-	// Font
-	TTF_Font*		(*GetFontTTF)(Font* pFont);
 };
 
 //
@@ -90,19 +111,19 @@ namespace Video {
 	void ClearFrame();
 	void RenderFrame();
 
-	// Texture manipulation
-	Texture* RegisterTexture(const char* szTexture);
-	Texture* RegisterBlankTexture(const unsigned int nWidth, const unsigned int nHeight);
+	// Materials
+	Material* RegisterMaterial(const char* szMaterial);
+	void DrawMaterial(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+	void DrawMaterialAspectCorrection(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+	void DrawMaterialClipped(Material* ptMaterial, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+	void DrawMaterialAbs(Material* ptMaterial, int nX, int nY, int nW, int nH);
+	void DrawMaterialAbsClipped(Material* ptMaterial, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+
+	// Textures
+	Texture* RegisterStreamingTexture(const unsigned int nW, const unsigned int nH);
 	int LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 	void UnlockStreamingTexture(Texture* ptTexture);
-	void BlendTexture(Texture* ptTexture);
-
-	// Texture Drawing
-	void DrawImage(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void DrawImageAspectCorrection(Texture* ptTexture, float xPct, float yPct, float wPct, float hPct);
-	void DrawImageClipped(Texture* ptTexture, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
-	void DrawImageAbs(Texture* ptTexture, int nX, int nY, int nW, int nH);
-	void DrawImageAbsClipped(Texture* ptTexture, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+	void DeleteStreamingTexture(Texture* ptTexture);
 
 	// Screenshots
 	void QueueScreenshot(const char* szFileName, const char* szExtension);

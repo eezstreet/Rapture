@@ -92,7 +92,6 @@
     <ClCompile Include="..\modcode\entities\level_light.cpp" />
     <ClCompile Include="..\modcode\entities\npc_test.cpp" />
     <ClCompile Include="..\modcode\Entity.cpp" />
-    <ClCompile Include="..\modcode\Json.cpp" />
     <ClCompile Include="..\modcode\Main.cpp" />
     <ClCompile Include="..\modcode\Local.cpp" />
     <ClCompile Include="..\modcode\Map.cpp" />
@@ -122,7 +121,6 @@
     <ClInclude Include="..\modcode\entities\level_light.h" />
     <ClInclude Include="..\modcode\entities\npc_test.h" />
     <ClInclude Include="..\modcode\Entity.h" />
-    <ClInclude Include="..\modcode\Json.h" />
     <ClInclude Include="..\modcode\Local.h" />
     <ClInclude Include="..\modcode\Map.h" />
     <ClInclude Include="..\modcode\MapFramework.h" />

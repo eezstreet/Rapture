@@ -13,11 +13,15 @@
 #include <algorithm>
 #include <map>
 #include <regex>
+#include <mutex>
+#include <chrono>
+#include <thread>
 #include <dirent.h>
 #include <functional>
 #include <iomanip>
 #include <time.h>
 #include <assert.h>
+#include <RaptureAsset.h>
 using namespace std;
 
 #ifdef _WIN32
@@ -44,6 +48,7 @@ string stripextension(const string& str);
 
 // Export types
 class File;
+class Resource;
 class Image;
 class Font;
 class Menu;
@@ -69,6 +74,13 @@ enum cvarFlags_e {
 	CVAR_ANNOUNCE,
 };
 
+// Callbacks
+typedef void(*fileOpenedCallback)(File* pFile);
+typedef void(*fileReadCallback)(File* pFile, void* buffer, size_t bufferSize);
+typedef fileReadCallback fileWrittenCallback;
+typedef fileOpenedCallback fileClosedCallback;
+typedef void(*assetRequestCallback)(AssetComponent* component);
+
 extern "C" {
 	struct gameImports_s {
 		// Logging
@@ -78,29 +90,45 @@ extern "C" {
 		// Time
 		int(*GetTicks)();
 
-		// File I/O
-		File* (*OpenFile)(const char* filename, const char* mode);
-		size_t (*WriteFile)(File* filehandle, const char* text);
-		void(*CloseFile)(File* filehandle);
-		char** (*ListFilesInDir)(const char* dir, const char* extension, int* iNumFiles);
-		void(*FreeFileList)(char** ptFileList, int iNumFiles);
-		size_t(*ReadPlaintext)(File* filehandle, size_t numChars, char* chars);
-		size_t(*ReadBinary)(File* filehandle, unsigned char* bytes, size_t numBytes, const bool bDontResetCursor);
-		size_t(*GetFileSize)(File* filehandle);
+		// Files
+		File* (*OpenFileSync)(const char* filename, const char* mode);
+		bool(*ReadFileSync)(File* pFile, void* data, size_t dataSize);
+		bool(*WriteFileSync)(File* pFile, void* data, size_t dataSize);
+		bool(*CloseFileSync)(File* pFile);
 
-		// Images
-		Texture* (*RegisterImage)(const char* filename);
-		void (*DrawImage)(Texture* image, float xPct, float yPct, float wPct, float hPct);
-		void (*DrawImageAbs)(Texture* image, int x, int y, int w, int h);
-		void (*DrawImageAspectCorrection)(Texture* image, float xPct, float yPct, float wPct, float hPct);
-		void (*DrawImageClipped)(Texture* image, float sxPct, float syPct, float swPct, float shPct,
-								float ixPct, float iyPct, float iwPct, float ihPct);
+		File*(*OpenFileAsync)(const char* fileName, const char* mode, fileOpenedCallback callback);
+		void(*ReadFileAsync)(File* pFile, void* data, size_t dataSize, fileReadCallback callback);
+		void(*WriteFileAsync)(File* pFile, void* data, size_t dataSize, fileWrittenCallback callback);
+		void(*CloseFileAsync)(File* pFile, fileClosedCallback callback);
+		bool(*FileOpened)(File* pFile);
+		bool(*FileRead)(File* pFile);
+		bool(*FileWritten)(File* pFile);
+		bool(*FileClosed)(File* pFile);
+		bool(*FileBad)(File* pFile);
 
-		// Font/text
-		Font* (*RegisterFont)(const char* sFontFile, int iPointSize);
-		void (*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
-		void (*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-		void (*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
+		// Resources
+		Resource* (*ResourceAsync)(const char* asset, const char* component, assetRequestCallback callback);
+		Resource* (*ResourceAsyncURI)(const char* uri, assetRequestCallback callback);
+		Resource* (*ResourceSync)(const char* asset, const char* component);
+		Resource* (*ResourceSyncURI)(const char* uri);
+		void	  (*FreeResource)(Resource* pResource);
+		AssetComponent* (*GetAssetComponent)(Resource* pResource);
+		bool(*ResourceRetrieved)(Resource* pResource);
+		bool(*ResourceBad)(Resource* pResource);
+
+		// Materials
+		Material*	(*RegisterMaterial)(const char* szMaterial);
+		void		(*DrawMaterial)(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+		void		(*DrawMaterialAspectCorrection)(Material* ptMaterial, float xPct, float yPct, float wPct, float hPct);
+		void		(*DrawMaterialClipped)(Material* ptMaterial, float sxPct, float syPct, float swPct, float shPct, float ixPct, float iyPct, float iwPct, float ihPct);
+		void		(*DrawMaterialAbs)(Material* ptMaterial, int nX, int nY, int nW, int nH);
+		void		(*DrawMaterialAbsClipped)(Material* ptMaterial, int sX, int sY, int sW, int sH, int iX, int iY, int iW, int iH);
+
+		// Textures
+		Texture*	(*RegisterStreamingTexture)(const unsigned int nW, const unsigned int nH);
+		int			(*LockStreamingTexture)(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
+		void		(*UnlockStreamingTexture)(Texture* ptTexture);
+		void		(*DeleteStreamingTexture)(Texture* ptTexture);
 
 		// UI
 		Menu* (*RegisterStaticMenu)(const char* sMenuFile);
@@ -113,20 +141,6 @@ extern "C" {
 		int   (*GetJSIntArg)(Menu* ptMenu, unsigned int argNum);
 		double(*GetJSDoubleArg)(Menu* ptMenu, unsigned int argNum);
 		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);
-
-		// Materials
-		void(*InitMaterials)();
-		void(*ShutdownMaterials)();
-		Material* (*RegisterMaterial)(const char* name);
-		void(*RenderMaterial)(Material* ptMaterial, int x, int y);
-		void(*RenderMaterialTrans)(Material* ptMaterial, int x, int y);
-
-		// Animation
-		AnimationManager* (*GetAnimation)(const char* sUUID, const char* sMaterial);
-		void(*AnimateMaterial)(AnimationManager* ptAnims, Material* ptMaterial, int x, int y, bool bTransparency);
-		bool(*AnimationFinished)(AnimationManager* ptAnims);
-		void(*SetAnimSequence)(AnimationManager* ptAnims, const char* sSequence);
-		const char* (*GetAnimSequence)(AnimationManager* ptAnims);
 
 		// Cvars
 		void(*CvarIntVal)(const char* cvarName, int* value);
