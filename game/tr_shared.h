@@ -79,7 +79,7 @@ struct renderImports_s {
 	AssetComponent*	(*ResourceComponent)(Resource* pResource);
 
 	// Other file operations
-	const char*		(*ResolveFilePath)(const char* file, const char* mode);
+	char*			(*ResolveFilePath)(char* buffer, size_t bufferSize, const char* file, const char* mode);
 	const char*		(*ResolveAssetPath)(const char* assetName);
 	
 	// Video

@@ -96,7 +96,9 @@ std::string GetLastErrorAsString()
 
 ptModule Sys_LoadLibrary(string name) {
 	name.append(".dll");
-	string filepath = Filesystem::ResolveFilePath(name, "rb+");
+
+	string filepath;
+	filepath = Filesystem::ResolveFilePath(filepath, name, "rb+");
 	ptModule hLib = (ptModule)LoadLibrary(filepath.c_str());
 	if(!hLib) {
 		R_Message(PRIORITY_ERROR, "module load failure: %s (%i)\n", GetLastErrorAsString().c_str(), GetLastError());

@@ -367,9 +367,9 @@ namespace Filesystem {
 	void Init();
 	void Exit();
 
-	string ResolveFilePath(const string& file, const string& mode);
+	string& ResolveFilePath(string& filePath, const string& file, const string& mode);
 	string ResolveAssetPath(const string& assetName);
-	const char* ResolveFilePath(const char* file, const char* mode);
+	char* ResolveFilePath(char* buffer, size_t bufferSize, const char* file, const char* mode);
 	const char* ResolveAssetPath(const char* assetName);
 
 	void LoadRaptureAsset(RaptureAsset** pAsset, const string& assetName);

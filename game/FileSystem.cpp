@@ -343,22 +343,83 @@ namespace Filesystem {
 	}
 
 	/* These two resolution functions are used by other processes */
-	string ResolveFilePath(const string& file, const string& mode) {
+	string& ResolveFilePath(string& filePath, const string& file, const string& mode) {
+		string desiredSearchPath = "";
+		bool bTermSlash = false;
+		bool bValidPath = false;
+
 		if (mode.find('w') != mode.npos) {
-			// Written file path, so just append the filename to homepath
-			string s = fs_homepath->String();
-			s += file;
-			return s;
+			// We're writing, ALWAYS use homepath.
+			desiredSearchPath = fs_homepath->String();
+			if (desiredSearchPath[desiredSearchPath.length() - 1] == '/') {
+				bTermSlash = true;
+			}
+			bValidPath = true;
 		}
-		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
-			string fullPath = (*it) + '/' + file;
-			FILE* fp = fopen(fullPath.c_str(), "rb+");
+		else for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			string s;
+			desiredSearchPath = (*it);
+			if (desiredSearchPath[desiredSearchPath.length() - 1] == '/') {
+				bTermSlash = true;
+			}
+			else {
+				bTermSlash = false;
+			}
+			s = (bTermSlash) ? desiredSearchPath + file : desiredSearchPath + '/' + file;
+			FILE* fp = fopen(s.c_str(), mode.c_str());
 			if (fp != nullptr) {
+				bValidPath = true;
 				fclose(fp);
-				return fullPath;
+				break;
 			}
 		}
-		return "";
+		
+		if (!bValidPath) {
+			R_Message(PRIORITY_WARNING, "Couldn't resolve path for file: %s\n", file.c_str());
+			return filePath;
+		}
+		filePath = (bTermSlash) ? desiredSearchPath + file : desiredSearchPath + '/' + file;
+		return filePath;
+	}
+
+	char* ResolveFilePath(char* buffer, size_t bufferLen, const char* file, const char* mode) {
+		string desiredSearchPath;
+		bool bTermSlash = false;
+		bool bValidPath = false;
+
+		if (strchr(mode, 'w')) {
+			// We're writing, ALWAYS use homepath.
+			desiredSearchPath = fs_homepath->String();
+			if (desiredSearchPath[desiredSearchPath.length() - 1] == '/') {
+				bTermSlash = true;
+			}
+		}
+		else for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			string s;
+			desiredSearchPath = (*it);
+			if (desiredSearchPath[desiredSearchPath.length() - 1] == '/') {
+				bTermSlash = true;
+			}
+			else {
+				bTermSlash = false;
+			}
+			s = (bTermSlash) ? desiredSearchPath + file : desiredSearchPath + '/' + file;
+			FILE* fp = fopen(s.c_str(), mode);
+			if (fp != nullptr) {
+				bValidPath = true;
+				fclose(fp);
+				break;
+			}
+		}
+
+		if (!bValidPath) {
+			R_Message(PRIORITY_WARNING, "Couldn't resolve path for file: %s\n", file);
+			return buffer;
+		}
+
+		desiredSearchPath = (bTermSlash) ? desiredSearchPath + file : desiredSearchPath + '/' + file;
+		strncpy(buffer, desiredSearchPath.c_str(), bufferLen);
+		return buffer;
 	}
 
 	string ResolveAssetPath(const string& assetName_) {
@@ -371,10 +432,6 @@ namespace Filesystem {
 			return "";
 		}
 		return it->second;
-	}
-
-	const char* ResolveFilePath(const char* file, const char* mode) {
-		return ResolveFilePath(string(file), string(mode)).c_str();
 	}
 
 	const char* ResolveAssetPath(const char* assetName) {
