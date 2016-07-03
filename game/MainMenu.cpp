@@ -12,7 +12,7 @@ MainMenu::MainMenu() {
 	R_Message(PRIORITY_NOTE, "Loading main menu...");
 	wView = UI::wc->CreateWebView(renderWidth, renderHeight, UI::sess);
 	// TODO: refactor all of this into a inherited func
-	wView->LoadURL(WebURL(WSLit("asset://menus/main")));
+	wView->LoadURL(WebURL(WSLit("asset://Rapture/menus/mainmenu")));
 	while(wView->IsLoading())
 		UI::wc->Update();
 	R_Message(PRIORITY_NOTE, "done.\n");
