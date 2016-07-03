@@ -37,14 +37,16 @@ int main(int argc, char** argv) {
 
 // This accounts for all input
 int RaptureInputCallback(void *notUsed, SDL_Event* e) {
-	if(sys->bHasFinished) {
+	if(sys && sys->bHasFinished) {
 		// DONT send input...
 		return 1;
 	}
 	switch(e->type) {
 		case SDL_APP_TERMINATING:
 		case SDL_QUIT:
-			sys->PassQuitEvent();
+			if (sys) {
+				sys->PassQuitEvent();
+			}
 			break;
 		case SDL_KEYDOWN:
 			Input->SendKeyDownEvent(e->key.keysym, e->text.text);

@@ -3,7 +3,7 @@
 #include <vector>
 #include <concurrentqueue.h>
 
-MutexVariable<unordered_map<string, RaptureAsset*>> m_openedAssets;
+unordered_map<string, AssetComponent*> m_assetComponents;
 
 namespace Filesystem {
 	/* Cvars */
@@ -121,7 +121,8 @@ namespace Filesystem {
 			string path = *it + "/";
 			if ((dir = opendir(path.c_str())) != nullptr) {
 				while ((ent = readdir(dir)) != nullptr) {
-					FILE* fp = fopen(ent->d_name, "rb+");
+					string fullPath = path + ent->d_name;
+					FILE* fp = fopen(fullPath.c_str(), "rb+");
 					if (fp == nullptr) {
 						continue;
 					}
@@ -132,7 +133,7 @@ namespace Filesystem {
 						AssetHeader head;
 						fseek(fp, 0, SEEK_SET);
 						fread(&head, sizeof(head), 1, fp);
-						m_assetList[head.assetName] = string(ent->d_name);
+						m_assetList[head.assetName] = fullPath;
 					}
 					fclose(fp);
 				}
@@ -211,7 +212,7 @@ namespace Filesystem {
 
 		// TODO: DLC check
 
-		pAsset->components = (AssetComponent*)Zone::Alloc(sizeof(AssetComponent), "files");
+		pAsset->components = (AssetComponent*)Zone::Alloc(sizeof(AssetComponent) * pAsset->head.numberComponents, "files");
 		for (int i = 0; i < pAsset->head.numberComponents; i++) {
 			AssetComponent* comp = &pAsset->components[i];
 			fread(&comp->meta, sizeof(comp->meta), 1, fp);
@@ -319,7 +320,10 @@ namespace Filesystem {
 					}
 					break;
 			}
+			string szFullName = assetName + '/' + comp->meta.componentName;
+			m_assetComponents[szFullName] = comp;
 		}
+		fclose(fp);
 	}
 
 	/* Find a component residing within an asset file */

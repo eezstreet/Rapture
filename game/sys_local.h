@@ -431,7 +431,7 @@ public:
 
 /* A resource is something that is streamed from an asset file */
 class Resource {
-	AssetComponent component;
+	AssetComponent* component;
 	bool bRetrieved;
 	bool bBad;
 
@@ -453,7 +453,7 @@ public:
 	static bool ResourceRetrieved(Resource* pResource) { return pResource->Retrieved(); }
 	static bool ResourceBad(Resource* pResource) { return pResource->Bad(); }
 
-	AssetComponent* GetAssetComponent() { return &component; }
+	AssetComponent* GetAssetComponent() { return component; }
 	static AssetComponent* GetAssetComponent(Resource* pRes) { return pRes->GetAssetComponent(); }
 };
 
