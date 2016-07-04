@@ -3,6 +3,8 @@
 #include <string>
 #include <fstream>
 
+#pragma warning(disable:4996)
+
 const char* ComponentTypeToString(ComponentType t) {
 	switch (t) {
 		default:
@@ -418,6 +420,7 @@ void DrawComponentData(int currentSelectedComponent) {
 	}
 
 	auto comp = currentFile->decompressedAssets[currentSelectedComponent];
+
 	ImGui::BeginGroup();
 	ImGui::InputText("Component Name", comp.meta.componentName, sizeof(comp.meta.componentName));
 	ImGui::Text("Decompressed size: %i bytes", comp.meta.decompressedSize);
@@ -465,7 +468,8 @@ void DrawComponentData(int currentSelectedComponent) {
 			}
 			break;
 	}
-	// Sometimes the decompressed size doesn't change correctly for some reason.
+	// Sometimes this data doesn't carry over properly for some reason.
 	currentFile->decompressedAssets[currentSelectedComponent].meta.decompressedSize = comp.meta.decompressedSize;
+	strncpy(currentFile->decompressedAssets[currentSelectedComponent].meta.componentName, comp.meta.componentName, COMP_NAMELEN);
 	ImGui::EndGroup();
 }
