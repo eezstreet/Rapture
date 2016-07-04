@@ -27,6 +27,30 @@ const char* ComponentTypeToString(ComponentType t) {
 	}
 }
 
+bool ComponentChanged(ComponentData* pPrevComponent, ComponentData* pNewComponent) {
+	return strcmp(pPrevComponent->head.mime, pNewComponent->head.mime);
+}
+
+bool ComponentChanged(ComponentMaterial* pPrevComponent, ComponentMaterial* pNewComponent) {
+	return memcmp(&pPrevComponent->head, &pNewComponent->head, sizeof(ComponentMaterial::MaterialHeader));
+}
+
+bool ComponentChanged(ComponentLevel* pPrevComponent, ComponentLevel* pNewComponent) {
+	return false; // TODO
+}
+
+bool ComponentChanged(ComponentComp* pPrevComponent, ComponentComp* pNewComponent) {
+	return false; // TODO
+}
+
+bool ComponentChanged(ComponentTile* pPrevComponent, ComponentTile* pNewComponent) {
+	return memcmp(pPrevComponent, pNewComponent, sizeof(ComponentTile));
+}
+
+bool ComponentChanged(ComponentFont* pPrevComponent, ComponentFont* pNewComponent) {
+	return memcmp(&pPrevComponent->head, &pNewComponent->head, sizeof(ComponentFont::FontHeader));
+}
+
 static void DrawNumberedCheckbox(int number, uint32_t* field) {
 	std::string s = std::to_string(number + 1);
 	ImGui::CheckboxFlags(s.c_str(), (unsigned int*)field, (1 << number));
@@ -58,6 +82,8 @@ static void DrawUndefinedComponent(void** component, uint64_t* decompressedSize)
 		*component = malloc(*decompressedSize);
 		infile.read((char*)*component, *decompressedSize);
 		infile.close();
+
+		fileChanged = true;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Export Data")) {
@@ -115,6 +141,8 @@ static void DrawDataComponent(ComponentData* pDataComponent, uint64_t* decompres
 		std::string ext = stlpath.substr(stlpath.find_last_of('.'));
 		char* mime = pDataComponent->head.mime;
 		TryGuessMimeType(mime, ext.c_str());
+
+		fileChanged = true;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Export Data")) {
@@ -137,6 +165,7 @@ static void DrawDataComponent(ComponentData* pDataComponent, uint64_t* decompres
 		outfile.write(pDataComponent->data, *decompressedSize);
 		outfile.close();
 	}
+
 	ImGui::InputText("MIME Type", pDataComponent->head.mime, sizeof(pDataComponent->head.mime));
 }
 
@@ -154,6 +183,7 @@ static void DrawMaterialComponent(ComponentMaterial* pMaterialComponent) {
 				ImportRGBASprite(&pMaterialComponent->diffusePixels, pMaterialComponent->head.numDirections,
 					&pMaterialComponent->head.frameWidth, &pMaterialComponent->head.frameHeight,
 					&pMaterialComponent->head.width, &pMaterialComponent->head.height);
+				fileChanged = true;
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Preview")) {
@@ -198,6 +228,7 @@ static void DrawMaterialComponent(ComponentMaterial* pMaterialComponent) {
 				ImportMonochromeSprite(&pMaterialComponent->depthPixels, pMaterialComponent->head.numDirections,
 					&pMaterialComponent->head.frameWidth, &pMaterialComponent->head.frameHeight,
 					&pMaterialComponent->head.depthWidth, &pMaterialComponent->head.depthHeight);
+				fileChanged = true;
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Preview")) {
@@ -233,6 +264,7 @@ static void DrawMaterialComponent(ComponentMaterial* pMaterialComponent) {
 				ImportRGBASprite(&pMaterialComponent->normalPixels, pMaterialComponent->head.numDirections,
 					&pMaterialComponent->head.frameWidth, &pMaterialComponent->head.frameHeight,
 					&pMaterialComponent->head.normalWidth, &pMaterialComponent->head.normalHeight);
+				fileChanged = true;
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Preview")) {
@@ -283,6 +315,7 @@ static void DrawImageComponent(ComponentImage* pImageComponent) {
 	ImGui::Text("Height: %i pixels", pImageComponent->head.height);
 	if (ImGui::Button("Import")) {
 		ImportImage(&pImageComponent->pixels, &pImageComponent->head.width, &pImageComponent->head.height);
+		fileChanged = true;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Preview")) {
@@ -304,10 +337,11 @@ static void DrawLevelComponent(ComponentLevel* pLevelComponent) {
 	ImGui::Text("Height: %i", pLevelComponent->head.height);
 	ImGui::Text("Tile Count: %i", pLevelComponent->head.numTiles);
 	ImGui::Text("Ent Count: %i", pLevelComponent->head.numEntities);
+	// TODO Shouldn't we have an import button here...?
 }
 
 static void DrawCompComponent(ComponentComp* pAnimComponent) {
-	
+	// TODO
 }
 
 static void DrawTileComponent(ComponentTile* pTileComponent) {
@@ -420,6 +454,7 @@ void DrawComponentData(int currentSelectedComponent) {
 	}
 
 	auto comp = currentFile->decompressedAssets[currentSelectedComponent];
+	AssetComponent::AssetCompHead prevMeta = comp.meta;
 
 	ImGui::BeginGroup();
 	ImGui::InputText("Component Name", comp.meta.componentName, sizeof(comp.meta.componentName));
@@ -427,24 +462,42 @@ void DrawComponentData(int currentSelectedComponent) {
 	ImGui::EndGroup();
 	ImGui::Spacing();
 	ImGui::BeginGroup();
+
 	switch (comp.meta.componentType) {
 		case Asset_Undefined:
 			DrawUndefinedComponent(&comp.data.undefinedComponent, &comp.meta.decompressedSize);
 			currentFile->decompressedAssets[currentSelectedComponent].data.undefinedComponent = comp.data.undefinedComponent;
 			break;
 		case Asset_Data:
-			DrawDataComponent(comp.data.dataComponent, &comp.meta.decompressedSize);
-			currentFile->decompressedAssets[currentSelectedComponent].data.dataComponent = comp.data.dataComponent;
+			if (comp.data.dataComponent) {
+				ComponentData prevComponent = *comp.data.dataComponent;
+				DrawDataComponent(comp.data.dataComponent, &comp.meta.decompressedSize);
+				currentFile->decompressedAssets[currentSelectedComponent].data.dataComponent = comp.data.dataComponent;
+				ComponentData newComponent = *comp.data.dataComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
+			}
 			break;
 		case Asset_Font:
 			if (comp.data.fontComponent) {
+				ComponentFont prevComponent = *comp.data.fontComponent;
 				DrawFontData(comp.data.fontComponent, &comp.meta.decompressedSize);
+				ComponentFont newComponent = *comp.data.fontComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
 			}
 			currentFile->decompressedAssets[currentSelectedComponent].data.fontComponent = comp.data.fontComponent;
 			break;
 		case Asset_Material:
 			if (comp.data.materialComponent) {
+				ComponentMaterial prevComponent = *comp.data.materialComponent;
 				DrawMaterialComponent(comp.data.materialComponent);
+				ComponentMaterial newComponent = *comp.data.materialComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
 			}
 			break;
 		case Asset_Image:
@@ -454,17 +507,32 @@ void DrawComponentData(int currentSelectedComponent) {
 			break;
 		case Asset_Level:
 			if (comp.data.levelComponent) {
+				ComponentLevel prevComponent = *comp.data.levelComponent;
 				DrawLevelComponent(comp.data.levelComponent);
+				ComponentLevel newComponent = *comp.data.levelComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
 			}
 			break;
 		case Asset_Composition:
 			if (comp.data.compComponent) {
+				ComponentComp prevComponent = *comp.data.compComponent;
 				DrawCompComponent(comp.data.compComponent);
+				ComponentComp newComponent = *comp.data.compComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
 			}
 			break;
 		case Asset_Tile:
 			if (comp.data.tileComponent) {
+				ComponentTile prevComponent = *comp.data.tileComponent;
 				DrawTileComponent(comp.data.tileComponent);
+				ComponentTile newComponent = *comp.data.tileComponent;
+				if (ComponentChanged(&prevComponent, &newComponent)) {
+					fileChanged = true;
+				}
 			}
 			break;
 	}
@@ -472,4 +540,9 @@ void DrawComponentData(int currentSelectedComponent) {
 	currentFile->decompressedAssets[currentSelectedComponent].meta.decompressedSize = comp.meta.decompressedSize;
 	strncpy(currentFile->decompressedAssets[currentSelectedComponent].meta.componentName, comp.meta.componentName, COMP_NAMELEN);
 	ImGui::EndGroup();
+
+	AssetComponent::AssetCompHead newMeta = comp.meta;
+	if (memcmp(&prevMeta, &newMeta, sizeof(AssetComponent::AssetCompHead))) {
+		fileChanged = true;
+	}
 }
