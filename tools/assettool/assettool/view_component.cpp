@@ -96,7 +96,14 @@ void ComponentView() {
 			for (i = 0; i < currentFile->decompressedAssets.size(); i++) {
 				char textBuffer[1024];
 				auto it = currentFile->decompressedAssets[i];
-				sprintf(textBuffer, "%s (%s)", it.meta.componentName, ComponentTypeToString(it.meta.componentType));
+				if (it.meta.componentType == Asset_Data && it.data.dataComponent != nullptr) {
+					// List the MIME type in the component name
+					ComponentData* dataComp = it.data.dataComponent;
+					sprintf(textBuffer, "%s (%s - %s)", it.meta.componentName, ComponentTypeToString(Asset_Data), dataComp->head.mime);
+				}
+				else {
+					sprintf(textBuffer, "%s (%s)", it.meta.componentName, ComponentTypeToString(it.meta.componentType));
+				}
 				if (ImGui::Selectable(textBuffer, &componentSelectedArray[i])) {
 					// deselect all other ones
 					for (int j = 0; j < numComponentsAllocated; j++) {
