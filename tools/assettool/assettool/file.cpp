@@ -9,6 +9,7 @@ ComponentData* LoadDataComponent(std::ifstream& infile, uint64_t decompSize) {
 	ComponentData* data = new ComponentData();
 	infile.read((char*)&data->head, sizeof(data->head));
 	if (decompSize > 0) {
+		data->data = (char*)malloc(decompSize);
 		infile.read(data->data, decompSize);
 	}
 	return data;
