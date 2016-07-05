@@ -2,24 +2,24 @@
 	<head>
         <title></title>
 		<!--- CODE --->
-		<link rel="stylesheet" href="css/custom-theme/jquery-ui.min.css">
-		<link rel="stylesheet" href="css/custom-theme/jquery-ui.structure.min.css" />
-		<link rel="stylesheet" href="css/custom-theme/jquery-ui.theme.min.css" />
+		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.min.css">
+		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.structure.min.css" />
+		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.theme.min.css" />
 		<script type="text/javascript">
 			var GameManager;
 		</script>
-		<script type="text/javascript" src="scripts/jQuery-2.1.1.min.js"></script>
-		<script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
-		
-		<script>    
+		<script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="asset://Rapture/jquery/jquery-ui.min.js"></script>
+
+		<script>
 			function QuitGame() {
 				GameManager.execCommand("quit");
 			}
-			
+
 			function NewGame() {
 				GameManager.execCommand("newgametest");
 			}
-			
+
 			function ReverseTransverse(element, tag) {
 				tag = tag.toLowerCase();
 				do {
@@ -29,31 +29,31 @@
 					}
 				} while(element.parentNode);
 			}
-			
+
 			var selectedResolution = "";
 			function UpdateVideoDisplay() {
 				// Resolution
 				var videoSelected = "#res";
 				var videoWidth = GameManager.getCvarInteger("vid_width");
 				var videoHeight = GameManager.getCvarInteger("vid_height");
-				
+
 				// Select the resolution...
 				selectedResolution = "res";
 				selectedResolution = selectedResolution.concat(videoWidth.toString()).concat("x");
 				selectedResolution = selectedResolution.concat(videoHeight.toString());
-				
+
 				videoSelected = videoSelected.concat(videoWidth.toString());
 				videoSelected = videoSelected.concat("x");
 				videoSelected = videoSelected.concat(videoHeight.toString());
-				
+
 				selectedResolution = videoSelected;
-				
+
 				$(videoSelected).addClass("ui-selected");
-				
+
 				// ... and then switch us to the tab which has that option
 				var pParent = ReverseTransverse(document.getElementById(videoSelected.substring(1)), "div");
 				var pParentName = pParent.id;
-				
+
 				var number = 0;
 				if(pParentName == "tab-54") {
 					number = 1;
@@ -63,10 +63,10 @@
 					number = 3;
 				}
 				$("#tabs-resolution").tabs("option", "active", number);
-				
+
 				// Gamma slider
 				$("#slider-gamma").slider("option", "value", GameManager.getCvarFloat("r_gamma"));
-				
+
 				// Fullscreen
 				var bFullscreen = GameManager.getCvarBoolean("r_fullscreen");
 				var jqRadioButton = $("input:radio[name=video-fullscreen]");
@@ -78,7 +78,7 @@
 					jqRadioButton.button("refresh");
 				}
 			}
-			
+
 			function ApplyVideoChanges() {
 				var resolution = selectedResolution.substring(3);
 				var resValues = resolution.split("x");
@@ -86,30 +86,30 @@
 				var resHeight = resValues[1];
 				GameManager.setCvarInteger("vid_width", parseInt(resWidth));
 				GameManager.setCvarInteger("vid_height", parseInt(resHeight));
-				
+
 				if($("input:radio[name=video-fullscreen]")[0].checked) {
 					GameManager.setCvarBoolean("r_fullscreen", true);
 				} else {
 					GameManager.setCvarBoolean("r_fullscreen", false);
 				}
 			}
-			
+
 			$(document).ready(function() {
 				$('#menuaccordion').accordion({ active: false, collapsible: true, heightStyle: "content"});
-				
+
 				$(window).scroll(function() {
 					scroll(0,0);
 				});
-				
+
 				$('#menu-exit-button').on('click', function() {
 					QuitGame();
 				});
-				
+
 				$('#menu-new-button').on('click', function() {
 					NewGame();
 				});
 			});
-			
+
 			function preventDrag(e) {
 				if(e.stopPropagation) e.stopPropagation();
 				if(e.preventDefault) e.preventDefault();
@@ -117,21 +117,21 @@
 				e.returnValue=false;
 				return false;
 			}
-			
+
 			$(document).mousedown(function(e) {
 				if(!e) {
 					e = window.event;
 				}
 				return preventDrag(e);
 			});
-			
+
 			$(document).mousemove(function(e) {
 				if(!e) {
 					e = window.event;
 				}
 				return preventDrag(e);
 			});
-			
+
 			$(function() {
 				$("button").button().click(function(event) {
 					event.preventDefault();
@@ -139,18 +139,18 @@
 				$("#newgame").menu();
 				$("#options").menu();
 				$("#extras").menu();
-				
+
 				$("#video-options").dialog({
 					autoOpen: false,
 					modal: true,
 					resizable: false,
 					buttons: {
-						OK: function() { 
+						OK: function() {
 							ApplyVideoChanges();
-							$(this).dialog("close"); 
+							$(this).dialog("close");
 						},
-						Cancel: function() { 
-							$(this).dialog("close"); 
+						Cancel: function() {
+							$(this).dialog("close");
 						},
 						Apply: function() {
 							$("#apply-warning").dialog("open");
@@ -160,7 +160,7 @@
 					},
 					width: 500
 				});
-				
+
 				$("#apply-warning").dialog({
 					autoOpen: false,
 					modal: true,
@@ -169,15 +169,15 @@
 						OK: function() { $(this).dialog("close"); }
 					},
 				});
-				
+
 				$("#open-video-options").click(function(){
 					UpdateVideoDisplay();
 					$("#video-options").dialog("open");
 				});
-				
+
 				$("#video-advanced").buttonset();
 				$("#video-fullscreen").buttonset();
-				
+
 				$("#slider-gamma").slider({
 					min: 0.22,
 					max: 4.0,
@@ -186,7 +186,7 @@
 						GameManager.setCvarFloat("r_gamma", ui.value);
 					}
 				});
-				
+
 				$("#res-small").selectable({
 					selecting: function(event, ui){
 						if( $("#res-small").length > 1){
@@ -214,7 +214,7 @@
 						$("#res-small").trigger("unselected");
 						$("#res-widesmall").trigger("unselected");
 						$("#res-widelarge").trigger("unselected");
-						
+
 					},
 					selected: function(event, ui) {
 						selectedResolution = ui.selected.id;
@@ -255,12 +255,12 @@
 				$("#tabs-resolution").tabs();
 			});
 		</script>
-		
+
 		<style type="text/css">
 			html, body {
 				overflow:hidden;
 			}
-			
+
 			#copyright {
 				position:absolute;
 				width:99%;
@@ -276,32 +276,32 @@
 				user-select:none;
 				font-size:8px;
 			}
-			
+
 			.ui-menu { width:100%; }
-			
+
 			#feedback { font-size: 1.4em; }
 			#res-small { list-style-type: none; margin: 0; padding: 0; width: 60%; }
 			#res-large { list-style-type: none; margin: 0; padding: 0; width: 60%; }
 			#res-widesmall { list-style-type: none; margin: 0; padding: 0; width: 60%; }
 			#res-widelarge { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-			
-			
+
+
 			.resolution-select .ui-selecting { background: #6a2321; }
 			.resolution-select .ui-selected { background: #621715; color: white; }
 		</style>
 	</head>
-	
-	
+
+
 	<!--- UI DESIGN --->
-	
-	
+
+
 	<body style="background-color:#DDDDDD;">
 		<div id="menucontainer" style="padding:10px;width:99%;height:99%;margin:auto auto auto auto;">
 			<div id="copyright">
 				<center><p>Copyright (c) 2014 Full Spectrum Software</p></center>
 			</div>
 			<div style="position:fixed;left:3%;">
-				<img src="images/alphalogo.png">
+				<img src="asset://Rapture/menu-images/alphalogo">
 			</div>
 			<div class="ui-widget-content" style="width:350px;position:fixed;right:5%;bottom:10%;">
 				<div id="menuaccordion">
@@ -335,11 +335,11 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div id="apply-warning" title="Warning">
 			Due to a bug in SDL, the ''Apply'' button currently doesn't function. Use ''OK'' and restart your game.
 		</div>
-		
+
 		<div id="video-options" title="Video Options">
 			<!-- Simple/Advanced Options -->
 			<div>
