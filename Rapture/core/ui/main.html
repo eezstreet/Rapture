@@ -65,10 +65,10 @@
 				$("#tabs-resolution").tabs("option", "active", number);
 
 				// Gamma slider
-				$("#slider-gamma").slider("option", "value", GameManager.getCvarFloat("r_gamma"));
+				$("#slider-gamma").slider("option", "value", GameManager.getCvarFloat("vid_gamma"));
 
 				// Fullscreen
-				var bFullscreen = GameManager.getCvarBoolean("r_fullscreen");
+				var bFullscreen = GameManager.getCvarBoolean("vid_fullscreen");
 				var jqRadioButton = $("input:radio[name=video-fullscreen]");
 				if(bFullscreen) {
 					jqRadioButton[0].checked = true;
@@ -88,9 +88,9 @@
 				GameManager.setCvarInteger("vid_height", parseInt(resHeight));
 
 				if($("input:radio[name=video-fullscreen]")[0].checked) {
-					GameManager.setCvarBoolean("r_fullscreen", true);
+					GameManager.setCvarBoolean("vid_fullscreen", true);
 				} else {
-					GameManager.setCvarBoolean("r_fullscreen", false);
+					GameManager.setCvarBoolean("vid_fullscreen", false);
 				}
 			}
 
@@ -183,7 +183,7 @@
 					max: 4.0,
 					step: 0.1,
 					slide: function(event, ui) {
-						GameManager.setCvarFloat("r_gamma", ui.value);
+						GameManager.setCvarFloat("vid_gamma", ui.value);
 					}
 				});
 
