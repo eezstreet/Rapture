@@ -104,6 +104,7 @@ public:
 	static int LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 	static void UnlockStreamingTexture(Texture* ptTexture);
 	static void DeleteStreamingTexture(Texture* pTexture);
+	static void BlendTexture(Texture* pTexture);
 };
 
 struct Screenshot {

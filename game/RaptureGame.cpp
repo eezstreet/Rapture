@@ -238,6 +238,7 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->LockStreamingTexture = Video::LockStreamingTexture;
 	imp->UnlockStreamingTexture = Video::UnlockStreamingTexture;
 	imp->DeleteStreamingTexture = Video::DeleteStreamingTexture;
+	imp->BlendTexture = Video::BlendTexture;
 
 	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
 	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;

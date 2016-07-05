@@ -175,6 +175,7 @@ extern "C" {
 		renderExport.LockStreamingTexture = Texture::LockStreamingTexture;
 		renderExport.UnlockStreamingTexture = Texture::UnlockStreamingTexture;
 		renderExport.DeleteStreamingTexture = Texture::DeleteStreamingTexture;
+		renderExport.BlendTexture = Texture::BlendTexture;
 
 		renderExport.QueueScreenshot = RenderExport::QueueScreenshot;
 

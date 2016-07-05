@@ -181,6 +181,12 @@ namespace Video {
 		}
 	}
 
+	void BlendTexture(Texture* ptTexture) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->BlendTexture(ptTexture);
+		}
+	}
+
 	// Texture Drawing
 	Material* RegisterMaterial(const char* szMaterial) {
 		if (pRenderer && pRenderer->AreExportsValid()) {

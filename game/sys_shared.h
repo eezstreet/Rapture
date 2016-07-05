@@ -129,6 +129,7 @@ extern "C" {
 		int			(*LockStreamingTexture)(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 		void		(*UnlockStreamingTexture)(Texture* ptTexture);
 		void		(*DeleteStreamingTexture)(Texture* ptTexture);
+		void		(*BlendTexture)(Texture* ptTexture);
 
 		// UI
 		Menu* (*RegisterStaticMenu)(const char* sMenuFile);

@@ -128,7 +128,7 @@ namespace UI {
 				bmp->CopyTo(pixels, pitch, 4, false, false);
 				Video::UnlockStreamingTexture(tex);
 			}
-			//Video::BlendTexture(tex);
+			Video::BlendTexture(tex);
 		}
 	}
 

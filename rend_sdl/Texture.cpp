@@ -170,3 +170,7 @@ void Texture::UnlockStreamingTexture(Texture* ptTexture) {
 void Texture::DeleteStreamingTexture(Texture* ptTexture) {
 	delete ptTexture;
 }
+
+void Texture::BlendTexture(Texture* ptTexture) {
+	ptTexture->Blend();
+}

@@ -31,6 +31,7 @@ struct renderExports_s {
 	int			(*LockStreamingTexture)(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 	void		(*UnlockStreamingTexture)(Texture* ptTexture);
 	void		(*DeleteStreamingTexture)(Texture* ptTexture);
+	void		(*BlendTexture)(Texture* ptTexture);
 
 	// Screenshots
 	void		(*QueueScreenshot)(const char* szFileName, const char* szExtension);
@@ -124,6 +125,7 @@ namespace Video {
 	int LockStreamingTexture(Texture* ptTexture, unsigned int nX, unsigned int nY, unsigned int nW, unsigned int nH, void** pixels, int* pitch);
 	void UnlockStreamingTexture(Texture* ptTexture);
 	void DeleteStreamingTexture(Texture* ptTexture);
+	void BlendTexture(Texture* ptTexture);
 
 	// Screenshots
 	void QueueScreenshot(const char* szFileName, const char* szExtension);
