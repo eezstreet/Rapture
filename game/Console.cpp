@@ -117,7 +117,7 @@ Console& Console::operator=(Console& other) {
 
 void Console::Show(){
 	bIsOpen = true;
-	wView->LoadURL(WebURL(WSLit("asset://menus/console")));
+	wView->LoadURL(WebURL(WSLit("asset://Rapture/menus/console")));
 	UI::StartDrawingMenu(this);
 	prevFocus = UI::currentFocus;
 	UI::currentFocus = wView;
@@ -145,7 +145,7 @@ void Console::Hide() {
 }
 
 void Console::BlankConsole() {
-	wView->LoadURL(WebURL(WSLit("asset://menus/null")));
+	wView->LoadURL(WebURL(WSLit("asset://Rapture/menus/null")));
 	UI::wc->Update();
 }
 

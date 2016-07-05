@@ -3,7 +3,7 @@
         <script type="text/javascript">
             var ConsoleManager; // global object
         </script>
-        <script type="text/javascript" src="scripts/jQuery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
         <style>
             body {
                 background-color:transparent;
@@ -63,7 +63,7 @@
 				background-color:white;
 				color:blue;
 			}
-            
+
             textarea#conlines {
 				margin: 0px;
 				left: 1px;
@@ -79,17 +79,17 @@
                 overflow:hidden;
                 !important;
             }
-            
+
             ::selection {
                 background:white;
                 color:blue;
             }
-            
+
             ::-moz-selection {
                 background:white;
                 color:blue;
             }
-            
+
             ::-webkit-selection {
                 background:white;
                 color:blue;
@@ -119,7 +119,7 @@
         function InputBufferUpdated(setToThisString) {
             document.getElementById("coninput").value = setToThisString;
         }
-        
+
 		function UNIX_TextSelect(e) {
 			// Whenever we select text in the main window, it gets added to the clipboard
 			// This is the only UNIX_ function not called by C++ code
@@ -128,17 +128,17 @@
 				return;
 			ConsoleManager.sendToClipboard(selectedText);
 		}
-		
+
 		function UNIX_DeselectAll() {
 			// Called directly by C++ code
 			window.getSelection().removeAllRanges();
 		}
-        
+
         function WeJustOpenedForBusiness() {
             document.getElementById("coninput").select();
             ConsoleManager.openSaysAMe();
         }
-        
+
         function KeyPressEvent(event) {
             var charCode;
             if(!event) event = window.event;
@@ -169,14 +169,14 @@
                 return false;
             }
         }
-        
+
         var var_KeyPressEvent = KeyPressEvent;
-        
+
         $(document).keydown(var_KeyPressEvent);
-        
+
         $(document).ready(function() {
             $("#coninput").bind("keypress", var_KeyPressEvent);
-            
+
             $("#conform").submit(function(event) {
                 var currentCommand = document.getElementById("coninput").value;
                 ConsoleManager.sendConsoleCommand(currentCommand);
@@ -184,27 +184,27 @@
                 event.preventDefault();
                 return false;
             });
-            
+
             WeJustOpenedForBusiness();
         });
-        
+
         // Handle the text area
         function EXPORT_ClearConsoleDisplay() {
             document.getElementById("conlines").value = "";
         }
-        
+
         function EXPORT_SetDisplayLines(text) {
             // Happens on console open. Set display lines to console buffer`
             document.getElementById("conlines").value = text;
             $('#conlines').scrollTop($('#conlines')[0].scrollHeight - $('#conlines').height());
         }
-        
+
         function EXPORT_SendNewLine(newLine) {
             // This happens whenever we get a new line in the console while it is open
             document.getElementById("conlines").value = document.getElementById("conlines").value.concat(newLine);
             $('#conlines').scrollTop($('#conlines')[0].scrollHeight - $('#conlines').height());
         }
-        
+
         function EXPORT_IncreaseTextSize(newSize) {
             if(newSize <= 0) {
                 // Increase by one point size
@@ -213,7 +213,7 @@
             //EXPORT_SendNewLine("text size = " + document.getElementById("conlines").style.fontSize);
             //document.coninput.style.fontSize = newSize;
         }
-        
+
         function EXPORT_DecreaseTextSize(newSize) {
             if(newsize <= 0) {
                 // Decrease by one point size
