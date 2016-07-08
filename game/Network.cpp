@@ -335,6 +335,10 @@ namespace Network {
 
 	// Disconnect from current remote server
 	void DisconnectFromRemote() {
+		if (currentNetState == Netstate_NoConnect) {
+			// Not connected in the first place
+			return;
+		}
 		if (sys && sys->trap) {
 			sys->trap->saveandexit();
 		}
