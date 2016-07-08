@@ -21,9 +21,13 @@ void Editor_Load() {
 	hotkeyDisplay = trap->RegisterStaticMenu("ui/editorhotkeys.html");
 }
 
-void Editor_Init() {
+void Editor_ClientInit(const char* fileName) {
 	trap->printf(PRIORITY_NOTE, "--- Editor Begin ---\n");
 	Editor_Load();
+}
+
+void Editor_ServerInit(const char* fileName) {
+	trap->printf(PRIORITY_NOTE, "Local server not started");
 }
 
 void Editor_Shutdown() {
@@ -84,13 +88,34 @@ void Editor_OnKeyPress(int x) {
 	}
 }
 
+bool Editor_InterpretPacket(Packet* packet) {
+	// The Editor isn't networked
+	return false;
+}
+
+bool Editor_AcceptClient(ClientPacket::ClientAttemptPacket* packet) {
+	return false;
+}
+
+void Editor_ServerFrame() {
+	return; // do nothing, it's totally client-side
+}
+
+void Editor_ClientFrame() {
+
+}
+
 extern "C" {
 	__declspec(dllexport) gameExports_s* GetRefAPI(gameImports_s* import) {
 		trap = import;
 
-		exportFns.init = Editor_Init;
-		exportFns.shutdown = Editor_Shutdown;
-		exportFns.runactiveframe = Editor_Frame;
+		exportFns.startclientfromsave = Editor_ClientInit;
+		exportFns.startserverfromsave = Editor_ServerInit;
+		exportFns.runserverframe = Editor_ServerFrame;
+		exportFns.runclientframe = Editor_ClientFrame;
+		exportFns.acceptclient = Editor_AcceptClient;
+		exportFns.saveandexit = Editor_Shutdown;
+		exportFns.interpretPacketFromClient = exportFns.interpretPacketFromServer = Editor_InterpretPacket;
 		exportFns.passmouseup = Editor_OnMouseUp;
 		exportFns.passmousedown = Editor_OnMouseDown;
 		exportFns.passmousemove = Editor_OnMouseMove;

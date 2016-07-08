@@ -1,5 +1,7 @@
 #pragma once
 #ifdef _WIN32
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 #include <Windows.h>
 #include <Rpc.h>
 #endif
@@ -57,7 +59,7 @@ class Cvar;
 class AnimationManager;
 class Texture;
 
-enum {
+enum dispatchPriorities_e {
 	PRIORITY_NONE,
 	PRIORITY_NOTE,
 	PRIORITY_DEBUG,
@@ -73,6 +75,49 @@ enum cvarFlags_e {
 	CVAR_ROM,
 	CVAR_ANNOUNCE,
 };
+
+enum packetType_e {
+	PACKET_PING,			// Server <-> (Any)		--	Check if service is alive	
+	PACKET_CLIENTATTEMPT,	// Server <-  Client	--	Attempt to join a server
+	PACKET_CLIENTACCEPT,	// Server  -> Client	--	Tell the client they are accepted into the server
+	PACKET_CLIENTDENIED,	// Server  -> Client	--	Tell the client they are denied into the server
+	PACKET_INFOREQUEST,		// Server <-  3rdParty	--	Ask for some info from a server
+	PACKET_INFOREQUESTED,	// Server  -> 3rdParty	--	Send the info that was requested from this server
+	PACKET_SENDCHAT,		// Server <-  Client	--	Client spoke
+	PACKET_RECVCHAT,		// Server  -> Client	--	Client is heard
+};
+
+struct Packet {
+	enum PacketDirection_e {
+		PD_ServerClient,	// Server -> Client
+		PD_ClientServer		// Client -> Server
+	};
+
+	struct PacketHeader {
+		packetType_e		type;			// Type of this packet
+		int8_t				clientNum;		// The other client number (host is always client 0)
+		PacketDirection_e	direction;		// Direction this packet is going (indicates how clientNum is interpretted)
+		uint64_t			sendTime;		// Time this packet was sent
+		size_t				packetSize;		// Size of this packet (minus the header)
+	};
+
+	PacketHeader packetHead;
+	void* packetData;
+};
+
+namespace ClientPacket {
+	struct ClientAttemptPacket {
+		uint8_t	netProtocol;
+	};
+
+	struct ClientAcceptPacket {
+		uint8_t clientNum;
+	};
+
+	struct ClientDeniedPacket {
+		char why[140];
+	};
+}
 
 // Callbacks
 typedef void(*fileOpenedCallback)(File* pFile);
@@ -143,6 +188,10 @@ extern "C" {
 		double(*GetJSDoubleArg)(Menu* ptMenu, unsigned int argNum);
 		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);
 
+		// Network
+		void(*SendServerPacket)(packetType_e packetType, int clientNum, void* packetData, size_t packetSize);
+		void(*SendClientPacket)(packetType_e packetType, void* packetData, size_t packetSize);
+
 		// Cvars
 		void(*CvarIntVal)(const char* cvarName, int* value);
 		void(*CvarStrVal)(const char* cvarName, char* value);
@@ -166,15 +215,20 @@ extern "C" {
 	};
 
 	struct gameExports_s {
-		void(*init)();
-		void(*shutdown)();
-		void(*runactiveframe)();
+		void(*startserverfromsave)(const char* szSaveGame);
+		void(*startclientfromsave)(const char* szSaveGame);
+		void(*runserverframe)();
+		void(*runclientframe)();
+		void(*saveandexit)();
+		bool(*acceptclient)(ClientPacket::ClientAttemptPacket* packet);
 
 		void(*passmouseup)(int x, int y);
 		void(*passmousedown)(int x, int y);
 		void(*passmousemove)(int x, int y);
-
 		void(*passkeypress)(int x);
+
+		bool(*interpretPacketFromClient)(Packet* packet);
+		bool(*interpretPacketFromServer)(Packet* packet);
 	};
 }
 

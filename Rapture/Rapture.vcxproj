@@ -60,7 +60,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -108,16 +108,18 @@
     <ClCompile Include="..\game\Input.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
+    <ClCompile Include="..\game\Network.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
     <ClCompile Include="..\game\Resource.cpp" />
     <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\game\Cmd.cpp" />
     <ClCompile Include="..\game\RaptureGame.cpp" />
+    <ClCompile Include="..\game\Socket.cpp" />
     <ClCompile Include="..\game\UIDataSource.cpp" />
     <ClCompile Include="..\game\Video.cpp" />
-    <ClCompile Include="..\game\Win32.cpp" />
     <ClCompile Include="..\game\Timer.cpp" />
     <ClCompile Include="..\game\UI.cpp" />
+    <ClCompile Include="..\game\win32\Win32.cpp" />
     <ClCompile Include="..\game\Zone.cpp" />
     <ClCompile Include="..\json\cJSON.c" />
   </ItemGroup>

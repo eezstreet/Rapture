@@ -10,6 +10,12 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\modcode\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\modcode\Server.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{70549835-D4E2-4A31-8ED4-5D885CDE6D70}</ProjectGuid>
     <RootNamespace>gamex86</RootNamespace>
@@ -78,71 +84,6 @@
       <AdditionalDependencies>rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\game\Shared.cpp" />
-    <ClCompile Include="..\json\cJSON.c" />
-    <ClCompile Include="..\modcode\Actor.cpp" />
-    <ClCompile Include="..\modcode\Client.cpp" />
-    <ClCompile Include="..\modcode\Container.cpp" />
-    <ClCompile Include="..\modcode\DRLG.cpp" />
-    <ClCompile Include="..\modcode\DungeonManager.cpp" />
-    <ClCompile Include="..\modcode\entities\contain_chest.cpp" />
-    <ClCompile Include="..\modcode\entities\info_player_start.cpp" />
-    <ClCompile Include="..\modcode\entities\level_ambient.cpp" />
-    <ClCompile Include="..\modcode\entities\level_light.cpp" />
-    <ClCompile Include="..\modcode\entities\npc_test.cpp" />
-    <ClCompile Include="..\modcode\Entity.cpp" />
-    <ClCompile Include="..\modcode\Main.cpp" />
-    <ClCompile Include="..\modcode\Local.cpp" />
-    <ClCompile Include="..\modcode\Map.cpp" />
-    <ClCompile Include="..\modcode\MapLoader.cpp" />
-    <ClCompile Include="..\modcode\NPC.cpp" />
-    <ClCompile Include="..\modcode\OptionList.cpp" />
-    <ClCompile Include="..\modcode\QuestManager.cpp" />
-    <ClCompile Include="..\modcode\quests\a1q1_test.cpp" />
-    <ClCompile Include="..\modcode\SaveGame.cpp" />
-    <ClCompile Include="..\modcode\Seed.cpp" />
-    <ClCompile Include="..\modcode\Server.cpp" />
-    <ClCompile Include="..\modcode\Worldspace.cpp" />
-    <ClCompile Include="..\modcode\Player.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\common\RVector.h" />
-    <ClInclude Include="..\game\sys_shared.h" />
-    <ClInclude Include="..\json\cJSON.h" />
-    <ClInclude Include="..\modcode\Actor.h" />
-    <ClInclude Include="..\modcode\Client.h" />
-    <ClInclude Include="..\modcode\Container.h" />
-    <ClInclude Include="..\modcode\DRLG.h" />
-    <ClInclude Include="..\modcode\DungeonManager.h" />
-    <ClInclude Include="..\modcode\entities\contain_chest.h" />
-    <ClInclude Include="..\modcode\entities\info_player_start.h" />
-    <ClInclude Include="..\modcode\entities\level_ambient.h" />
-    <ClInclude Include="..\modcode\entities\level_light.h" />
-    <ClInclude Include="..\modcode\entities\npc_test.h" />
-    <ClInclude Include="..\modcode\Entity.h" />
-    <ClInclude Include="..\modcode\Local.h" />
-    <ClInclude Include="..\modcode\Map.h" />
-    <ClInclude Include="..\modcode\MapFramework.h" />
-    <ClInclude Include="..\modcode\MapLoader.h" />
-    <ClInclude Include="..\modcode\MazeFramework.h" />
-    <ClInclude Include="..\modcode\NPC.h" />
-    <ClInclude Include="..\modcode\OptionList.h" />
-    <ClInclude Include="..\modcode\Player.h" />
-    <ClInclude Include="..\modcode\PresetFileData.h" />
-    <ClInclude Include="..\modcode\QuadTree.h" />
-    <ClInclude Include="..\modcode\Quest.h" />
-    <ClInclude Include="..\modcode\QuestCallbacks.h" />
-    <ClInclude Include="..\modcode\QuestManager.h" />
-    <ClInclude Include="..\modcode\QuestState.h" />
-    <ClInclude Include="..\modcode\quests\a1q1_test.h" />
-    <ClInclude Include="..\modcode\SaveGame.h" />
-    <ClInclude Include="..\modcode\Seed.h" />
-    <ClInclude Include="..\modcode\Server.h" />
-    <ClInclude Include="..\modcode\Tile.h" />
-    <ClInclude Include="..\modcode\Warp.h" />
-    <ClInclude Include="..\modcode\Worldspace.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

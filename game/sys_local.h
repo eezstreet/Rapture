@@ -249,6 +249,7 @@ namespace Zone {
 		TAG_IMAGES,
 		TAG_MATERIALS,
 		TAG_FONT,
+		TAG_NETWORK,
 		TAG_CUSTOM, // should only be used by mods
 		MAX_ENGINE_TAGS // last of the engine tags, but we can add more for vms
 	};
@@ -583,6 +584,64 @@ public:
 };
 extern Dispatch* ptDispatch;
 
+/* Netcode. Note that only TCP is supported, not UDP. */
+
+#ifdef _WIN32
+typedef SOCKET socket_t;
+#else
+typedef int socket_t;
+#endif
+
+// The Network namespace contains all of the basic, low-level functions 
+namespace Network {
+	void Init();
+	void Shutdown();
+	void DispatchServerReadPackets();
+	void DispatchClientReadPackets();
+	void SendServerPacketTo(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
+	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
+	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetSize);
+	bool ConnectToRemote(const char* hostname, int port);
+	void DisconnectFromRemote();
+	void ServerFrame();
+	void ClientFrame();
+	bool StartLocalServer(const char* szSaveGame, RaptureGame* pGameModule);
+	bool JoinServer(const char* szSaveGame, const char* hostname, RaptureGame* pGameModule);
+};
+
+//
+// Socket.cpp
+// Socket is just a wrapper for internal socket format, with some functions operating on it
+// TODO: Make this into a class with inheritance (TCPSocket.cpp/UDPSocket.cpp)
+//
+struct Socket {
+private:
+	socket_t internalSocket;
+	int af, type;
+	addrinfo addressInfo;
+	bool bNeedFreeAddress;
+
+	bool SetNonBlocking();
+	bool SendEntireData(void* data, size_t dataSize);
+	bool ReadEntireData(void* data, size_t dataSize);
+public:
+	Socket(int af_, int type_);
+	Socket(addrinfo& pConnectingClient, socket_t socket);
+	Socket(Socket& other);
+	~Socket();
+
+	bool Connect(const char* hostname, unsigned short port);
+	bool StartListening(unsigned short port, uint32_t backlog);
+	void Disconnect();
+	bool SendPacket(Packet& outgoing);
+	bool ReadPacket(Packet& incoming);
+	void ReadAllPackets(vector<Packet>& vPackets);
+	Socket* CheckPendingConnections();
+	
+	static void Select(vector<Socket*> vSockets, vector<Socket*>& vReadAble, vector<Socket*>& vWriteAble);
+	static void SelectSingle(Socket* pSocket, bool& bReadable, bool& bWriteable);
+};
+
 //
 // FrameCapper.cpp
 //
@@ -618,3 +677,5 @@ void Sys_FreeLibrary(ptModule module);
 ptModuleFunction Sys_GetFunctionAddress(ptModule module, string name);
 bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
+void Sys_InitSockets();
+void Sys_ExitSockets();

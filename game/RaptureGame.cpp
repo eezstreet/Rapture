@@ -132,22 +132,25 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 		return;
 	}
 
-
-	// Init rand (cuz we will DEFINITELY need it ;D
-
 	// Init input
 	SDL_SetEventFilter(RaptureInputCallback, nullptr);
 	InitInput();
 
 	// Init UI
 	UI::Initialize();
+
+	Network::Init();
 }
 
 /* Called after the main loop has finished and we are ready to shut down */
 RaptureGame::~RaptureGame() {
 	if(game) {
-		trap->shutdown();
+		trap->saveandexit();
 		delete game;
+	}
+	if (editor) {
+		trap->saveandexit();
+		delete editor;
 	}
 
 	DeleteInput();
@@ -156,6 +159,7 @@ RaptureGame::~RaptureGame() {
 	Filesystem::Exit();
 	Zone::Shutdown();
 	Video::Shutdown();
+	Network::Shutdown();
 }
 
 /* Run every frame */
@@ -168,9 +172,8 @@ void RaptureGame::RunLoop() {
 	Video::ClearFrame();
 
 	// Do gamecode
-	if(game || editor) {
-		trap->runactiveframe();
-	}
+	Network::ServerFrame();
+	Network::ClientFrame();
 
 	// Do rendering
 	UI::Render();
@@ -251,6 +254,9 @@ void RaptureGame::AssignExports(gameImports_s *imp) {
 	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp->KillStaticMenu = UI::KillStaticMenu;
 
+	imp->SendServerPacket = Network::SendServerPacket;
+	imp->SendClientPacket = Network::SendClientPacket;
+
 	imp->RunJavaScript = UI::RunJavaScript;
 	imp->AddJSCallback = UI::AddJavaScriptCallback;
 	imp->GetJSNumArgs = UI::GetJavaScriptNumArgs;
@@ -281,7 +287,6 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	if(!trap) {
 		return nullptr;
 	}
-	trap->init();
 	return game;
 }
 
@@ -332,6 +337,33 @@ void NewGame() {
 		return;
 	}
 	sys->game = sys->CreateGameModule("gamex86");
+	Network::StartLocalServer(nullptr, sys);
+}
+
+void LoadGame(const char* szSaveGame) {
+	MainMenu::DestroySingleton();
+	if (Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
+	if (sys->game || sys->editor) {
+		// Have to exit from these first
+		return;
+	}
+	sys->game = sys->CreateGameModule("gamex86");
+	Network::StartLocalServer(szSaveGame, sys);
+}
+
+void JoinServer(const char* szSaveGame, const char* szHostName) {
+	MainMenu::DestroySingleton();
+	if (Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
+	if (sys->game || sys->editor) {
+		// Have to exit from these first
+		return;
+	}
+	sys->game = sys->CreateGameModule("gamex86");
+	Network::JoinServer(szSaveGame, szHostName, sys);
 }
 
 void StartEditor() {
@@ -351,14 +383,15 @@ void ReturnToMain() {
 		Console::GetSingleton()->Hide();
 	}
 	if(sys->game) {
-		sys->trap->shutdown();
+		sys->trap->saveandexit();
 		delete sys->game;
 		sys->game = nullptr;
 	} else if(sys->editor) {
-		sys->trap->shutdown();
+		sys->trap->saveandexit();
 		delete sys->editor;
 		sys->editor = nullptr;
 	}
+	Network::DisconnectFromRemote();
 	R_Message(PRIORITY_MESSAGE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
 }

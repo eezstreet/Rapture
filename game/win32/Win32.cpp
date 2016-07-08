@@ -1,4 +1,4 @@
-#include "sys_local.h"
+#include "../sys_local.h"
 #include <direct.h>
 #include <process.h>
 
@@ -147,4 +147,17 @@ void Sys_Error(const char* error, ...) {
 
 	setGameQuitting(false);
 	throw false;
+}
+
+void Sys_InitSockets() {
+	WSADATA wsaDat;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaDat) != 0) {
+		R_Message(PRIORITY_WARNING, "Winsock error: %i\n", GetLastError());
+		WSACleanup();
+		return;
+	}
+}
+
+void Sys_ExitSockets() {
+	WSACleanup();
 }

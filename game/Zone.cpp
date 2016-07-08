@@ -12,6 +12,7 @@ namespace Zone {
 			"images",
 			"materials",
 			"font",
+			"network",
 			"custom",
 			"max"
 	};

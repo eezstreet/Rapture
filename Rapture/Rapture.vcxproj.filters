@@ -22,6 +22,9 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{ad20b08b-c7ff-4088-a02d-19baf8402744}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{684350a7-96f1-4bcc-91d2-c956327b425a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\game\CvarSystem.cpp">
@@ -78,9 +81,6 @@
     <ClCompile Include="..\game\RaptureGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\MainMenu.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
@@ -100,6 +100,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\game\AsyncTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\win32\Win32.cpp">
+      <Filter>Source Files\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Socket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
