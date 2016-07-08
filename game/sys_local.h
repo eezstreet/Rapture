@@ -620,7 +620,6 @@ private:
 	socket_t internalSocket;
 	int af, type;
 	addrinfo addressInfo;
-	bool bNeedFreeAddress;
 
 	bool SetNonBlocking();
 	bool SendEntireData(void* data, size_t dataSize);

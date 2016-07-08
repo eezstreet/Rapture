@@ -22,17 +22,17 @@ namespace Network {
 		Netstate_Authorized,	// Connected to a server and authorized
 	};
 
-	Cvar*				net_port = nullptr;
-	Cvar*				net_serverbacklog = nullptr;
-	Cvar*				net_maxclients = nullptr;
-	Cvar*				net_netmode = nullptr;
+	static Cvar*				net_port = nullptr;
+	static Cvar*				net_serverbacklog = nullptr;
+	static Cvar*				net_maxclients = nullptr;
+	static Cvar*				net_netmode = nullptr;
 
-	Socket*				localSocket = nullptr;
-	map<int, Socket*>	mOtherConnectedClients;
-	Socket*				remoteSocket = nullptr;
-	vector<Packet>		vPacketsAwaitingSend;	// Goes in both directions
-	Netstate_e			currentNetState = Netstate_NoConnect;
-	vector<Socket*>		vTemporaryConnections;
+	static Socket*				localSocket = nullptr;
+	static map<int, Socket*>	mOtherConnectedClients;
+	static Socket*				remoteSocket = nullptr;
+	static vector<Packet>		vPacketsAwaitingSend;	// Goes in both directions
+	static Netstate_e			currentNetState = Netstate_NoConnect;
+	static vector<Socket*>		vTemporaryConnections;
 
 	static int			numConnectedClients = 1;
 	static int			myClientNum = 0;				// Client 0 is always the host
@@ -327,6 +327,7 @@ namespace Network {
 		bool connected = remoteSocket->Connect(hostname, port);
 		if (!connected) {
 			delete remoteSocket;
+			remoteSocket = nullptr;
 		}
 		currentNetState = Netstate_NeedAuth;
 		return connected;
@@ -338,7 +339,6 @@ namespace Network {
 			sys->trap->saveandexit();
 		}
 		if (remoteSocket != nullptr) {
-			remoteSocket->Disconnect();
 			delete remoteSocket;
 			remoteSocket = nullptr;
 		}
