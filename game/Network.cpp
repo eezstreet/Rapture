@@ -307,6 +307,18 @@ namespace Network {
 		return numConnectedClients >= net_maxclients->Integer();
 	}
 
+	void Connect(const char* hostname) {
+		int port = net_port->Integer();
+		R_Message(PRIORITY_MESSAGE, "Connecting to %s:%i\n", hostname, port);
+		if (ConnectToRemote(hostname, port)) {
+			R_Message(PRIORITY_MESSAGE, "Connection established.\n", hostname, port);
+		}
+		else {
+			R_Message(PRIORITY_MESSAGE, "Could not connect to %s:%i\n", hostname, port);
+			DisconnectFromRemote();
+		}
+	}
+
 	// Try and connect to a server
 	bool ConnectToRemote(const char* hostname, int port) {
 		DisconnectFromRemote();
@@ -322,11 +334,15 @@ namespace Network {
 
 	// Disconnect from current remote server
 	void DisconnectFromRemote() {
+		if (sys && sys->trap) {
+			sys->trap->saveandexit();
+		}
 		if (remoteSocket != nullptr) {
 			remoteSocket->Disconnect();
 			delete remoteSocket;
 			remoteSocket = nullptr;
 		}
 		currentNetState = Netstate_NoConnect;
+		R_Message(PRIORITY_NOTE, "--- Disconnected ---\n");
 	}
 }

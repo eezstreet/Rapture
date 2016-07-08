@@ -171,6 +171,22 @@ void Cmd_Editor_f(vector<string>& args) {
 	StartEditor();
 }
 
+void Cmd_Connect_f(vector<string>& args) {
+	if (args.size() != 2) {
+		R_Message(PRIORITY_MESSAGE, "usage: connect <ip address>\n");
+		return;
+	}
+	Network::Connect(args[1].c_str());
+}
+
+void Cmd_Disconnect_f(vector<string>& args) {
+	Network::DisconnectFromRemote();
+}
+
+void Cmd_Join_f(vector<string>& args) {
+	// TODO
+}
+
 void Sys_InitCommands() {
 	// Register commands from the engine
 	Cmd::AddCommand("set", Cmd_Set_f);
@@ -185,6 +201,10 @@ void Sys_InitCommands() {
 
 	Cmd::AddCommand("vid_restart", Cmd_VidRestart_f);
 	Cmd::AddCommand("video_restart", Cmd_VidRestart_f);
+
+	Cmd::AddCommand("connect", Cmd_Connect_f);
+	Cmd::AddCommand("disconnect", Cmd_Disconnect_f);
+	Cmd::AddCommand("join", Cmd_Join_f);
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);

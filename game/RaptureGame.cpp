@@ -2,7 +2,7 @@
 
 /* main game initialization */
 
-static RaptureGame *sys = nullptr;
+RaptureGame *sys = nullptr;
 bool bStartupQuit = false;
 
 void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFinished = true; }

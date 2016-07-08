@@ -607,6 +607,7 @@ namespace Network {
 	void ClientFrame();
 	bool StartLocalServer(const char* szSaveGame, RaptureGame* pGameModule);
 	bool JoinServer(const char* szSaveGame, const char* hostname, RaptureGame* pGameModule);
+	void Connect(const char* hostname);
 };
 
 //
