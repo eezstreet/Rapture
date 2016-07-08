@@ -18,10 +18,14 @@ int main(int argc, char** argv) {
 		}
 	}
 	catch(const bool) {
-		while((sys && !sys->bHasFinished) || (!bStartupQuit)) {
+		if (sys && sys->bHasFinished || !bStartupQuit) {
+			delete sys;
+			return 0;
+		}
+		else while (true) {
 #ifdef _WIN32
 			MSG        msg;
-			if (!GetMessage (&msg, nullptr, 0, 0)) {
+			if (!GetMessage(&msg, nullptr, 0, 0)) {
 				break;
 			}
 			TranslateMessage(&msg);
