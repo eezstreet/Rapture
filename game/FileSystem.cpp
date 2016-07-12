@@ -14,6 +14,7 @@ namespace Filesystem {
 
 	Cvar* fs_multithreaded = nullptr;
 	Cvar* fs_threads = nullptr;
+	Cvar* fs_threadsleep = nullptr;
 
 	/* Parallelism */
 	using namespace moodycamel;
@@ -58,6 +59,8 @@ namespace Filesystem {
 						break;
 				}
 			}
+
+			::this_thread::sleep_for(chrono::milliseconds(fs_threadsleep->Integer()));
 		}
 	}
 
@@ -153,6 +156,7 @@ namespace Filesystem {
 		fs_game = CvarSystem::RegisterCvar("fs_game", "Which mod to use (core is still loaded)", (1 << CVAR_ROM), "");
 		fs_multithreaded = CvarSystem::RegisterCvar("fs_multithreaded", "Whether to use a multithreaded filesystem", (1 << CVAR_ROM), true);
 		fs_threads = CvarSystem::RegisterCvar("fs_threads", "How many threads to use. 2 is best for most systems; 4 is best for RAID or SSD drives.", 0, 2);
+		fs_threadsleep = CvarSystem::RegisterCvar("fs_threadsleep", "How long filesystem threads should sleep for between tasks.", (1 << CVAR_ARCHIVE), 50);
 
 		fs_threads->AddCallback(ResizeThreadPool);
 

@@ -179,6 +179,7 @@ bool Socket::SendPacket(Packet& outgoing) {
 			outgoing.packetHead.type, outgoing.packetHead.clientNum);
 		return false;
 	}
+	return true;
 }
 
 // Read an entire block of memory from a socket, without fragmentation.

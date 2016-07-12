@@ -47,6 +47,7 @@ Renderer::Renderer(const char* renderName) : bExportsValid(false) {
 	renderModule = Sys_LoadLibrary(fullRendName);
 	if (renderModule == NULL) {
 		R_Message(PRIORITY_ERRFATAL, "Failed to load renderer\n");
+		return;
 	}
 
 	ptModuleFunction ptGetRefAPI = Sys_GetFunctionAddress(renderModule, "GetRefAPI");

@@ -76,8 +76,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../SDL_image/include;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../SDL_image/include;../common;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -85,7 +85,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
