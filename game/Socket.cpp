@@ -238,7 +238,6 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_socktype = type;
-	hints.ai_family = af;
 
 	char szPort[16] = { 0 };
 	std::sprintf(szPort, "%i", port);
