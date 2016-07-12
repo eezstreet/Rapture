@@ -159,3 +159,49 @@ void Sys_InitSockets() {
 void Sys_ExitSockets() {
 	WSACleanup();
 }
+
+const char* Sys_SocketConnectError(int& number) {
+	number = WSAGetLastError();
+	switch (number) {
+	case WSANOTINITIALISED:
+		return "Invalid initialization.";
+	case WSAENETDOWN:
+		return "The network subsystem has failed.";
+	case WSAEADDRINUSE:
+		return "The socket's local address is already in use and the socket did not receive proper parameters.";
+	case WSAEINTR:
+		return "A blocking Windows Sockets 1.1 call was canceled through WSACancelBlockingCall.";
+	case WSAEINPROGRESS:
+		return "A blocking Windows Sockets 1.1 call is in progress.";
+	case WSAEALREADY:
+		return "A nonblocking connect call is in progress on the specified socket.";
+	case WSAEADDRNOTAVAIL:
+		return "The remote address is not a valid address.";
+	case WSAEAFNOSUPPORT:
+		return "Addresses in the specified family cannot be used with this socket.";
+	case WSAECONNREFUSED:
+		return "The attempt to connect was forcefully rejected.";
+	case WSAEFAULT:
+		return "Invalid sockaddr";
+	case WSAEINVAL:
+		return "The parameter s is a listening socket.";
+	case WSAEISCONN:
+		return "The socket is already connected.";
+	case WSAENETUNREACH:
+		return "The network cannot be reached from this host at this time.";
+	case WSAEHOSTUNREACH:
+		return "A socket operation was attempted to an unreachable host.";
+	case WSAENOBUFS:
+		return "No buffer space is available. The socket cannot be connected.";
+	case WSAENOTSOCK:
+		return "The descriptor specified in the s parameter is not a socket.";
+	case WSAETIMEDOUT:
+		return "An attempt to connect timed out without establishing a connection.";
+	case WSAEWOULDBLOCK:
+		return "The socket is marked as nonblocking and the connection cannot be completed immediately.";
+	case WSAEACCES:
+		return "An attempt to connect a datagram socket to broadcast address failed because setsockopt option SO_BROADCAST is not enabled.";
+	default:
+		return "Unknown socket error";
+	}
+}

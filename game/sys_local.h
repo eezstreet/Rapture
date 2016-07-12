@@ -679,3 +679,4 @@ bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
 void Sys_InitSockets();
 void Sys_ExitSockets();
+const char* Sys_SocketConnectError(int& number);

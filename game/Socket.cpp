@@ -46,8 +46,6 @@ Socket::Socket(addrinfo& connectingClientInfo, socket_t socket) {
 	type = connectingClientInfo.ai_socktype;
 	internalSocket = socket;
 
-	SetNonBlocking();
-
 	// Set some extra options
 	int yes = 1;
 	int no = 0;
@@ -260,7 +258,9 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 
 			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
 			if (connectCode != 0) {
-				R_Message(PRIORITY_ERROR, "Could not connect to %s (code %i)\n", hostname, connectCode);
+				int errorCode;
+				const char* msg = Sys_SocketConnectError(errorCode);
+				R_Message(PRIORITY_ERROR, "Could not connect to %s (error code %i: %s)\n", hostname, errorCode, msg);
 				return false;
 			}
 		}
@@ -274,7 +274,9 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 
 			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
 			if (connectCode != 0) {
-				R_Message(PRIORITY_ERROR, "Could not connect to %s (code %i)\n", hostname, connectCode);
+				int errorCode;
+				const char* msg = Sys_SocketConnectError(errorCode);
+				R_Message(PRIORITY_ERROR, "Could not connect to %s (error code %i: %s)\n", hostname, errorCode, msg);
 				return false;
 			}
 		}
