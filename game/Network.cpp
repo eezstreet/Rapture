@@ -49,6 +49,7 @@ namespace Network {
 
 	// Initialize the network
 	void Init() {
+		Zone::NewTag("network");
 		net_port = Cvar::Get<int>("net_port", "Port used for networking (TCP)", (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_PORT);
 		net_serverbacklog
 			= Cvar::Get<int>("net_serverbacklog", "Maximum number of waiting connections for the server", (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_BACKLOG);

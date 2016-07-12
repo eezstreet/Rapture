@@ -60,21 +60,22 @@ Socket::Socket(addrinfo& connectingClientInfo, socket_t socket) {
 }
 
 Socket::~Socket() {
-	if (addressInfo.ai_addr != nullptr) {
-		Zone::FastFree(addressInfo.ai_addr, "network");
-	}
-
 	Disconnect();
 	closesocket(internalSocket);
 }
 
 bool Socket::SetNonBlocking() {
 	unsigned long ulMode = 1;
+
+	// Enable non-blocking recv and write
 	ioctlsocket(internalSocket, FIONBIO, &ulMode);
 	if (ulMode != 1) {
 		R_Message(PRIORITY_ERROR, "Couldn't establish non-blocking socket\n");
 		return false;
 	}
+
+	// Also set it as a broadcast socket
+
 	return true;
 }
 
@@ -233,6 +234,7 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	// First we need to resolve the hostname before we can bind the socket
 	addrinfo hints;
 	addrinfo* results;
+	memset(&hints, 0, sizeof(hints));
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_socktype = type;
 	hints.ai_family = af;
@@ -258,6 +260,7 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 
 			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
 			if (connectCode != 0) {
+				
 				R_Message(PRIORITY_ERROR, "Could not connect to %s (code %i)\n", hostname, connectCode);
 				return false;
 			}
