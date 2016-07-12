@@ -241,7 +241,7 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	hints.ai_family = af;
 
 	char szPort[16] = { 0 };
-	sprintf(szPort, "%i", port);
+	std::sprintf(szPort, "%i", port);
 
 	int dwReturn = getaddrinfo(hostname, szPort, &hints, &results);
 	if (dwReturn != 0) {
@@ -261,7 +261,6 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 
 			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
 			if (connectCode != 0) {
-				
 				R_Message(PRIORITY_ERROR, "Could not connect to %s (code %i)\n", hostname, connectCode);
 				return false;
 			}
@@ -320,7 +319,7 @@ void Socket::Select(vector<Socket*> vSockets, vector<Socket*>& vReadable, vector
 	select(vSockets.size(), &readSet, &writeSet, nullptr, &timeout);
 	
 	// add to vReadable
-	for (int i = 0; i < readSet.fd_count; i++) {
+	for (u_int i = 0; i < readSet.fd_count; i++) {
 		socket_t sock = readSet.fd_array[i];
 		for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
 			Socket* socket = *it;
@@ -332,7 +331,7 @@ void Socket::Select(vector<Socket*> vSockets, vector<Socket*>& vReadable, vector
 	}
 
 	// add to vWriteable
-	for (int i = 0; i < writeSet.fd_count; i++) {
+	for (u_int i = 0; i < writeSet.fd_count; i++) {
 		socket_t sock = writeSet.fd_array[i];
 		for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
 			Socket* socket = *it;

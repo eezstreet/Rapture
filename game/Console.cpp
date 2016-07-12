@@ -16,7 +16,7 @@ void Console::Sizeup(vector<string>& args) {
 		arg = args[1];
 	}
 	JSArray outArgs = con->window.ToObject().GetMethodNames();
-	for (int i = 0; i < outArgs.size(); i++) {
+	for (unsigned int i = 0; i < outArgs.size(); i++) {
 		JSValue val = outArgs[i];
 		char text[1024] = { 0 };
 		val.ToString().ToUTF8(text, sizeof(text));
@@ -219,6 +219,7 @@ JSValue Console::OnMethodCallWithReturnValue(Awesomium::WebView* caller, unsigne
 	if(method_name == WSLit("getClipboard")) {
 		return JSValue(WSLit(Sys_GetClipboardContents().c_str()));
 	}
+	return JSValue(0);
 }
 
 void Console::UpdateInputBufferPosition() {

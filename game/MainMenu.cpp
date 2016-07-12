@@ -56,4 +56,5 @@ JSValue MainMenu::OnMethodCallWithReturnValue(WebView* caller, unsigned int remo
 	if(x.first)
 		return x.second;
 	// Check for our command
+	return JSValue(false);
 }

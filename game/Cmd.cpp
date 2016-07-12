@@ -184,7 +184,6 @@ void Cmd_Disconnect_f(vector<string>& args) {
 }
 
 void Cmd_Join_f(vector<string>& args) {
-	// TODO
 }
 
 void Sys_InitCommands() {
