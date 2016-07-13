@@ -72,8 +72,6 @@ bool Socket::SetNonBlocking() {
 		return false;
 	}
 
-	// Also set it as a broadcast socket
-
 	return true;
 }
 
@@ -103,7 +101,7 @@ bool Socket::StartListening(unsigned short port, uint32_t backlog) {
 	}
 
 	listen(internalSocket, backlog);
-
+	R_Message(PRIORITY_MESSAGE, "Now listening on port %i\n", port);
 	return true;
 }
 
@@ -124,22 +122,26 @@ Socket* Socket::CheckPendingConnections() {
 	connectingInfo.ai_protocol = IPPROTO_TCP;
 	connectingInfo.ai_socktype = type;
 	switch (connectingInfo.ai_family) {
-	case AF_INET:	// IPv4
-	{
-		sockaddr_in* sockIn = (sockaddr_in*)genericClientInfo;
-		connectingInfo.ai_addrlen = sizeof(sockaddr_in);
-		connectingInfo.ai_addr = (sockaddr*)Zone::Alloc(connectingInfo.ai_addrlen, "network");
-		memcpy(connectingInfo.ai_addr, sockIn, connectingInfo.ai_addrlen);
-	}
-	break;
-	case AF_INET6:	// IPv6
-	{
-		sockaddr_in6* sockIn = (sockaddr_in6*)genericClientInfo;
-		connectingInfo.ai_addrlen = sizeof(sockaddr_in6);
-		connectingInfo.ai_addr = (sockaddr*)Zone::Alloc(connectingInfo.ai_addrlen, "network");
-		memcpy(connectingInfo.ai_addr, sockIn, connectingInfo.ai_addrlen);
-	}
-	break;
+		case AF_INET:	// IPv4
+		{
+			sockaddr_in* sockIn = (sockaddr_in*)genericClientInfo;
+			connectingInfo.ai_addrlen = sizeof(sockaddr_in);
+			connectingInfo.ai_addr = (sockaddr*)Zone::Alloc(connectingInfo.ai_addrlen, "network");
+			memcpy(connectingInfo.ai_addr, sockIn, connectingInfo.ai_addrlen);
+			R_Message(PRIORITY_MESSAGE, "Pending connection: %s\n", inet_ntoa(sockIn->sin_addr));
+		}
+		break;
+		case AF_INET6:	// IPv6
+		{
+			sockaddr_in6* sockIn = (sockaddr_in6*)genericClientInfo;
+			char ipBuffer[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET6, &sockIn->sin6_addr, ipBuffer, sizeof(ipBuffer));
+			connectingInfo.ai_addrlen = sizeof(sockaddr_in6);
+			connectingInfo.ai_addr = (sockaddr*)Zone::Alloc(connectingInfo.ai_addrlen, "network");
+			memcpy(connectingInfo.ai_addr, sockIn, connectingInfo.ai_addrlen);
+			R_Message(PRIORITY_MESSAGE, "Pending connection: %s\n", ipBuffer);
+		}
+		break;
 	}
 
 	return new Socket(connectingInfo, value);
@@ -234,8 +236,12 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	addrinfo hints;
 	addrinfo* results;
 	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET6;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_socktype = type;
+#ifdef _WIN32
+	hints.ai_flags = AI_V4MAPPED;	// Use IPv4-mapped IPv6 address to force us to use IPv6 addresses
+#endif
 
 	char szPort[16] = { 0 };
 	std::sprintf(szPort, "%i", port);
@@ -248,42 +254,20 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	memcpy(&this->addressInfo, results, sizeof(addrinfo));
 	
 	char ipBuffer[128];
-	switch (results->ai_family) {
-		case AF_INET:	// IPv4
-		{
-			sockaddr_in* address = (sockaddr_in*)results->ai_addr;
-			const char* ipStr = inet_ntop(results->ai_family, &address->sin_addr, ipBuffer, sizeof(ipBuffer));
+	size_t addrSize;
 
-			R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipStr);
+	inet_ntop(AF_INET6, &((sockaddr_in6*)(results->ai_addr))->sin6_addr, ipBuffer, sizeof(ipBuffer));
+	sockaddr_in6 in;
+	inet_pton(AF_INET6, ipBuffer, in.sin6_addr.s6_addr);
+	in.sin6_port = htons(port);
+	in.sin6_family = AF_INET6;
 
-			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
-			if (connectCode != 0) {
-				int errorCode;
-				const char* msg = Sys_SocketConnectError(errorCode);
-				R_Message(PRIORITY_ERROR, "Could not connect to %s (error code %i: %s)\n", hostname, errorCode, msg);
-				return false;
-			}
-		}
-		break;
-		case AF_INET6:	// IPv6
-		{
-			sockaddr_in6* address = (sockaddr_in6*)results->ai_addr;
-			const char* ipStr = inet_ntop(results->ai_family, &address->sin6_addr, ipBuffer, sizeof(ipBuffer));
+	R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipBuffer);
 
-			R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipStr);
-
-			int connectCode = connect(internalSocket, (sockaddr*)address, sizeof(*address));
-			if (connectCode != 0) {
-				int errorCode;
-				const char* msg = Sys_SocketConnectError(errorCode);
-				R_Message(PRIORITY_ERROR, "Could not connect to %s (error code %i: %s)\n", hostname, errorCode, msg);
-				return false;
-			}
-		}
-		break;
-		default:
-			R_Message(PRIORITY_WARNING, "Unidentified socket family %i\n", results->ai_family);
-			return false;
+	if (connect(internalSocket, (sockaddr*)&in, addrSize) != 0) {
+		int errorCode;
+		const char* errorMsg = Sys_SocketConnectError(errorCode);
+		R_Message(PRIORITY_ERROR, "Socket::Connect failed (%i: %s)\n", errorCode, errorMsg);
 	}
 
 	if (!SetNonBlocking()) {
