@@ -183,7 +183,13 @@ void Cmd_Disconnect_f(vector<string>& args) {
 	Network::DisconnectFromRemote();
 }
 
+extern RaptureGame* sys;
 void Cmd_Join_f(vector<string>& args) {
+	if (args.size() != 3) {
+		R_Message(PRIORITY_MESSAGE, "usage: join <ip address> <savegame>\n");
+		return;
+	}
+	Network::JoinServer(args[2].c_str(), args[1].c_str(), sys);
 }
 
 void Sys_InitCommands() {
