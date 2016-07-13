@@ -4,6 +4,8 @@
 #include <Ws2TcpIp.h>
 #endif
 
+#define INET_PORTLEN	16
+
 /* Non-static member functions */
 
 // Creates a new socket object with family and type
@@ -11,7 +13,6 @@
 Socket::Socket(int af_, int type_) {
 	af = af_;
 	type = type_;
-	memset(&addressInfo, 0, sizeof(addressInfo));
 	internalSocket = socket(af, type, IPPROTO_TCP);
 	if (internalSocket < 0 && af == AF_INET6) {
 		// retry using IPv4
@@ -36,12 +37,10 @@ Socket::Socket(Socket& other) {
 	af = other.af;
 	type = other.type;
 	internalSocket = other.internalSocket;
-	memcpy(&addressInfo, &other.addressInfo, sizeof(addressInfo));
 }
 
 // Creates a new socket from an internal socket and some information on the address.
 Socket::Socket(addrinfo& connectingClientInfo, socket_t socket) {
-	addressInfo = connectingClientInfo;
 	af = connectingClientInfo.ai_family;
 	type = connectingClientInfo.ai_socktype;
 	internalSocket = socket;
@@ -89,7 +88,6 @@ bool Socket::StartListening(unsigned short port, uint32_t backlog) {
 	sprintf(szPort, "%i", port);
 
 	getaddrinfo(nullptr, szPort, &hints, &value);
-	addressInfo = *value;
 	int code = ::bind(internalSocket, value->ai_addr, value->ai_addrlen);
 	if (code != 0) {
 		R_Message(PRIORITY_ERROR, "Failed to bind socket on port %s (code %i)\n", szPort, code);
@@ -233,43 +231,36 @@ void Socket::ReadAllPackets(vector<Packet>& vOutPackets) {
 // Also establishes this socket as being nonblocking.
 bool Socket::Connect(const char* hostname, unsigned short port) {
 	// First we need to resolve the hostname before we can bind the socket
-	addrinfo hints;
+	addrinfo hints{ AI_V4MAPPED, AF_INET6, 0, IPPROTO_TCP, 0, nullptr, nullptr, nullptr };
 	addrinfo* results;
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET6;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_socktype = type;
-#ifdef _WIN32
-	hints.ai_flags = AI_V4MAPPED;	// Use IPv4-mapped IPv6 address to force us to use IPv6 addresses
-#endif
+	char szPort[INET_PORTLEN] {0};
+	char ipBuffer[INET_ADDRSTRLEN] {0};
 
-	char szPort[16] = { 0 };
 	std::sprintf(szPort, "%i", port);
 
+	// Convert the IP address into a valid IPv6 address
 	int dwReturn = getaddrinfo(hostname, szPort, &hints, &results);
 	if (dwReturn != 0) {
 		R_Message(PRIORITY_ERROR, "Could not resolve hostname %s (reason: %s)\n", hostname, gai_strerror(dwReturn));
 		return false;
 	}
-	memcpy(&this->addressInfo, results, sizeof(addrinfo));
-	
-	char ipBuffer[128];
-	size_t addrSize;
 
-	inet_ntop(AF_INET6, &((sockaddr_in6*)(results->ai_addr))->sin6_addr, ipBuffer, sizeof(ipBuffer));
-	sockaddr_in6 in;
-	inet_pton(AF_INET6, ipBuffer, in.sin6_addr.s6_addr);
-	in.sin6_port = htons(port);
-	in.sin6_family = AF_INET6;
+	// Create the sockaddr fields necessary for the connection
+	sockaddr_in6* in = (sockaddr_in6*)&results->ai_addr;
+	inet_ntop(AF_INET6, &in->sin6_addr, ipBuffer, sizeof(ipBuffer));
+	in->sin6_port = htons(port);
+	in->sin6_family = AF_INET6;
 
 	R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipBuffer);
 
-	if (connect(internalSocket, (sockaddr*)&in, addrSize) != 0) {
+	// Finally actually connect to the remote (in blocking mode)
+	if (connect(internalSocket, (sockaddr*)&in, sizeof(sockaddr_in6)) != 0) {
 		int errorCode;
 		const char* errorMsg = Sys_SocketConnectError(errorCode);
 		R_Message(PRIORITY_ERROR, "Socket::Connect failed (%i: %s)\n", errorCode, errorMsg);
 	}
 
+	// Set us as non-blocking
 	if (!SetNonBlocking()) {
 		return false;
 	}
