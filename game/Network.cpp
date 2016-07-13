@@ -26,6 +26,7 @@ namespace Network {
 	static Cvar*				net_serverbacklog = nullptr;
 	static Cvar*				net_maxclients = nullptr;
 	static Cvar*				net_netmode = nullptr;
+	static Cvar*				net_timeout = nullptr;
 
 	static Socket*				localSocket = nullptr;
 	static map<int, Socket*>	mOtherConnectedClients;
@@ -55,6 +56,7 @@ namespace Network {
 			= Cvar::Get<int>("net_serverbacklog", "Maximum number of waiting connections for the server", (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_BACKLOG);
 		net_maxclients = Cvar::Get<int>("net_maxclients", "Maximum number of clients allowed on server", (1 << CVAR_ROM) | (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_MAXCLIENTS);
 		net_netmode = Cvar::Get<int>("net_netmode", "Current netmode", 0, Netmode_Red);
+		net_timeout = Cvar::Get<int>("net_timeout", "Timeout duration, in milliseconds", 0, 30000);
 
 		net_netmode->AddCallback(Netmode_Callback);
 		Sys_InitSockets();
@@ -77,10 +79,11 @@ namespace Network {
 				{
 					// We have been accepted into the server
 					ClientAcceptPacket* cPacket = (ClientAcceptPacket*)(packet.packetData);
+					R_Message(PRIORITY_MESSAGE, "Authorization successful");
 					myClientNum = cPacket->clientNum;
 					currentNetState = Netstate_Authorized;
 				}
-				return;
+				break;
 			case PACKET_CLIENTDENIED:
 				{
 					// We have been denied from the server
@@ -88,16 +91,17 @@ namespace Network {
 					R_Message(PRIORITY_MESSAGE, "Denied entry from server: %s\n", cPacket->why);
 					currentNetState = Netstate_NoConnect;
 				}
-				return;
+				break;
 			case PACKET_PING:
 				{
 					R_Message(PRIORITY_DEBUG, "Server PONG");
 				}
-				return;
-		}
-
-		if (sys && sys->trap) {
-			sys->trap->interpretPacketFromServer(&packet);
+				break;
+			default:
+				if (!sys || !sys->trap || !sys->trap->interpretPacketFromServer(&packet)) {
+					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
+				}
+				break;
 		}
 	}
 
@@ -107,11 +111,12 @@ namespace Network {
 			case PACKET_PING:
 				R_Message(PRIORITY_DEBUG, "Server PING from %i\n", packet.packetHead.clientNum);
 				SendServerPacketTo(PACKET_PING, packet.packetHead.clientNum, nullptr, 0);
-				return;
-		}
-
-		if (sys && sys->trap) {
-			sys->trap->interpretPacketFromClient(&packet);
+				break;
+			default:
+				if (!sys || !sys->trap || !sys->trap->interpretPacketFromClient(&packet)) {
+					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
+				}
+				break;
 		}
 	}
 
