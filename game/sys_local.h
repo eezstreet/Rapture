@@ -619,6 +619,8 @@ struct Socket {
 private:
 	socket_t internalSocket;
 	int af, type;
+	int lastHeardFrom;
+	int lastSpoken;
 
 	bool SetNonBlocking();
 	bool SendEntireData(void* data, size_t dataSize);
@@ -636,6 +638,7 @@ public:
 	bool ReadPacket(Packet& incoming);
 	void ReadAllPackets(vector<Packet>& vPackets);
 	Socket* CheckPendingConnections();
+	bool ShouldDrop(int timeout, int currentTime);
 	
 	static void Select(vector<Socket*> vSockets, vector<Socket*>& vReadAble, vector<Socket*>& vWriteAble);
 	static void SelectSingle(Socket* pSocket, bool& bReadable, bool& bWriteable);

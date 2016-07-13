@@ -74,6 +74,8 @@ enum cvarFlags_e {
 	CVAR_ARCHIVE,
 	CVAR_ROM,
 	CVAR_ANNOUNCE,
+	CVAR_SERVERINFO,		// Networked from server -> client
+	CVAR_CLIENTINFO,		// Networked from client -> server
 };
 
 enum packetType_e {

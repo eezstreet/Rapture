@@ -9,7 +9,6 @@
 /* Non-static member functions */
 
 // Creates a new socket object with family and type
-// AF_UNSPEC should be used by default
 Socket::Socket(int af_, int type_) {
 	af = af_;
 	type = type_;
@@ -246,7 +245,7 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	}
 
 	// Create the sockaddr fields necessary for the connection
-	sockaddr_in6* in = (sockaddr_in6*)&results->ai_addr;
+	sockaddr_in6* in = (sockaddr_in6*)results->ai_addr;
 	inet_ntop(AF_INET6, &in->sin6_addr, ipBuffer, sizeof(ipBuffer));
 	in->sin6_port = htons(port);
 	in->sin6_family = AF_INET6;
@@ -254,12 +253,13 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipBuffer);
 
 	// Finally actually connect to the remote (in blocking mode)
-	if (connect(internalSocket, (sockaddr*)&in, sizeof(sockaddr_in6)) != 0) {
+	if (connect(internalSocket, (sockaddr*)in, sizeof(sockaddr_in6)) != 0) {
 		int errorCode;
 		const char* errorMsg = Sys_SocketConnectError(errorCode);
 		R_Message(PRIORITY_ERROR, "Socket::Connect failed (%i: %s)\n", errorCode, errorMsg);
 	}
 
+	freeaddrinfo(results);
 	// Set us as non-blocking
 	if (!SetNonBlocking()) {
 		return false;
