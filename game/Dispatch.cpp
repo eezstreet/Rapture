@@ -171,7 +171,7 @@ void Dispatch::PrintMessage(const int iPriority, const char* message) {
 	if(iShutdownMask & (1 << iPriority) || iPriority == PRIORITY_ERRFATAL) {
 		// PRIORITY_ERRFATAL always shuts down the game
 		// We might get multiple successive ERRFATALs in one frame, so we don't want to close the logfile just yet.
-		setGameQuitting(true);
+		RaptureGame::GetSingleton()->AddFlag(RaptureGame::Rapture_FatalError);
 	}
 }
 
@@ -197,4 +197,19 @@ void Dispatch::ChangeMessageMask(int newValue) {
 		return;
 	}
 	ptDispatch->iMessageMask = newValue;
+}
+
+// Going here because I can't think of a better place to put it
+#include "ui_local.h"
+void R_Message(int iPriority, const char *fmt, ...) {
+	va_list args;
+	char str[1024];
+
+	va_start(args, fmt);
+	vsnprintf(str, 1024, fmt, args);
+	va_end(args);
+
+	ptDispatch->PrintMessage(iPriority, str);
+
+	Console::PushConsoleMessage(str);
 }

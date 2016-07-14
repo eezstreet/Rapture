@@ -39,8 +39,6 @@ namespace Network {
 	static int			myClientNum = 0;				// Client 0 is always the host
 	static int			lastFreeClientNum = 1;
 
-	RaptureGame*		sys = nullptr;
-
 	void Netmode_Callback(int newValue) {
 		if (newValue == Netmode_Red) {
 			mOtherConnectedClients.clear();
@@ -98,10 +96,28 @@ namespace Network {
 				}
 				break;
 			default:
-				if (!sys || !sys->trap || !sys->trap->interpretPacketFromServer(&packet)) {
+				if (!RaptureGame::GetSingleton()->trap || !RaptureGame::GetSingleton()->trap->interpretPacketFromServer(&packet)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
 				}
 				break;
+		}
+	}
+
+	// Send a server packet to a single client
+	void SendServerPacketTo(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize) {
+		Packet packet = { { packetType, clientNum, Packet::PD_ServerClient, 0, packetDataSize }, packetData };
+		if (clientNum == myClientNum) {
+			DispatchSingleServerPacket(packet);
+		}
+		else {
+			auto it = mOtherConnectedClients.find(clientNum);
+			if (it == mOtherConnectedClients.end()) {
+				R_Message(PRIORITY_WARNING, "Tried to send a packet (%i) to invalid client %i\n", packetType, clientNum);
+				return;
+			}
+			else {
+				it->second->SendPacket(packet);
+			}
 		}
 	}
 
@@ -113,7 +129,7 @@ namespace Network {
 				SendServerPacketTo(PACKET_PING, packet.packetHead.clientNum, nullptr, 0);
 				break;
 			default:
-				if (!sys || !sys->trap || !sys->trap->interpretPacketFromClient(&packet)) {
+				if (!RaptureGame::GetSingleton()->trap || !RaptureGame::GetSingleton()->trap->interpretPacketFromClient(&packet)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
 				}
 				break;
@@ -135,7 +151,7 @@ namespace Network {
 
 			Packet outPacket;
 			if (incPacket.packetHead.type == PACKET_CLIENTATTEMPT) {
-				if (sys && sys->trap && sys->trap->acceptclient((ClientAttemptPacket*)incPacket.packetData)) {
+				if (RaptureGame::GetSingleton()->trap && RaptureGame::GetSingleton()->trap->acceptclient((ClientAttemptPacket*)incPacket.packetData)) {
 					// Send an acceptance packet with the new client number. Also remove this socket from temporary read packets
 					outPacket.packetHead.clientNum = lastFreeClientNum++;
 					outPacket.packetHead.direction = Packet::PD_ServerClient;
@@ -155,6 +171,87 @@ namespace Network {
 				socket->SendPacket(outPacket);
 			}
 		}
+	}
+
+	// Try and connect to a server
+	bool ConnectToRemote(const char* hostname, int port) {
+		DisconnectFromRemote();
+		remoteSocket = new Socket(AF_INET6, SOCK_STREAM);
+
+		bool connected = remoteSocket->Connect(hostname, port);
+		if (!connected) {
+			delete remoteSocket;
+			remoteSocket = nullptr;
+		}
+		currentNetState = Netstate_NeedAuth;
+		return connected;
+	}
+
+	// Start a local server
+	bool StartLocalServer() {
+		return localSocket->StartListening(net_port->Integer(), net_serverbacklog->Integer());
+	}
+
+	// Join a remote server
+	bool JoinServer(const char* hostname) {
+		return ConnectToRemote(hostname, net_port->Integer());
+	}
+
+	// Send packet from server -> client
+	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize) {
+		if (clientNum != -1) {
+			SendServerPacketTo(packetType, clientNum, packetData, packetDataSize);
+		}
+		else for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
+			SendServerPacketTo(packetType, it->first, packetData, packetDataSize);
+		}
+	}
+
+	// Send packet from client -> server
+	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetDataSize) {
+		// FIXME: use the correct timestamp
+		Packet packet = { { packetType, myClientNum, Packet::PD_ClientServer, 0, packetDataSize }, packetData };
+		if (remoteSocket == nullptr) {
+			// Not connected to a remote server, send it to ourselves instead
+			DispatchSingleClientPacket(packet);
+		}
+		else {
+			remoteSocket->SendPacket(packet);
+		}
+	}
+
+	// Determine if the local server is full.
+	bool LocalServerFull() {
+		return numConnectedClients >= net_maxclients->Integer();
+	}
+
+	void Connect(const char* hostname) {
+		int port = net_port->Integer();
+		R_Message(PRIORITY_MESSAGE, "Connecting to %s:%i\n", hostname, port);
+		if (ConnectToRemote(hostname, port)) {
+			R_Message(PRIORITY_MESSAGE, "Connection established.\n", hostname, port);
+		}
+		else {
+			R_Message(PRIORITY_MESSAGE, "Could not connect to %s:%i\n", hostname, port);
+			DisconnectFromRemote();
+		}
+	}
+
+	// Disconnect from current remote server
+	void DisconnectFromRemote() {
+		if (currentNetState == Netstate_NoConnect) {
+			// Not connected in the first place
+			return;
+		}
+		if (RaptureGame::GetSingleton()->trap) {
+			RaptureGame::GetSingleton()->trap->saveandexit();
+		}
+		if (remoteSocket != nullptr) {
+			delete remoteSocket;
+			remoteSocket = nullptr;
+		}
+		currentNetState = Netstate_NoConnect;
+		R_Message(PRIORITY_NOTE, "--- Disconnected ---\n");
 	}
 
 	// Run all of the server stuff
@@ -204,8 +301,10 @@ namespace Network {
 		}
 		vPacketsAwaitingSend.clear();
 
-		if (sys && sys->trap) {
-			sys->trap->runserverframe();
+		if (RaptureGame::GetSingleton()->trap && remoteSocket == nullptr) {
+			if (remoteSocket == nullptr) {
+				RaptureGame::GetSingleton()->trap->runserverframe();
+			}
 		}
 	}
 
@@ -227,132 +326,8 @@ namespace Network {
 			}
 			vPacketsAwaitingSend.clear();
 		}
-		if (sys && sys->trap) {
-			sys->trap->runclientframe();
+		if (RaptureGame::GetSingleton()->trap) {
+			RaptureGame::GetSingleton()->trap->runclientframe();
 		}
-	}
-
-	// Start running the client
-	void StartRunningClient(const char* szSaveGame, RaptureGame* pGameModule) {
-		sys = pGameModule;
-		if (sys->trap != nullptr) {
-			sys->trap->startclientfromsave(szSaveGame);
-		}
-	}
-
-	// Start running the server
-	void StartRunningServer(const char* szSaveGame, RaptureGame* pGameModule) {
-		sys = pGameModule;
-		if (sys->trap != nullptr) {
-			sys->trap->startserverfromsave(szSaveGame);
-		}
-	}
-
-	// Start a local server
-	bool StartLocalServer(const char* szSaveGame, RaptureGame* pGameModule) {
-		if (!localSocket->StartListening(net_port->Integer(), net_serverbacklog->Integer())) {
-			return false;
-		}
-		StartRunningServer(szSaveGame, pGameModule);
-		StartRunningClient(szSaveGame, pGameModule);
-		return true;
-	}
-
-	// Join a remote server
-	bool JoinServer(const char* szSaveGame, const char* hostname, RaptureGame* pGameModule) {
-		if (!ConnectToRemote(hostname, net_port->Integer())) {
-			return false;
-		}
-		StartRunningClient(szSaveGame, pGameModule);
-		return true;
-	}
-
-	// Send a server packet to a single client
-	void SendServerPacketTo(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize) {
-		Packet packet = { { packetType, clientNum, Packet::PD_ServerClient, 0, packetDataSize }, packetData };
-		if (clientNum == myClientNum) {
-			DispatchSingleServerPacket(packet);
-		}
-		else {
-			auto it = mOtherConnectedClients.find(clientNum);
-			if (it == mOtherConnectedClients.end()) {
-				R_Message(PRIORITY_WARNING, "Tried to send a packet (%i) to invalid client %i\n", packetType, clientNum);
-				return;
-			}
-			else {
-				it->second->SendPacket(packet);
-			}
-		}
-	}
-
-	// Send packet from server -> client
-	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize) {
-		if (clientNum != -1) {
-			SendServerPacketTo(packetType, clientNum, packetData, packetDataSize);
-		}
-		else for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
-			SendServerPacketTo(packetType, it->first, packetData, packetDataSize);
-		}
-	}
-
-	// Send packet from client -> server
-	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetDataSize) {
-		// FIXME: use the correct timestamp
-		Packet packet = { { packetType, myClientNum, Packet::PD_ClientServer, 0, packetDataSize }, packetData };
-		if (remoteSocket == nullptr) {
-			// Not connected to a remote server, send it to ourselves instead
-			DispatchSingleClientPacket(packet);
-		}
-		else {
-			remoteSocket->SendPacket(packet);
-		}
-	}
-
-	// Determine if the local server is full.
-	bool LocalServerFull() {
-		return numConnectedClients >= net_maxclients->Integer();
-	}
-
-	void Connect(const char* hostname) {
-		int port = net_port->Integer();
-		R_Message(PRIORITY_MESSAGE, "Connecting to %s:%i\n", hostname, port);
-		if (ConnectToRemote(hostname, port)) {
-			R_Message(PRIORITY_MESSAGE, "Connection established.\n", hostname, port);
-		}
-		else {
-			R_Message(PRIORITY_MESSAGE, "Could not connect to %s:%i\n", hostname, port);
-			DisconnectFromRemote();
-		}
-	}
-
-	// Try and connect to a server
-	bool ConnectToRemote(const char* hostname, int port) {
-		DisconnectFromRemote();
-		remoteSocket = new Socket(AF_INET6, SOCK_STREAM);
-		
-		bool connected = remoteSocket->Connect(hostname, port);
-		if (!connected) {
-			delete remoteSocket;
-			remoteSocket = nullptr;
-		}
-		currentNetState = Netstate_NeedAuth;
-		return connected;
-	}
-
-	// Disconnect from current remote server
-	void DisconnectFromRemote() {
-		if (currentNetState == Netstate_NoConnect) {
-			// Not connected in the first place
-			return;
-		}
-		if (sys && sys->trap) {
-			sys->trap->saveandexit();
-		}
-		if (remoteSocket != nullptr) {
-			delete remoteSocket;
-			remoteSocket = nullptr;
-		}
-		currentNetState = Netstate_NoConnect;
-		R_Message(PRIORITY_NOTE, "--- Disconnected ---\n");
 	}
 }

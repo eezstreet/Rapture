@@ -1,55 +1,18 @@
 #include "sys_local.h"
-
-/* main game initialization */
-
-RaptureGame *sys = nullptr;
-bool bStartupQuit = false;
-
-void setGameQuitting(const bool b) { if(!sys) bStartupQuit = b; else sys->bHasFinished = true; }
-
-int main(int argc, char** argv) {
-	try {
-		sys = new RaptureGame(argc, argv);
-		FrameCapper fc;
-		while(!sys->bHasFinished && !bStartupQuit) {
-			fc.StartFrame();
-			sys->RunLoop();
-			fc.EndFrame();
-		}
-	}
-	catch(const bool) {
-		if (sys && sys->bHasFinished || !bStartupQuit) {
-			delete sys;
-			return 0;
-		}
-		else while (true) {
-#ifdef _WIN32
-			MSG        msg;
-			if (!GetMessage(&msg, nullptr, 0, 0)) {
-				break;
-			}
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-#endif
-		}
-	}
-	if(sys) {
-		delete sys;
-	}
-	return 0;
-}
+#include "ui_local.h"
 
 // This accounts for all input
-int RaptureInputCallback(void *notUsed, SDL_Event* e) {
-	if(sys && sys->bHasFinished) {
+int RaptureGame::RaptureInputCallback(void *notUsed, SDL_Event* e) {
+	RaptureGame* game = GetSingleton();
+	if (!game || game->HasFlags(Rapture_FatalError) || game->HasFlags(Rapture_Quitting)) {
 		// DONT send input...
 		return 1;
 	}
 	switch(e->type) {
 		case SDL_APP_TERMINATING:
 		case SDL_QUIT:
-			if (sys) {
-				sys->PassQuitEvent();
+			if (game) {
+				game->uGameFlags |= (1 << Rapture_Quitting);
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -100,7 +63,7 @@ void Sys_PrintSDLVersion() {
 }
 
 /* RaptureGame class, this does all the heavy lifting */
-RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
+RaptureGame::RaptureGame(int argc, char **argv) {
 	game = nullptr;
 	editor = nullptr;
 
@@ -111,7 +74,7 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 	// init cmds
 	Sys_InitCommands();
 
-	// Init zone memory
+	// Init memory
 	Zone::Init();
 
 	// Init the cvar system (so we can assign preliminary cvars in the commandline)
@@ -128,8 +91,6 @@ RaptureGame::RaptureGame(int argc, char **argv) : bHasFinished(false) {
 
 	// Actually read the arguments
 	HandleCommandline(argc, argv);
-
-	// Init hunk memory
 
 	// Init the renderer
 	if (!Video::Init()) {
@@ -198,94 +159,84 @@ void RaptureGame::HandleCommandline(int argc, char** argv) {
 	}
 }
 
-/* Quit the game. */
-void RaptureGame::PassQuitEvent() {
-	bHasFinished = true;
-}
-
-/* Set up common exports which are used in both the game and the editor */
-extern bool IsConsoleOpen();
-void RaptureGame::AssignExports(gameImports_s *imp) {
-	imp->printf = R_Message;
-	imp->error = R_Error;
-
-	imp->GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
-
-	imp->OpenFileSync = File::OpenSync;
-	imp->ReadFileSync = File::ReadSync;
-	imp->WriteFileSync = File::WriteSync;
-	imp->CloseFileSync = File::CloseSync;
-	imp->OpenFileAsync = File::OpenAsync;
-	imp->ReadFileAsync = File::ReadAsync;
-	imp->WriteFileAsync = File::WriteAsync;
-	imp->CloseFileAsync = File::CloseAsync;
-	imp->FileOpened = File::AsyncOpened;
-	imp->FileRead = File::AsyncRead;
-	imp->FileWritten = File::AsyncWritten;
-	imp->FileClosed = File::AsyncClosed;
-	imp->FileBad = File::AsyncBad;
-
-	imp->ResourceAsync = Resource::ResourceAsync;
-	imp->ResourceAsyncURI = Resource::ResourceAsyncURI;
-	imp->ResourceSync = Resource::ResourceSync;
-	imp->ResourceSyncURI = Resource::ResourceSyncURI;
-	imp->FreeResource = Resource::FreeResource;
-	imp->GetAssetComponent = Resource::GetAssetComponent;
-	imp->ResourceRetrieved = Resource::ResourceRetrieved;
-	imp->ResourceBad = Resource::ResourceBad;
-
-	imp->RegisterMaterial = Video::RegisterMaterial;
-	imp->DrawMaterial = Video::DrawMaterial;
-	imp->DrawMaterialAspectCorrection = Video::DrawMaterialAspectCorrection;
-	imp->DrawMaterialClipped = Video::DrawMaterialClipped;
-	imp->DrawMaterialAbs = Video::DrawMaterialAbs;
-	imp->DrawMaterialAbsClipped = Video::DrawMaterialAbsClipped;
-
-	imp->RegisterStreamingTexture = Video::RegisterStreamingTexture;
-	imp->LockStreamingTexture = Video::LockStreamingTexture;
-	imp->UnlockStreamingTexture = Video::UnlockStreamingTexture;
-	imp->DeleteStreamingTexture = Video::DeleteStreamingTexture;
-	imp->BlendTexture = Video::BlendTexture;
-
-	imp->CvarBoolVal = CvarSystem::EXPORT_BoolValue;
-	imp->CvarIntVal = CvarSystem::EXPORT_IntValue;
-	imp->CvarStrVal = CvarSystem::EXPORT_StrValue;
-	imp->CvarValue = CvarSystem::EXPORT_Value;
-	imp->RegisterCvarBool = static_cast<Cvar*(*)(const char*, const char*, int, bool)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarFloat = static_cast<Cvar*(*)(const char*, const char*, int, float)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
-	imp->RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
-	imp->RegisterStaticMenu = UI::RegisterStaticMenu;
-	imp->KillStaticMenu = UI::KillStaticMenu;
-
-	imp->SendServerPacket = Network::SendServerPacket;
-	imp->SendClientPacket = Network::SendClientPacket;
-
-	imp->RunJavaScript = UI::RunJavaScript;
-	imp->AddJSCallback = UI::AddJavaScriptCallback;
-	imp->GetJSNumArgs = UI::GetJavaScriptNumArgs;
-	imp->GetJSStringArg = UI::GetJavaScriptStringArgument;
-	imp->GetJSIntArg = UI::GetJavaScriptIntArgument;
-	imp->GetJSDoubleArg = UI::GetJavaScriptDoubleArgument;
-	imp->GetJSBoolArg = UI::GetJavaScriptBoolArgument;
-
-	imp->IsConsoleOpen = IsConsoleOpen;
-
-	imp->Zone_Alloc = Zone::VMAlloc;
-	imp->Zone_FastFree = Zone::VMFastFree;
-	imp->Zone_Free = Zone::Free;
-	imp->Zone_FreeAll = Zone::VMFreeAll;
-	imp->Zone_NewTag = Zone::NewTag;
-	imp->Zone_Realloc = Zone::Realloc;
-
-	imp->FadeFromBlack = Video::FadeFromBlack;
-}
-
 /* Started a new game (probably from the menu) */
 GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	GameModule* game = new GameModule(bundle);
 	static gameImports_s imp;
-	AssignExports(&imp);
+	
+	imp.printf = R_Message;
+	imp.error = R_Error;
+
+	imp.GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
+
+	imp.OpenFileSync = File::OpenSync;
+	imp.ReadFileSync = File::ReadSync;
+	imp.WriteFileSync = File::WriteSync;
+	imp.CloseFileSync = File::CloseSync;
+	imp.OpenFileAsync = File::OpenAsync;
+	imp.ReadFileAsync = File::ReadAsync;
+	imp.WriteFileAsync = File::WriteAsync;
+	imp.CloseFileAsync = File::CloseAsync;
+	imp.FileOpened = File::AsyncOpened;
+	imp.FileRead = File::AsyncRead;
+	imp.FileWritten = File::AsyncWritten;
+	imp.FileClosed = File::AsyncClosed;
+	imp.FileBad = File::AsyncBad;
+
+	imp.ResourceAsync = Resource::ResourceAsync;
+	imp.ResourceAsyncURI = Resource::ResourceAsyncURI;
+	imp.ResourceSync = Resource::ResourceSync;
+	imp.ResourceSyncURI = Resource::ResourceSyncURI;
+	imp.FreeResource = Resource::FreeResource;
+	imp.GetAssetComponent = Resource::GetAssetComponent;
+	imp.ResourceRetrieved = Resource::ResourceRetrieved;
+	imp.ResourceBad = Resource::ResourceBad;
+
+	imp.RegisterMaterial = Video::RegisterMaterial;
+	imp.DrawMaterial = Video::DrawMaterial;
+	imp.DrawMaterialAspectCorrection = Video::DrawMaterialAspectCorrection;
+	imp.DrawMaterialClipped = Video::DrawMaterialClipped;
+	imp.DrawMaterialAbs = Video::DrawMaterialAbs;
+	imp.DrawMaterialAbsClipped = Video::DrawMaterialAbsClipped;
+
+	imp.RegisterStreamingTexture = Video::RegisterStreamingTexture;
+	imp.LockStreamingTexture = Video::LockStreamingTexture;
+	imp.UnlockStreamingTexture = Video::UnlockStreamingTexture;
+	imp.DeleteStreamingTexture = Video::DeleteStreamingTexture;
+	imp.BlendTexture = Video::BlendTexture;
+
+	imp.CvarBoolVal = CvarSystem::EXPORT_BoolValue;
+	imp.CvarIntVal = CvarSystem::EXPORT_IntValue;
+	imp.CvarStrVal = CvarSystem::EXPORT_StrValue;
+	imp.CvarValue = CvarSystem::EXPORT_Value;
+	imp.RegisterCvarBool = static_cast<Cvar*(*)(const char*, const char*, int, bool)>(CvarSystem::RegisterCvar);
+	imp.RegisterCvarFloat = static_cast<Cvar*(*)(const char*, const char*, int, float)>(CvarSystem::RegisterCvar);
+	imp.RegisterCvarInt = static_cast<Cvar*(*)(const char*, const char*, int, int)>(CvarSystem::RegisterCvar);
+	imp.RegisterCvarStr = static_cast<Cvar*(*)(const char*, const char*, int, char*)>(CvarSystem::RegisterCvar);
+	imp.RegisterStaticMenu = UI::RegisterStaticMenu;
+	imp.KillStaticMenu = UI::KillStaticMenu;
+
+	imp.SendServerPacket = Network::SendServerPacket;
+	imp.SendClientPacket = Network::SendClientPacket;
+
+	imp.RunJavaScript = UI::RunJavaScript;
+	imp.AddJSCallback = UI::AddJavaScriptCallback;
+	imp.GetJSNumArgs = UI::GetJavaScriptNumArgs;
+	imp.GetJSStringArg = UI::GetJavaScriptStringArgument;
+	imp.GetJSIntArg = UI::GetJavaScriptIntArgument;
+	imp.GetJSDoubleArg = UI::GetJavaScriptDoubleArgument;
+	imp.GetJSBoolArg = UI::GetJavaScriptBoolArgument;
+
+	imp.IsConsoleOpen = UI::IsConsoleOpen;
+
+	imp.Zone_Alloc = Zone::VMAlloc;
+	imp.Zone_FastFree = Zone::VMFastFree;
+	imp.Zone_Free = Zone::Free;
+	imp.Zone_FreeAll = Zone::VMFreeAll;
+	imp.Zone_NewTag = Zone::NewTag;
+	imp.Zone_Realloc = Zone::Realloc;
+
+	imp.FadeFromBlack = Video::FadeFromBlack;
 	
 	trap = game->GetRefAPI(&imp);
 	if(!trap) {
@@ -294,108 +245,156 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	return game;
 }
 
+/* Singleton ops */
+RaptureGame* RaptureGame::singleton = nullptr;
+bool noMoreSingleton = false;
+RaptureGame* RaptureGame::GetSingleton(int argc, char** argv) {
+	if (noMoreSingleton) {
+		return nullptr;
+	}
+	if (singleton != nullptr) {
+		return singleton;
+	}
+	singleton = new RaptureGame(argc, argv);
+	return singleton;
+}
+
+void RaptureGame::DestroySingleton() {
+	if (singleton != nullptr) {
+		delete singleton;
+	}
+	noMoreSingleton = true;
+}
+
 /* Get the game module */
 GameModule* RaptureGame::GetGameModule() {
-	if(sys) {
-		return sys->game;
+	RaptureGame* singleton = RaptureGame::GetSingleton();
+	if (singleton && singleton->HasFlags(Rapture_GameLoaded)) {
+		return singleton->game;
 	}
 	return nullptr;
 }
 
 GameModule* RaptureGame::GetEditorModule() {
-	if(sys) {
-		return sys->editor;
+	RaptureGame* singleton = RaptureGame::GetSingleton();
+	if (singleton && singleton->HasFlags(Rapture_EditorLoaded)) {
+		return singleton->editor;
 	}
 	return nullptr;
 }
 
 gameExports_s* RaptureGame::GetImport() {
-	if(sys) {
-		return sys->trap;
+	RaptureGame* singleton = RaptureGame::GetSingleton();
+	if (singleton) {
+		if (singleton->HasFlags(Rapture_GameLoaded) || singleton->HasFlags(Rapture_EditorLoaded)) {
+			return singleton->trap;
+		}
 	}
 	return nullptr;
 }
 
-/* Some shared functions */
-#include "ui_local.h"
-void R_Message(int iPriority, const char *fmt, ...) {
-	va_list args;
-	char str[1024];
+bool RaptureGame::AllowedToStartNewModules() {
+	if (HasFlags(Rapture_EditorLoaded)) {
+		R_Message(PRIORITY_MESSAGE, "Exit from the editor first before running this command.\n");
+		return false;
+	}
 
-	va_start(args, fmt);
-	vsnprintf(str, 1024, fmt, args);
-	va_end(args);
+	if (HasFlags(Rapture_GameLoaded)) {
+		R_Message(PRIORITY_MESSAGE, "Exit from the game first before running the command.\n");
+		return false;
+	}
 
-	ptDispatch->PrintMessage(iPriority, str);
+	if (!HasFlags(Rapture_Initialized)) {
+		R_Message(PRIORITY_MESSAGE, "The game needs to be fully initialized before this command can be run.\n");
+		return false;
+	}
 
-	Console::PushConsoleMessage(str);
+	if (HasFlags(Rapture_Quitting) || HasFlags(Rapture_FatalError)) {
+		R_Message(PRIORITY_MESSAGE, "An error occurred and the module could not be loaded.\n");
+		return false;
+	}
+	return true;
 }
 
-void NewGame() {
-	MainMenu::DestroySingleton();
-	if(Console::GetSingleton()->IsOpen()) {
-		Console::GetSingleton()->Hide();
-	}
-	if(sys->game || sys->editor) {
-		// Have to exit from these first
+void RaptureGame::StartGameFromFile(const char* szSaveGameName) {
+	if (!AllowedToStartNewModules()) {
 		return;
 	}
-	sys->game = sys->CreateGameModule("gamex86");
-	Network::StartLocalServer(nullptr, sys);
-}
 
-void LoadGame(const char* szSaveGame) {
-	MainMenu::DestroySingleton();
-	if (Console::GetSingleton()->IsOpen()) {
-		Console::GetSingleton()->Hide();
-	}
-	if (sys->game || sys->editor) {
-		// Have to exit from these first
-		return;
-	}
-	sys->game = sys->CreateGameModule("gamex86");
-	Network::StartLocalServer(szSaveGame, sys);
-}
-
-void JoinServer(const char* szSaveGame, const char* szHostName) {
 	MainMenu::DestroySingleton();
 	if (Console::GetSingleton()->IsOpen()) {
 		Console::GetSingleton()->Hide();
 	}
-	if (sys->game || sys->editor) {
-		// Have to exit from these first
+
+	game = CreateGameModule("gamex86");
+	if (game == nullptr) {
 		return;
 	}
-	sys->game = sys->CreateGameModule("gamex86");
-	Network::JoinServer(szSaveGame, szHostName, sys);
+	Network::StartLocalServer();
+	trap->startserverfromsave(szSaveGameName);
+	trap->startclientfromsave(szSaveGameName);
+
+	uGameFlags |= (1 << Rapture_GameLoaded);
 }
 
-void StartEditor() {
-	if(Console::GetSingleton()->IsOpen()) {
+void RaptureGame::JoinRemoteGame(const char* szFileName, const char* szHostName) {
+	if (!AllowedToStartNewModules()) {
+		return;
+	}
+
+	MainMenu::DestroySingleton();
+	if (Console::GetSingleton()->IsOpen()) {
+		Console::GetSingleton()->Hide();
+	}
+
+	game = CreateGameModule("gamex86");
+	if (game == nullptr) {
+		return;
+	}
+
+	if (!Network::JoinServer(szHostName)) {
+		return;
+	}
+	trap->startclientfromsave(szFileName);
+
+	uGameFlags |= (1 << Rapture_GameLoaded);
+}
+
+void RaptureGame::StartEditor() {
+	if (!AllowedToStartNewModules()) {
+		return;
+	}
+
+	if (Console::GetSingleton()->IsOpen()) {
 		Console::GetSingleton()->Hide();
 	}
 	MainMenu::DestroySingleton();
-	if(sys->game || sys->editor) {
-		// Have to exit from these first
-		return;
-	}
-	sys->editor = sys->CreateGameModule("editorx86");
+
+	editor = CreateGameModule("editorx86");
+	trap->startclientfromsave(nullptr);
+
+	uGameFlags |= (1 << Rapture_EditorLoaded);
 }
 
-void ReturnToMain() {
-	if(Console::GetSingleton()->IsOpen()) {
+void RaptureGame::SaveAndExit() {
+	if (Console::GetSingleton()->IsOpen()) {
 		Console::GetSingleton()->Hide();
 	}
-	if(sys->game) {
-		sys->trap->saveandexit();
-		delete sys->game;
-		sys->game = nullptr;
-	} else if(sys->editor) {
-		sys->trap->saveandexit();
-		delete sys->editor;
-		sys->editor = nullptr;
+
+	if (trap) {
+		trap->saveandexit();
 	}
 	Network::DisconnectFromRemote();
 	R_Message(PRIORITY_MESSAGE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
+
+	uGameFlags = ~((1 << Rapture_GameLoaded) | (1 < Rapture_EditorLoaded));
+}
+
+bool RaptureGame::HasFlags(const RaptureGame::GameFlags flag) {
+	return uGameFlags & (1 << flag);
+}
+
+void RaptureGame::AddFlag(const RaptureGame::GameFlags flag) {
+	uGameFlags |= (1 << flag);
 }

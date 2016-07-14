@@ -26,8 +26,24 @@ public:
 
 class RaptureGame {
 private:
-	void AssignExports(gameImports_s* in);
+	static RaptureGame* singleton;
+
+	uint32_t uGameFlags;
 public:
+	enum GameFlags {
+		Rapture_Initialized,
+		Rapture_FatalError,
+		Rapture_EditorLoaded,
+		Rapture_GameLoaded,
+		Rapture_Quitting,
+	};
+
+	static RaptureGame* GetSingleton(int argc = 0, char** argv = nullptr);
+	static void DestroySingleton();
+
+	bool HasFlags(const GameFlags flags);
+	void AddFlag(const GameFlags flags);
+
 	GameModule*		game;
 	GameModule*		editor;
 	gameExports_s*	trap;
@@ -35,20 +51,25 @@ public:
 	RaptureGame(int argc, char **argv);
 	~RaptureGame();
 
-	RaptureGame(const RaptureGame& other) : bHasFinished(other.bHasFinished) {}
-	RaptureGame& operator= (RaptureGame other) { bHasFinished = other.bHasFinished; return *this; }
+	RaptureGame(const RaptureGame& other) {}
+	RaptureGame& operator= (RaptureGame other) { return *this; }
 
 	void HandleCommandline(int argc, char **argv);
-	void PassQuitEvent();
-
-	bool bHasFinished;
 	void RunLoop();
 
+
 	GameModule* CreateGameModule(const char* bundle);
+	bool AllowedToStartNewModules();
+	void StartGameFromFile(const char* szFileName);
+	void JoinRemoteGame(const char* szFileName, const char* szHostName);
+	void StartEditor();
+	void SaveAndExit();
 
 	static GameModule* GetGameModule();
 	static GameModule* GetEditorModule();
 	static gameExports_s* GetImport();
+
+	static int RaptureInputCallback(void *notUsed, SDL_Event* e);
 };
 
 //
@@ -322,21 +343,6 @@ namespace Zone {
 };
 
 //
-// Hunk.cpp
-//
-
-namespace Hunk {
-	class MemoryManager {
-	public:
-		void *Allocate(int iSize);
-		void Free(void* memory);
-	};
-
-	void Init();
-	void Shutdown();
-};
-
-//
 //
 //
 
@@ -596,17 +602,13 @@ typedef int socket_t;
 namespace Network {
 	void Init();
 	void Shutdown();
-	void DispatchServerReadPackets();
-	void DispatchClientReadPackets();
-	void SendServerPacketTo(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
 	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
 	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetSize);
-	bool ConnectToRemote(const char* hostname, int port);
 	void DisconnectFromRemote();
 	void ServerFrame();
 	void ClientFrame();
-	bool StartLocalServer(const char* szSaveGame, RaptureGame* pGameModule);
-	bool JoinServer(const char* szSaveGame, const char* hostname, RaptureGame* pGameModule);
+	bool StartLocalServer();
+	bool JoinServer(const char* hostname);
 	void Connect(const char* hostname);
 };
 

@@ -471,6 +471,6 @@ bool UI::GetJavaScriptBoolArgument(Menu* ptMenu, unsigned int iArgNum) {
 	return ptMenu->GetVMBoolArg(iArgNum);
 }
 
-bool IsConsoleOpen() {
+bool UI::IsConsoleOpen() {
 	return Console::GetSingleton()->IsOpen();
 }

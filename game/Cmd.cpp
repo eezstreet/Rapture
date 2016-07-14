@@ -99,9 +99,8 @@ void Cmd_Quit_f(vector<string>& args) {
 	SDL_PushEvent(&e);
 }
 
-extern void ReturnToMain();
 void Cmd_MainMenu_f(vector<string>& args) {
-	ReturnToMain();
+	RaptureGame::GetSingleton()->SaveAndExit();
 }
 
 void Cmd_Cmdlist_f(vector<string>& args) {
@@ -161,14 +160,12 @@ void Cmd_BlockVMInput_f(vector<string>& args) {
 	bVMInputBlocked = !bVMInputBlocked;
 }
 
-extern void NewGame();
-extern void StartEditor();
 void Cmd_NewGameTest_f(vector<string>& args) {
-	NewGame();
+	RaptureGame::GetSingleton()->StartGameFromFile(nullptr);
 }
 
 void Cmd_Editor_f(vector<string>& args) {
-	StartEditor();
+	RaptureGame::GetSingleton()->StartEditor();
 }
 
 void Cmd_Connect_f(vector<string>& args) {
@@ -180,16 +177,15 @@ void Cmd_Connect_f(vector<string>& args) {
 }
 
 void Cmd_Disconnect_f(vector<string>& args) {
-	Network::DisconnectFromRemote();
+	RaptureGame::GetSingleton()->SaveAndExit();
 }
 
-extern RaptureGame* sys;
 void Cmd_Join_f(vector<string>& args) {
 	if (args.size() != 3) {
 		R_Message(PRIORITY_MESSAGE, "usage: join <ip address> <savegame>\n");
 		return;
 	}
-	Network::JoinServer(args[2].c_str(), args[1].c_str(), sys);
+	RaptureGame::GetSingleton()->JoinRemoteGame(args[2].c_str(), args[1].c_str());
 }
 
 void Sys_InitCommands() {

@@ -143,8 +143,7 @@ void Sys_Error(const char* error, ...) {
 	R_Message(PRIORITY_ERRFATAL, text);
 	R_Message(PRIORITY_MESSAGE, "\n");
 
-	setGameQuitting(false);
-	throw false;
+	RaptureGame::GetSingleton()->AddFlag(RaptureGame::Rapture_FatalError);
 }
 
 void Sys_InitSockets() {

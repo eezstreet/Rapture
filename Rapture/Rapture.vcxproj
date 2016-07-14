@@ -104,8 +104,8 @@
     <ClCompile Include="..\game\FileSystem.cpp" />
     <ClCompile Include="..\game\FrameCapper.cpp" />
     <ClCompile Include="..\game\GameModule.cpp" />
-    <ClCompile Include="..\game\Hunk.cpp" />
     <ClCompile Include="..\game\Input.cpp" />
+    <ClCompile Include="..\game\Main.cpp" />
     <ClCompile Include="..\game\MainMenu.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Network.cpp" />
@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RaptureAsset.h" />
+    <ClInclude Include="..\game\RaptureGame.h" />
     <ClInclude Include="..\game\sys_local.h" />
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\game\tr_local.h" />

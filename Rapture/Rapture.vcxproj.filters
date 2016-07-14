@@ -33,9 +33,6 @@
     <ClCompile Include="..\game\Zone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Hunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\FileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +108,9 @@
     <ClCompile Include="..\game\Socket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\game\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\sys_shared.h">
@@ -132,6 +132,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\RaptureAsset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\RaptureGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,6 +21,8 @@ namespace UI {
 
 		virtual void OnRequest(int request_id, const Awesomium::WebString& path);
 	};
+
+	bool IsConsoleOpen();
 };
 
 class Menu : public Awesomium::JSMethodHandler {
