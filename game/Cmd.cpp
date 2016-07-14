@@ -201,7 +201,6 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("blockvminput", Cmd_BlockVMInput_f);
 
 	Cmd::AddCommand("vid_restart", Cmd_VidRestart_f);
-	Cmd::AddCommand("video_restart", Cmd_VidRestart_f);
 
 	Cmd::AddCommand("connect", Cmd_Connect_f);
 	Cmd::AddCommand("disconnect", Cmd_Disconnect_f);
