@@ -66,6 +66,7 @@ void Sys_PrintSDLVersion() {
 RaptureGame::RaptureGame(int argc, char **argv) {
 	game = nullptr;
 	editor = nullptr;
+	uGameFlags = 0;
 
 	ptDispatch = new Dispatch(0, 0, 0);
 
@@ -105,6 +106,8 @@ RaptureGame::RaptureGame(int argc, char **argv) {
 	UI::Initialize();
 
 	Network::Init();
+
+	uGameFlags |= (1 << Rapture_Initialized);
 }
 
 /* Called after the main loop has finished and we are ready to shut down */
