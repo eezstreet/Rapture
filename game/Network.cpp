@@ -39,6 +39,8 @@ namespace Network {
 	static int			myClientNum = 0;				// Client 0 is always the host
 	static int			lastFreeClientNum = 1;
 
+	static networkCallbackFunction	callbacks[NIC_MAX] {nullptr};
+
 	void Netmode_Callback(int newValue) {
 		if (newValue == Netmode_Red) {
 			mOtherConnectedClients.clear();
@@ -96,7 +98,7 @@ namespace Network {
 				}
 				break;
 			default:
-				if (!RaptureGame::GetSingleton()->trap || !RaptureGame::GetSingleton()->trap->interpretPacketFromServer(&packet)) {
+				if (!callbacks[NIC_INTERPRETSERVER] || !callbacks[NIC_INTERPRETSERVER](&packet)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
 				}
 				break;
@@ -129,7 +131,7 @@ namespace Network {
 				SendServerPacketTo(PACKET_PING, packet.packetHead.clientNum, nullptr, 0);
 				break;
 			default:
-				if (!RaptureGame::GetSingleton()->trap || !RaptureGame::GetSingleton()->trap->interpretPacketFromClient(&packet)) {
+				if (!callbacks[NIC_INTERPRETCLIENT] || !callbacks[NIC_INTERPRETCLIENT](&packet)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
 				}
 				break;
@@ -151,7 +153,7 @@ namespace Network {
 
 			Packet outPacket;
 			if (incPacket.packetHead.type == PACKET_CLIENTATTEMPT) {
-				if (RaptureGame::GetSingleton()->trap && RaptureGame::GetSingleton()->trap->acceptclient((ClientAttemptPacket*)incPacket.packetData)) {
+				if (callbacks[NIC_ACCEPTCLIENT] && callbacks[NIC_ACCEPTCLIENT](incPacket.packetData)) {
 					// Send an acceptance packet with the new client number. Also remove this socket from temporary read packets
 					outPacket.packetHead.clientNum = lastFreeClientNum++;
 					outPacket.packetHead.direction = Packet::PD_ServerClient;
@@ -243,8 +245,8 @@ namespace Network {
 			// Not connected in the first place
 			return;
 		}
-		if (RaptureGame::GetSingleton()->trap) {
-			RaptureGame::GetSingleton()->trap->saveandexit();
+		if (callbacks[NIC_EXIT]) {
+			callbacks[NIC_EXIT](nullptr);
 		}
 		if (remoteSocket != nullptr) {
 			delete remoteSocket;
@@ -301,10 +303,8 @@ namespace Network {
 		}
 		vPacketsAwaitingSend.clear();
 
-		if (RaptureGame::GetSingleton()->trap && remoteSocket == nullptr) {
-			if (remoteSocket == nullptr) {
-				RaptureGame::GetSingleton()->trap->runserverframe();
-			}
+		if (callbacks[NIC_SERVERFRAME]) {
+			callbacks[NIC_SERVERFRAME](nullptr);
 		}
 	}
 
@@ -326,8 +326,26 @@ namespace Network {
 			}
 			vPacketsAwaitingSend.clear();
 		}
-		if (RaptureGame::GetSingleton()->trap) {
-			RaptureGame::GetSingleton()->trap->runclientframe();
+		if (callbacks[NIC_CLIENTFRAME]) {
+			callbacks[NIC_CLIENTFRAME](nullptr);
+		}
+	}
+
+	void AddCallback(NetworkInterfaceCallbacks callback, networkCallbackFunction func) {
+		if (callback == NIC_ALL) {
+			R_Message(PRIORITY_WARNING, "Callback added to NIC_ALL (invalid)\n");
+			return;
+		}
+		callbacks[callback] = func;
+	}
+
+	void RemoveCallback(NetworkInterfaceCallbacks callback) {
+		if (callback == NIC_ALL) {
+			memset(callbacks, 0, sizeof(networkCallbackFunction) * NIC_MAX);
+		}
+		else {
+			callbacks[callback] = nullptr;
 		}
 	}
 }
+

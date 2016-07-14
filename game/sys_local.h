@@ -600,6 +600,19 @@ typedef int socket_t;
 
 // The Network namespace contains all of the basic, low-level functions 
 namespace Network {
+	enum NetworkInterfaceCallbacks {
+		NIC_ALL = -1,			// Not actually a callback, just a sentinel value for all callbacks
+		NIC_INTERPRETSERVER,	// trap->interpretPacketFromServer
+		NIC_INTERPRETCLIENT,	// trap->interpretPacketFromClient
+		NIC_ACCEPTCLIENT,		// trap->acceptClient
+		NIC_EXIT,				// trap->saveAndExit
+		NIC_SERVERFRAME,		// trap->serverFrame
+		NIC_CLIENTFRAME,		// trap->clientFrame
+		NIC_MAX
+	};
+
+	typedef bool(*networkCallbackFunction)(void*);
+
 	void Init();
 	void Shutdown();
 	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
@@ -610,6 +623,8 @@ namespace Network {
 	bool StartLocalServer();
 	bool JoinServer(const char* hostname);
 	void Connect(const char* hostname);
+	void AddCallback(NetworkInterfaceCallbacks callback, networkCallbackFunction func);
+	void RemoveCallback(NetworkInterfaceCallbacks callback);
 };
 
 //

@@ -242,6 +242,15 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	if(!trap) {
 		return nullptr;
 	}
+
+	// Add callbacks to things that need them
+	Network::RemoveCallback(Network::NIC_ALL);
+	Network::AddCallback(Network::NIC_ACCEPTCLIENT, (Network::networkCallbackFunction)trap->acceptclient);
+	Network::AddCallback(Network::NIC_EXIT, (Network::networkCallbackFunction)trap->saveandexit);
+	Network::AddCallback(Network::NIC_CLIENTFRAME, (Network::networkCallbackFunction)trap->runclientframe);
+	Network::AddCallback(Network::NIC_SERVERFRAME, (Network::networkCallbackFunction)trap->runserverframe);
+	Network::AddCallback(Network::NIC_INTERPRETCLIENT, (Network::networkCallbackFunction)trap->interpretPacketFromClient);
+	Network::AddCallback(Network::NIC_INTERPRETSERVER, (Network::networkCallbackFunction)trap->interpretPacketFromServer);
 	return game;
 }
 
