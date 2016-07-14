@@ -131,7 +131,7 @@ Socket* Socket::CheckPendingConnections() {
 		case AF_INET6:	// IPv6
 		{
 			sockaddr_in6* sockIn = (sockaddr_in6*)genericClientInfo;
-			char ipBuffer[INET_ADDRSTRLEN];
+			char ipBuffer[INET6_ADDRSTRLEN];
 			inet_ntop(AF_INET6, &sockIn->sin6_addr, ipBuffer, sizeof(ipBuffer));
 			connectingInfo.ai_addrlen = sizeof(sockaddr_in6);
 			connectingInfo.ai_addr = (sockaddr*)Zone::Alloc(connectingInfo.ai_addrlen, "network");
@@ -230,10 +230,10 @@ void Socket::ReadAllPackets(vector<Packet>& vOutPackets) {
 // Also establishes this socket as being nonblocking.
 bool Socket::Connect(const char* hostname, unsigned short port) {
 	// First we need to resolve the hostname before we can bind the socket
-	addrinfo hints{ AI_V4MAPPED, AF_INET6, 0, IPPROTO_TCP, 0, nullptr, nullptr, nullptr };
+	addrinfo hints{ af == AF_INET6 ? AI_V4MAPPED : 0, af, 0, IPPROTO_TCP, 0, nullptr, nullptr, nullptr };
 	addrinfo* results;
 	char szPort[INET_PORTLEN] {0};
-	char ipBuffer[INET_ADDRSTRLEN] {0};
+	char ipBuffer[INET6_ADDRSTRLEN] {0};
 
 	std::sprintf(szPort, "%i", port);
 
@@ -245,18 +245,39 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	}
 
 	// Create the sockaddr fields necessary for the connection
-	sockaddr_in6* in = (sockaddr_in6*)results->ai_addr;
-	inet_ntop(AF_INET6, &in->sin6_addr, ipBuffer, sizeof(ipBuffer));
-	in->sin6_port = htons(port);
-	in->sin6_family = AF_INET6;
+	SOCKADDR_STORAGE* in;
+	size_t addrSize;
+	switch (af) {
+		case AF_INET6:
+		{
+			sockaddr_in6* in6 = (sockaddr_in6*)results->ai_addr;
+			inet_ntop(af, &in6->sin6_addr, ipBuffer, sizeof(ipBuffer));
+			in6->sin6_port = htons(port);
+			in6->sin6_family = AF_INET6;
+			in = (SOCKADDR_STORAGE*)in6;
+			addrSize = sizeof(sockaddr_in6);
+		}
+		break;
+		case AF_INET:
+		{
+			sockaddr_in* in4 = (sockaddr_in*)results->ai_addr;
+			inet_ntop(af, &in4->sin_addr, ipBuffer, sizeof(ipBuffer));
+			in4->sin_port = htons(port);
+			in4->sin_family = AF_INET;
+			in = (SOCKADDR_STORAGE*)in4;
+			addrSize = sizeof(sockaddr_in);
+		}
+		break;
+	}
 
 	R_Message(PRIORITY_MESSAGE, "%s resolved to %s\n", hostname, ipBuffer);
 
 	// Finally actually connect to the remote (in blocking mode)
-	if (connect(internalSocket, (sockaddr*)in, sizeof(sockaddr_in6)) != 0) {
+	if (connect(internalSocket, (sockaddr*)in, addrSize) != 0) {
 		int errorCode;
 		const char* errorMsg = Sys_SocketConnectError(errorCode);
 		R_Message(PRIORITY_ERROR, "Socket::Connect failed (%i: %s)\n", errorCode, errorMsg);
+		return false;
 	}
 
 	freeaddrinfo(results);

@@ -354,10 +354,10 @@ void RaptureGame::JoinRemoteGame(const char* szFileName, const char* szHostName)
 		return;
 	}
 
-	MainMenu::DestroySingleton();
 	if (Console::GetSingleton()->IsOpen()) {
 		Console::GetSingleton()->Hide();
 	}
+	MainMenu::DestroySingleton();
 
 	game = CreateGameModule("gamex86");
 	if (game == nullptr) {

@@ -27,6 +27,7 @@ namespace Network {
 	static Cvar*				net_maxclients = nullptr;
 	static Cvar*				net_netmode = nullptr;
 	static Cvar*				net_timeout = nullptr;
+	static Cvar*				net_ipv6 = nullptr;
 
 	static Socket*				localSocket = nullptr;
 	static map<int, Socket*>	mOtherConnectedClients;
@@ -57,12 +58,13 @@ namespace Network {
 		net_maxclients = Cvar::Get<int>("net_maxclients", "Maximum number of clients allowed on server", (1 << CVAR_ROM) | (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_MAXCLIENTS);
 		net_netmode = Cvar::Get<int>("net_netmode", "Current netmode", 0, Netmode_Red);
 		net_timeout = Cvar::Get<int>("net_timeout", "Timeout duration, in milliseconds", 0, 30000);
+		net_ipv6 = Cvar::Get<bool>("net_ipv6", "Whether to use IPv6 addresses", (1 << CVAR_ARCHIVE), false);
 
 		net_netmode->AddCallback(Netmode_Callback);
 		Sys_InitSockets();
 
 		// Create a local socket so we can serve as the host later
-		localSocket = new Socket(AF_INET6, SOCK_STREAM);
+		localSocket = new Socket(net_ipv6->Bool() ? AF_INET6 : AF_INET, SOCK_STREAM);
 	}
 
 	// Shut down the network, delete the local socket, disconnect any clients, etc.
@@ -162,6 +164,7 @@ namespace Network {
 					outPacket.packetHead.packetSize = 0; // FIXME
 
 					mOtherConnectedClients[outPacket.packetHead.clientNum] = socket;
+					R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", outPacket.packetHead.clientNum);
 				}
 				else {
 					outPacket.packetHead.clientNum = -1;
@@ -169,6 +172,7 @@ namespace Network {
 					outPacket.packetHead.sendTime = 0; // FIXME
 					outPacket.packetHead.type = PACKET_CLIENTDENIED;
 					outPacket.packetHead.packetSize = 0; // FIXME
+					R_Message(PRIORITY_MESSAGE, "ClientDenied --\n");
 				}
 				socket->SendPacket(outPacket);
 			}
@@ -178,7 +182,7 @@ namespace Network {
 	// Try and connect to a server
 	bool ConnectToRemote(const char* hostname, int port) {
 		DisconnectFromRemote();
-		remoteSocket = new Socket(AF_INET6, SOCK_STREAM);
+		remoteSocket = new Socket(net_ipv6->Bool() ? AF_INET6 : AF_INET, SOCK_STREAM);
 
 		bool connected = remoteSocket->Connect(hostname, port);
 		if (!connected) {
@@ -196,7 +200,12 @@ namespace Network {
 
 	// Join a remote server
 	bool JoinServer(const char* hostname) {
-		return ConnectToRemote(hostname, net_port->Integer());
+		bool connected = ConnectToRemote(hostname, net_port->Integer());
+		if (!connected) {
+			return false;
+		}
+		SendClientPacket(PACKET_CLIENTATTEMPT, nullptr, 0);
+		return true;
 	}
 
 	// Send packet from server -> client
