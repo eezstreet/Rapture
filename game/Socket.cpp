@@ -200,8 +200,14 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 // Read a packet from a socket.
 // Guaranteed delivery (no fragmentation), may block.
 bool Socket::ReadPacket(Packet& incomingPacket) {
+	bool bReadable, bWriteable;
 	lastHeardFrom = SDL_GetTicks();
 	memset(&incomingPacket, 0, sizeof(incomingPacket));
+
+	Socket::SelectSingle(this, bReadable, bWriteable);
+	if (!bReadable) {
+		return false;
+	}
 
 	if (!ReadEntireData(&incomingPacket.packetHead, sizeof(incomingPacket.packetHead))) {
 		// TODO: make it rain fire from the sky, we dropped a packet
@@ -221,6 +227,7 @@ bool Socket::ReadPacket(Packet& incomingPacket) {
 // Gauranteed delivery (no fragmentation), does not block.
 void Socket::ReadAllPackets(vector<Packet>& vOutPackets) {
 	bool bReading, bWriting;
+
 	do {
 		Packet readPacket;
 		if (!ReadPacket(readPacket)) {
