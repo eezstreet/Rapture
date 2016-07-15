@@ -160,8 +160,7 @@ bool Socket::SendEntireData(void* data, size_t dataSize) {
 // Send a packet across the network.
 // Guaranteed delivery (no fragmentation), does not block.
 bool Socket::SendPacket(Packet& outgoing) {
-	SendEntireData(&outgoing.packetHead, sizeof(outgoing.packetHead));
-	SendEntireData(&outgoing.packetData, outgoing.packetHead.packetSize);
+	lastSpoken = SDL_GetTicks();
 	bool sent = SendEntireData(&outgoing.packetHead, sizeof(outgoing.packetHead));
 	if (!sent) {
 		R_Message(PRIORITY_WARNING,
@@ -195,6 +194,7 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 // Read a packet from a socket.
 // Guaranteed delivery (no fragmentation), may block.
 bool Socket::ReadPacket(Packet& incomingPacket) {
+	lastHeardFrom = SDL_GetTicks();
 	memset(&incomingPacket, 0, sizeof(incomingPacket));
 
 	if (!ReadEntireData(&incomingPacket.packetHead, sizeof(incomingPacket.packetHead))) {
@@ -275,7 +275,7 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 	// Finally actually connect to the remote (in blocking mode)
 	if (connect(internalSocket, (sockaddr*)in, addrSize) != 0) {
 		int errorCode;
-		const char* errorMsg = Sys_SocketConnectError(errorCode);
+		const char* errorMsg = Sys_SocketError(errorCode);
 		R_Message(PRIORITY_ERROR, "Socket::Connect failed (%i: %s)\n", errorCode, errorMsg);
 		return false;
 	}
@@ -297,23 +297,29 @@ void Socket::Disconnect() {
 
 /* Static member functions */
 
-void Socket::Select(vector<Socket*> vSockets, vector<Socket*>& vReadable, vector<Socket*>& vWriteable) {
+void Socket::SelectReadable(const vector<Socket*>& vSockets, vector<Socket*>& vReadable) {
+	if (vSockets.size() == 0) {
+		return;
+	}
 	vReadable.clear();
-	vWriteable.clear();
 
 	fd_set readSet{ 0 };
-	fd_set writeSet{ 0 };
-	timeval timeout{ 0, 1 };
+	timeval timeout{ 0, 0 };
 	for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
 		Socket* sock = *it;
 		if (sock == nullptr) {
 			return;
 		}
 		FD_SET(sock->internalSocket, &readSet);
-		FD_SET(sock->internalSocket, &writeSet);
 	}
 
-	select(vSockets.size(), &readSet, &writeSet, nullptr, &timeout);
+	int errCode = select(vSockets.size(), &readSet, nullptr, nullptr, &timeout);
+	if (errCode == -1) {
+		int errNum;
+		const char* errMsg = Sys_SocketError(errNum);
+		R_Message(PRIORITY_ERROR, "Select failed: %s (error code %i)\n", errMsg, errNum);
+		return;
+	}
 	
 	// add to vReadable
 	for (u_int i = 0; i < readSet.fd_count; i++) {
@@ -323,17 +329,6 @@ void Socket::Select(vector<Socket*> vSockets, vector<Socket*>& vReadable, vector
 			if (socket->internalSocket == sock) {
 				vReadable.push_back(socket);
 				break;
-			}
-		}
-	}
-
-	// add to vWriteable
-	for (u_int i = 0; i < writeSet.fd_count; i++) {
-		socket_t sock = writeSet.fd_array[i];
-		for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
-			Socket* socket = *it;
-			if (socket->internalSocket == sock) {
-				vWriteable.push_back(socket);
 			}
 		}
 	}

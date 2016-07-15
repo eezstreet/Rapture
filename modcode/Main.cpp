@@ -46,6 +46,10 @@ bool Game_ClientPacket(Packet* pPacket) {
 	return true;
 }
 
+bool Game_ClientAttempt(ClientPacket::ClientAttemptPacket* pPacket) {
+	return true;	// no reason to blacklist people yet
+}
+
 static gameExports_s exports;
 extern "C" {
 	__declspec(dllexport) gameExports_s* GetRefAPI(gameImports_s* imp) {
@@ -55,6 +59,7 @@ extern "C" {
 		exports.startserverfromsave = Game_InitServer;
 		exports.runserverframe = Game_ServerFrame;
 		exports.runclientframe = Game_ClientFrame;
+		exports.acceptclient = Game_ClientAttempt;
 		exports.passkeypress = Game_KeyPress;
 		exports.passmousedown = Game_MouseDown;
 		exports.passmousemove = Game_MouseMove;

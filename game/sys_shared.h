@@ -80,6 +80,7 @@ enum cvarFlags_e {
 
 enum packetType_e {
 	PACKET_PING,			// Server <-> (Any)		--	Check if service is alive	
+	PACKET_DROP,			// Server <-> (Any)		--	Connection timed out
 	PACKET_CLIENTATTEMPT,	// Server <-  Client	--	Attempt to join a server
 	PACKET_CLIENTACCEPT,	// Server  -> Client	--	Tell the client they are accepted into the server
 	PACKET_CLIENTDENIED,	// Server  -> Client	--	Tell the client they are denied into the server

@@ -97,6 +97,7 @@ namespace Network {
 			case PACKET_PING:
 				{
 					R_Message(PRIORITY_DEBUG, "Server PONG");
+					SendClientPacket(PACKET_PING, nullptr, 0);
 				}
 				break;
 			default:
@@ -130,7 +131,6 @@ namespace Network {
 		switch (packet.packetHead.type) {
 			case PACKET_PING:
 				R_Message(PRIORITY_DEBUG, "Server PING from %i\n", packet.packetHead.clientNum);
-				SendServerPacketTo(PACKET_PING, packet.packetHead.clientNum, nullptr, 0);
 				break;
 			default:
 				if (!callbacks[NIC_INTERPRETCLIENT] || !callbacks[NIC_INTERPRETCLIENT](&packet)) {
@@ -142,14 +142,22 @@ namespace Network {
 
 	// Check for new incoming temporary connections
 	void CheckTemporaryConnections() {
-		Socket* newConnection = localSocket->CheckPendingConnections();
-		if (newConnection != nullptr) {
+		// vTemporary contains a list of sockets that are not validated as clients. 
+		// When they are validated as clients (or time out) the sockets are destroyed.
+		// Here we are polling the local socket to see if there are any temporary connections awaiting acceptance
+		uint64_t ticks = SDL_GetTicks();
+
+		bool canReadLocalSocket, canWriteLocalSocket;
+		Socket::SelectSingle(localSocket, canReadLocalSocket, canWriteLocalSocket);
+		if (canReadLocalSocket) {
+			Socket* newConnection = localSocket->CheckPendingConnections();
+			newConnection->lastHeardFrom = ticks;
 			vTemporaryConnections.push_back(newConnection);
 		}
-
-		vector<Socket*> readReady, writeReady;	// WriteReady is not actually used in this case
-		Socket::Select(vTemporaryConnections, readReady, writeReady);
-		for (auto& socket : readReady) {
+		
+		vector<Socket*> readReady;
+		Socket::SelectReadable(vTemporaryConnections, readReady);
+		for (auto& socket: readReady) {
 			Packet incPacket;
 			socket->ReadPacket(incPacket);
 
@@ -163,6 +171,8 @@ namespace Network {
 					outPacket.packetHead.type = PACKET_CLIENTACCEPT;
 					outPacket.packetHead.packetSize = 0; // FIXME
 
+					socket->lastSpoken = ticks;
+
 					mOtherConnectedClients[outPacket.packetHead.clientNum] = socket;
 					R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", outPacket.packetHead.clientNum);
 				}
@@ -173,8 +183,26 @@ namespace Network {
 					outPacket.packetHead.type = PACKET_CLIENTDENIED;
 					outPacket.packetHead.packetSize = 0; // FIXME
 					R_Message(PRIORITY_MESSAGE, "ClientDenied --\n");
+					socket->SendPacket(outPacket);
+					delete socket;
 				}
-				socket->SendPacket(outPacket);
+				remove(vTemporaryConnections.begin(), vTemporaryConnections.end(), socket);
+			}
+		}
+
+		// Make sure that the temporary connections are still alive
+		vector<Socket*>::iterator it = vTemporaryConnections.begin();
+		for (; it != vTemporaryConnections.end();) {
+			Socket* socket = *it;
+			if (ticks - socket->lastHeardFrom > net_timeout->Integer()) {
+				// Connection timed out
+				Packet packet{ { PACKET_DROP, -1, Packet::PD_ServerClient, ticks, 0 }, nullptr };
+				socket->SendPacket(packet);
+				delete socket;
+				it = vTemporaryConnections.erase(it);
+			}
+			else {
+				++it;
 			}
 		}
 	}
@@ -221,6 +249,8 @@ namespace Network {
 	// Send packet from client -> server
 	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetDataSize) {
 		// FIXME: use the correct timestamp
+		uint64_t ticks = SDL_GetTicks();
+
 		Packet packet = { { packetType, myClientNum, Packet::PD_ClientServer, 0, packetDataSize }, packetData };
 		if (remoteSocket == nullptr) {
 			// Not connected to a remote server, send it to ourselves instead
@@ -228,6 +258,7 @@ namespace Network {
 		}
 		else {
 			remoteSocket->SendPacket(packet);
+			remoteSocket->lastSpoken = ticks;
 		}
 	}
 
@@ -265,20 +296,32 @@ namespace Network {
 		R_Message(PRIORITY_NOTE, "--- Disconnected ---\n");
 	}
 
+	// Drops a client.
+	// Returns the next client iterator.
+	map<int, Socket*>::iterator DropClient(int clientNum) {
+		// TODO: gamecode for dropped client
+		R_Message(PRIORITY_MESSAGE, "DropClient: %i\n", clientNum);
+		auto it = mOtherConnectedClients.find(clientNum);
+		delete it->second;
+		return mOtherConnectedClients.erase(it);
+	}
+
 	// Run all of the server stuff
 	void ServerFrame() {
+		uint64_t ticks = SDL_GetTicks();
+
 		// Try listening for any temporary connections
 		CheckTemporaryConnections();
 
 		// Create list of sockets
-		vector<Socket*> vSockets = { localSocket };
+		vector<Socket*> vSockets;
 		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
 			vSockets.push_back(it->second);
 		}
 
 		// Poll sockets
-		vector<Socket*> vSocketsRead, vSocketsWrite;
-		Socket::Select(vSockets, vSocketsRead, vSocketsWrite);
+		vector<Socket*> vSocketsRead;
+		Socket::SelectReadable(vSockets, vSocketsRead);
 
 		// Deal with sockets that need reading
 		for (auto& socket : vSocketsRead) {
@@ -287,6 +330,7 @@ namespace Network {
 			for (auto& packet : vPackets) {
 				DispatchSingleClientPacket(packet);
 			}
+			socket->lastHeardFrom = ticks;
 		}
 
 		// Deal with sockets that need writing
@@ -302,6 +346,7 @@ namespace Network {
 					continue;
 				}
 				found->second->SendPacket(packet);
+				found->second->lastSpoken = ticks;
 			}
 			else {
 				for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
@@ -314,6 +359,21 @@ namespace Network {
 
 		if (callbacks[NIC_SERVERFRAME]) {
 			callbacks[NIC_SERVERFRAME](nullptr);
+		}
+
+		// Iterate through all sockets, make sure they are still listening.
+		map<int, Socket*>::iterator it = mOtherConnectedClients.begin();
+		for (; it != mOtherConnectedClients.end();) {
+			Socket* socket = it->second;
+			if (ticks - socket->lastHeardFrom > net_timeout->Integer()) {
+				// Been longer than the timeout, drop it.
+				it = DropClient(it->first);
+			}
+			else if (ticks - socket->lastHeardFrom > net_timeout->Integer() / 2) {
+				// Been longer than half the time, send a PING packet.
+				SendServerPacketTo(PACKET_PING, it->first, nullptr, 0);
+				socket->lastSpoken = ticks;
+			}
 		}
 	}
 

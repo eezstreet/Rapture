@@ -636,13 +636,14 @@ struct Socket {
 private:
 	socket_t internalSocket;
 	int af, type;
-	int lastHeardFrom;
-	int lastSpoken;
 
 	bool SetNonBlocking();
 	bool SendEntireData(void* data, size_t dataSize);
 	bool ReadEntireData(void* data, size_t dataSize);
 public:
+	uint64_t lastHeardFrom;
+	uint64_t lastSpoken;
+
 	Socket(int af_, int type_);
 	Socket(addrinfo& pConnectingClient, socket_t socket);
 	Socket(Socket& other);
@@ -657,7 +658,7 @@ public:
 	Socket* CheckPendingConnections();
 	bool ShouldDrop(int timeout, int currentTime);
 	
-	static void Select(vector<Socket*> vSockets, vector<Socket*>& vReadAble, vector<Socket*>& vWriteAble);
+	static void SelectReadable(const vector<Socket*>& vSockets, vector<Socket*>& vReadAble);
 	static void SelectSingle(Socket* pSocket, bool& bReadable, bool& bWriteable);
 };
 
@@ -698,4 +699,4 @@ bool Sys_Assertion(const char* msg, const char* file, const unsigned int line);
 void Sys_Error(const char* error, ...);
 void Sys_InitSockets();
 void Sys_ExitSockets();
-const char* Sys_SocketConnectError(int& number);
+const char* Sys_SocketError(int& number);

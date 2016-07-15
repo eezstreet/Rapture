@@ -159,7 +159,7 @@ void Sys_ExitSockets() {
 	WSACleanup();
 }
 
-const char* Sys_SocketConnectError(int& number) {
+const char* Sys_SocketError(int& number) {
 	number = WSAGetLastError();
 	switch (number) {
 	case WSANOTINITIALISED:
@@ -181,9 +181,9 @@ const char* Sys_SocketConnectError(int& number) {
 	case WSAECONNREFUSED:
 		return "The attempt to connect was forcefully rejected.";
 	case WSAEFAULT:
-		return "Invalid sockaddr";
+		return "Invalid pointer address.";
 	case WSAEINVAL:
-		return "The parameter s is a listening socket.";
+		return "Invalid parameter.";
 	case WSAEISCONN:
 		return "The socket is already connected.";
 	case WSAENETUNREACH:
@@ -193,7 +193,7 @@ const char* Sys_SocketConnectError(int& number) {
 	case WSAENOBUFS:
 		return "No buffer space is available. The socket cannot be connected.";
 	case WSAENOTSOCK:
-		return "The descriptor specified in the s parameter is not a socket.";
+		return "Not a valid socket.";
 	case WSAETIMEDOUT:
 		return "An attempt to connect timed out without establishing a connection.";
 	case WSAEWOULDBLOCK:
