@@ -164,8 +164,12 @@ const char* Sys_SocketError(int& number) {
 	switch (number) {
 	case WSANOTINITIALISED:
 		return "Invalid initialization.";
+	case WSAESHUTDOWN:
+		return "The socket was shut down.";
 	case WSAENETDOWN:
 		return "The network subsystem has failed.";
+	case WSAENETRESET:
+		return "The connection has been broken due to keep-alive activity detecting a failure while the operation was in progress.";
 	case WSAEADDRINUSE:
 		return "The socket's local address is already in use and the socket did not receive proper parameters.";
 	case WSAEINTR:
@@ -180,6 +184,14 @@ const char* Sys_SocketError(int& number) {
 		return "Addresses in the specified family cannot be used with this socket.";
 	case WSAECONNREFUSED:
 		return "The attempt to connect was forcefully rejected.";
+	case WSAENOTCONN:
+		return "The socket is not connected.";
+	case WSAEOPNOTSUPP:
+		return "The operation is not supported.";
+	case WSAECONNABORTED:
+		return "The connection was aborted for unknown reasons.";
+	case WSAECONNRESET:
+		return "The remote server issued a hardware reset.";
 	case WSAEFAULT:
 		return "Invalid pointer address.";
 	case WSAEINVAL:
@@ -191,7 +203,7 @@ const char* Sys_SocketError(int& number) {
 	case WSAEHOSTUNREACH:
 		return "A socket operation was attempted to an unreachable host.";
 	case WSAENOBUFS:
-		return "No buffer space is available. The socket cannot be connected.";
+		return "No buffer space is available.";
 	case WSAENOTSOCK:
 		return "Not a valid socket.";
 	case WSAETIMEDOUT:

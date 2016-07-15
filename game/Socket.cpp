@@ -150,6 +150,9 @@ bool Socket::SendEntireData(void* data, size_t dataSize) {
 	while (sent < dataSize) {
 		int numSent = send(internalSocket, (const char*)data + sent, dataSize - sent, 0);
 		if (numSent < 0) {
+			int errorNum;
+			const char* errMsg = Sys_SocketError(errorNum);
+			R_Message(PRIORITY_ERROR, "Socket::SendEntireData: %s (error code %i)\n", errMsg, errorNum);
 			return false;
 		}
 		sent += numSent;
@@ -184,6 +187,9 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 	while (received < dataSize) {
 		int numRead = recv(internalSocket, (char*)data + received, dataSize - received, 0);
 		if (numRead < 0) {
+			int errorNum;
+			const char* errorMsg = Sys_SocketError(errorNum);
+			R_Message(PRIORITY_ERROR, "Socket::ReadEntireData failed. %s (error code %i)\n", errorMsg, errorNum);
 			return false;
 		}
 		received += numRead;
