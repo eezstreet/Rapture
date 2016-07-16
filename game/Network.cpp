@@ -110,6 +110,9 @@ namespace Network {
 					SendClientPacket(PACKET_PONG, nullptr, 0);
 				}
 				break;
+			case PACKET_PONG:
+				// TODO: use the difference from last PING packet to determine client latency
+				break;
 			case PACKET_DROP:
 				{
 					R_Message(PRIORITY_MESSAGE, "The server has forcibly terminated the connection.\n");
