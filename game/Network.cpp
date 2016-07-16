@@ -57,7 +57,7 @@ namespace Network {
 			= Cvar::Get<int>("net_serverbacklog", "Maximum number of waiting connections for the server", (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_BACKLOG);
 		net_maxclients = Cvar::Get<int>("net_maxclients", "Maximum number of clients allowed on server", (1 << CVAR_ROM) | (1 << CVAR_ARCHIVE), RAPTURE_DEFAULT_MAXCLIENTS);
 		net_netmode = Cvar::Get<int>("net_netmode", "Current netmode", 0, Netmode_Red);
-		net_timeout = Cvar::Get<int>("net_timeout", "Timeout duration, in milliseconds", 0, 30000);
+		net_timeout = Cvar::Get<int>("net_timeout", "Timeout duration, in milliseconds", 0, 90000);
 		net_ipv6 = Cvar::Get<bool>("net_ipv6", "Whether to use IPv6 addresses", (1 << CVAR_ARCHIVE), false);
 
 		net_netmode->AddCallback(Netmode_Callback);
@@ -84,7 +84,10 @@ namespace Network {
 			R_Message(PRIORITY_WARNING, "Tried to drop invalid client %i\n", clientNum);
 			return;
 		}
-		delete it->second;
+		if (it->second != nullptr) {
+			delete it->second;
+			it->second = nullptr;
+		}
 		numConnectedClients--;
 	}
 
@@ -110,7 +113,7 @@ namespace Network {
 				break;
 			case PACKET_PING:
 				{
-					R_Message(PRIORITY_DEBUG, "Server PONG");
+					R_Message(PRIORITY_DEBUG, "Server PONG\n");
 					SendClientPacket(PACKET_PONG, nullptr, 0);
 				}
 				break;
@@ -416,14 +419,16 @@ namespace Network {
 		// Iterate through all sockets, make sure they are still listening.
 		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); it++) {
 			Socket* socket = it->second;
-			if (ticks - socket->lastHeardFrom > net_timeout->Integer()) {
+			int difference = ticks - socket->lastHeardFrom;
+			if (difference > net_timeout->Integer()) {
 				// Been longer than the timeout, drop it.
 				R_Message(PRIORITY_MESSAGE, "Client %i timed out.\n", it->first);
 				DropClient(it->first);
 				mOtherConnectedClients.erase(it);
 				break;
 			}
-			else if (ticks - socket->lastHeardFrom > net_timeout->Integer() / 2) {
+			else if (difference > net_timeout->Integer() / 2 &&
+				ticks - socket->lastSpoken > net_timeout->Integer() / 2) {
 				// Been longer than half the time, send a PING packet.
 				R_Message(PRIORITY_MESSAGE, "Client %i hasn't sent anything in a while, pinging...\n", it->first);
 				SendServerPacketTo(PACKET_PING, it->first, nullptr, 0);
@@ -467,15 +472,16 @@ namespace Network {
 			}
 
 			// Check for timeout
-			uint64_t msLast = ticks - remoteSocket->lastHeardFrom;
-			if (msLast > net_timeout->Integer()) {
+			int msLastHeard = ticks - remoteSocket->lastHeardFrom;
+			int msLastSpoken = ticks - remoteSocket->lastSpoken;
+			if (msLastHeard > net_timeout->Integer()) {
 				// Drop due to timeout
-				R_Message(PRIORITY_MESSAGE, "No response from server in %i milliseconds, dropping...\n", msLast);
+				R_Message(PRIORITY_MESSAGE, "No response from server in %i milliseconds, dropping...\n", msLastHeard);
 				DisconnectFromRemote();
 			}
-			else if (msLast > net_timeout->Integer() / 2) {
+			else if (msLastHeard > net_timeout->Integer() / 2 && msLastSpoken > net_timeout->Integer() / 2) {
 				// Send a PING packet to make sure we're still alive
-				R_Message(PRIORITY_MESSAGE, "No server response in %i milliseconds, pinging...\n", msLast);
+				R_Message(PRIORITY_MESSAGE, "No server response in %i milliseconds, pinging...\n", msLastHeard);
 				SendClientPacket(PACKET_PING, nullptr, 0);
 			}
 		}
