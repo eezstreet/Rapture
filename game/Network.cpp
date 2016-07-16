@@ -156,6 +156,7 @@ namespace Network {
 			case PACKET_DROP:
 				R_Message(PRIORITY_MESSAGE, "Client %i left.\n", packet.packetHead.clientNum);
 				DropClient(packet.packetHead.clientNum);
+				break;
 			default:
 				if (!callbacks[NIC_INTERPRETCLIENT] || !callbacks[NIC_INTERPRETCLIENT](&packet)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
