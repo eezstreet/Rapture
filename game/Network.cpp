@@ -113,12 +113,13 @@ namespace Network {
 				break;
 			case PACKET_PING:
 				{
-					R_Message(PRIORITY_DEBUG, "Server PONG\n");
+					R_Message(PRIORITY_DEBUG, "Server PING\n");
 					SendClientPacket(PACKET_PONG, nullptr, 0);
 				}
 				break;
 			case PACKET_PONG:
 				// TODO: use the difference from last PING packet to determine client latency
+				R_Message(PRIORITY_DEBUG, "Client PONG\n");
 				break;
 			case PACKET_DROP:
 				{
@@ -162,6 +163,7 @@ namespace Network {
 				SendServerPacketTo(PACKET_PONG, packet.packetHead.clientNum, nullptr, 0);
 				break;
 			case PACKET_PONG:
+				R_Message(PRIORITY_DEBUG, "Server PONG\n");
 				break;
 			case PACKET_DROP:
 				R_Message(PRIORITY_MESSAGE, "Client %i left.\n", packet.packetHead.clientNum);
