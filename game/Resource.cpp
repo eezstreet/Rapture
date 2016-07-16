@@ -30,8 +30,9 @@ Resource* Resource::ResourceAsyncURI(const char* uri, assetRequestCallback callb
 	string szAsset, szComponent;
 	smatch rmMatch;
 	regex rxStr("^(?:asset://)?([^/]*)/([^/]*)$");
+	string szURI(uri);
 
-	regex_match(string(uri), rmMatch, rxStr);
+	regex_match(szURI, rmMatch, rxStr);
 	if (rmMatch.empty()) {
 		// regex match failed
 		R_Message(PRIORITY_WARNING, "Resource::ResourceAsyncURI: malformed URI: '%s'\n", uri);
