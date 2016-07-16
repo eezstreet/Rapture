@@ -99,8 +99,8 @@ private:
 	bool bIsOpen;
 	Awesomium::WebView* prevFocus;
 
-	vector<const string> inputBuffer;
-	vector<const string>::iterator itBufferPosition;
+	vector<string> inputBuffer;
+	vector<string>::iterator itBufferPosition;
 	void UpdateInputBufferPosition();
 public:
 	Console();
