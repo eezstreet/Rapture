@@ -186,6 +186,9 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 	size_t received = 0;
 	while (received < dataSize) {
 		int numRead = recv(internalSocket, (char*)data + received, dataSize - received, 0);
+		if (numRead == 0) {
+			return false;		// dead connection
+		}
 		if (numRead < 0) {
 			int errorNum;
 			const char* errorMsg = Sys_SocketError(errorNum);

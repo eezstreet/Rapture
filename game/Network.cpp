@@ -270,6 +270,9 @@ namespace Network {
 			delete remoteSocket;
 			remoteSocket = nullptr;
 		}
+		else {
+			remoteSocket->lastHeardFrom = SDL_GetTicks();
+		}
 		currentNetState = Netstate_NeedAuth;
 		return connected;
 	}
@@ -359,18 +362,26 @@ namespace Network {
 		// Poll each single socket individually, so we can guarantee they're valid packets
 		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
 			bool bReadable, bWriteable;
-			Socket::SelectSingle(it->second, bReadable, bWriteable);
-			if (bReadable) {
-				vector<Packet> vPackets;
-				it->second->ReadAllPackets(vPackets);
-				for (auto& packet : vPackets) {
-					int packetClNum = packet.packetHead.clientNum;
-					if (packetClNum != it->first) {
-						R_Message(PRIORITY_WARNING, "Client %i tried to send packet with invalid clientNum %i -- packet dropped\n", it->first, packetClNum);
-						continue;
-					}
-					DispatchSingleClientPacket(packet);
+			Socket* pSocket = it->second;
+			int clientNum = it->first;
+			Socket::SelectSingle(pSocket, bReadable, bWriteable);
+			while (bReadable) {
+				Packet packet;
+				if (!pSocket->ReadPacket(packet)) {
+					R_Message(PRIORITY_MESSAGE, "Client %i dropped.\n", clientNum);
+					DropClient(clientNum);
+					break;
 				}
+				else {
+					int packetClNum = packet.packetHead.clientNum;
+					if (packetClNum != clientNum) {
+						R_Message(PRIORITY_WARNING, "Client %i tried to send packet with invalid clientNum %i -- packet dropped\n", clientNum, packetClNum);
+					}
+					else {
+						DispatchSingleClientPacket(packet);
+					}
+				}
+				Socket::SelectSingle(pSocket, bReadable, bWriteable);
 			}
 		}
 
@@ -432,12 +443,19 @@ namespace Network {
 
 			// Read packets from the server
 			if (bRead) {
-				vector<Packet> vPackets;
-				remoteSocket->ReadAllPackets(vPackets);
-				for (auto& packet : vPackets) {
-					DispatchSingleServerPacket(packet);
-					remoteSocket->lastHeardFrom = ticks;
-				}
+				do {
+					Packet packet;
+					if (!remoteSocket->ReadPacket(packet)) {
+						// Close the connection?
+						R_Message(PRIORITY_MESSAGE, "Connection lost.\n");
+						DisconnectFromRemote();
+						return;
+					}
+					else {
+						DispatchSingleServerPacket(packet);
+					}
+					Socket::SelectSingle(remoteSocket, bRead, bWrite);
+				} while (bRead);
 			}
 
 			// Write packets to the server
