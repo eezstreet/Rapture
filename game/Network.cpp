@@ -80,6 +80,10 @@ namespace Network {
 		// TODO: gamecode for dropped client
 		R_Message(PRIORITY_MESSAGE, "DropClient: %i\n", clientNum);
 		auto it = mOtherConnectedClients.find(clientNum);
+		if (it == mOtherConnectedClients.end()) {
+			R_Message(PRIORITY_WARNING, "Tried to drop invalid client %i\n", clientNum);
+			return;
+		}
 		delete it->second;
 		numConnectedClients--;
 	}
