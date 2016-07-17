@@ -654,12 +654,8 @@ public:
 	void Disconnect();
 	bool SendPacket(Packet& outgoing);
 	bool ReadPacket(Packet& incoming);
-	void ReadAllPackets(vector<Packet>& vPackets);
 	Socket* CheckPendingConnections();
-	bool ShouldDrop(int timeout, int currentTime);
-	
-	static void SelectReadable(const vector<Socket*>& vSockets, vector<Socket*>& vReadAble);
-	static void SelectSingle(Socket* pSocket, bool& bReadable, bool& bWriteable);
+	bool Select();
 };
 
 //

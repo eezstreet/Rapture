@@ -141,6 +141,7 @@ Socket* Socket::CheckPendingConnections() {
 		break;
 	}
 
+	lastHeardFrom = SDL_GetTicks();
 	return new Socket(connectingInfo, value);
 }
 
@@ -163,7 +164,6 @@ bool Socket::SendEntireData(void* data, size_t dataSize) {
 // Send a packet across the network.
 // Guaranteed delivery (no fragmentation), does not block.
 bool Socket::SendPacket(Packet& outgoing) {
-	lastSpoken = SDL_GetTicks();
 	bool sent = SendEntireData(&outgoing.packetHead, sizeof(outgoing.packetHead));
 	if (!sent) {
 		R_Message(PRIORITY_WARNING,
@@ -180,6 +180,7 @@ bool Socket::SendPacket(Packet& outgoing) {
 			return false;
 		}
 	}
+	lastSpoken = SDL_GetTicks();
 	return true;
 }
 
@@ -205,14 +206,7 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 // Read a packet from a socket.
 // Guaranteed delivery (no fragmentation), may block.
 bool Socket::ReadPacket(Packet& incomingPacket) {
-	bool bReadable, bWriteable;
-	lastHeardFrom = SDL_GetTicks();
 	memset(&incomingPacket, 0, sizeof(incomingPacket));
-
-	Socket::SelectSingle(this, bReadable, bWriteable);
-	if (!bReadable) {
-		return false;
-	}
 
 	if (!ReadEntireData(&incomingPacket.packetHead, sizeof(incomingPacket.packetHead))) {
 		// TODO: make it rain fire from the sky, we dropped a packet
@@ -227,22 +221,8 @@ bool Socket::ReadPacket(Packet& incomingPacket) {
 		}
 	}
 
+	lastHeardFrom = SDL_GetTicks();
 	return true;
-}
-
-// Read all packets from a socket
-// Gauranteed delivery (no fragmentation), does not block.
-void Socket::ReadAllPackets(vector<Packet>& vOutPackets) {
-	bool bReading, bWriting;
-
-	do {
-		Packet readPacket;
-		if (!ReadPacket(readPacket)) {
-			break;
-		}
-		vOutPackets.push_back(readPacket);
-		Socket::SelectSingle(this, bReading, bWriting);
-	} while (bReading);
 }
 
 // Connect this socket to a hostname and port.
@@ -306,6 +286,8 @@ bool Socket::Connect(const char* hostname, unsigned short port) {
 		return false;
 	}
 
+	lastHeardFrom = SDL_GetTicks();
+
 	return true;
 }
 
@@ -317,68 +299,17 @@ void Socket::Disconnect() {
 
 /* Static member functions */
 
-void Socket::SelectReadable(const vector<Socket*>& vSockets, vector<Socket*>& vReadable) {
-	if (vSockets.size() == 0) {
-		return;
-	}
-	vReadable.clear();
-
+bool Socket::Select() {
 	fd_set readSet{ 0 };
 	timeval timeout{ 0, 0 };
-	for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
-		Socket* sock = *it;
-		if (sock == nullptr) {
-			return;
-		}
-		FD_SET(sock->internalSocket, &readSet);
-	}
-
-	int errCode = select(vSockets.size(), &readSet, nullptr, nullptr, &timeout);
-	if (errCode == -1) {
-		int errNum;
-		const char* errMsg = Sys_SocketError(errNum);
-		R_Message(PRIORITY_ERROR, "Select failed: %s (error code %i)\n", errMsg, errNum);
-		return;
-	}
 	
-	// add to vReadable
-	for (u_int i = 0; i < readSet.fd_count; i++) {
-		socket_t sock = readSet.fd_array[i];
-		for (auto it = vSockets.begin(); it != vSockets.end(); ++it) {
-			Socket* socket = *it;
-			if (socket->internalSocket == sock) {
-				vReadable.push_back(socket);
-				break;
-			}
-		}
-	}
-}
+	FD_SET(internalSocket, &readSet);
+	select(1, &readSet, nullptr, nullptr, &timeout);
 
-void Socket::SelectSingle(Socket* pSocket, bool& bReadable, bool& bWriteable) {
-	fd_set readSet{ 0 };
-	fd_set writeSet{ 0 };
-
-	if (pSocket == nullptr) {
-		return;
-	}
-	
-	FD_SET(pSocket->internalSocket, &readSet);
-	FD_SET(pSocket->internalSocket, &writeSet);
-
-	timeval timeout{ 0, 1 };
-	select(1, &readSet, &writeSet, nullptr, &timeout);
-
-	if (FD_ISSET(pSocket->internalSocket, &readSet)) {
-		bReadable = true;
+	if (FD_ISSET(internalSocket, &readSet)) {
+		return true;
 	}
 	else {
-		bReadable = false;
-	}
-
-	if (FD_ISSET(pSocket->internalSocket, &writeSet)) {
-		bWriteable = false;
-	}
-	else {
-		bWriteable = false;
+		return false;
 	}
 }
