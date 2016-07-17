@@ -219,10 +219,12 @@ bool Socket::ReadPacket(Packet& incomingPacket) {
 		return false;
 	}
 
-	incomingPacket.packetData = Zone::Alloc(incomingPacket.packetHead.packetSize, "network");
-	if (!ReadEntireData(&incomingPacket.packetData, incomingPacket.packetHead.packetSize)) {
-		Zone::FastFree(incomingPacket.packetData, "network");
-		return false;
+	if (incomingPacket.packetHead.packetSize > 0) {
+		incomingPacket.packetData = Zone::Alloc(incomingPacket.packetHead.packetSize, "network");
+		if (!ReadEntireData(&incomingPacket.packetData, incomingPacket.packetHead.packetSize)) {
+			Zone::FastFree(incomingPacket.packetData, "network");
+			return false;
+		}
 	}
 
 	return true;

@@ -97,9 +97,8 @@ namespace Network {
 			case PACKET_CLIENTACCEPT:
 				{
 					// We have been accepted into the server
-					ClientAcceptPacket* cPacket = (ClientAcceptPacket*)(packet.packetData);
 					R_Message(PRIORITY_MESSAGE, "Authorization successful");
-					myClientNum = cPacket->clientNum;
+					myClientNum = packet.packetHead.clientNum;
 					currentNetState = Netstate_Authorized;
 				}
 				break;
