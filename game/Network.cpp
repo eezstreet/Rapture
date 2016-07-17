@@ -113,13 +113,13 @@ namespace Network {
 				break;
 			case PACKET_PING:
 				{
-					R_Message(PRIORITY_DEBUG, "Server PING\n");
+					R_Message(PRIORITY_MESSAGE, "Server PING\n");
 					SendClientPacket(PACKET_PONG, nullptr, 0);
 				}
 				break;
 			case PACKET_PONG:
 				// TODO: use the difference from last PING packet to determine client latency
-				R_Message(PRIORITY_DEBUG, "Client PONG\n");
+				R_Message(PRIORITY_MESSAGE, "Client PONG\n");
 				break;
 			case PACKET_DROP:
 				{
@@ -159,11 +159,11 @@ namespace Network {
 	void DispatchSingleClientPacket(Packet& packet) {
 		switch (packet.packetHead.type) {
 			case PACKET_PING:
-				R_Message(PRIORITY_DEBUG, "Server PING from %i\n", packet.packetHead.clientNum);
+				R_Message(PRIORITY_MESSAGE, "Server PING from %i\n", packet.packetHead.clientNum);
 				SendServerPacketTo(PACKET_PONG, packet.packetHead.clientNum, nullptr, 0);
 				break;
 			case PACKET_PONG:
-				R_Message(PRIORITY_DEBUG, "Server PONG\n");
+				R_Message(PRIORITY_MESSAGE, "Server PONG\n");
 				break;
 			case PACKET_DROP:
 				R_Message(PRIORITY_MESSAGE, "Client %i left.\n", packet.packetHead.clientNum);
@@ -421,6 +421,9 @@ namespace Network {
 		// Iterate through all sockets, make sure they are still listening.
 		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); it++) {
 			Socket* socket = it->second;
+			if (socket == nullptr) {
+				mOtherConnectedClients.erase(it);
+			}
 			int difference = ticks - socket->lastHeardFrom;
 			if (difference > net_timeout->Integer()) {
 				// Been longer than the timeout, drop it.

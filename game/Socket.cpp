@@ -171,12 +171,14 @@ bool Socket::SendPacket(Packet& outgoing) {
 			outgoing.packetHead.type, outgoing.packetHead.clientNum);
 		return false;
 	}
-	sent = SendEntireData(outgoing.packetData, outgoing.packetHead.packetSize);
-	if (!sent) {
-		R_Message(PRIORITY_WARNING,
-			"Failed to send packet data (packet type: %i; clientNum: %i\n",
-			outgoing.packetHead.type, outgoing.packetHead.clientNum);
-		return false;
+	if (outgoing.packetHead.packetSize > 0) {
+		sent = SendEntireData(outgoing.packetData, outgoing.packetHead.packetSize);
+		if (!sent) {
+			R_Message(PRIORITY_WARNING,
+				"Failed to send packet data (packet type: %i; clientNum: %i\n",
+				outgoing.packetHead.type, outgoing.packetHead.clientNum);
+			return false;
+		}
 	}
 	return true;
 }
