@@ -183,6 +183,8 @@ namespace Network {
 		// When they are validated as clients (or time out) the sockets are destroyed.
 		// Here we are polling the local socket to see if there are any temporary connections awaiting acceptance
 		uint64_t ticks = SDL_GetTicks();
+		Packet genericPongPacket = { { PACKET_PONG, 0, Packet::PD_ServerClient, ticks, 0 }, nullptr };
+		Packet outPacket;
 
 		bool canReadLocalSocket, canWriteLocalSocket;
 		Socket::SelectSingle(localSocket, canReadLocalSocket, canWriteLocalSocket);
@@ -192,75 +194,86 @@ namespace Network {
 			vTemporaryConnections.push_back(newConnection);
 		}
 		
-		vector<Socket*> readReady;
-		Socket::SelectReadable(vTemporaryConnections, readReady);
-		for (auto& socket: readReady) {
-			Packet incPacket;
-			socket->ReadPacket(incPacket);
-
-			socket->lastHeardFrom = ticks;
-
-			Packet outPacket;
-			if (incPacket.packetHead.type == PACKET_CLIENTATTEMPT) {
-				if (callbacks[NIC_ACCEPTCLIENT] && callbacks[NIC_ACCEPTCLIENT](incPacket.packetData)) {
-					// Send an acceptance packet with the new client number. Also remove this socket from temporary read packets
-
-					//
-					// <<<CLIENT CONNECTED>>
-					//
-					outPacket.packetHead.clientNum = lastFreeClientNum++;
-					outPacket.packetHead.direction = Packet::PD_ServerClient;
-					outPacket.packetHead.sendTime = 0; // FIXME
-					outPacket.packetHead.type = PACKET_CLIENTACCEPT;
-					outPacket.packetHead.packetSize = 0; // FIXME
-
-					socket->lastSpoken = ticks;
-
-					mOtherConnectedClients[outPacket.packetHead.clientNum] = socket;
-					numConnectedClients++;
-					R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", outPacket.packetHead.clientNum);
+		for (auto it = vTemporaryConnections.begin(); it != vTemporaryConnections.end();) {
+			bool bReadable, bWriteable;
+			Socket* pSocket = *it;
+			bool bNewClient = false;
+			int msLastHeard;
+			
+			Socket::SelectSingle(pSocket, bReadable, bWriteable);
+			while (bReadable && !bNewClient) {
+				Packet thisPacket;
+				if (!pSocket->ReadPacket(thisPacket)) {
+					bWriteable = false;
+					break;
 				}
-				else {
-					//
-					// <<<CLIENT BLOCKED>>>
-					//
-					outPacket.packetHead.clientNum = -1;
-					outPacket.packetHead.direction = Packet::PD_ServerClient;
-					outPacket.packetHead.sendTime = 0; // FIXME
-					outPacket.packetHead.type = PACKET_CLIENTDENIED;
-					outPacket.packetHead.packetSize = 0; // FIXME
-					R_Message(PRIORITY_MESSAGE, "ClientDenied --\n");
-					socket->SendPacket(outPacket);
-					delete socket;
-				}
-				// Remove the client from the list of temporary connections
-				remove(vTemporaryConnections.begin(), vTemporaryConnections.end(), socket);
-			}
-		}
 
-		// Make sure that the temporary connections are still alive
-		vector<Socket*>::iterator it = vTemporaryConnections.begin();
-		for (; it != vTemporaryConnections.end();) {
-			Socket* socket = *it;
-			if (ticks - socket->lastHeardFrom > net_timeout->Integer()) {
-				// Connection timed out
-				Packet packet{ { PACKET_DROP, -1, Packet::PD_ServerClient, ticks, 0 }, nullptr };
-				socket->SendPacket(packet);
+				pSocket->lastHeardFrom = ticks;
 
-				// Remove it from the client list also if it's there
-				for (auto itClient = mOtherConnectedClients.begin(); itClient != mOtherConnectedClients.end(); ++itClient) {
-					if (itClient->second == socket) {
-						mOtherConnectedClients.erase(itClient);
+				switch (thisPacket.packetHead.type) {
+					case PACKET_PING:
+						pSocket->SendPacket(genericPongPacket);
+						pSocket->lastSpoken = ticks;
 						break;
-					}
+					case PACKET_CLIENTATTEMPT:
+						{
+							if (callbacks[NIC_ACCEPTCLIENT] && callbacks[NIC_ACCEPTCLIENT](thisPacket.packetData)) {
+								// Send an acceptance packet with the new client number. Also remove this socket from temporary read packets
+
+								//
+								// <<<CLIENT CONNECTED>>
+								//
+								outPacket.packetHead.clientNum = lastFreeClientNum++;
+								outPacket.packetHead.direction = Packet::PD_ServerClient;
+								outPacket.packetHead.sendTime = 0; // FIXME
+								outPacket.packetHead.type = PACKET_CLIENTACCEPT;
+								outPacket.packetHead.packetSize = 0; // FIXME
+
+								pSocket->lastSpoken = ticks;
+
+								mOtherConnectedClients[outPacket.packetHead.clientNum] = pSocket;
+								numConnectedClients++;
+								R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", outPacket.packetHead.clientNum);
+								bNewClient = true;
+							}
+							else {
+								//
+								// <<<CLIENT BLOCKED>>>
+								//
+								outPacket.packetHead.clientNum = -1;
+								outPacket.packetHead.direction = Packet::PD_ServerClient;
+								outPacket.packetHead.sendTime = 0; // FIXME
+								outPacket.packetHead.type = PACKET_CLIENTDENIED;
+								outPacket.packetHead.packetSize = 0; // FIXME
+								R_Message(PRIORITY_MESSAGE, "ClientDenied --\n");
+							}
+							pSocket->SendPacket(outPacket);
+						}
+						break;
 				}
 
-				// Kill the socket, remove it from temporary connections list
-				delete socket;
+				Socket::SelectSingle(pSocket, bReadable, bWriteable);
+			}
+
+			if (!bWriteable || bNewClient) {
+				// If it's not writeable, then it died
+				// If it's a new client then we should erase it too
 				it = vTemporaryConnections.erase(it);
+				if (!bNewClient) {
+					delete pSocket;
+				}
+				continue;
+			}
+
+			// Check temporary connection for timeout
+			msLastHeard = ticks - pSocket->lastHeardFrom;
+			if (msLastHeard > net_timeout->Integer()) {
+				R_Message(PRIORITY_MESSAGE, "Closing temporary connection due to timeout\n");
+				it = vTemporaryConnections.erase(it);
+				delete pSocket;
 			}
 			else {
-				++it;
+				it++;
 			}
 		}
 	}
@@ -365,9 +378,13 @@ namespace Network {
 		CheckTemporaryConnections();
 
 		// Poll each single socket individually, so we can guarantee they're valid packets
-		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
+		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end();) {
 			bool bReadable, bWriteable;
 			Socket* pSocket = it->second;
+			if (pSocket == nullptr) {
+				it = mOtherConnectedClients.erase(it);
+				continue;
+			}
 			int clientNum = it->first;
 			Socket::SelectSingle(pSocket, bReadable, bWriteable);
 			while (bReadable) {
@@ -388,6 +405,7 @@ namespace Network {
 				}
 				Socket::SelectSingle(pSocket, bReadable, bWriteable);
 			}
+			++it;
 		}
 
 		// Deal with sockets that need writing (they're always writeable according to Didz)
@@ -419,18 +437,19 @@ namespace Network {
 		}
 
 		// Iterate through all sockets, make sure they are still listening.
-		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); it++) {
+		for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end();) {
 			Socket* socket = it->second;
 			if (socket == nullptr) {
-				mOtherConnectedClients.erase(it);
+				it = mOtherConnectedClients.erase(it);
+				continue;
 			}
 			int difference = ticks - socket->lastHeardFrom;
 			if (difference > net_timeout->Integer()) {
 				// Been longer than the timeout, drop it.
 				R_Message(PRIORITY_MESSAGE, "Client %i timed out.\n", it->first);
 				DropClient(it->first);
-				mOtherConnectedClients.erase(it);
-				break;
+				it = mOtherConnectedClients.erase(it);
+				continue;
 			}
 			else if (difference > net_timeout->Integer() / 2 &&
 				ticks - socket->lastSpoken > net_timeout->Integer() / 2) {
@@ -439,6 +458,7 @@ namespace Network {
 				SendServerPacketTo(PACKET_PING, it->first, nullptr, 0);
 				socket->lastSpoken = ticks;
 			}
+			it++;
 		}
 	}
 
