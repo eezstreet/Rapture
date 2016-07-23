@@ -1,13 +1,17 @@
 #include "Server.h"
+#include "Client.h"
+#include "Savegame.h"
+#include "Simulation.h"
 
 gameImports_s* trap = nullptr;
+Savegame currentSave = { 0 };
 
 void Game_InitServer(const char* szSavePath) {
-
+	Simulation::Initialize(szSavePath);
 }
 
 void Game_InitClient(const char* szSavePath) {
-
+	Simulation::Initialize(szSavePath);
 }
 
 void Game_KeyPress(int x) {
@@ -35,7 +39,7 @@ void Game_ClientFrame() {
 }
 
 void Game_Shutdown() {
-
+	Simulation::Shutdown();
 }
 
 bool Game_ServerPacket(Packet* pPacket) {

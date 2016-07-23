@@ -659,6 +659,15 @@ public:
 };
 
 //
+// TimeDate.cpp
+//
+namespace TimeDate {
+	Rapture_TimeDate GetCurrent();
+	void Subtract(Rapture_TimeDate a, Rapture_TimeDate b, Rapture_TimeDate* result);
+	void Add(Rapture_TimeDate a, Rapture_TimeDate b, Rapture_TimeDate* result);
+}
+
+//
 // FrameCapper.cpp
 //
 class FrameCapper {

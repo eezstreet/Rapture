@@ -115,6 +115,7 @@
     <ClCompile Include="..\game\Cmd.cpp" />
     <ClCompile Include="..\game\RaptureGame.cpp" />
     <ClCompile Include="..\game\Socket.cpp" />
+    <ClCompile Include="..\game\TimeDate.cpp" />
     <ClCompile Include="..\game\UIDataSource.cpp" />
     <ClCompile Include="..\game\Video.cpp" />
     <ClCompile Include="..\game\Timer.cpp" />

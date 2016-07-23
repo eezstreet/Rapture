@@ -41,12 +41,10 @@ bool atob(const char* str);
 string trim(const string& str, const string& trim = " \t");
 string hexstring(const int address);
 typedef void (__cdecl *conCmd_t)(vector<string>& args);
-void tostring(const wstring& in, string& out);
 void towstring(const string& in, wstring& out);
 bool checkExtension (const string &fullString, const string &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
 const char* btoa(bool b);
-string stripextension(const string& str);
 
 // Export types
 class File;
@@ -123,6 +121,15 @@ namespace ClientPacket {
 	};
 }
 
+struct Rapture_TimeDate {
+	uint32_t	year;		// Year
+	uint8_t		month;		// Month (0-11)
+	uint8_t		day;		// Day (1-31)
+	uint8_t		hour;		// Hours (0-23)
+	uint8_t		minute;		// Minute (0-59)
+	uint8_t		second;		// Second (0-59)
+};
+
 // Callbacks
 typedef void(*fileOpenedCallback)(File* pFile);
 typedef void(*fileReadCallback)(File* pFile, void* buffer, size_t bufferSize);
@@ -138,6 +145,9 @@ extern "C" {
 
 		// Time
 		int(*GetTicks)();
+		Rapture_TimeDate(*GetCurrentTimeDate)();
+		void(*SubtractTimeDate)(Rapture_TimeDate a, Rapture_TimeDate b, Rapture_TimeDate* result);
+		void(*AddTimeDate)(Rapture_TimeDate a, Rapture_TimeDate b, Rapture_TimeDate* result);
 
 		// Files
 		File* (*OpenFileSync)(const char* filename, const char* mode);

@@ -12,9 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\modcode\Main.cpp" />
+    <ClCompile Include="..\modcode\Savegame.cpp" />
+    <ClCompile Include="..\modcode\Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\modcode\Client.h" />
+    <ClInclude Include="..\modcode\Modcode.h" />
+    <ClInclude Include="..\modcode\Savegame.h" />
     <ClInclude Include="..\modcode\Server.h" />
+    <ClInclude Include="..\modcode\Simulation.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{70549835-D4E2-4A31-8ED4-5D885CDE6D70}</ProjectGuid>

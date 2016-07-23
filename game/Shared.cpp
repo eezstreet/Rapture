@@ -335,11 +335,6 @@ string hexstring(const int address) {
 
 // http://stackoverflow.com/questions/2573834/c-convert-string-or-char-to-wstring-or-wchar- inspiration
 
-void tostring(const wstring& in, string& out) {
-	string temp(in.begin(), in.end());
-	out = temp;
-}
-
 void towstring(const string& in, wstring& out) {
 	wstring temp(in.begin(), in.end());
 	out = temp;
@@ -361,11 +356,4 @@ void stringreplace(string& fullString, const string& sequence, const string& rep
 	while ((pos = fullString.find(sequence)) != string::npos) {
 		fullString.replace(pos, sequence.length(), replace);
 	}
-}
-
-// http://stackoverflow.com/questions/6417817/easy-way-to-remove-extension-from-a-filename
-string stripextension(const string& filename) {
-	size_t lastdot = filename.find_last_of(".");
-	if (lastdot == string::npos) return filename;
-	return filename.substr(0, lastdot); 
 }

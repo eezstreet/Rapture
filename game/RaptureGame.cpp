@@ -171,6 +171,9 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	imp.error = R_Error;
 
 	imp.GetTicks = reinterpret_cast<int(*)()>(SDL_GetTicks);
+	imp.GetCurrentTimeDate = TimeDate::GetCurrent;
+	imp.SubtractTimeDate = TimeDate::Subtract;
+	imp.AddTimeDate = TimeDate::Add;
 
 	imp.OpenFileSync = File::OpenSync;
 	imp.ReadFileSync = File::ReadSync;
