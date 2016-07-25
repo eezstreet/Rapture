@@ -67,7 +67,7 @@ class TextManager {
 private:
 	vector<SDL_Texture*> vTextFields;
 
-	unordered_map<const char*, Font*> umFontsRegistered;
+	unordered_map<string, Font*> umFontsRegistered;
 public:
 	TextManager();
 	~TextManager();
