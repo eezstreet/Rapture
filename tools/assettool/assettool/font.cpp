@@ -36,7 +36,7 @@ void ImportFontFileTTF(uint8_t** fontData, uint64_t* decompressedSize, int ptSiz
 	size_t len = SDL_RWseek(pFile, 0, RW_SEEK_END);
 	SDL_RWseek(pFile, 0, RW_SEEK_SET);
 
-	*decompressedSize = len;
+	*decompressedSize = len + sizeof(ComponentFont::FontHeader);
 
 	if (*fontData != nullptr) {
 		free(*fontData);
