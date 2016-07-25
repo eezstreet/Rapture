@@ -29,7 +29,7 @@ namespace ClientFont {
 	void Initialize() {
 		char fontURIBuffer[COMP_NAMELEN + ASSET_NAMELEN]{0};
 		for (int i = 0; i < FONT_MAX; i++) {
-			sprintf(fontURIBuffer, "asset://%s/%s", FONT_ASSETNAME, fontNames[i]);
+			sprintf(fontURIBuffer, "%s/%s", FONT_ASSETNAME, fontNames[i]);
 			trap->RegisterFontAsync(fontURIBuffer, ClientFontCallback);
 			memset(fontURIBuffer, 0, sizeof(fontURIBuffer));
 		}

@@ -35,7 +35,7 @@ void TextManager::RegisterFontAsync(const char* szFontComponent, fontRegisteredC
 		// It's not there
 		umFontsRegistered[szFontComponent] = nullptr;
 		currentCallback = callback;
-		trap->ResourceAsync("fonts", szFontComponent, TextManager::FontRequestCallback);
+		trap->ResourceAsyncURI(szFontComponent, TextManager::FontRequestCallback);
 	}
 	else {
 		callback(szFontComponent, it->second);
