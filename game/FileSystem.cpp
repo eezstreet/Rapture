@@ -283,7 +283,7 @@ namespace Filesystem {
 						comp->data.fontComponent = (ComponentFont*)Zone::Alloc(sizeof(ComponentFont), "files");
 						fread(comp->data.fontComponent, sizeof(ComponentFont::FontHeader), 1, fp);
 						comp->data.fontComponent->fontData = (uint8_t*)Zone::Alloc(comp->meta.decompressedSize, "font");
-						fread(comp->data.fontComponent->fontData, 1, comp->meta.decompressedSize, fp);
+						fread(comp->data.fontComponent->fontData, 1, comp->meta.decompressedSize - sizeof(ComponentFont::FontHeader), fp);
 					}
 					else {
 						R_Message(PRIORITY_WARNING, "Font component '%s' in %s has invalid version (expected %i, found %i)\n",
