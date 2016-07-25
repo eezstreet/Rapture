@@ -129,6 +129,17 @@ struct Rapture_TimeDate {
 	uint8_t		second;		// Second (0-59)
 };
 
+#define RAPTURE_CHARLENMAX	32
+struct Rapture_CharacterMeta {	// Metadata that gets passed from character creation screen -> game
+	char		charName[RAPTURE_CHARLENMAX];	// Character name
+	uint8_t		charClass;						// Character class
+	uint8_t		bandanaRGB;						// Bandana color
+	uint8_t		charLeague;						// Character League
+	uint8_t		difficulty;						// Difficulty level
+	uint8_t		startingSkill;					// Starting skill
+	uint8_t		multiplayer;					// Whether this is a multiplayer character
+};
+
 // Callbacks
 typedef void(*fileOpenedCallback)(File* pFile);
 typedef void(*fileReadCallback)(File* pFile, void* buffer, size_t bufferSize);
