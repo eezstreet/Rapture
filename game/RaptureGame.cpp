@@ -211,6 +211,11 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	imp.DeleteStreamingTexture = Video::DeleteStreamingTexture;
 	imp.BlendTexture = Video::BlendTexture;
 
+	imp.RegisterFontAsync = Video::RegisterFontAsync;
+	imp.RenderSolidText = Video::RenderSolidText;
+	imp.RenderShadedText = Video::RenderShadedText;
+	imp.RenderBlendedText = Video::RenderBlendedText;
+
 	imp.CvarBoolVal = CvarSystem::EXPORT_BoolValue;
 	imp.CvarIntVal = CvarSystem::EXPORT_IntValue;
 	imp.CvarStrVal = CvarSystem::EXPORT_StrValue;

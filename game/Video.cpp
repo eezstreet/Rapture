@@ -187,6 +187,31 @@ namespace Video {
 		}
 	}
 
+	// Font
+	void RegisterFontAsync(const char* resourceURI, fontRegisteredCallback callback) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->RegisterFontAsync(resourceURI, callback);
+		}
+	}
+
+	void RenderSolidText(Font* font, const char* text, int x, int y, int r, int g, int b) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->RenderSolidText(font, text, x, y, r, g, b);
+		}
+	}
+
+	void RenderShadedText(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->RenderShadedText(font, text, x, y, br, bg, bb, fr, fg, fb);
+		}
+	}
+
+	void RenderBlendedText(Font* font, const char* text, int x, int y, int r, int g, int b) {
+		if (pRenderer && pRenderer->AreExportsValid()) {
+			pRenderer->pExports->RenderBlendedText(font, text, x, y, r, g, b);
+		}
+	}
+
 	// Texture Drawing
 	Material* RegisterMaterial(const char* szMaterial) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
@@ -236,25 +261,6 @@ namespace Video {
 	void FadeFromBlack(int ms) {
 		if (pRenderer && pRenderer->AreExportsValid()) {
 			pRenderer->pExports->FadeFromBlack(ms);
-		}
-	}
-
-	// Text
-	void RenderTextSolid(Font* font, const char* text, int r, int g, int b) {
-		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->RenderTextSolid(font, text, r, g, b);
-		}
-	}
-
-	void RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
-		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->RenderTextShaded(font, text, br, bg, br, fr, fg, fb);
-		}
-	}
-
-	void RenderTextBlended(Font* font, const char* text, int r, int g, int b) {
-		if (pRenderer && pRenderer->AreExportsValid()) {
-			pRenderer->pExports->RenderTextBlended(font, text, r, g, b);
 		}
 	}
 }

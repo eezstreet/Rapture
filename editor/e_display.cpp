@@ -17,7 +17,7 @@ static void DisplayDataTop() {
 	ss << "            ";
 
 	int iDrawFPS;
-	trap->CvarIntVal("cg_drawfps", &iDrawFPS);
+//	trap->CvarIntVal("cg_drawfps", &iDrawFPS);
 	if(iDrawFPS > 0) {
 		if(iDrawFPS == 1 || iDrawFPS == 3) {
 			ss << "FPS: ";

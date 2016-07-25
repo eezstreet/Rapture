@@ -248,10 +248,10 @@ public:
 
 	static bool ProcessCvarCommand(const string& sName, const vector<string>& VArguments);
 
-	static void EXPORT_IntValue(const char* name, int* value);
-	static void EXPORT_StrValue(const char* name, char* value);
-	static void EXPORT_BoolValue(const char* name, bool* value);
-	static void EXPORT_Value(const char* name, float* value);
+	static int EXPORT_IntValue(Cvar* cvar, int* value);
+	static char* EXPORT_StrValue(Cvar* cvar, char* value);
+	static bool EXPORT_BoolValue(Cvar* cvar, bool* value);
+	static float EXPORT_Value(Cvar* cvar, float* value);
 friend class Cvar;
 };
 

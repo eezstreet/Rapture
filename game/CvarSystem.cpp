@@ -400,80 +400,76 @@ bool CvarSystem::ProcessCvarCommand(const string& sName, const vector<string>& V
 	return true;
 }
 
-// Exported to the UI
-void CvarSystem::EXPORT_BoolValue(const char* name, bool* value) {
-	if(!Cvar::Exists(name)) {
-		value = nullptr;
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
-		return;
+// Exported to the modcode
+bool CvarSystem::EXPORT_BoolValue(Cvar* cvar, bool* value) {
+	if (cvar == nullptr) {
+		R_Message(PRIORITY_WARNING, "Tried to get nonexistent cvar value!\n");
+		return false;
 	}
 	if(value == nullptr) {
-		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::BoolValue\n");
-		return;
+		R_Message(PRIORITY_WARNING, "Modcode passed 'null' to CvarSystem::BoolValue\n");
+		return false;
 	}
-	if(GetCvarType(name) != Cvar::CV_BOOLEAN) {
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not boolean type!\n", name);
-		return;
+	if (cvar->type != Cvar::CV_BOOLEAN) {
+		R_Message(PRIORITY_WARNING, "%s is not boolean type\n", cvar->name.c_str());
+		return false;
 	}
-	bool retVal = GetBooleanValue(name);
-	*value = retVal;
+	*value = cvar->b.currentVal;
+	return *value;
 }
 
-// Exported to the UI
-void CvarSystem::EXPORT_IntValue(const char* name, int* value) {
-	if(!Cvar::Exists(name)) {
-		value = nullptr;
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
-		return;
+// Exported to the modcode
+int CvarSystem::EXPORT_IntValue(Cvar* cvar, int* value) {
+	if (cvar == nullptr) {
+		R_Message(PRIORITY_WARNING, "Tried to get nonexistent cvar value!\n");
+		return -1;
 	}
-	if(value == nullptr) {
-		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::IntValue\n");
-		return;
+	if (value == nullptr) {
+		R_Message(PRIORITY_WARNING, "Modcode passed 'null' to CvarSystem::IntValue\n");
+		return -1;
 	}
-	if(GetCvarType(name) != Cvar::CV_INTEGER) {
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not integral type!\n", name);
-		return;
+	if (cvar->type != Cvar::CV_INTEGER) {
+		R_Message(PRIORITY_WARNING, "%s is not integral type\n", cvar->name.c_str());
+		return -1;
 	}
-	int retVal = GetIntegerValue(name);
-	*value = retVal;
+	*value = cvar->i.currentVal;
+	return *value;
 }
 
-// Exported to the UI
-void CvarSystem::EXPORT_StrValue(const char* name, char* value) {
-	if(!Cvar::Exists(name)) {
-		value = nullptr;
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
-		return;
+// Exported to the modcode
+char* CvarSystem::EXPORT_StrValue(Cvar* cvar, char* value) {
+	if (cvar == nullptr) {
+		R_Message(PRIORITY_WARNING, "Tried to get nonexistent cvar value!\n");
+		return "";
 	}
-	if(value == nullptr) {
-		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::StrValue\n");
-		return;
+	if (value == nullptr) {
+		R_Message(PRIORITY_WARNING, "Modcode passed 'null' to CvarSystem::BoolValue\n");
+		return "";
 	}
-	if(GetCvarType(name) != Cvar::CV_STRING) {
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not a string!\n", name);
-		return;
+	if (cvar->type != Cvar::CV_STRING) {
+		R_Message(PRIORITY_WARNING, "%s is not string type\n", cvar->name.c_str());
+		return "";
 	}
-	string retVal = GetStringValue(name);
-	strcpy(value, retVal.c_str());
+	strcpy(value, cvar->s.currentVal);
+	return value;
 }
 
-// Exported to the UI
-void CvarSystem::EXPORT_Value(const char* name, float* value) {
-	if(!Cvar::Exists(name)) {
-		value = nullptr;
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s does not exist!\n", name);
-		return;
+// Exported to the modcode
+float CvarSystem::EXPORT_Value(Cvar* cvar, float* value) {
+	if (cvar == nullptr) {
+		R_Message(PRIORITY_WARNING, "Tried to get nonexistent cvar value!\n");
+		return NAN;
 	}
-	if(value == nullptr) {
-		R_Message(PRIORITY_WARNING, "WARNING: gamecode passed 'null' to CvarSystem::Value\n");
-		return;
+	if (value == nullptr) {
+		R_Message(PRIORITY_WARNING, "Modcode passed 'null' to CvarSystem::Value\n");
+		return NAN;
 	}
-	if(GetCvarType(name) != Cvar::CV_FLOAT) {
-		R_Message(PRIORITY_WARNING, "WARNING: cvar %s is not floating point type!\n", name);
-		return;
+	if (cvar->type != Cvar::CV_FLOAT) {
+		R_Message(PRIORITY_WARNING, "%s is not floating point\n", cvar->name.c_str());
+		return NAN;
 	}
-	float retVal = GetFloatValue(name);
-	*value = retVal;
+	*value = cvar->v.currentVal;
+	return *value;
 }
 
 bool CvarSystem::init = false;

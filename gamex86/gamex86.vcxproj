@@ -11,12 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\modcode\Client.cpp" />
+    <ClCompile Include="..\modcode\ChatBox.cpp" />
+    <ClCompile Include="..\modcode\ClientDisplay.cpp" />
+    <ClCompile Include="..\modcode\ClientFont.cpp" />
     <ClCompile Include="..\modcode\Main.cpp" />
     <ClCompile Include="..\modcode\Savegame.cpp" />
+    <ClCompile Include="..\modcode\Server.cpp" />
     <ClCompile Include="..\modcode\Simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\game\sys_shared.h" />
+    <ClInclude Include="..\modcode\ChatBox.h" />
+    <ClInclude Include="..\modcode\ChatMessage.h" />
     <ClInclude Include="..\modcode\Client.h" />
+    <ClInclude Include="..\modcode\ClientDisplay.h" />
+    <ClInclude Include="..\modcode\ClientFont.h" />
     <ClInclude Include="..\modcode\Modcode.h" />
     <ClInclude Include="..\modcode\Savegame.h" />
     <ClInclude Include="..\modcode\Server.h" />

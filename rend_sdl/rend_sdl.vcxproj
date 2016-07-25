@@ -77,6 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\game\tr_shared.h" />
     <ClInclude Include="tr_local.h" />
   </ItemGroup>
   <ItemGroup>

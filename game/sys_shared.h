@@ -136,6 +136,7 @@ typedef void(*fileReadCallback)(File* pFile, void* buffer, size_t bufferSize);
 typedef fileReadCallback fileWrittenCallback;
 typedef fileOpenedCallback fileClosedCallback;
 typedef void(*assetRequestCallback)(AssetComponent* component);
+typedef void(*fontRegisteredCallback)(const char* handleName, Font* fontFile);
 
 extern "C" {
 	struct gameImports_s {
@@ -190,6 +191,12 @@ extern "C" {
 		void		(*DeleteStreamingTexture)(Texture* ptTexture);
 		void		(*BlendTexture)(Texture* ptTexture);
 
+		// Text/font
+		void		(*RegisterFontAsync)(const char* resourceURI, fontRegisteredCallback callback);
+		void		(*RenderSolidText)(Font* font, const char* text, int x, int y, int r, int g, int b);
+		void		(*RenderShadedText)(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb);
+		void		(*RenderBlendedText)(Font* font, const char* text, int x, int y, int r, int g, int b);
+
 		// UI
 		Menu* (*RegisterStaticMenu)(const char* sMenuFile);
 		void  (*KillStaticMenu)(Menu* menu);
@@ -207,10 +214,10 @@ extern "C" {
 		void(*SendClientPacket)(packetType_e packetType, void* packetData, size_t packetSize);
 
 		// Cvars
-		void(*CvarIntVal)(const char* cvarName, int* value);
-		void(*CvarStrVal)(const char* cvarName, char* value);
-		void(*CvarBoolVal)(const char* cvarName, bool* value);
-		void(*CvarValue)(const char* cvarName, float* value);
+		int(*CvarIntVal)(Cvar* cvar, int* value);
+		char*(*CvarStrVal)(Cvar* cvar, char* value);
+		bool(*CvarBoolVal)(Cvar* cvar, bool* value);
+		float(*CvarValue)(Cvar* cvar, float* value);
 		Cvar* (*RegisterCvarInt)(const char* cvarName, const char* description, int flags, int startingValue);
 		Cvar* (*RegisterCvarFloat)(const char* cvarName, const char* description, int flags, float startingValue);
 		Cvar* (*RegisterCvarBool)(const char* cvarName, const char* description, int flags, bool bStartingValue);

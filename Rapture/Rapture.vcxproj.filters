@@ -137,8 +137,5 @@
     <ClInclude Include="..\common\RaptureAsset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\RaptureGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

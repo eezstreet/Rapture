@@ -33,16 +33,17 @@ struct renderExports_s {
 	void		(*DeleteStreamingTexture)(Texture* ptTexture);
 	void		(*BlendTexture)(Texture* ptTexture);
 
+	// Text/font etc
+	void		(*RegisterFontAsync)(const char* szResourceURI, fontRegisteredCallback callback);
+	void		(*RenderSolidText)(Font* font, const char* text, int x, int y, int r, int g, int b);
+	void		(*RenderShadedText)(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb);
+	void		(*RenderBlendedText)(Font* font, const char* text, int x, int y, int r, int g, int b);
+
 	// Screenshots
 	void		(*QueueScreenshot)(const char* szFileName, const char* szExtension);
 	
 	// Special effects
 	void		(*FadeFromBlack)(int ms);
-
-	// Text
-	void		(*RenderTextSolid)(Font* font, const char* text, int r, int g, int b);
-	void		(*RenderTextShaded)(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-	void		(*RenderTextBlended)(Font* font, const char* text, int r, int g, int b);
 
 	// Callbacks
 	void		(*WindowWidthChanged)(int newWidth);
@@ -127,16 +128,17 @@ namespace Video {
 	void DeleteStreamingTexture(Texture* ptTexture);
 	void BlendTexture(Texture* ptTexture);
 
+	// Font/text
+	void RegisterFontAsync(const char* resourceURI, fontRegisteredCallback callback);
+	void RenderSolidText(Font* font, const char* text, int x, int y, int r, int g, int b);
+	void RenderShadedText(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb);
+	void RenderBlendedText(Font* font, const char* text, int x, int y, int r, int g, int b);
+
 	// Screenshots
 	void QueueScreenshot(const char* szFileName, const char* szExtension);
 
 	// Special Effects
 	void FadeFromBlack(int ms);
-
-	// Text
-	void RenderTextSolid(Font* font, const char* text, int r, int g, int b);
-	void RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-	void RenderTextBlended(Font* font, const char* text, int r, int g, int b);
 
 	// Imported from the engine
 	SDL_Window* GetRaptureWindow();

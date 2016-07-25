@@ -136,18 +136,6 @@ void RenderExport::FadeFromBlack(int ms) {
 	fade.fadeTime = fade.initialFadeTime + ms;
 }
 
-void RenderExport::RenderTextSolid(Font* font, const char* text, int r, int g, int b) {
-	ptText->RenderTextSolid(font, text, r, g, b);
-}
-
-void RenderExport::RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb) {
-	ptText->RenderTextShaded(font, text, br, bg, bb, fr, fg, fb);
-}
-
-void RenderExport::RenderTextBlended(Font* font, const char* text, int r, int g, int b) {
-	ptText->RenderTextBlended(font, text, r, g, b);
-}
-
 // Main entrypoint of the program
 static renderExports_s renderExport;
 extern "C" {
@@ -177,13 +165,14 @@ extern "C" {
 		renderExport.DeleteStreamingTexture = Texture::DeleteStreamingTexture;
 		renderExport.BlendTexture = Texture::BlendTexture;
 
+		renderExport.RegisterFontAsync = TextManager::_RegisterFontAsync;
+		renderExport.RenderSolidText = TextManager::_RenderTextSolid;
+		renderExport.RenderShadedText = TextManager::_RenderTextShaded;
+		renderExport.RenderBlendedText = TextManager::_RenderTextBlended;
+
 		renderExport.QueueScreenshot = RenderExport::QueueScreenshot;
 
 		renderExport.FadeFromBlack = RenderExport::FadeFromBlack;
-
-		renderExport.RenderTextBlended = RenderExport::RenderTextBlended;
-		renderExport.RenderTextShaded = RenderExport::RenderTextShaded;
-		renderExport.RenderTextSolid = RenderExport::RenderTextSolid;
 
 		return &renderExport;
 	}

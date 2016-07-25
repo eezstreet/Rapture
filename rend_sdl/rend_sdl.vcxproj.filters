@@ -18,6 +18,9 @@
     <ClInclude Include="tr_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\game\tr_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EntrySDL.cpp">

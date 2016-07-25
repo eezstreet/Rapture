@@ -4,14 +4,15 @@
 #include "Simulation.h"
 
 gameImports_s* trap = nullptr;
-Savegame currentSave = { 0 };
 
 void Game_InitServer(const char* szSavePath) {
 	Simulation::Initialize(szSavePath);
+	Server::Initialize();
 }
 
 void Game_InitClient(const char* szSavePath) {
 	Simulation::Initialize(szSavePath);
+	Client::Initialize();
 }
 
 void Game_KeyPress(int x) {
@@ -31,23 +32,25 @@ void Game_MouseUp(int x, int y) {
 }
 
 void Game_ServerFrame() {
-
+	Server::Frame();
 }
 
 void Game_ClientFrame() {
-
+	Client::Frame();
 }
 
 void Game_Shutdown() {
 	Simulation::Shutdown();
+	Server::Shutdown();
+	Client::Shutdown();
 }
 
 bool Game_ServerPacket(Packet* pPacket) {
-	return true;
+	return Client::ServerPacket(pPacket);
 }
 
 bool Game_ClientPacket(Packet* pPacket) {
-	return true;
+	return Server::ClientPacket(pPacket);
 }
 
 bool Game_ClientAttempt(ClientPacket::ClientAttemptPacket* pPacket) {

@@ -61,20 +61,31 @@ public:
 	static void KillAllMaterials();
 };
 
+class TextManager;
+extern TextManager* ptText;
 class TextManager {
 private:
 	vector<SDL_Texture*> vTextFields;
+
+	unordered_map<const char*, Font*> umFontsRegistered;
 public:
 	TextManager();
 	~TextManager();
 	TextManager(const TextManager& other);
 
-	void RenderTextSolid(Font* font, const char* text, int r, int g, int b);
-	void RenderTextShaded(Font* font, const char* text, int br, int bg, int bb, int fr, int fg, int fb);
-	void RenderTextBlended(Font* font, const char* text, int r, int g, int b);
+	void RenderTextSolid(Font* font, const char* text, int x, int y, int r, int g, int b);
+	void RenderTextShaded(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb);
+	void RenderTextBlended(Font* font, const char* text, int x, int y, int r, int g, int b);
 	void ResetFrame();
+
+	void RegisterFontAsync(const char* resourceURI, fontRegisteredCallback callback);
+	static void FontRequestCallback(AssetComponent* component);
+
+	static void _RegisterFontAsync(const char* resourceURI, fontRegisteredCallback callback) { ptText->RegisterFontAsync(resourceURI, callback); }
+	static void _RenderTextSolid(Font* font, const char* text, int x, int y, int r, int g, int b) { ptText->RenderTextSolid(font, text, x, y, r, g, b); }
+	static void _RenderTextShaded(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb) { ptText->RenderTextShaded(font, text, x, y, br, bg, bb, fr, fg, fb); }
+	static void _RenderTextBlended(Font* font, const char* text, int x, int y, int r, int g, int b) { ptText->RenderTextBlended(font, text, x, y, r, g, b); }
 };
-extern TextManager* ptText;
 
 class Texture {
 private:
