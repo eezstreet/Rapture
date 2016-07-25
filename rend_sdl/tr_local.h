@@ -68,6 +68,7 @@ private:
 	vector<SDL_Texture*> vTextFields;
 
 	unordered_map<string, Font*> umFontsRegistered;
+	void RenderTextSurface(SDL_Surface* pSurf, int x, int y);
 public:
 	TextManager();
 	~TextManager();

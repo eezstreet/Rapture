@@ -42,6 +42,18 @@ void TextManager::RegisterFontAsync(const char* szFontComponent, fontRegisteredC
 	}
 }
 
+void TextManager::RenderTextSurface(SDL_Surface* pSurf, int x, int y) {
+	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(pSurf, SDL_PIXELFORMAT_ARGB8888, 0);
+	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
+	SDL_Rect dstRct{ x, y, surf2->w, surf2->h };
+	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
+	SDL_FreeSurface(pSurf);
+	SDL_FreeSurface(surf2);
+
+	// Cache the texture so we can kill it after this frame
+	vTextFields.push_back(tex);
+}
+
 void TextManager::RenderTextSolid(Font* font, const char* text, int x, int y, int r, int g, int b) {
 	SDL_Color color = { r, g, b, 255 };
 	SDL_Surface* surf = TTF_RenderText_Solid((TTF_Font*)font, text, color);
@@ -49,15 +61,7 @@ void TextManager::RenderTextSolid(Font* font, const char* text, int x, int y, in
 		return;
 	}
 
-	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, surf2->w, surf2->h };
-	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
-	SDL_FreeSurface(surf);
-	SDL_FreeSurface(surf2);
-
-	// Cache the texture so we can kill it after this frame
-	vTextFields.push_back(tex);
+	RenderTextSurface(surf, x, y);
 }
 
 void TextManager::RenderTextShaded(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb) {
@@ -68,15 +72,7 @@ void TextManager::RenderTextShaded(Font* font, const char* text, int x, int y, i
 		return;
 	}
 
-	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, surf2->w, surf2->h };
-	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
-	SDL_FreeSurface(surf);
-	SDL_FreeSurface(surf2);
-
-	// Cache the texture so we can kill it after this frame
-	vTextFields.push_back(tex);
+	RenderTextSurface(surf, x, y);
 }
 
 void TextManager::RenderTextBlended(Font* font, const char* text, int x, int y, int r, int g, int b) {
@@ -86,15 +82,7 @@ void TextManager::RenderTextBlended(Font* font, const char* text, int x, int y, 
 		return;
 	}
 
-	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, surf2->w, surf2->h};
-	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
-	SDL_FreeSurface(surf);
-	SDL_FreeSurface(surf2);
-
-	// Cache the texture so we can kill it after this frame
-	vTextFields.push_back(tex);
+	RenderTextSurface(surf, x, y);
 }
 
 void TextManager::ResetFrame() {
