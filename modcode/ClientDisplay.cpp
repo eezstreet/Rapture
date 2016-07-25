@@ -35,7 +35,7 @@ namespace ClientDisplay {
 		Font* consolasFont = ClientFont::RetrieveFont(ClientFont::FONT_CONSOLAS);
 
 		if (bDrawFPS) {
-			float fps = 1000.0f / currentTicks - lastTicks;
+			float fps = 1000.0f / (currentTicks - lastTicks);
 			char fpsBuffer[32] {0};
 			sprintf(fpsBuffer, "FPS: %.2f", fps);
 			trap->RenderShadedText(consolasFont, fpsBuffer, 0, 0, 0, 0, 0, 255, 255, 255);
@@ -44,7 +44,7 @@ namespace ClientDisplay {
 			int frametime = currentTicks - lastTicks;
 			char ftBuffer[32]{0};
 			sprintf(ftBuffer, "Frametime: %i ms", frametime);
-			trap->RenderShadedText(consolasFont, ftBuffer, 30, 0, 0, 0, 0, 255, 255, 255);
+			trap->RenderShadedText(consolasFont, ftBuffer, 100, 0, 0, 0, 0, 255, 255, 255);
 		}
 		if (bDrawChat) {
 			chat->Display();
