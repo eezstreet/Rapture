@@ -104,7 +104,10 @@ void TextManager::ResetFrame() {
 	vTextFields.clear();
 }
 
-TextManager::TextManager() {}
+TextManager::TextManager() {
+	TTF_Init();
+}
+
 TextManager::~TextManager() {
 	for (auto it = vTextFields.begin(); it != vTextFields.end(); it++) {
 		SDL_DestroyTexture(*it);
@@ -115,4 +118,6 @@ TextManager::~TextManager() {
 	umFontsRegistered.clear();
 	vTextFields.clear();
 	currentCallback = nullptr;
+
+	TTF_Quit();
 }
