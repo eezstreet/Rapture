@@ -76,8 +76,22 @@ namespace Cmd {
 		cmdlist[cmdName] = cmd;
 	}
 
+	// Adds a formally-recognized command to the engine.
+	// const char* variant is safe to use across DLL boundaries.
+	void AddCommand(const char* cmdName, conCmd_t cmd) {
+		string scmd = cmdName;
+		AddTabCompletion(scmd);
+		cmdlist[scmd] = cmd;
+	}
+
 	// Removes a command from the engine.
 	void RemoveCommand(string cmdName) {
+		cmdlist.erase(cmdName);
+	}
+
+	// Removes a command from the engine.
+	// const char* variant is safe to use across DLL boundaries.
+	void RemoveCommand(const char* cmdName) {
 		cmdlist.erase(cmdName);
 	}
 

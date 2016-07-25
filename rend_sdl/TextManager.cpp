@@ -3,6 +3,7 @@
 TextManager* ptText = nullptr;
 static fontRegisteredCallback currentCallback = nullptr;
 
+// Occurs when a font resource has finished loading
 void TextManager::FontRequestCallback(AssetComponent* pComponent) {
 	if (ptText != nullptr && pComponent != nullptr) {
 		ComponentFont* pFont = pComponent->data.fontComponent;
@@ -29,6 +30,7 @@ void TextManager::FontRequestCallback(AssetComponent* pComponent) {
 	}
 }
 
+// Registers a font asynchronously
 void TextManager::RegisterFontAsync(const char* szFontComponent, fontRegisteredCallback callback) {
 	auto it = umFontsRegistered.find(szFontComponent);
 	if (it == umFontsRegistered.end()) {
@@ -42,6 +44,7 @@ void TextManager::RegisterFontAsync(const char* szFontComponent, fontRegisteredC
 	}
 }
 
+// Renders a text surface
 void TextManager::RenderTextSurface(SDL_Surface* pSurf, int x, int y) {
 	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(pSurf, SDL_PIXELFORMAT_ARGB8888, 0);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
@@ -54,6 +57,7 @@ void TextManager::RenderTextSurface(SDL_Surface* pSurf, int x, int y) {
 	vTextFields.push_back(tex);
 }
 
+// Renders some text onto the display
 void TextManager::RenderTextSolid(Font* font, const char* text, int x, int y, int r, int g, int b) {
 	SDL_Color color = { r, g, b, 255 };
 	SDL_Surface* surf = TTF_RenderText_Solid((TTF_Font*)font, text, color);
@@ -64,6 +68,7 @@ void TextManager::RenderTextSolid(Font* font, const char* text, int x, int y, in
 	RenderTextSurface(surf, x, y);
 }
 
+// Renders text with a background color onto the display
 void TextManager::RenderTextShaded(Font* font, const char* text, int x, int y, int br, int bg, int bb, int fr, int fg, int fb) {
 	SDL_Color cB = { br, bg, bb, 255 };
 	SDL_Color cF = { fr, fg, fb, 255 };
@@ -75,6 +80,7 @@ void TextManager::RenderTextShaded(Font* font, const char* text, int x, int y, i
 	RenderTextSurface(surf, x, y);
 }
 
+// Renders text which is alpha-blended onto the display.
 void TextManager::RenderTextBlended(Font* font, const char* text, int x, int y, int r, int g, int b) {
 	SDL_Color color = { r, g, b, 255 };
 	SDL_Surface* surf = TTF_RenderText_Blended((TTF_Font*)font, text, color);
@@ -85,6 +91,7 @@ void TextManager::RenderTextBlended(Font* font, const char* text, int x, int y, 
 	RenderTextSurface(surf, x, y);
 }
 
+// Clears any text surfaces
 void TextManager::ResetFrame() {
 	for (auto it = vTextFields.begin(); it != vTextFields.end(); it++) {
 		SDL_DestroyTexture(*it);
@@ -92,10 +99,13 @@ void TextManager::ResetFrame() {
 	vTextFields.clear();
 }
 
+// Initializes the text manager
 TextManager::TextManager() {
 	TTF_Init();
 }
 
+// Shuts down the text manager.
+// Since this closes the fonts for us, we don't have to worry about freeing them at any point during execution.
 TextManager::~TextManager() {
 	for (auto it = vTextFields.begin(); it != vTextFields.end(); it++) {
 		SDL_DestroyTexture(*it);

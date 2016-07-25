@@ -293,8 +293,11 @@ namespace Network {
 		if (clientNum != -1) {
 			SendServerPacketTo(packetType, clientNum, packetData, packetDataSize);
 		}
-		else for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
-			SendServerPacketTo(packetType, it->first, packetData, packetDataSize);
+		else {
+			for (auto it = mOtherConnectedClients.begin(); it != mOtherConnectedClients.end(); ++it) {
+				SendServerPacketTo(packetType, it->first, packetData, packetDataSize);
+			}
+			SendServerPacketTo(packetType, 0, packetData, packetDataSize);	// Also send it to ourselves
 		}
 	}
 

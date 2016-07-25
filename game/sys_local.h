@@ -501,7 +501,9 @@ namespace Cmd {
 	void ProcessCommand(const char *cmd);
 	void AddTabCompletion(const string& cmdName);
 	void AddCommand(const string& cmdName, conCmd_t cmd);
+	void AddCommand(const char* cmdName, conCmd_t cmd);
 	void RemoveCommand(const string& cmdName);
+	void RemoveCommand(const char* cmdName);
 	void ClearCommandList();
 	void ListCommands();
 	vector<string> Tokenize(const string &str);

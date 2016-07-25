@@ -227,6 +227,9 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	imp.RegisterStaticMenu = UI::RegisterStaticMenu;
 	imp.KillStaticMenu = UI::KillStaticMenu;
 
+	imp.AddCommand = Cmd::AddCommand;
+	imp.RemoveCommand = Cmd::RemoveCommand;
+
 	imp.SendServerPacket = Network::SendServerPacket;
 	imp.SendClientPacket = Network::SendClientPacket;
 

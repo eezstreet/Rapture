@@ -40,7 +40,6 @@ bool atob(const string& str);
 bool atob(const char* str);
 string trim(const string& str, const string& trim = " \t");
 string hexstring(const int address);
-typedef void (__cdecl *conCmd_t)(vector<string>& args);
 void towstring(const string& in, wstring& out);
 bool checkExtension (const string &fullString, const string &ending);
 void stringreplace(string& fullString, const string& sequence, const string& replace);
@@ -137,6 +136,7 @@ typedef fileReadCallback fileWrittenCallback;
 typedef fileOpenedCallback fileClosedCallback;
 typedef void(*assetRequestCallback)(AssetComponent* component);
 typedef void(*fontRegisteredCallback)(const char* handleName, Font* fontFile);
+typedef void(__cdecl *conCmd_t)(vector<string>& args);
 
 extern "C" {
 	struct gameImports_s {
@@ -222,6 +222,10 @@ extern "C" {
 		Cvar* (*RegisterCvarFloat)(const char* cvarName, const char* description, int flags, float startingValue);
 		Cvar* (*RegisterCvarBool)(const char* cvarName, const char* description, int flags, bool bStartingValue);
 		Cvar* (*RegisterCvarStr)(const char* cvarName, const char* description, int flags, char* sStartingValue);
+
+		// Commands
+		void(*AddCommand)(const char* cmdName, conCmd_t command);
+		void(*RemoveCommand)(const char* cmdName);
 
 		// Zone memory
 		void* (*Zone_Alloc)(int iSize, const char* tag);
