@@ -6,7 +6,7 @@ static fontRegisteredCallback currentCallback = nullptr;
 void TextManager::FontRequestCallback(AssetComponent* pComponent) {
 	if (ptText != nullptr && pComponent != nullptr) {
 		ComponentFont* pFont = pComponent->data.fontComponent;
-		SDL_RWops* rw = SDL_RWFromMem(pFont->fontData, pComponent->meta.decompressedSize);
+		SDL_RWops* rw = SDL_RWFromMem(pFont->fontData, pComponent->meta.decompressedSize - sizeof(pFont->head));
 		const char* compName = pComponent->meta.componentName;
 
 		if (rw == nullptr) {
@@ -15,7 +15,7 @@ void TextManager::FontRequestCallback(AssetComponent* pComponent) {
 		}
 		TTF_Font* ttfFont = TTF_OpenFontIndexRW(rw, 0, pFont->head.pointSize, pFont->head.fontFace);
 		if (ttfFont == nullptr) {
-			trap->Print(PRIORITY_WARNING, "Bad font face for component %s\n", compName);
+			trap->Print(PRIORITY_WARNING, "Could not load font component %s (reason: %s)\n", compName, TTF_GetError());
 			SDL_RWclose(rw);
 			return;
 		}
