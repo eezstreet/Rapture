@@ -51,8 +51,8 @@ void TextManager::RenderTextSolid(Font* font, const char* text, int x, int y, in
 
 	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, 0, 0 };
-	SDL_RenderCopy(renderer, tex, &dstRct, &surf->clip_rect);
+	SDL_Rect dstRct{ x, y, surf2->w, surf2->h };
+	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
 	SDL_FreeSurface(surf);
 	SDL_FreeSurface(surf2);
 
@@ -70,8 +70,8 @@ void TextManager::RenderTextShaded(Font* font, const char* text, int x, int y, i
 
 	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, 0, 0 };
-	SDL_RenderCopy(renderer, tex, &dstRct, &surf->clip_rect);
+	SDL_Rect dstRct{ x, y, surf2->w, surf2->h };
+	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
 	SDL_FreeSurface(surf);
 	SDL_FreeSurface(surf2);
 
@@ -88,8 +88,8 @@ void TextManager::RenderTextBlended(Font* font, const char* text, int x, int y, 
 
 	SDL_Surface* surf2 = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_ARGB8888, 0);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf2);
-	SDL_Rect dstRct{ x, y, 0, 0 };
-	SDL_RenderCopy(renderer, tex, &dstRct, &surf->clip_rect);
+	SDL_Rect dstRct{ x, y, surf2->w, surf2->h};
+	SDL_RenderCopy(renderer, tex, nullptr, &dstRct);
 	SDL_FreeSurface(surf);
 	SDL_FreeSurface(surf2);
 
