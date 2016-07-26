@@ -5,6 +5,7 @@
 #endif
 
 #define INET_PORTLEN	16
+#define INET_MAXWAIT	50			// How many milliseconds the game should wait to receive data
 
 /* Non-static member functions */
 
@@ -187,7 +188,9 @@ bool Socket::SendPacket(Packet& outgoing) {
 // Read an entire block of memory from a socket, without fragmentation.
 bool Socket::ReadEntireData(void* data, size_t dataSize) {
 	size_t received = 0;
-	while (received < dataSize) {
+	uint64_t startSendTime = SDL_GetTicks();
+	uint64_t currentTime = startSendTime;
+	while (received < dataSize && startSendTime - currentTime < INET_MAXWAIT) {
 		int numRead = recv(internalSocket, (char*)data + received, dataSize - received, 0);
 		if (numRead == 0) {
 			return false;		// dead connection
@@ -195,8 +198,22 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 		if (numRead < 0) {
 			int errorNum;
 			const char* errorMsg = Sys_SocketError(errorNum);
-			R_Message(PRIORITY_ERROR, "Socket::ReadEntireData failed. %s (error code %i)\n", errorMsg, errorNum);
-			return false;
+#ifdef WIN32
+			if (errorNum == WSAEWOULDBLOCK) {
+				// sleep it off, don't break
+				this_thread::sleep_for(std::chrono::milliseconds(1));
+				numRead = 0;
+			}
+			else {
+#endif
+				R_Message(PRIORITY_ERROR, "Socket::ReadEntireData failed. %s (error code %i)\n", errorMsg, errorNum);
+				return false;
+#ifdef WIN32
+			}
+#endif
+		}
+		else {
+			currentTime = SDL_GetTicks();
 		}
 		received += numRead;
 	}
