@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\common\RaptureAsset.h" />
+    <ClInclude Include="..\..\..\json\cJSON.h" />
     <ClInclude Include="..\imgui\imconfig.h" />
     <ClInclude Include="..\imgui\imgui.h" />
     <ClInclude Include="..\imgui\imgui_internal.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="imgui_impl_sdl.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\json\cJSON.c" />
     <ClCompile Include="..\imgui\imgui.cpp" />
     <ClCompile Include="..\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\imgui\imgui_draw.cpp" />
@@ -98,6 +100,7 @@
     <ClCompile Include="font.cpp" />
     <ClCompile Include="imgui_impl_sdl.cpp" />
     <ClCompile Include="mime.cpp" />
+    <ClCompile Include="project.cpp" />
     <ClCompile Include="spritesheet.cpp" />
     <ClCompile Include="view_assetproperties.cpp" />
     <ClCompile Include="view_component.cpp" />

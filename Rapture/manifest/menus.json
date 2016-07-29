@@ -1,0 +1,27 @@
+{
+	"assetName": "menus",
+	"author": "Nicholas Whitlock <eezstreet>",
+	"contentGroup": "BaseGame",
+	"components": {
+		"console": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/console.html"
+		},
+		"null": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/null.html"
+		},
+		"mainmenu": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/main.html"
+		},
+		"video-menu": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/video-menu.html"
+		}
+	}
+}

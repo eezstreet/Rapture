@@ -27,6 +27,31 @@ const char* ComponentTypeToString(ComponentType t) {
 	}
 }
 
+ComponentType ComponentTypeFromString(const char* str) {
+	if (!stricmp(str, "Asset_Data") || !stricmp(str, "Raw") || !stricmp(str, "Data")) {
+		return Asset_Data;
+	}
+	else if (!stricmp(str, "Asset_Composition") || !stricmp(str, "Composition")) {
+		return Asset_Composition;
+	}
+	else if (!stricmp(str, "Asset_Font") || !stricmp(str, "Font")) {
+		return Asset_Font;
+	}
+	else if (!stricmp(str, "Asset_Image") || !stricmp(str, "Image")) {
+		return Asset_Image;
+	}
+	else if (!stricmp(str, "Asset_Level") || !stricmp(str, "Level") || !stricmp(str, "Preset")) {
+		return Asset_Level;
+	}
+	else if (!stricmp(str, "Asset_Material") || !stricmp(str, "Material")) {
+		return Asset_Material;
+	}
+	else if (!stricmp(str, "Asset_Tile") || !stricmp(str, "Tile")) {
+		return Asset_Tile;
+	}
+	return Asset_Undefined;
+}
+
 bool ComponentChanged(ComponentData* pPrevComponent, ComponentData* pNewComponent) {
 	return strcmp(pPrevComponent->head.mime, pNewComponent->head.mime);
 }

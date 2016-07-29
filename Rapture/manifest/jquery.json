@@ -1,0 +1,107 @@
+{
+	"assetName": "jquery",
+	"author": "Nicholas Whitlock <eezstreet>",
+	"contentGroup": "BaseGame",
+	"components": {
+		"jquery-ui.min.css": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/css",
+			"file": "../core/ui/css/custom-theme/jquery-ui.min.css"
+		},
+		"jquery-ui.structure.min.css": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/css",
+			"file": "../core/ui/css/custom-theme/jquery-ui.structure.min.css"
+		},
+		"jquery-ui.theme.min.css": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/css",
+			"file": "../core/ui/css/custom-theme/jquery-ui.theme.min.css"
+		},
+		"jQuery-2.1.1.min.js": {
+			"componentType": "Asset_Data",
+			"mimeType": "application/javascript",
+			"file": "../core/ui/scripts/jQuery-2.1.1.min.js"
+		},
+		"jquery-ui.min.js": {
+			"componentType": "Asset_Data",
+			"mimeType": "application/javascript",
+			"file": "../core/ui/scripts/jquery-ui.min.js"
+		},
+		"ui-bg_flat_75_000000_40x100": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_75_000000_40x100.png"
+		},
+		"ui-bg_flat_100_2b2b2b_40x100": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_100_2b2b2b_40x100.png"
+		},
+		"ui-bg_flat_75_2e2e2e_40x100": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_75_2e2e2e_40x100.png"
+		},
+		"ui-bg_carbon_fiber_20_360b0b_8x9": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_carbon_fiber_20_360b0b_8x9.png"
+		},
+		"ui-bg_diagonals-medium_20_531313_40x40": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_diagonals-medium_20_531313_40x40.png"
+		},
+		"ui-bg_diagonals-medium_55_fbf9ee_40x40": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_diagonals-medium_55_fbf9ee_40x40.png"
+		},
+		"ui-bg_glass_95_fef1ec_1x400": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_glass_95_fef1ec_1x400.png"
+		},
+		"ui-icons_ffffff_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons_ffffff_256x240.png"
+		},
+		"ui-icons_e3e3e3_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons_e3e3e3_256x240.png"
+		},
+		"ui-icons-888888_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons-888888_256x240.png"
+		},
+		"ui-icons_454545_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons_454545_256x240.png"
+		},
+		"ui-icons_2e83ff_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons_2e83ff_256x240.png"
+		},
+		"ui-icons_cd0a0a_256x240": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-icons_cd0a0a_256x240.png"
+		},
+		"ui-bg_flat_0_303030_40x100": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_0_303030_40x100.png"
+		},
+		"ui-bg_flat_0_aaaaaa_40x100": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_0_aaaaaa_40x100.png"
+		}
+	}
+}

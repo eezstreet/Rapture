@@ -2,6 +2,7 @@
 #include "assettool.h"
 #include "imgui_impl_sdl.h"
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 
 #pragma warning(disable:4996)
 
@@ -288,57 +289,112 @@ void RunGUI() {
 	}
 }
 
-int main(int argc, char** argv) {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS)) {
-		printf("Error: %s\n", SDL_GetError());
-		return -1;
-	}
-	TTF_Init();
+void ParseCommandline(AssetToolArguments& args, int argc, char** argv) {
+	bool bPreviousWasProjectFile = false;
+	bool bPreviousWasOutput = false;
+	for (int i = 0; i < argc; i++) {
+		char* arg = argv[i];
 
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-	SDL_DisplayMode current;
-	SDL_GetCurrentDisplayMode(0, &current);
-	window = SDL_CreateWindow(PROGRAM_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+		// Check for the parameter for any previous flags
+		if (bPreviousWasProjectFile) {
+			args.pfProjectFile.bFlagPresent = true;
+			strcpy(args.pfProjectFile.szFlagText, arg);
+			bPreviousWasProjectFile = false;
+		}
+		else if (bPreviousWasOutput) {
+			args.pfOutputDir.bFlagPresent = true;
+			strcpy(args.pfOutputDir.szFlagText, arg);
+			bPreviousWasOutput = false;
+		}
 
-	ImGui_ImplSdl_Init(window);
-
-	ImVec4 clear_color = ImColor(114, 144, 154);
-
-	InitPreviewMenu();
-
-	while (!done) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			ImGui_ImplSdl_ProcessEvent(&event);
-			if (event.type == SDL_QUIT) {
-				done = true;
+		// Check for argument type
+		else if (arg[0] == '-') {
+			// flag
+			if (arg[1] == '-') {
+				// non-parametered flag
+			}
+			else {
+				// parametered flag
+				if (!stricmp(arg, "-project")) {
+					bPreviousWasProjectFile = true;
+				}
+				else if (!stricmp(arg, "-outdir")) {
+					bPreviousWasOutput = true;
+				}
 			}
 		}
-		ImGui_ImplSdl_NewFrame(window);
-
-		RunGUI();
-
-		glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
-		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
-		ImGui::Render();
-		SDL_GL_SwapWindow(window);
 	}
+}
 
-	if (currentFile != nullptr) {
-		delete currentFile;
+int main(int argc, char** argv) {
+	AssetToolArguments args{ { 0 } };
+	ParseCommandline(args, argc, argv);
+
+	if (args.pfProjectFile.bFlagPresent) {
+		if (SDL_Init(SDL_INIT_VIDEO)) {
+			printf("Error: %s\n", SDL_GetError());
+			return -1;
+		}
+		TTF_Init();
+		IMG_Init(IMG_INIT_PNG);
+
+		ProcessProjectFile(args);
+
+		IMG_Quit();
+		TTF_Quit();
+		SDL_Quit();
 	}
+	else {
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS)) {
+			printf("Error: %s\n", SDL_GetError());
+			return -1;
+		}
+		TTF_Init();
 
-	TTF_Quit();
-	ImGui_ImplSdl_Shutdown();
-	SDL_GL_DeleteContext(glcontext);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+		SDL_DisplayMode current;
+		SDL_GetCurrentDisplayMode(0, &current);
+		window = SDL_CreateWindow(PROGRAM_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
+		ImGui_ImplSdl_Init(window);
+
+		ImVec4 clear_color = ImColor(114, 144, 154);
+
+		InitPreviewMenu();
+
+		while (!done) {
+			SDL_Event event;
+			while (SDL_PollEvent(&event)) {
+				ImGui_ImplSdl_ProcessEvent(&event);
+				if (event.type == SDL_QUIT) {
+					done = true;
+				}
+			}
+			ImGui_ImplSdl_NewFrame(window);
+
+			RunGUI();
+
+			glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
+			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+			glClear(GL_COLOR_BUFFER_BIT);
+			ImGui::Render();
+			SDL_GL_SwapWindow(window);
+		}
+
+		if (currentFile != nullptr) {
+			delete currentFile;
+		}
+
+		TTF_Quit();
+		ImGui_ImplSdl_Shutdown();
+		SDL_GL_DeleteContext(glcontext);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+	}
 	return 0;
 }

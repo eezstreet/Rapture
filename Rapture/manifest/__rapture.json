@@ -1,0 +1,10 @@
+{
+	"name": "Rapture",
+	"author": "Full Spectrum Software",
+	"assets": {
+		"fonts": "fonts.json",
+		"jquery": "jquery.json",
+		"menu-images": "menu-images.json",
+		"menus": "menus.json"
+	}
+}

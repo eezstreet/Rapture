@@ -1,0 +1,17 @@
+{
+	"assetName": "fonts",
+	"author": "Nicholas Whitlock <eezstreet>",
+	"contentGroup": "BaseGame",
+	"components": {
+		"segoeui": {
+			"componentType": "Asset_Font",
+			"file": "../core/fonts/consola.ttf",
+			"size": 14
+		},
+		"consolas": {
+			"componentType": "Asset_Font",
+			"file": "../core/fonts/segoeui.ttf",
+			"size": 14
+		}
+	}
+}

@@ -1,11 +1,25 @@
 #pragma once
 #include <../../common/RaptureAsset.h>
+#include <../../json/cJSON.h>
 #include "../imgui/imgui.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <vector>
 
 #define PROGRAM_NAME		"Rapture Asset Tool"
+
+// assettool.h
+#define MAX_FLAG_PARAMLEN	64
+
+struct AssetTool_ParamFlag {
+	bool bFlagPresent;
+	char szFlagText[MAX_FLAG_PARAMLEN];
+};
+
+struct AssetToolArguments {
+	AssetTool_ParamFlag pfProjectFile;
+	AssetTool_ParamFlag pfOutputDir;
+};
 
 extern bool componentViewVisible;
 extern bool textViewVisible;
@@ -14,6 +28,9 @@ extern bool assetPropertiesVisible;
 
 extern bool fileOpen;
 extern bool fileChanged;
+
+// project.cpp
+void ProcessProjectFile(const AssetToolArguments& args);
 
 // view_component.cpp
 void ComponentView();
@@ -34,6 +51,7 @@ void AssetPropertiesView();
 
 // component.cpp
 const char* ComponentTypeToString(ComponentType t);
+ComponentType ComponentTypeFromString(const char* str);
 void DrawComponentData(int currentSelectedComponent);
 
 class AssetFile {

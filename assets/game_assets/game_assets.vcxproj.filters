@@ -67,6 +67,9 @@
     <Filter Include="core\ui\images\hud\common">
       <UniqueIdentifier>{02d218bb-0261-4eeb-b7f5-1327ac1aa83b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="manifest">
+      <UniqueIdentifier>{d7e5a9af-af3b-47e9-b140-567fff113094}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Rapture\core\levels\LevelMaze.json">
@@ -357,6 +360,19 @@
     <None Include="..\..\Rapture\core\ui\images\hud\common\button_exit.psd">
       <Filter>core\ui\images\hud\common</Filter>
     </None>
+    <None Include="..\..\Rapture\manifest\fonts.json">
+      <Filter>manifest</Filter>
+    </None>
+    <None Include="..\..\Rapture\manifest\jquery.json">
+      <Filter>manifest</Filter>
+    </None>
+    <None Include="..\..\Rapture\manifest\menu-images.json">
+      <Filter>manifest</Filter>
+    </None>
+    <None Include="..\..\Rapture\manifest\menus.json">
+      <Filter>manifest</Filter>
+    </None>
+    <None Include="..\..\Rapture\manifest\__rapture.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Rapture\core\materials\characters\test\test1.png">

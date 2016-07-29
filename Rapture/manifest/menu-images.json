@@ -1,0 +1,12 @@
+{
+	"assetName": "menu-images",
+	"author": "Nicholas Whitlock <eezstreet>",
+	"contentGroup": "BaseGame",
+	"components": {
+		"alphalogo": {
+			"componentType": "Asset_Data",
+			"mimeType": "image/png",
+			"file": "../core/ui/images/alphalogo.png"
+		}
+	}
+}
