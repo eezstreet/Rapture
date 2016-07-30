@@ -1,115 +1,58 @@
 <html>
 	<head>
-        <title></title>
 		<!--- CODE --->
+        <title>Rapture Main Menu</title>
 		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.min.css">
 		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.structure.min.css" />
 		<link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.theme.min.css" />
 		<script type="text/javascript">
-			var GameManager;
+			var Engine;
 		</script>
 		<script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
 		<script type="text/javascript" src="asset://Rapture/jquery/jquery-ui.min.js"></script>
 
 		<script>
+            // Run when the modal menu gets closed (OK/CANCEL/etc)
+            function ModalClosed() {
+                $('#modal').hide();
+            }
+
+            // Run when the "quit game" button is clicked
 			function QuitGame() {
-				GameManager.execCommand("quit");
+				Engine.execCommand("quit");
 			}
 
-			function NewGame() {
-				GameManager.execCommand("newgametest");
-			}
-
-			function ReverseTransverse(element, tag) {
-				tag = tag.toLowerCase();
-				do {
-					element = element.parentNode;
-					if(element.tagName.toLowerCase() == tag) {
-						return element;
-					}
-				} while(element.parentNode);
-			}
-
-			var selectedResolution = "";
-			function UpdateVideoDisplay() {
-				// Resolution
-				var videoSelected = "#res";
-				var videoWidth = GameManager.getCvarInteger("vid_width");
-				var videoHeight = GameManager.getCvarInteger("vid_height");
-
-				// Select the resolution...
-				selectedResolution = "res";
-				selectedResolution = selectedResolution.concat(videoWidth.toString()).concat("x");
-				selectedResolution = selectedResolution.concat(videoHeight.toString());
-
-				videoSelected = videoSelected.concat(videoWidth.toString());
-				videoSelected = videoSelected.concat("x");
-				videoSelected = videoSelected.concat(videoHeight.toString());
-
-				selectedResolution = videoSelected;
-
-				$(videoSelected).addClass("ui-selected");
-
-				// ... and then switch us to the tab which has that option
-				var pParent = ReverseTransverse(document.getElementById(videoSelected.substring(1)), "div");
-				var pParentName = pParent.id;
-
-				var number = 0;
-				if(pParentName == "tab-54") {
-					number = 1;
-				} else if(pParentName == "tab-85") {
-					number = 2;
-				} else if(pParentName == "tab-169") {
-					number = 3;
-				}
-				$("#tabs-resolution").tabs("option", "active", number);
-
-				// Gamma slider
-				$("#slider-gamma").slider("option", "value", GameManager.getCvarFloat("vid_gamma"));
-
-				// Fullscreen
-				var bFullscreen = GameManager.getCvarBoolean("vid_fullscreen");
-				var jqRadioButton = $("input:radio[name=video-fullscreen]");
-				if(bFullscreen) {
-					jqRadioButton[0].checked = true;
-					jqRadioButton.button("refresh");
-				} else {
-					jqRadioButton[1].checked = true;
-					jqRadioButton.button("refresh");
-				}
-			}
-
-			function ApplyVideoChanges() {
-				var resolution = selectedResolution.substring(3);
-				var resValues = resolution.split("x");
-				var resWidth = resValues[0];
-				var resHeight = resValues[1];
-				GameManager.setCvarInteger("vid_width", parseInt(resWidth));
-				GameManager.setCvarInteger("vid_height", parseInt(resHeight));
-
-				if($("input:radio[name=video-fullscreen]")[0].checked) {
-					GameManager.setCvarBoolean("vid_fullscreen", true);
-				} else {
-					GameManager.setCvarBoolean("vid_fullscreen", false);
-				}
-			}
-
-			$(document).ready(function() {
+			$(document).ready(function () {
+                // Activate the menu accordion object
 				$('#menuaccordion').accordion({ active: false, collapsible: true, heightStyle: "content"});
 
+                // Prevent page scrolling under any circumstance, even if a scrollbar shows
 				$(window).scroll(function() {
 					scroll(0,0);
 				});
 
-				$('#menu-exit-button').on('click', function() {
-					QuitGame();
+			    // Specific buttons
+                // Open video options
+				$('#open-video-options').click(function () {
+				    $('#modal').attr('src', 'asset://Rapture/menus/video-menu');
+				    $('#modal').show();
 				});
 
-				$('#menu-new-button').on('click', function() {
-					NewGame();
+				$('#menu-exit-button').on('click', function () {
+				    QuitGame();
 				});
+
+                // Hide the modal iframe
+				$('#modal').hide();
+
+                // Handle the options menu in its accordion category
+				$("#options").menu();
 			});
 
+            /*
+                The following snippet (and the event codes below) prevents dragging the mouse cursor over text elements.
+                It does not prevent the altered mouse cursor from being shown
+            */
 			function preventDrag(e) {
 				if(e.stopPropagation) e.stopPropagation();
 				if(e.preventDefault) e.preventDefault();
@@ -136,126 +79,11 @@
 				$("button").button().click(function(event) {
 					event.preventDefault();
 				});
-				$("#newgame").menu();
-				$("#options").menu();
-				$("#extras").menu();
 
-				$("#video-options").dialog({
-					autoOpen: false,
-					modal: true,
-					resizable: false,
-					buttons: {
-						OK: function() {
-							ApplyVideoChanges();
-							$(this).dialog("close");
-						},
-						Cancel: function() {
-							$(this).dialog("close");
-						},
-						Apply: function() {
-							$("#apply-warning").dialog("open");
-							//ApplyVideoChanges();
-							//GameManager.execCommand("vid_restart");
-						}
-					},
-					width: 500
-				});
-
-				$("#apply-warning").dialog({
-					autoOpen: false,
-					modal: true,
-					resizable: false,
-					buttons: {
-						OK: function() { $(this).dialog("close"); }
-					},
-				});
-
-				$("#open-video-options").click(function(){
-					UpdateVideoDisplay();
-					$("#video-options").dialog("open");
-				});
-
-				$("#video-advanced").buttonset();
-				$("#video-fullscreen").buttonset();
-
-				$("#slider-gamma").slider({
-					min: 0.22,
-					max: 4.0,
-					step: 0.1,
-					slide: function(event, ui) {
-						GameManager.setCvarFloat("vid_gamma", ui.value);
-					}
-				});
-
-				$("#res-small").selectable({
-					selecting: function(event, ui){
-						if( $("#res-small").length > 1){
-							$(ui.selecting).removeClass("ui-selecting");
-						}
-						$("#res-large .ui-selected").removeClass("ui-selected");
-						$("#res-widesmall .ui-selected").removeClass("ui-selected");
-						$("#res-widelarge .ui-selected").removeClass("ui-selected");
-						$("#res-widelarge").trigger("unselected");
-						$("#res-widesmall").trigger("unselected");
-						$("#res-large").trigger("unselected");
-					},
-					selected: function(event, ui) {
-						selectedResolution = ui.selected.id;
-					}
-				});
-				$("#res-large").selectable({
-					selecting: function(event, ui){
-						if( $("#res-large").length > 1){
-							$(ui.selecting).removeClass("ui-selecting");
-						}
-						$("#res-small .ui-selected").removeClass("ui-selected");
-						$("#res-widesmall .ui-selected").removeClass("ui-selected");
-						$("#res-widelarge .ui-selected").removeClass("ui-selected");
-						$("#res-small").trigger("unselected");
-						$("#res-widesmall").trigger("unselected");
-						$("#res-widelarge").trigger("unselected");
-
-					},
-					selected: function(event, ui) {
-						selectedResolution = ui.selected.id;
-					}
-				});
-				$("#res-widesmall").selectable({
-					selecting: function(event, ui){
-						if( $("#res-widesmall").length > 1){
-							$(ui.selecting).removeClass("ui-selecting");
-						}
-						$("#res-small .ui-selected").removeClass("ui-selected");
-						$("#res-large .ui-selected").removeClass("ui-selected");
-						$("#res-widelarge .ui-selected").removeClass("ui-selected");
-						$("#res-small").trigger("unselected");
-						$("#res-widelarge").trigger("unselected");
-						$("#res-large").trigger("unselected");
-					},
-					selected: function(event, ui) {
-						selectedResolution = ui.selected.id;
-					}
-				});
-				$("#res-widelarge").selectable({
-					selecting: function(event, ui){
-						if( $("#res-widelarge").length > 1){
-							$(ui.selecting).removeClass("ui-selecting");
-						}
-						$("#res-small .ui-selected").removeClass("ui-selected");
-						$("#res-widesmall .ui-selected").removeClass("ui-selected");
-						$("#res-large .ui-selected").removeClass("ui-selected");
-						$("#res-small").trigger("unselected");
-						$("#res-widesmall").trigger("unselected");
-						$("#res-large").trigger("unselected");
-					},
-					selected: function(event, ui) {
-						selectedResolution = ui.selected.id;
-					}
-				});
-				$("#tabs-resolution").tabs();
 			});
 		</script>
 
+     <!-- Design -->
 		<style type="text/css">
 			html, body {
 				overflow:hidden;
@@ -277,6 +105,14 @@
 				font-size:8px;
 			}
 
+            #modal {
+                border: 0;
+                width: 100%;
+                height: 100%;
+                position:absolute;
+                z-index:100;
+            }
+
 			.ui-menu { width:100%; }
 
 			#feedback { font-size: 1.4em; }
@@ -291,11 +127,8 @@
 		</style>
 	</head>
 
-
-	<!--- UI DESIGN --->
-
-
 	<body style="background-color:#DDDDDD;">
+        <iframe id="modal" scrolling="no">modal screen</iframe>
 		<div id="menucontainer" style="padding:10px;width:99%;height:99%;margin:auto auto auto auto;">
 			<div id="copyright">
 				<center><p>Copyright (c) 2014 Full Spectrum Software</p></center>
@@ -305,28 +138,10 @@
 			</div>
 			<div class="ui-widget-content" style="width:350px;position:fixed;right:5%;bottom:10%;">
 				<div id="menuaccordion">
-					<h3>Play</h3>
-					<div>
-						<ul id="newgame">
-              <li id="menu-char-select-offline">Start Singleplayer Game</li>
-							<li id="menu-char-select-online">Start Multiplayer Game</li>
-							<li id="menu-join-game">Join Server</li>
-						</ul>
-					</div>
 					<h3>Options</h3>
 					<div>
 						<ul id="options">
 							<li id="open-video-options">Video Options</li>
-							<li class="ui-state-disabled">Audio Options</li>
-							<li class="ui-state-disabled">Gameplay Options</li>
-							<li class="ui-state-disabled">HUD Options</li>
-						</ul>
-					</div>
-					<h3>Extras</h3>
-					<div>
-						<ul id="extras">
-							<li class="ui-state-disabled">Editor</li>
-							<li class="ui-state-disabled">Gamehub</li>
 						</ul>
 					</div>
 					<h3>Exit</h3>
@@ -334,89 +149,6 @@
 						<p>Are you sure? <p><button class="ui-button mainbutton" id="menu-exit-button">Exit Game</button></p>
 					</div>
 				</div>
-			</div>
-		</div>
-
-		<div id="apply-warning" title="Warning">
-			Due to a bug in SDL, the ''Apply'' button currently doesn't function. Use ''OK'' and restart your game.
-		</div>
-
-		<div id="video-options" title="Video Options">
-			<!-- Simple/Advanced Options -->
-			<div>
-				<center>
-					<form>
-						<div id="video-advanced" style="position:relative;right:1px;">
-							<input type="radio" id="video_basic" checked="checked" name="video-advanced"><label for="video_basic" style="font-size:13px;">Basic</label>
-							<input type="radio" id="video_advanced" name="video-advanced"><label for="video_advanced" style="font-size:13px;">Advanced</label>
-						</div>
-					</form>
-				</center>
-				<table class="ui-state-default ui-widget-content" style="width:100%;padding:10px;" cellpadding="2">
-					<tr>
-						<td colspan="2">
-							Resolution
-							<center>
-							<div id="tabs-resolution">
-								<ul>
-									<li><a href="#tab-43">4:3</a></li>
-									<li><a href="#tab-54">5:4</a></li>
-									<li><a href="#tab-85">16:10 / 8:5</a></li>
-									<li><a href="#tab-169">16:9</a></li>
-								</ul>
-								<div id="tab-43">
-									<ol id="res-small" class="resolution-select">
-										<li class="ui-widget-content" id="res800x600">800x600</li>
-										<li class="ui-widget-content" id="res1024x768">1024x768</li>
-										<li class="ui-widget-content" id="res1152x864">1152x864</li>
-										<li class="ui-widget-content" id="res1280x960">1280x960</li>
-										<li class="ui-widget-content" id="res1600x1200">1600x1200</li>
-									</ol>
-								</div>
-								<div id="tab-54">
-									<ol id="res-large" class="resolution-select">
-										<li class="ui-widget-content" id="res1280x1024">1280x1024</li>
-										<li class="ui-widget-content" id="res1800x1440">1800x1440</li>
-									</ol>
-								</div>
-								<div id="tab-85">
-									<ol id="res-widesmall" class="resolution-select">
-										<li class="ui-widget-content" id="res1152x720">1152x720</li>
-										<li class="ui-widget-content" id="res1280x800">1280x800</li>
-										<li class="ui-widget-content" id="res1440x900">1440x900</li>
-										<li class="ui-widget-content" id="res1680x1050">1680x1050</li>
-										<li class="ui-widget-content" id="res1920x1200">1920x1200</li>
-									</ol>
-								</div>
-								<div id="tab-169">
-									<ol id="res-widelarge" class="resolution-select">
-										<li class="ui-widget-content" id="res1280x720">1280x720 (720p)</li>
-										<li class="ui-widget-content" id="res1600x900">1600x900</li>
-										<li class="ui-widget-content" id="res1920x1080">1920x1080 (1080p)</li>
-										<li class="ui-widget-content" id="res2048x1152">2048x1152 (2K)</li>
-										<li class="ui-widget-content" id="res4096x2304">4096x2304 (4K)</li>
-									</ol>
-								</div>
-							</div>
-							</center>
-						</td>
-					</tr>
-					<tr>
-						<td width="50%">
-							Gamma
-							<br><div id="slider-gamma"></div>
-						</td>
-						<td width="50%">
-							<form>
-								<br>
-								<div id="video-fullscreen">
-									<input type="radio" id="video_fullscreen" checked="checked" name="video-fullscreen"><label for="video_fullscreen" style="padding:3px;font-size:13px;">Fullscreen</label>
-									<input type="radio" id="video_windowed" name="video-fullscreen"><label for="video_windowed" style="padding:3px;font-size:13px;">Windowed</label>
-								</div>
-							</form>
-						</td>
-					</tr>
-				</table>
 			</div>
 		</div>
 	</body>

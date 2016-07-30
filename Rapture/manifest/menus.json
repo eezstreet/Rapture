@@ -3,6 +3,11 @@
 	"author": "Nicholas Whitlock <eezstreet>",
 	"contentGroup": "BaseGame",
 	"components": {
+		"char-select": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/char-select.html"
+		},
 		"console": {
 			"componentType": "Asset_Data",
 			"mimeType": "text/html",

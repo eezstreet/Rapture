@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="css/custom-theme/jquery-ui.structure.min.css" />
 		<link rel="stylesheet" href="css/custom-theme/jquery-ui.theme.min.css" />
 		<script type="text/javascript">
-			var GameManager;
+			var Engine;
 			var EscapesOn = false;
 		</script>
 		<script type="text/javascript" src="scripts/jQuery-2.1.1.min.js"></script>
@@ -402,7 +402,7 @@
 		$(function () {
 			$("#ID_questSelect").selectmenu();
 			$("#ID_questSelect").on("selectmenuselect", function (event, ui) {
-				GameManager.changedSelectedQuest(ui.item.value);
+				Engine.changedSelectedQuest(ui.item.value);
 			});
 			$(".panelButton").mouseover(function (e) {
 				var labelValue;
@@ -487,16 +487,16 @@
 					return;
 				}
 
-				GameManager.undefineClickZone("QuestLogButton");
+				Engine.undefineClickZone("QuestLogButton");
 
 				if ($("#ID_panelQuestLog").is(":visible")) {
-					GameManager.undefineClickZone("QuestLog");
+					Engine.undefineClickZone("QuestLog");
 					clearLeftPanels();
 					return;
 				}
 				clearLeftPanels();
 				$("#ID_panelQuestLog").show();
-				GameManager.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
+				Engine.defineClickZone("QuestLog", $("#ID_panelQuestLog").offset().left, $("#ID_panelQuestLog").offset().top,
 					$("#ID_panelQuestLog").width(), $("#ID_panelQuestLog").height());
 				$("#ID_questLogButtonDiv").hide();
 				$("#ID_questSelectForm").selectmenu("change");
@@ -515,11 +515,11 @@
 				e = e || window.event;
 				targetID = e.target.dataset["npcoption"];
 
-				GameManager.npcMenuCallback(targetID.toString());
+				Engine.npcMenuCallback(targetID.toString());
 			});
 
 			$(".bottomContainer").click(function () {
-				GameManager.signalNPCMenuClosed();
+				Engine.signalNPCMenuClosed();
 			});
 
 			// FIXME: not necessary?
@@ -570,7 +570,7 @@
 			clearLeftPanels();
 			clearRightPanels();
 			$("#escMenu").toggleClass("invisible");
-			GameManager.execCommand("blockvminput");
+			Engine.execCommand("blockvminput");
 		}
 
 		// NPC menu
@@ -609,7 +609,7 @@
 				$(jqDivText).css('display', 'block'); // Show this option
 
 				$(jqDivText).click(function (e) {
-					GameManager.npcCallback(correctedOption);
+					Engine.npcCallback(correctedOption);
 				});
 			}
 
@@ -644,7 +644,7 @@
 				$(jqDivText).css('display', 'block');
 
 				$(jqDivText).click(function (e) {
-					GameManager.npcCallback(correctedOption);
+					Engine.npcCallback(correctedOption);
 				});
 			}
 		}
@@ -662,14 +662,14 @@
 			str = str.concat("</option>");
 			$("#ID_questSelect").append(str);
 			$("#ID_questSelect").selectmenu("refresh", true);
-			GameManager.changedSelectedQuest(questRecord);
+			Engine.changedSelectedQuest(questRecord);
 		}
 
 		function showQuestLogDisplay(message, questAffected) {
 			changeDivHTML("ID_questLogText", message);
 			$("#ID_questLogButtonDiv").show();
 
-			GameManager.defineClickZone("QuestLogButton", $("#ID_questLogButtonDiv").offset().left, $("#ID_questLogButtonDiv").offset().top,
+			Engine.defineClickZone("QuestLogButton", $("#ID_questLogButtonDiv").offset().left, $("#ID_questLogButtonDiv").offset().top,
 					$("#ID_questLogButtonDiv").width(), $("#ID_questLogButtonDiv").height());
 		}
 
@@ -693,7 +693,7 @@
 
 		// ESC menu
 		function quit() {
-			GameManager.execCommand("mainmenu");
+			Engine.execCommand("mainmenu");
 		}
 
 		$("a.option").hover(function () {

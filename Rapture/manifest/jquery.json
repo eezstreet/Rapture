@@ -43,7 +43,7 @@
 			"mimeType": "image/png",
 			"file": "../core/ui/css/custom-theme/images/ui-bg_flat_75_2e2e2e_40x100.png"
 		},
-		"ui-bg_carbon_fiber_20_360b0b_8x9": {
+		"ui-bg_carbon-fiber_20_360b0b_8x9": {
 			"componentType": "Asset_Data",
 			"mimeType": "image/png",
 			"file": "../core/ui/css/custom-theme/images/ui-bg_carbon_fiber_20_360b0b_8x9.png"
@@ -73,7 +73,7 @@
 			"mimeType": "image/png",
 			"file": "../core/ui/css/custom-theme/images/ui-icons_e3e3e3_256x240.png"
 		},
-		"ui-icons-888888_256x240": {
+		"ui-icons_888888_256x240": {
 			"componentType": "Asset_Data",
 			"mimeType": "image/png",
 			"file": "../core/ui/css/custom-theme/images/ui-icons-888888_256x240.png"

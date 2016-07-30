@@ -18,7 +18,7 @@ MainMenu::MainMenu() {
 	R_Message(PRIORITY_NOTE, "done.\n");
 	UI::StartDrawingMenu(this);
 	UI::currentFocus = wView;
-	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
+	global = wView->CreateGlobalJavascriptObject(WSLit("Engine"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
 	SetupBaseCommands(&jObj);

@@ -16,6 +16,7 @@ namespace UI {
 	WebView* currentFocus = nullptr;
 	WebCore* wc = nullptr;
 	WebSession* sess = nullptr;
+	Cvar* ui_debugport = nullptr;
 
 	void StartDrawingMenu(Menu* menu) {
 		vDrawMenus.push_back(menu->GetWebView());
@@ -36,6 +37,7 @@ namespace UI {
 	/* UI Class */
 	void Initialize() {
 		R_Message(PRIORITY_NOTE, "UI::Initialize()\n");
+		ui_debugport = Cvar::Get<int>("ui_debugport", "Debugger port for Awesomium debugging (access http://127.0.0.1:this)", (1 << CVAR_ARCHIVE), 8000);
 		for (int i = 0; i < NUM_UI_VISIBLE; i++) {
 			uiTextures[i] = Video::RegisterStreamingTexture(Video::GetWidth(), Video::GetHeight());
 		}
@@ -55,12 +57,8 @@ namespace UI {
 		R_Message(PRIORITY_NOTE, "Initializing Awesomium Webcore\n");
 		WebConfig x;
 		x.log_level = Awesomium::kLogLevel_Verbose;
-#ifdef _DEBUG
-		// If you have installed the Awesomium SDK, you can use the inspector as long as you have inspector.pak in your Gamedata folder.
-		// This file has not been included on the repository as it isn't needed in most circumstances.
-		// To use it, simply connect to http://127.0.0.1:80 in a web browser while debugging in Visual Studio.
-		x.remote_debugging_port = 80;
-#endif
+		x.remote_debugging_port = ui_debugport->Integer();	// You still need inspector.pak in order to debug
+
 		WebStringArray wsa = WebStringArray(1);
 		string option = "--allow-file-access-from-files";
 		wsa[0] = WSLit(option.c_str());

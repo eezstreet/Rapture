@@ -177,7 +177,7 @@ Menu::Menu(const char *menuName) {
 	while(wView->IsLoading())
 		UI::wc->Update();
 	UI::StartDrawingMenu(this);
-	global = wView->CreateGlobalJavascriptObject(WSLit("GameManager"));
+	global = wView->CreateGlobalJavascriptObject(WSLit("Engine"));
 	wView->set_js_method_handler(this);
 	JSObject jObj = global.ToObject();
 	gamemanager = jObj;
