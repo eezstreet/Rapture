@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <meta name="generator" content="Microsoft Visual Studio">
+        <title>Join Game</title>
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.min.css">
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.structure.min.css" />
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.theme.min.css" />
+        <script type="text/javascript" src="asset://rapture/jquery/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="asset://rapture/jquery/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <div id="join-game" title="Join Game">
+            <fieldset>
+                <input type="text" name="join-ip" id="join-ip" style="width:60%;"/> <label for="join-ip">IP Address</label>
+            </fieldset>
+        </div>
+
+        <script type="text/javascript">
+            function ModalWindowClosed() {
+                parent.ModalClosed();
+            }
+
+            $("#join-game").dialog({
+                autoOpen: false,
+                modal: true,
+                resizable: true,
+                width: 500,
+                close: ModalWindowClosed,
+                buttons: {
+                    OK: function () {
+                        parent.window.localStorage.setItem("ipAddress", $("#join-ip").val()); // FIXME: maybe validate it?
+                        parent.window.location.href = "asset://Rapture/menus/char-select";
+                        $(this).dialog("close");
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $('input').addClass("ui-widget ui-widget-content ui-corner-all");
+            $("#join-ip").val(parent.window.localStorage.getItem("ipAddress"));
+            $("#join-game").dialog("open");
+        </script>
+    </body>
+</html>

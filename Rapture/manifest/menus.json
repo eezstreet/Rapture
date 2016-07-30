@@ -13,6 +13,11 @@
 			"mimeType": "text/html",
 			"file": "../core/ui/console.html"
 		},
+		"join-menu": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/join-menu.html"
+		},
 		"null": {
 			"componentType": "Asset_Data",
 			"mimeType": "text/html",
@@ -23,7 +28,12 @@
 			"mimeType": "text/html",
 			"file": "../core/ui/main.html"
 		},
-		"video-menu": {
+		"network-options": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/network-menu.html"
+		},
+		"video-options": {
 			"componentType": "Asset_Data",
 			"mimeType": "text/html",
 			"file": "../core/ui/video-menu.html"

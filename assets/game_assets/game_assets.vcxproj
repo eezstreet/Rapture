@@ -164,7 +164,9 @@
     <None Include="..\..\Rapture\core\ui\images\hud\orb_left.psd" />
     <None Include="..\..\Rapture\core\ui\images\hud\orb_right.psd" />
     <None Include="..\..\Rapture\core\ui\images\rapture-logo.psd" />
+    <None Include="..\..\Rapture\core\ui\join-menu.html" />
     <None Include="..\..\Rapture\core\ui\main.html" />
+    <None Include="..\..\Rapture\core\ui\network-menu.html" />
     <None Include="..\..\Rapture\core\ui\null.html" />
     <None Include="..\..\Rapture\core\ui\scripts\jQuery-2.1.1.min.js" />
     <None Include="..\..\Rapture\core\ui\scripts\jquery-ui.min.js" />

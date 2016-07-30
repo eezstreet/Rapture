@@ -34,9 +34,36 @@
 			    // Specific buttons
                 // Open video options
 				$('#open-video-options').click(function () {
-				    $('#modal').attr('src', 'asset://Rapture/menus/video-menu');
+				    $('#modal').attr('src', 'asset://Rapture/menus/video-options');
 				    $('#modal').show();
 				});
+
+			    // Open network options
+				$('#open-network-options').click(function () {
+				    $('#modal').attr('src', 'asset://Rapture/menus/network-options');
+				    $('#modal').show();
+				});
+
+			    // Open character select (singleplayer)
+				$('#open-charselect').on('click', function () {
+				    window.sessionStorage.setItem("gameMethod", "single");
+				    window.location.href = "asset://Rapture/menus/char-select";
+				});
+
+			    // Open character select (multiplayer)
+				$('#open-charselect-multi').on('click', function () {
+				    window.sessionStorage.setItem("gameMethod", "multihost");
+				    window.location.href = "asset://Rapture/menus/char-select";
+				});
+
+                // Open join game
+				$('#open-joingame').on('click', function () {
+				    window.sessionStorage.setItem("gameMethod", "multijoin");
+				    $('#modal').attr('src', 'asset://Rapture/menus/join-menu');
+				    $('#modal').show();
+				});
+
+                // Join game
 
 				$('#menu-exit-button').on('click', function () {
 				    QuitGame();
@@ -47,6 +74,7 @@
 
                 // Handle the options menu in its accordion category
 				$("#options").menu();
+				$("#play").menu();
 			});
 
             /*
@@ -116,32 +144,38 @@
 			.ui-menu { width:100%; }
 
 			#feedback { font-size: 1.4em; }
-			#res-small { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-			#res-large { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-			#res-widesmall { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-			#res-widelarge { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-
-
-			.resolution-select .ui-selecting { background: #6a2321; }
-			.resolution-select .ui-selected { background: #621715; color: white; }
 		</style>
 	</head>
 
 	<body style="background-color:#DDDDDD;">
         <iframe id="modal" scrolling="no">modal screen</iframe>
 		<div id="menucontainer" style="padding:10px;width:99%;height:99%;margin:auto auto auto auto;">
+            <!-- Copyright -->
 			<div id="copyright">
-				<center><p>Copyright (c) 2014 Full Spectrum Software</p></center>
+				<center><p>Copyright (c) 2014-2016 Full Spectrum Software</p></center>
 			</div>
+
+            <!-- Logo -->
 			<div style="position:fixed;left:3%;">
 				<img src="asset://Rapture/menu-images/alphalogo">
 			</div>
+
+            <!-- Menu Options -->
 			<div class="ui-widget-content" style="width:350px;position:fixed;right:5%;bottom:10%;">
 				<div id="menuaccordion">
+                    <h3>Play</h3>
+                    <div>
+                        <ul id="play">
+                            <li id="open-charselect">Singleplayer</li>
+                            <li id="open-charselect-multi">Create Server</li>
+                            <li id="open-joingame">Join Game</li>
+                        </ul>
+                    </div>
 					<h3>Options</h3>
 					<div>
 						<ul id="options">
 							<li id="open-video-options">Video Options</li>
+                            <li id="open-network-options">Network Options</li>
 						</ul>
 					</div>
 					<h3>Exit</h3>

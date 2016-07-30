@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <meta name="generator" content="Microsoft Visual Studio">
+        <title>Network Options</title>
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.min.css">
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.structure.min.css" />
+        <link rel="stylesheet" href="asset://rapture/jquery/jquery-ui.theme.min.css" />
+        <script type="text/javascript" src="asset://rapture/jquery/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="asset://rapture/jquery/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <div id="network-options" title="Network Options">
+            <div>
+                <table class="ui-state-default ui-widget-content" style="width:100%;padding:10px;" cellpadding="2">
+                    <tr>
+                        <td style="padding:20px;">
+                            Max Clients
+                            <br />
+                            <form>
+                                <p>
+                                    <input type="text" id="text-maxclients" style="width:20%;float:left;" />
+                                    <div id="slider-maxclients" style="width:60%;float:right;"></div>
+                                </p>
+                            </form>
+                        </td>
+                        <td rowspan="2" style="padding:20px;">
+                            <fieldset>
+                                <label for="ipv6">IPv6 Enabled</label>
+                                <input type="checkbox" name="checkbox_ipv6" id="checkbox_ipv6"/>
+                            </fieldset>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:20px;">
+                            Timeout (milliseconds)
+                            <br />
+                            <form>
+                                <p>
+                                    <div id="slider-timeout"></div>
+                                    <br />
+                                    <input type="text" id="text-timeout" />
+                                </p>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function ModalWindowClosed() {
+                parent.Engine.setCvarBoolean("net_ipv6", $("#checkbox_ipv6").prop( "checked" ));
+                parent.ModalClosed();
+            }
+
+            function UpdateProtocol() {
+                $("#checkbox_ipv6").prop("checked", parent.Engine.getCvarBoolean("net_ipv6"));
+            }
+
+            $("#network-options").dialog({
+                autoOpen: false,
+                modal: true,
+                resizable: true,
+                width: 500,
+                close: ModalWindowClosed,
+                buttons: {
+                    OK: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            })
+
+            $("#slider-timeout").slider({
+                min: 15000,
+                max: 300000,
+                step: 1000,
+                value: parent.Engine.getCvarInteger("net_timeout"),
+                slide: function (event, ui) {
+                    $("#text-timeout").val(ui.value);
+                    parent.Engine.setCvarInteger("net_timeout", parseInt(ui.value));
+                }
+            });
+
+            $("#slider-maxclients").slider({
+                min: 1,
+                max: 32,
+                step: 1,
+                value: parent.Engine.getCvarInteger("net_maxclients"),
+                slide: function (event, ui) {
+                    $("#text-maxclients").val(ui.value);
+                    parent.Engine.setCvarInteger("net_maxclients", parseInt(ui.value));
+                }
+            });
+
+            $("#text-timeout").change(function () {
+                var value = this.value;
+                console.log("net_timeout changed to " + value);
+                $("#slider-timeout").slider("value", parseInt(value));
+                parent.Engine.setCvarInteger("net_maxclients", parseInt(value));
+            });
+
+            $("#text-timeout").val(parent.Engine.getCvarInteger("net_timeout"));
+            $("#text-maxclients").val(parent.Engine.getCvarInteger("net_maxclients"));
+
+            $("#text-maxclients").change(function () {
+                var value = this.value;
+                console.log("net_maxclients changed to " + value);
+                $("#slider-maxclients").slider("value", parseInt(value));
+                parent.Engine.setCvarInteger("net_maxclients", parseInt(value));
+            });
+
+            $('input').addClass("ui-widget ui-widget-content ui-corner-all");
+            UpdateProtocol();
+
+            $("#network-options").dialog("open");
+        </script>
+    </body>
+</html>

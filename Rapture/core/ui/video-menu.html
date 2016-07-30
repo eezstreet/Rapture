@@ -7,6 +7,17 @@
         <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.theme.min.css" />
         <script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
         <script type="text/javascript" src="asset://Rapture/jquery/jquery-ui.min.js"></script>
+
+        <style type="text/css">
+            #res-small { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+			#res-large { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+			#res-widesmall { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+			#res-widelarge { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+
+
+			.resolution-select .ui-selecting { background: #6a2321; }
+			.resolution-select .ui-selected { background: #621715; color: white; }
+        </style>
     </head>
     <body>
             <div id="apply-warning" title="Warning">
@@ -173,7 +184,8 @@
                 $("#video-options").dialog({
                     autoOpen: false,
                     modal: true,
-                    resizable: false,
+                    resizable: true,
+                    width:500,
                     close: ModalWindowClosed,
                     open: function (event, ui) {
                         UpdateVideoDisplay();
@@ -183,16 +195,12 @@
                             ApplyVideoChanges();
                             $(this).dialog("close");
                         },
-                        Cancel: function () {
-                            $(this).dialog("close");
-                        },
                         Apply: function () {
                             $("#apply-warning").dialog("open");
                             //ApplyVideoChanges();
                             //Engine.execCommand("vid_restart");
                         }
-                    },
-                    width: 500
+                    }
                 });
 
                 $("#apply-warning").dialog({
