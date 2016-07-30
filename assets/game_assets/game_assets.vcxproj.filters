@@ -373,6 +373,9 @@
       <Filter>manifest</Filter>
     </None>
     <None Include="..\..\Rapture\manifest\__rapture.json" />
+    <None Include="..\..\Rapture\core\ui\char-select.html">
+      <Filter>core\ui</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Rapture\core\materials\characters\test\test1.png">

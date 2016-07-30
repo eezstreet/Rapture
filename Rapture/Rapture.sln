@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rapture", "Rapture.vcxproj", "{2E8A9A14-709B-4B42-AE2A-BEC940FBF39A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38} = {FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamex86", "..\gamex86\gamex86.vcxproj", "{70549835-D4E2-4A31-8ED4-5D885CDE6D70}"
 EndProject
@@ -35,6 +38,7 @@ Global
 		{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}.Release|Win32.ActiveCfg = Release|Win32
 		{AE4AA20C-E6CD-4133-ABDF-7F09C526CE09}.Release|Win32.Build.0 = Release|Win32
 		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Debug|Win32.Build.0 = Debug|Win32
 		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Release|Win32.ActiveCfg = Release|Win32
 		{FDC15BE3-10AE-4BE4-AB6A-EE10E5EE7B38}.Release|Win32.Build.0 = Release|Win32
 		{686EA3EA-A049-4A42-A4DC-1D3F2622191E}.Debug|Win32.ActiveCfg = Debug|Win32

@@ -50,10 +50,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copyfiles.bat Debug</Command>
       <Message>Copying assets to gamedata...</Message>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>compileassets.bat Debug</Command>
+      <Message>Compiling game assets</Message>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -141,6 +144,7 @@
     <None Include="..\..\Rapture\core\materials\testvisup.json" />
     <None Include="..\..\Rapture\core\materials\testvisup_h.json" />
     <None Include="..\..\Rapture\core\materials\testwalltile.json" />
+    <None Include="..\..\Rapture\core\ui\char-select.html" />
     <None Include="..\..\Rapture\core\ui\console.html" />
     <None Include="..\..\Rapture\core\ui\css\colors.css" />
     <None Include="..\..\Rapture\core\ui\css\common.css" />

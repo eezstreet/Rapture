@@ -1,5 +1,7 @@
 @echo off
 
+cd ../../Rapture
+
 echo Copying libraries
 xcopy /s /f /i /y /v /c *.dll %RAPTURE_INSTALL%
 
