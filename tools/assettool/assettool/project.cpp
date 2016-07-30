@@ -521,6 +521,7 @@ void ProcessAssetSchemaFile(const AssetToolArguments& args, const char* assetFil
 		}
 
 		std::cout << "Parsed " << pAsset->decompressedAssets.size() << " components." << std::endl;
+		pAsset->asset.head.numberComponents = pAsset->decompressedAssets.size();
 	}
 
 	char outPath[MAX_OUTFILE_PATH]{0};
@@ -565,10 +566,13 @@ void ProcessProjectFile(const AssetToolArguments& args) {
 
 	std::cout << "Project file parsed successfully" << std::endl;
 	cJSON* filesArray = cJSON_GetObjectItem(rootNode, "assets");
+	int numParsed = 0;
 	for (cJSON* item = cJSON_GetFirstItem(filesArray); item; item = cJSON_GetNextItem(item)) {
 		const char* itemKey = cJSON_GetItemKey(item);
 		const char* itemVal = cJSON_ToString(item);
 		std::cout << itemKey << ".asset: " << itemVal << std::endl;
 		ProcessAssetSchemaFile(args, itemKey, itemVal);
+		numParsed++;
 	}
+	std::cout << "Parsed " << numParsed << " asset files in project" << std::endl;
 }
