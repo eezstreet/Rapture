@@ -215,3 +215,5 @@ pip-log.txt
 *raptureconfig.cfg
 *.bdf
 .mr.developer.cfg
+*imgui.ini
+*.asset
