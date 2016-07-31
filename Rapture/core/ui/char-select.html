@@ -44,18 +44,32 @@
                 height: 80%;
             }
 
-            #charselect { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+            #charselect { list-style-type: none; margin: 0; padding: 0; width: 60%; text-align: center; }
+            #charselect .ui-selecting { background: #6a2321; }
+			#charselect .ui-selected { background: #621715; color: white; }
+
+            ol {
+                padding: 20px;
+            }
+
+            li {
+                width: 100%;
+            }
         </style>
     </head>
     <body>
 
         <!-- Design -->
+        <div id="delete-message" title="Caution">
+            Deleting your character is permanent. Are you sure you wish to continue?
+        </div>
+
         <div id="menucontainer">
             <div id="title" class="ui-widget">
                 <h1>Character Select</h1>
             </div>
             <div id="selectcontainer" class="ui-state-default ui-widget-content">
-                <ol id="charselect"></ol>
+                <ol id="charselect" class="ui-widget"></ol>
             </div>
             <div id="buttoncontainer">
                 <div id="buttoncontainer-top">
@@ -103,11 +117,15 @@
 
             // Setup, functions etc
             var allSavedChars;
-            var selectedChar;
+            var selectedPath;
+            var selectedID;
 
-            function DeleteSavegame(path) {
-                Engine.echo("delete savegame: " + path + "\n");
-                Engine.deleteSaveFile(path);
+            function DeleteSavegame() {
+                Engine.echo("delete savegame: " + selectedPath + "\n");
+                $("#button-delete").button("disable");
+                $("#button-context").button("disable");
+                $("li.ui-selected").remove();
+                //Engine.deleteSaveFile(selectedPath);
             }
 
             function ParseSaveInfo() {
@@ -123,10 +141,24 @@
                     var saveSelect = document.createElement("li");
                     var text = document.createTextNode(value.name);
                     saveSelect.appendChild(text);
-                    saveSelect.class = "ui-widget-content ui-selectee";
-                    saveSelect.char = value;
+                    saveSelect.class = "ui-widget ui-selectee";
+                    saveSelect.save_char = value;
+                    saveSelect.save_path = key;
 
                     $("#charselect").append(saveSelect);
+                });
+                $("#charselect").selectable({
+                    selecting: function (event, ui) {
+                        if ($("#charselect").length > 1) {
+                            $(ui.selecting).removeClass("ui-selecting");
+                        }
+                    },
+                    selected: function (event, ui) {
+                        selectedPath = ui.selected.save_path;
+                        selectedID = ui.selected.id;
+                        $("#button-delete").button("enable");
+                        $("#button-context").button("enable");
+                    }
                 });
             }
 
@@ -162,16 +194,7 @@
             }
 
             // Actual execution
-            $("#charselect").selectable({
-                selecting: function (event, ui) {
-                    if ($("#charselect").length > 1) {
-                        $(ui.selecting).removeClass("ui-selecting");
-                    }
-                },
-                selected: function (event, ui) {
-                    selectedChar = ui.selected.id;
-                }
-            });
+            
 
             ParseSaveInfo();
             CreateButtons();
@@ -182,11 +205,26 @@
                 window.location = "asset://Rapture/menus/char-create";
             });
             $("#button-delete").click(function () {
-                // TODO
+                $("#delete-message").dialog("open");
             });
             $("#button-context").click(function () {
                 // TODO
             });
+
+            $("#delete-message").dialog({
+                autoOpen: false,
+                modal: true,
+                resizable: false,
+                buttons: {
+                    No: function () {
+                        $(this).dialog("close");
+                    },
+                    Yes: function () {
+                        DeleteSavegame();
+                        $(this).dialog("close");
+                    }
+                }
+            })
         </script>
     </body>
 
