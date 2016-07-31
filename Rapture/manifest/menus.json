@@ -8,6 +8,11 @@
 			"mimeType": "text/html",
 			"file": "../core/ui/char-select.html"
 		},
+		"char-create": {
+			"componentType": "Asset_Data",
+			"mimeType": "text/html",
+			"file": "../core/ui/char-create.html"
+		},
 		"console": {
 			"componentType": "Asset_Data",
 			"mimeType": "text/html",

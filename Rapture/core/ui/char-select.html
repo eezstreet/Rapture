@@ -1,8 +1,193 @@
 <html>
     <head>
-        <title></title>
+        <title>Character Select</title>
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.min.css">
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.structure.min.css" />
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.theme.min.css" />
+        <script type="text/javascript">
+			var Engine;
+        </script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jquery-ui.min.js"></script>
+
+        <style type="text/css">
+            html {
+				overflow:hidden;
+			}
+
+            body {
+                overflow: hidden;
+                background-color:#DDDDDD;
+                margin: 5%;
+            }
+
+            .ui-menu { width:100%; }
+
+            #menucontainer {
+                text-align: center;
+            }
+
+            #buttoncontainer {
+                bottom: 2%;
+                text-align: center;
+            }
+
+            #button-back {
+                float: left;
+            }
+
+            #button-context {
+                float: right;
+            }
+
+            #selectcontainer {
+                height: 80%;
+            }
+
+            #charselect { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+        </style>
     </head>
     <body>
 
+        <!-- Design -->
+        <div id="menucontainer">
+            <div id="title" class="ui-widget">
+                <h1>Character Select</h1>
+            </div>
+            <div id="selectcontainer" class="ui-state-default ui-widget-content">
+                <ol id="charselect"></ol>
+            </div>
+            <div id="buttoncontainer">
+                <div id="buttoncontainer-top">
+                    <button class="ui-button mainbutton" id="button-create">Create a Character</button>
+                    <button class="ui-button mainbutton" id="button-delete">Delete Character</button>
+                </div>
+                <button class="ui-button mainbutton" id="button-back">Back</button>
+                <button class="ui-button mainbutton" id="button-context">Context-Specific Option</button>
+            </div>
+        </div>
+
+        <!-- Code -->
+        <script type="text/javascript">
+            /*
+                When this menu opens, we ask for some information from the engine about savegame files.
+                These are then relayed back in JSON format, and we need the following information:
+                    - Character name
+                    - Character class
+                    - Character level*
+                    - Path to save file
+                    - Time played
+                    - Multiplayer character Y/N
+                (anything with a * is not currently part of the savegame structure)
+                We need to do this *every time* the menu opens because new savegames could be inserted at any point.
+                Fortunately all of the stuff we need is in the header of the savegames, so it won't stall the game too bad.
+
+                Here's a sample of what gets sent:
+                {
+                    "C:/Rapture/save/test.rsav": {
+                        "name": "test",
+                        "class": 0,
+                        "league": 0,
+                        "difficulty": 0
+                        "timePlayed": {
+                            "years": 0,
+                            "months": 0,
+                            "days": 0,
+                            "hours": 2,
+                            "minutes": 36,
+                            "seconds": 12
+                        }
+                    }
+                }
+            */
+
+            // Setup, functions etc
+            var allSavedChars;
+            var selectedChar;
+
+            function DeleteSavegame(path) {
+                Engine.echo("delete savegame: " + path + "\n");
+                Engine.deleteSaveFile(path);
+            }
+
+            function ParseSaveInfo() {
+                var bMultiplayer = false;
+                var gameMethod = window.sessionStorage.getItem("gameMethod");
+                if (gameMethod != "single") {
+                    bMultiplayer = true;
+                }
+
+                allSavedChars = JSON.parse(Engine.requestSaveInfo(bMultiplayer));
+                $.each(allSavedChars, function (key, value) {
+                    // Iterate through each savegame in the list
+                    var saveSelect = document.createElement("li");
+                    var text = document.createTextNode(value.name);
+                    saveSelect.appendChild(text);
+                    saveSelect.class = "ui-widget-content ui-selectee";
+                    saveSelect.char = value;
+
+                    $("#charselect").append(saveSelect);
+                });
+            }
+
+            function CreateButtons() {
+                var contextLabel = "OK";
+                var gameMethod = window.sessionStorage.getItem("gameMethod");
+
+                $("#button-back").button({
+                    icons: { primary: "ui-icon-carat-1-w" },
+                    label: "Back"
+                })
+                $("#button-create").button({
+                    label: "Create a Character"
+                });
+                $("#button-delete").button({
+                    label: "Delete Character",
+                    disabled: true,
+                });
+
+                if (gameMethod == "single") {
+                    contextLabel = "Start Game";
+                } else if (gameMethod == "multihost") {
+                    contextLabel = "Start Server";
+                } else if (gameMethod == "multijoin") {
+                    contextLabel = "Join Server";
+                }
+
+                $("#button-context").button({
+                    label: contextLabel,
+                    icons: { secondary: "ui-icon-carat-1-e" },
+                    disabled: true
+                });
+            }
+
+            // Actual execution
+            $("#charselect").selectable({
+                selecting: function (event, ui) {
+                    if ($("#charselect").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                },
+                selected: function (event, ui) {
+                    selectedChar = ui.selected.id;
+                }
+            });
+
+            ParseSaveInfo();
+            CreateButtons();
+            $("#button-back").click(function () {
+                window.location = "asset://Rapture/menus/mainmenu";
+            });
+            $("#button-create").click(function () {
+                window.location = "asset://Rapture/menus/char-create";
+            });
+            $("#button-delete").click(function () {
+                // TODO
+            });
+            $("#button-context").click(function () {
+                // TODO
+            });
+        </script>
     </body>
+
 </html>

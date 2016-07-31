@@ -388,6 +388,8 @@ namespace Filesystem {
 	void QueueFileClose(File* pFile, fileClosedCallback callback);
 
 	void QueueResource(Resource* pRes, assetRequestCallback callback);
+
+	void ListAllFilesInPath(vector<string>& vFiles, const char* extension, const char* folder);
 };
 
 /* A File is something which we pull from the hard drive */
@@ -690,6 +692,15 @@ void setGameQuitting(const bool b);
 //
 
 void Sys_InitCommands();
+
+//
+// SaveGame.cpp
+//
+
+namespace SaveGame {
+	const char* RequestSavegameInfo(bool bMultiplayer);
+	void DeleteSavegame(const char* szSaveFilePath);
+}
 
 //
 // <Platform>.cpp

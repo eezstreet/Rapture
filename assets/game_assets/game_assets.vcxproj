@@ -144,6 +144,7 @@
     <None Include="..\..\Rapture\core\materials\testvisup.json" />
     <None Include="..\..\Rapture\core\materials\testvisup_h.json" />
     <None Include="..\..\Rapture\core\materials\testwalltile.json" />
+    <None Include="..\..\Rapture\core\ui\char-create.html" />
     <None Include="..\..\Rapture\core\ui\char-select.html" />
     <None Include="..\..\Rapture\core\ui\console.html" />
     <None Include="..\..\Rapture\core\ui\css\colors.css" />

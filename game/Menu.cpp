@@ -132,6 +132,30 @@ void EXPORT_echo(const JSArray& args) {
 	R_Message(PRIORITY_MESSAGE, ToString(args[0].ToString()).c_str());
 }
 
+JSValue EXPORT_requestSaveInfo(const JSArray& args) {
+	// First argument: true for multiplayer games, false otherwise
+	if (args.size() != 1) {
+		R_Message(PRIORITY_WARNING, "JS warning: requestSaveInfo called with incorrect number of arguments");
+		return JSValue(WSLit(""));
+	}
+	if (!args[0].IsBoolean()) {
+		R_Message(PRIORITY_WARNING, "JS warning: requestSaveInfo: argument is not boolean\n");
+		return JSValue(WSLit(""));
+	}
+	const char* saveinfo = SaveGame::RequestSavegameInfo(args[0].ToBoolean());
+	return JSValue(WSLit(saveinfo));
+}
+
+void EXPORT_deleteSaveFile(const JSArray& args) {
+	// First argument: full path to save file
+	if (args.size() != 1) {
+		R_Message(PRIORITY_WARNING, "JS warning: deleteSaveFile called with incorrect number of arguments");
+		return;
+	}
+	string szFile = ToString(args[0].ToString());
+	SaveGame::DeleteSavegame(szFile.c_str());
+}
+
 /* End function definitions */
 template<class T>
 struct funcTable_t {
@@ -143,20 +167,22 @@ typedef funcTable_t<Menu::menuNonReturning> nonReturningTable_t;
 typedef funcTable_t<Menu::menuReturning> returningTable_t;
 
 nonReturningTable_t tbl_nonreturn [] = {
-	{ "execCommand", EXPORT_execCommand },
-	{ "setCvarString", EXPORT_setCvarString },
-	{ "setCvarInteger", EXPORT_setCvarInteger },
-	{ "setCvarFloat", EXPORT_setCvarFloat },
-	{ "setCvarBoolean", EXPORT_setCvarBoolean },
+	{ "deleteSaveFile", EXPORT_deleteSaveFile },
 	{ "echo", EXPORT_echo },
+	{ "execCommand", EXPORT_execCommand },
+	{ "setCvarBoolean", EXPORT_setCvarBoolean },
+	{ "setCvarFloat", EXPORT_setCvarFloat },
+	{ "setCvarInteger", EXPORT_setCvarInteger },
+	{ "setCvarString", EXPORT_setCvarString },
 	{ "END", nullptr }
 };
 
 returningTable_t tbl_return [] = {
-	{ "getCvarString", EXPORT_getCvarString },
-	{ "getCvarInteger", EXPORT_getCvarInteger },
-	{ "getCvarFloat", EXPORT_getCvarFloat },
 	{ "getCvarBoolean", EXPORT_getCvarBoolean },
+	{ "getCvarFloat", EXPORT_getCvarFloat },
+	{ "getCvarInteger", EXPORT_getCvarInteger },
+	{ "getCvarString", EXPORT_getCvarString },
+	{ "requestSaveInfo", EXPORT_requestSaveInfo },
 	{ "END", nullptr }
 };
 

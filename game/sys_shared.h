@@ -75,6 +75,11 @@ enum cvarFlags_e {
 	CVAR_CLIENTINFO,		// Networked from client -> server
 };
 
+/*
+==============================================================
+NETWORKING INFORMATION
+==============================================================
+*/
 enum packetType_e {
 	PACKET_PING,			// Server <-> (Any)		--	Check if service is alive	
 	PACKET_PONG,			// Server <-> (Any)		--	Response to ping packet
@@ -120,6 +125,11 @@ namespace ClientPacket {
 	};
 }
 
+/*
+====================================================
+SAVEGAME STRUCTURE
+====================================================
+*/
 struct Rapture_TimeDate {
 	uint32_t	year;		// Year
 	uint8_t		month;		// Month (0-11)
@@ -139,6 +149,27 @@ struct Rapture_CharacterMeta {	// Metadata that gets passed from character creat
 	uint8_t		startingSkill;					// Starting skill
 	uint8_t		multiplayer;					// Whether this is a multiplayer character
 };
+
+struct Rapture_CharacterTime {	// Time information
+	Rapture_TimeDate	lastUseTime;	// Last time this character was used
+	Rapture_TimeDate	creationTime;	// When this character was created
+	Rapture_TimeDate	playTime;		// How long this character has been played for
+};
+
+struct Rapture_Savegame {
+	struct Rapture_SaveHeader {
+		char header[4]; // 'R' 'S' 'A' 'V'
+		Rapture_CharacterMeta meta;
+		Rapture_CharacterTime time;
+	};
+	Rapture_SaveHeader head;
+};
+
+/*
+=====================================================================
+API
+=====================================================================
+*/
 
 // Callbacks
 typedef void(*fileOpenedCallback)(File* pFile);

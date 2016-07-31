@@ -2,6 +2,7 @@
 #include <thread>
 #include <vector>
 #include <concurrentqueue.h>
+#include <dirent.h>
 
 unordered_map<string, AssetComponent*> m_assetComponents;
 
@@ -168,6 +169,16 @@ namespace Filesystem {
 		vSearchPaths.push_back(string(fs_homepath->String()) + "/" + string(fs_core->String()));
 		vSearchPaths.push_back(string(fs_homepath->String()) + "/" + string(fs_game->String()));
 		// FIXME: probably include working directory as a searchpath, but that's what fs_basepath defaults to
+
+		// Remove any duplicate searchpaths
+		vector<string> swap;
+		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
+			auto found = find(swap.begin(), swap.end(), *it);
+			if (found == swap.end()) {
+				swap.push_back(*it);
+			}
+		}
+		vSearchPaths = swap;
 
 		R_Message(PRIORITY_MESSAGE, "Searchpaths:\n");
 		for (auto it = vSearchPaths.begin(); it != vSearchPaths.end(); ++it) {
@@ -505,6 +516,28 @@ namespace Filesystem {
 		}
 		else {
 			pRes->DequeRetrieve(callback);
+		}
+	}
+
+	/* Misc helper functions */
+	void ListAllFilesInPath(vector<string>& vFiles, const char* extension, const char* folder) {
+		string ext = extension;
+		for (auto& searchpath : vSearchPaths) {
+			string directory = searchpath + '/' + folder;
+			DIR* dir = opendir(directory.c_str());
+			if (dir == nullptr) {
+				continue;
+			}
+			while (auto ent = readdir(dir)) {
+				string filePath = ent->d_name;
+				if (filePath.length() <= ext.length()) {
+					continue;	// not valid
+				}
+				if (!filePath.compare(filePath.length() - ext.length(), ext.length(), ext)) {
+					vFiles.push_back(filePath);
+				}
+			}
+			closedir(dir);
 		}
 	}
 }

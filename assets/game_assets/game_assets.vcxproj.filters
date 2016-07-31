@@ -382,6 +382,9 @@
     <None Include="..\..\Rapture\core\ui\join-menu.html">
       <Filter>core\ui</Filter>
     </None>
+    <None Include="..\..\Rapture\core\ui\char-create.html">
+      <Filter>core\ui</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Rapture\core\materials\characters\test\test1.png">

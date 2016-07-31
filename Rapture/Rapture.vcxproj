@@ -131,6 +131,7 @@
     <ClCompile Include="..\game\Network.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
     <ClCompile Include="..\game\Resource.cpp" />
+    <ClCompile Include="..\game\SaveGame.cpp" />
     <ClCompile Include="..\game\Shared.cpp" />
     <ClCompile Include="..\game\Cmd.cpp" />
     <ClCompile Include="..\game\RaptureGame.cpp" />
