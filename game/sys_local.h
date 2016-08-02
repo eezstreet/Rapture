@@ -60,7 +60,7 @@ public:
 
 	GameModule* CreateGameModule(const char* bundle);
 	bool AllowedToStartNewModules();
-	void StartGameFromFile(const char* szFileName);
+	void StartGameFromFile(const char* szFileName, bool bMultiplayer);
 	void JoinRemoteGame(const char* szFileName, const char* szHostName);
 	void StartEditor();
 	void SaveAndExit();

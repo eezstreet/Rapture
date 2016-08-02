@@ -160,20 +160,16 @@ void Cmd_BlockVMInput_f(vector<string>& args) {
 	bVMInputBlocked = !bVMInputBlocked;
 }
 
-void Cmd_NewGameTest_f(vector<string>& args) {
-	RaptureGame::GetSingleton()->StartGameFromFile(nullptr);
-}
-
 void Cmd_Editor_f(vector<string>& args) {
 	RaptureGame::GetSingleton()->StartEditor();
 }
 
-void Cmd_Connect_f(vector<string>& args) {
-	if (args.size() != 2) {
-		R_Message(PRIORITY_MESSAGE, "usage: connect <ip address>\n");
-		return;
-	}
-	Network::Connect(args[1].c_str());
+void Cmd_StartSingle_f(vector<string>& args) {
+	RaptureGame::GetSingleton()->StartGameFromFile(args[1].c_str(), false);
+}
+
+void Cmd_StartMulti_f(vector<string>& args) {
+	RaptureGame::GetSingleton()->StartGameFromFile(args[1].c_str(), true);
 }
 
 void Cmd_Disconnect_f(vector<string>& args) {
@@ -202,9 +198,10 @@ void Sys_InitCommands() {
 
 	Cmd::AddCommand("vid_restart", Cmd_VidRestart_f);
 
-	Cmd::AddCommand("connect", Cmd_Connect_f);
-	Cmd::AddCommand("disconnect", Cmd_Disconnect_f);
 	Cmd::AddCommand("join", Cmd_Join_f);
+	Cmd::AddCommand("startsingle", Cmd_StartSingle_f);
+	Cmd::AddCommand("startmulti", Cmd_StartMulti_f);
+	Cmd::AddCommand("disconnect", Cmd_Disconnect_f);
 
 	Cmd::AddCommand("screenshot", Cmd_Screenshot_f);
 	Cmd::AddCommand("screenshotBMP", Cmd_Screenshot_f);
@@ -212,7 +209,6 @@ void Sys_InitCommands() {
 	Cmd::AddCommand("screenshotJPEG", Cmd_ScreenshotJPEG_f);
 	Cmd::AddCommand("screenshotPCX", Cmd_ScreenshotPCX_f);
 
-	Cmd::AddCommand("newgametest", Cmd_NewGameTest_f);
 	Cmd::AddCommand("editor", Cmd_Editor_f);
 	Cmd::AddCommand("mainmenu", Cmd_MainMenu_f);
 }

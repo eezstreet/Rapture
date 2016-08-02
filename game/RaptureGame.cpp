@@ -339,7 +339,7 @@ bool RaptureGame::AllowedToStartNewModules() {
 	return true;
 }
 
-void RaptureGame::StartGameFromFile(const char* szSaveGameName) {
+void RaptureGame::StartGameFromFile(const char* szSaveGameName, bool bMultiplayer) {
 	if (!AllowedToStartNewModules()) {
 		return;
 	}
@@ -353,7 +353,9 @@ void RaptureGame::StartGameFromFile(const char* szSaveGameName) {
 	if (game == nullptr) {
 		return;
 	}
-	Network::StartLocalServer();
+	if (bMultiplayer) {
+		Network::StartLocalServer();
+	}
 	trap->startserverfromsave(szSaveGameName);
 	trap->startclientfromsave(szSaveGameName);
 

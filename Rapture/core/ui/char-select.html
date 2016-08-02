@@ -119,18 +119,19 @@
             var allSavedChars;
             var selectedPath;
             var selectedID;
+            var gameMethod = window.sessionStorage.getItem("gameMethod");
+            var stashedIP = window.localStorage.getItem("ipAddress");
 
             function DeleteSavegame() {
                 Engine.echo("delete savegame: " + selectedPath + "\n");
                 $("#button-delete").button("disable");
                 $("#button-context").button("disable");
                 $("li.ui-selected").remove();
-                //Engine.deleteSaveFile(selectedPath);
+                Engine.deleteSaveFile(selectedPath);
             }
 
             function ParseSaveInfo() {
                 var bMultiplayer = false;
-                var gameMethod = window.sessionStorage.getItem("gameMethod");
                 if (gameMethod != "single") {
                     bMultiplayer = true;
                 }
@@ -164,7 +165,6 @@
 
             function CreateButtons() {
                 var contextLabel = "OK";
-                var gameMethod = window.sessionStorage.getItem("gameMethod");
 
                 $("#button-back").button({
                     icons: { primary: "ui-icon-carat-1-w" },
@@ -208,7 +208,15 @@
                 $("#delete-message").dialog("open");
             });
             $("#button-context").click(function () {
-                // TODO
+                if (gameMethod == "single") {
+                    Engine.execCommand("startsingle " + selectedPath);
+                } else if (gameMethod == "multihost") {
+                    Engine.execCommand("startmulti " + selectedPath);
+                } else if (gameMethod == "multijoin") {
+                    Engine.execCommand("join " + stashedIP + " " + selectedPath);
+                } else {
+                    alert("something went wrong");
+                }
             });
 
             $("#delete-message").dialog({
