@@ -171,7 +171,7 @@
     <None Include="..\..\Rapture\core\ui\null.html" />
     <None Include="..\..\Rapture\core\ui\scripts\jQuery-2.1.1.min.js" />
     <None Include="..\..\Rapture\core\ui\scripts\jquery-ui.min.js" />
-    <None Include="..\..\Rapture\core\ui\scripts\video-menu.js" />
+    <None Include="..\..\Rapture\core\ui\scripts\jquery.simple-color.js" />
     <None Include="..\..\Rapture\core\ui\video-menu.html" />
     <None Include="..\..\Rapture\manifest\fonts.json" />
     <None Include="..\..\Rapture\manifest\jquery.json" />

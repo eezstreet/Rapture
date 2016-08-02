@@ -1,10 +1,395 @@
 <html>
     <head>
+        <meta name="generator" content="Microsoft Visual Studio">
+        <title>Create a Character</title>
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.min.css">
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.structure.min.css" />
+        <link rel="stylesheet" href="asset://Rapture/jquery/jquery-ui.theme.min.css" />
+        <script type="text/javascript">
+	        var Engine;
+        </script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jQuery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="asset://Rapture/jquery/jquery.simple-color.js"></script>
 
-    <meta name="generator" content="Microsoft Visual Studio">
-    <title>Create a Character</title>
+        <style type="text/css">
+            html {
+                overflow:hidden;
+            }
 
+            body {
+                overflow:hidden;
+                background-color:#DDDDDD;
+                margin: 5%;
+            }
+
+            table {
+                margin: auto;
+            }
+
+            #menucontainer {
+                text-align:center;
+            }
+
+            #leftpane {
+                float: left;
+                height: 50%;
+                padding: 10px;
+                text-align:center;
+                width: 30%;
+            }
+
+            #rightpane {
+                float: right;
+                height: 50%;
+                text-align:center;
+                width: 30%;
+            }
+
+            .charblock {
+                padding: 10px;
+                margin: 8px;
+            }
+
+            #centeroptions {
+                width: 30%;
+                position: absolute;
+                bottom: 10%;
+                left: 0px;
+                right: 0px;
+                margin:auto;
+            }
+
+            #button-back {
+                float: left;
+            }
+
+            #button-done {
+                float: right;
+            }
+
+            .ui-controlgroup.ui-controlgroup-vertical > button.ui-button,
+            .ui-controlgroup.ui-controlgroup-vertical > .ui-controlgroup-label,
+            centered {
+                text-align: center;
+                margin: auto;
+            }
+
+            .skillhelp {
+                text-align: left;
+                font-size: 12px;
+            }
+
+            .centertext {
+                text-align: center;
+                font-size: 12px;
+            }
+
+            .simpleColorChooser {
+                z-index: 100;
+                left: 0px;
+            }
+
+            .simpleColorContainer {
+                display: inline-block;
+            }
+
+            #bandana-chooser {
+                width: auto;
+                display: inline-block;
+            }
+
+            #bandana-text {
+                font-size: 11px;
+                display: inline-block;
+                width: auto;
+                position: relative;
+                bottom: 15px;
+            }
+
+            .bandana-div {
+                position: relative;
+                display: inline-block;
+            }
+
+            #league-button, #class0-skill-button, #class1-skill-button, #class2-skill-button, .gameplayText, .ui-menu-item {
+                font-size: 11px;
+            }
+        </style>
     </head>
     <body>
+        <div id="invalidname-modal" title="Error" class="charcreate-modal">
+            <p>Your character name contains invalid characters. Only alphanumeric characters, spaces, and underscores are allowed.</p>
+        </div>
+        <div id="invalidclass-modal" title="Error" class="charcreate-modal">
+            <p>You need to pick a character class first.</p>
+        </div>
+        <div id="menucontainer" class="ui-widget">
+            <div id="title" class="centered">
+                <h1>Character Creation</h1>
+            </div>
+            <div id="leftpane">
+                <!-- Character Class -->
+                <div id="panel-charclass" class="charblock ui-widget ui-state-default ui-widget-content">
+                    <fieldset>
+                        <legend>Character Class</legend>
+                        <div id="charclass-buttonset">
+                            <div>
+                                <input type="radio" name="charclass" id="charclass-0">
+                                <label for="charclass-0">Mobster</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="charclass" id="charclass-1">
+                                <label for="charclass-1">Samurai</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="charclass" id="charclass-2" class="charclass-radio">
+                                <label for="charclass-2">Witch</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- Starting Skill -->
+                <div id="panel-startingskill" class="charblock ui-widget ui-state-default ui-widget-content">
+                    <fieldset>
+                        <legend>Starting Skill</legend>
+                        <div id="skills-default" class="class-specific">
+                            <p class="skillhelp">
+                                Your class has access to specific <i>talents</i> and one skill is unlocked at the start of the game. By completing the game in New Game+, you unlock new starting skills.
+                            </p>
+                        </div>
+                        <div id="skills-mobster" class="class-specific mobster-specific">
+                            <select id="class0-skill" class="gameplayText skillchooser">
+                                <option value="skill-0">Skill 1</option>
+                                <option value="skill-1">Skill 2</option>
+                                <option value="skill-2">Skill 3</option>
+                                <option value="skill-3">Skill 4</option>
+                            </select>
+                            <label for="class0-skill" class="gameplayText">Starting Skill</label>
+                            <p class="skillhelp">
+                                The mobster has access to the Lockpicking, Persuasion, Bartering, Craftsmanship, Pistols, Handheld Weapons, Power Weapons, 2H Guns, Nimbleness and Soak talents.
+                            </p>
+                        </div>
+                        <div id="skills-samurai" class="class-specific samurai-specific">
+                            <select id="class1-skill" class="gameplayText skillchooser">
+                                <option value="skill-0">Skill 1</option>
+                                <option value="skill-1">Skill 2</option>
+                                <option value="skill-2">Skill 3</option>
+                                <option value="skill-3">Skill 4</option>
+                            </select>
+                            <label for="class0-skill" class="gameplayText">Starting Skill</label>
+                            <p class="skillhelp">
+                                The samurai has access to the Blacksmithing, Breaching, Lockpicking, Alchemy, Survival, Calligraphy, Swords, Handheld Weapons, Power Weapons and Soak talents.
+                            </p>
+                        </div>
+                        <div id="skills-witch" class="class-specific witch-specific">
+                            <select id="class2-skill" class="gameplayText skillchooser">
+                                <option value="skill-0">Skill 1</option>
+                                <option value="skill-1">Skill 2</option>
+                                <option value="skill-2">Skill 3</option>
+                                <option value="skill-3">Skill 4</option>
+                            </select>
+                            <label for="class0-skill" class="gameplayText">Starting Skill</label>
+                            <p class="skillhelp">
+                                The witch has access to the Lockpicking, Persuasion, Computer, Alchemy, Survial, Calligraphy, Craftsmanship, Swords, Bows and Nimbleness talents.
+                            </p>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div id="rightpane">
+                <!-- Bandana Color-->
+                <div id="panel-bandana" class="charblock ui-widget ui-state-default ui-widget-content">
+                    <fieldset>
+                        <legend>Bandana Color</legend>
+                        <input id="bandana-chooser" value="#FFFFFF" class="ui-corner-all" />
+                        <input id="bandana-text" value="#FFFFFF" type="text" class="ui-corner-all" maxlength="7" size="7" />
+                    </fieldset>
+                </div>
+
+                <!-- Gameplay Options -->
+                <div id="panel-gameplay" class="charblock ui-widget ui-state-default ui-widget-content">
+                    <fieldset>
+                        <legend>Gameplay Options</legend>
+                        <!-- League -->
+                        <select id="league" class="gameplayText">
+                            <option value="league-normal">Normal</option>
+                            <option value="league-hardcore">Permadeath</option>
+                        </select>
+                        <label for="league" class="gameplayText">League</label>
+                    </fieldset>
+                </div>
+            </div>
+            <div id="centeroptions">
+                <table>
+                    <!-- Class specific text -->
+                    <!-- Mobster -->
+                    <tr class="mobster-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            <b>Mobster</b>
+                        </td>
+                    </tr>
+                    <tr class="mobster-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            As a member of the mob, he's packing heat in a biblical apocalypse.
+                        </td>
+                    </tr>
+                    <!-- Samurai -->
+                    <tr class="samurai-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            <b>Samurai</b>
+                        </td>
+                    </tr>
+                    <tr class="samurai-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            A feudal warrior, he finds new mechanisms for war in modern times.
+                        </td>
+                    </tr>
+                    <!-- Witch -->
+                    <tr class="witch-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            <b>Witch</b>
+                        </td>
+                    </tr>
+                    <tr class="witch-specific class-specific">
+                        <td colspan="2" class="centertext">
+                            She curses her foes and dispells magick while posessing some of her own.
+                        </td>
+                    </tr>
+                    <!-- Name / Back / Done buttons -->
+                    <tr>
+                        <td colspan="2">
+                            <input id="name-text" type="text" class="ui-corner-all" maxlength="32" size="32" placeholder="Name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><button class="ui-button mainbutton" id="button-back">Back</button></td>
+                        <td><button class="ui-button mainbutton" id="button-done">Done</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Code -->
+        <script type="text/javascript">
+            var currentClass = -1;
+            var currentBandanaColor;
+            var currentName;
+            var currentSkill = "skill-0";
+            var currentLeague = "league-normal";
+            var nameInvalidExp = new RegExp("[^A-Za-z0-9_ ]");
+
+            $(function () {
+                $("#name-text").on("keyup", function () {
+                    currentName = $(this).val();
+                    if (currentName.length > 3) {
+                        $("#button-done").button("enable");
+                    } else {
+                        $("#button-done").button("disable");
+                    }
+                });
+
+                $("#bandana-text").on("change", function () {
+                    currentBandanaColor = $(this).val();
+                    $("#bandana-chooser").setColor(currentBandanaColor);
+                });
+
+                $("select").selectmenu();
+                $("#league").selectmenu({
+                    change: function () {
+                        currentLeague = $(this).val();
+                        console.log("league changed to " + currentLeague);
+                    }
+                });
+
+                $(".skillchooser").selectmenu({
+                    change: function () {
+                        currentSkill = $(this).val();
+                        console.log("skill changed to " + currentSkill);
+                    }
+                });
+
+                $(".mobster-specific").hide();
+                $(".samurai-specific").hide();
+                $(".witch-specific").hide();
+            });
+
+            $("#button-back").button({
+                icons: { primary: "ui-icon-trash" },
+                label: "Back",
+            });
+
+            $("#button-back").click(function () {
+                window.location.href = "asset://Rapture/menus/char-select";
+            });
+
+            $("#button-done").button({
+                icons: { secondary: "ui-icon-star" },
+                label: "Done",
+                disabled: true
+            });
+
+            $("#button-done").click(function () {
+                if (nameInvalidExp.test(currentName)) {
+                    // Invalid name
+                    $("#invalidname-modal").dialog("open");
+                    return;
+                }
+                if (currentClass == -1) {
+                    // No class selected
+                    $("#invalidclass-modal").dialog("open");
+                    return;
+                }
+            });
+
+            $(".charcreate-modal").dialog({
+                autoOpen: false,
+                resizable: false,
+                modal: true,
+                buttons: {
+                    OK: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            $("#charclass-buttonset").buttonset();
+            $('#bandana-chooser').simpleColor({
+                livePreview: true,
+                boxWidth: 45,
+                boxHeight: 45,
+                insert: "before",
+                onSelect: function (hex) {
+                    $("#bandana-text").val("#" + hex);
+                },
+                onCellEnter: function (hex, element) {
+                    $("#bandana-text").val("#" + hex);
+                }
+            });
+
+            $("#charclass-0").on("click", function (e) {
+                currentClass = 0;
+                $(".class-specific").hide();
+                $(".mobster-specific").show();
+                $("select").refresh();
+            });
+
+            $("#charclass-1").on("click", function (e) {
+                currentClass = 1;
+                $(".class-specific").hide();
+                $(".samurai-specific").show();
+                $("select").refresh();
+            });
+
+            $("#charclass-2").on("click", function (e) {
+                currentClass = 2;
+                $(".class-specific").hide();
+                $(".witch-specific").show();
+                $("select").refresh();
+            });
+
+            $("input:text").button().addClass("ui-textfield").off("mouseneter").off("mousedown").off("keydown");
+        </script>
     </body>
 </html>

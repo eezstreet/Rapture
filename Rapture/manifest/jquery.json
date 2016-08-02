@@ -28,6 +28,11 @@
 			"mimeType": "application/javascript",
 			"file": "../core/ui/scripts/jquery-ui.min.js"
 		},
+		"jquery.simple-color.js": {
+			"componentType": "Asset_Data",
+			"mimeType": "application/javascript",
+			"file": "../core/ui/scripts/jquery.simple-color.js"
+		},
 		"ui-bg_flat_75_000000_40x100": {
 			"componentType": "Asset_Data",
 			"mimeType": "image/png",
