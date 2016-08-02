@@ -363,6 +363,14 @@ namespace Filesystem {
 		bool bTermSlash = false;
 		bool bValidPath = false;
 
+		// Have you tried just reading the path itself????????????
+		FILE* fp = fopen(file.c_str(), mode.c_str());
+		if (fp != nullptr) {
+			fclose(fp);
+			filePath = file;
+			return filePath;
+		}
+
 		if (mode.find('w') != mode.npos) {
 			// We're writing, ALWAYS use homepath.
 			desiredSearchPath = fs_homepath->String();
@@ -529,7 +537,7 @@ namespace Filesystem {
 				continue;
 			}
 			while (auto ent = readdir(dir)) {
-				string filePath = ent->d_name;
+				string filePath = searchpath + folder + '/' + ent->d_name;
 				if (filePath.length() <= ext.length()) {
 					continue;	// not valid
 				}

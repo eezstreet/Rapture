@@ -124,6 +124,9 @@
         <div id="invalidclass-modal" title="Error" class="charcreate-modal">
             <p>You need to pick a character class first.</p>
         </div>
+        <div id="invalidcolor-modal" title="Error" class="charcreate-modal">
+            <p>Your bandana color is invalid.</p>
+        </div>
         <div id="menucontainer" class="ui-widget">
             <div id="title" class="centered">
                 <h1>Character Creation</h1>
@@ -274,11 +277,27 @@
         <!-- Code -->
         <script type="text/javascript">
             var currentClass = -1;
-            var currentBandanaColor;
-            var currentName;
+            var currentBandanaColor = "#FFFFFF";
+            var currentName = "";
             var currentSkill = "skill-0";
             var currentLeague = "league-normal";
             var nameInvalidExp = new RegExp("[^A-Za-z0-9_ ]");
+
+            function hexCodeToInteger(str) {
+                return parseInt(str.substring(1) + "FF", 16);
+            }
+
+            function leagueToInteger(str) {
+                if (str == "league-normal") {
+                    return 0;
+                } else if (str == "league-hardcore") {
+                    return 1;
+                }
+            }
+
+            function skillToInteger(str) {
+                return parseInt(str.substring(6, 7));
+            }
 
             $(function () {
                 $("#name-text").on("keyup", function () {
@@ -331,6 +350,10 @@
             });
 
             $("#button-done").click(function () {
+                var engineSend;
+                var bandanaColor = hexCodeToInteger(currentBandanaColor);
+                var league = leagueToInteger(currentLeague);
+                var skill = skillToInteger(currentSkill);
                 if (nameInvalidExp.test(currentName)) {
                     // Invalid name
                     $("#invalidname-modal").dialog("open");
@@ -341,6 +364,21 @@
                     $("#invalidclass-modal").dialog("open");
                     return;
                 }
+                if (isNaN(bandanaColor)) {
+                    // Bad bandana color
+                    $("#invalidcolor-modal").dialog("open");
+                    return;
+                }
+
+                engineSend = {};
+                engineSend.class = currentClass;
+                engineSend.bandana = bandanaColor;
+                engineSend.name = currentName;
+                engineSend.multiplayer = window.sessionStorage.getItem("gameMethod") != "single";
+                engineSend.skill = skill;
+                engineSend.league = league;
+                Engine.createSaveFile(JSON.stringify(engineSend));
+                window.location.href = "asset://Rapture/menus/char-select";
             });
 
             $(".charcreate-modal").dialog({

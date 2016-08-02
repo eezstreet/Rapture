@@ -156,6 +156,16 @@ void EXPORT_deleteSaveFile(const JSArray& args) {
 	SaveGame::DeleteSavegame(szFile.c_str());
 }
 
+void EXPORT_createSaveFile(const JSArray& args) {
+	// First argument: entire string in JSON
+	if (args.size() != 1) {
+		R_Message(PRIORITY_WARNING, "JS warning: createSaveFile called with incorrect number of arguments");
+		return;
+	}
+	string szJSON = ToString(args[0].ToString());
+	SaveGame::CreateSavegame(szJSON.c_str());
+}
+
 /* End function definitions */
 template<class T>
 struct funcTable_t {
@@ -167,6 +177,7 @@ typedef funcTable_t<Menu::menuNonReturning> nonReturningTable_t;
 typedef funcTable_t<Menu::menuReturning> returningTable_t;
 
 nonReturningTable_t tbl_nonreturn [] = {
+	{ "createSaveFile", EXPORT_createSaveFile },
 	{ "deleteSaveFile", EXPORT_deleteSaveFile },
 	{ "echo", EXPORT_echo },
 	{ "execCommand", EXPORT_execCommand },

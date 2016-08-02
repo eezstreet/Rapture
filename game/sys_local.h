@@ -700,6 +700,7 @@ void Sys_InitCommands();
 namespace SaveGame {
 	const char* RequestSavegameInfo(bool bMultiplayer);
 	void DeleteSavegame(const char* szSaveFilePath);
+	void CreateSavegame(const char* charCreateJSON);
 }
 
 //

@@ -143,7 +143,7 @@ struct Rapture_TimeDate {
 struct Rapture_CharacterMeta {	// Metadata that gets passed from character creation screen -> game
 	char		charName[RAPTURE_CHARLENMAX];	// Character name
 	uint8_t		charClass;						// Character class
-	uint8_t		bandanaRGB;						// Bandana color
+	uint32_t	bandanaRGB;						// Bandana color
 	uint8_t		charLeague;						// Character League
 	uint8_t		difficulty;						// Difficulty level
 	uint8_t		startingSkill;					// Starting skill
@@ -156,6 +156,7 @@ struct Rapture_CharacterTime {	// Time information
 	Rapture_TimeDate	playTime;		// How long this character has been played for
 };
 
+// The actual savegame itself
 struct Rapture_Savegame {
 	struct Rapture_SaveHeader {
 		char header[4]; // 'R' 'S' 'A' 'V'
