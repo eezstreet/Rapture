@@ -8,48 +8,41 @@
 
 Savegame Savegame::Retrieve(const char* path) {
 	Savegame out;
+	memset(&out, 0, sizeof(Savegame));
 
-	if(path != nullptr) {
-		char pathBuf[MAX_SAVE_PATH]{0};
-		sprintf(pathBuf, "%s/%s", SAVE_DIRECTORY, path);
-		File* inFile = trap->OpenFileSync(pathBuf, SAVE_READ_MODE);
-		if (inFile != nullptr) {
-			// Read each field individually
-			trap->ReadFileSync(inFile, &out.head, sizeof(out.head));
-			trap->CloseFileAsync(inFile, nullptr);
-
-			// We should also modify the last use time
-			out.head.lastUseTime = trap->GetCurrentTimeDate();
-			return out;
+	if (path != nullptr) {
+		File* infile = trap->OpenFileSync(path, SAVE_READ_MODE);
+		if (infile == nullptr) {
+			trap->printf(PRIORITY_WARNING, "Couldn't open %s for reading\n", path);
 		}
-	}
+		
+		// <---------- SAVEGAME READING ROUTINE ------------>
+		trap->ReadFileSync(infile, &out.head, sizeof(out.head));
 
-	Rapture_TimeDate curTime = trap->GetCurrentTimeDate();
-	Rapture_TimeDate playTime{ 0 };
-	Savegame_Header head{ SAVEGAME_HEAD, SAVEGAME_VER, curTime, curTime, playTime };
-	out.head = head;
+		trap->CloseFileSync(infile);
+	}
 
 	return out;
 }
 
-#define TEMP_SAVE_PATH "temp.rsav"
 void Savegame::Save(Savegame& out, const char* path) {
-	char pathBuf[MAX_SAVE_PATH]{0};
-
-	sprintf(pathBuf, "%s/%s", SAVE_DIRECTORY, path);
-	File* outFile = trap->OpenFileSync(pathBuf, SAVE_WRITE_MODE);
-	if (outFile == nullptr) {
-		trap->printf(PRIORITY_WARNING, "Couldn't open %s for saving\n", pathBuf);
-		return;
-	}
-
-	// Add on to the play time
+	// Add on to play time
 	Rapture_TimeDate currentTime = trap->GetCurrentTimeDate();
 	Rapture_TimeDate diffTime{ 0 };
-	trap->SubtractTimeDate(currentTime, out.head.lastUseTime, &diffTime);
-	trap->AddTimeDate(diffTime, out.head.playTime, &out.head.playTime);
+	trap->SubtractTimeDate(currentTime, out.head.time.lastUseTime, &diffTime);
+	trap->AddTimeDate(diffTime, out.head.time.playTime, &out.head.time.playTime);
 
-	// Save the file
-	trap->WriteFileSync(outFile, &out.head, sizeof(out.head));
-	trap->CloseFileAsync(outFile, nullptr);
+	// Actually save the file
+	if (path != nullptr && stricmp(path, "null")) {
+		File* outfile = trap->OpenFileSync(path, SAVE_WRITE_MODE);
+		if (outfile == nullptr) {
+			trap->printf(PRIORITY_WARNING, "Couldn't open %s for saving\n", path);
+			return;
+		}
+
+		// <---------- SAVEGAME WRITING ROUTINE ------------>
+		trap->WriteFileSync(outfile, &out.head, sizeof(out.head));
+
+		trap->CloseFileSync(outfile);
+	}
 }
