@@ -39,7 +39,7 @@ namespace Client {
 		switch (pPacket->packetHead.type) {
 			case PACKET_RECVCHAT:
 				if (pPacket->packetHead.packetSize > 0) {
-					ClientDisplay::ReceivedChatMessage(pPacket->packetHead.clientNum, (const char*)pPacket->packetData);
+					ClientDisplay::ReceivedChatMessage(0, (const char*)pPacket->packetData);
 				}
 				return true;
 		}

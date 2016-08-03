@@ -101,7 +101,6 @@ struct Packet {
 
 	struct PacketHeader {
 		packetType_e		type;			// Type of this packet
-		int8_t				clientNum;		// The other client number (host is always client 0)
 		PacketDirection_e	direction;		// Direction this packet is going (indicates how clientNum is interpretted)
 		uint64_t			sendTime;		// Time this packet was sent
 		size_t				packetSize;		// Size of this packet (minus the header)
@@ -295,7 +294,7 @@ extern "C" {
 		void(*passmousemove)(int x, int y);
 		void(*passkeypress)(int x);
 
-		bool(*interpretPacketFromClient)(Packet* packet);
+		bool(*interpretPacketFromClient)(Packet* packet, int clientNum);
 		bool(*interpretPacketFromServer)(Packet* packet);
 	};
 }

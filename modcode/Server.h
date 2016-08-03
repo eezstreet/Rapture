@@ -6,5 +6,5 @@ namespace Server {
 	void Shutdown();
 
 	void Frame();
-	bool ClientPacket(Packet* packet);
+	bool ClientPacket(Packet* packet, int clientNum);
 }

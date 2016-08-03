@@ -49,8 +49,8 @@ bool Game_ServerPacket(Packet* pPacket) {
 	return Client::ServerPacket(pPacket);
 }
 
-bool Game_ClientPacket(Packet* pPacket) {
-	return Server::ClientPacket(pPacket);
+bool Game_ClientPacket(Packet* pPacket, int clientNum) {
+	return Server::ClientPacket(pPacket, clientNum);
 }
 
 bool Game_ClientAttempt(ClientPacket::ClientAttemptPacket* pPacket) {

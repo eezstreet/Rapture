@@ -28,9 +28,8 @@ namespace Server {
 	}
 
 	/* Serverside Packet Receieve */
-	void OnChatPacketReceived(Packet* pPacket) {
+	void OnChatPacketReceived(Packet* pPacket, int clientNum) {
 		char message[CHAT_MAXLEN];
-		int clientNum = pPacket->packetHead.clientNum;
 		if (pPacket->packetHead.packetSize > CHAT_MAXLEN) {
 			trap->printf(PRIORITY_WARNING, "Chat message from client %i exceeded CHAT_MAXLEN\n", clientNum);
 			return;
@@ -41,11 +40,11 @@ namespace Server {
 		trap->SendServerPacket(PACKET_RECVCHAT, -1, message, CHAT_MAXLEN);
 	}
 
-	bool ClientPacket(Packet* pPacket) {
+	bool ClientPacket(Packet* pPacket, int clientNum) {
 		switch (pPacket->packetHead.type) {
 			case PACKET_SENDCHAT:
 				// Send chat to all other clients
-				OnChatPacketReceived(pPacket);
+				OnChatPacketReceived(pPacket, clientNum);
 				return true;
 		}
 		return false;

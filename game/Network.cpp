@@ -21,6 +21,8 @@ namespace Network {
 		Netstate_NeedAuth,		// Connected to a server, need authorization packet
 		Netstate_Authorized,	// Connected to a server and authorized
 	};
+	
+	typedef pair<Packet, int> packetMsg;
 
 	static Cvar*				net_port = nullptr;
 	static Cvar*				net_serverbacklog = nullptr;
@@ -32,7 +34,7 @@ namespace Network {
 	static Socket*				localSocket = nullptr;
 	static map<int, Socket*>	mOtherConnectedClients;
 	static Socket*				remoteSocket = nullptr;
-	static vector<Packet>		vPacketsAwaitingSend;	// Goes in both directions
+	static vector<packetMsg>	vPacketsAwaitingSend;	// Goes in both directions
 	static Netstate_e			currentNetState = Netstate_NoConnect;
 	static vector<Socket*>		vTemporaryConnections;
 
@@ -89,7 +91,7 @@ namespace Network {
 				{
 					// We have been accepted into the server
 					R_Message(PRIORITY_MESSAGE, "Authorization successful");
-					myClientNum = packet.packetHead.clientNum;
+					myClientNum = 1; // FIXME
 					currentNetState = Netstate_Authorized;
 				}
 				break;
@@ -128,7 +130,7 @@ namespace Network {
 	// Send a server packet to a single client
 	void SendServerPacketTo(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize) {
 		uint64_t ticks = SDL_GetTicks();
-		Packet packet = { { packetType, clientNum, Packet::PD_ServerClient, 0, packetDataSize }, packetData };
+		Packet packet = { { packetType, Packet::PD_ServerClient, 0, packetDataSize }, packetData };
 		if (clientNum == myClientNum) {
 			DispatchSingleServerPacket(packet);
 		}
@@ -146,21 +148,21 @@ namespace Network {
 	}
 
 	// Dispatches a single packet that's been sent to us from the client
-	void DispatchSingleClientPacket(Packet& packet) {
+	void DispatchSingleClientPacket(Packet& packet, int clientNum) {
 		switch (packet.packetHead.type) {
 			case PACKET_PING:
-				R_Message(PRIORITY_MESSAGE, "Server PING from %i\n", packet.packetHead.clientNum);
-				SendServerPacketTo(PACKET_PONG, packet.packetHead.clientNum, nullptr, 0);
+				R_Message(PRIORITY_MESSAGE, "Server PING from %i\n", clientNum);
+				SendServerPacketTo(PACKET_PONG, clientNum, nullptr, 0);
 				break;
 			case PACKET_PONG:
 				R_Message(PRIORITY_MESSAGE, "Server PONG\n");
 				break;
 			case PACKET_DROP:
-				R_Message(PRIORITY_MESSAGE, "Client %i left.\n", packet.packetHead.clientNum);
-				DropClient(packet.packetHead.clientNum);
+				R_Message(PRIORITY_MESSAGE, "Client %i left.\n", clientNum);
+				DropClient(clientNum);
 				break;
 			default:
-				if (!callbacks[NIC_INTERPRETCLIENT] || !callbacks[NIC_INTERPRETCLIENT](&packet)) {
+				if (!callbacks[NIC_INTERPRETCLIENT] || !callbacks[NIC_INTERPRETCLIENT](&packet, clientNum)) {
 					R_Message(PRIORITY_WARNING, "Unknown packet type %i\n", packet.packetHead.type);
 				}
 				break;
@@ -173,8 +175,8 @@ namespace Network {
 		// When they are validated as clients (or time out) the sockets are destroyed.
 		// Here we are polling the local socket to see if there are any temporary connections awaiting acceptance
 		uint64_t ticks = SDL_GetTicks();
-		Packet genericPongPacket { { PACKET_PONG, 0, Packet::PD_ServerClient, ticks, 0 }, nullptr };
-		Packet outPacket { { PACKET_PING, 0 }, 0 };
+		Packet genericPongPacket { { PACKET_PONG, Packet::PD_ServerClient, ticks, 0 }, nullptr };
+		Packet outPacket { { PACKET_PING, Packet::PD_ServerClient, 0 }, 0 };
 
 		// Check for a new incoming temporary connection
 		if (localSocket->Select()) {
@@ -208,22 +210,20 @@ namespace Network {
 								//
 								// <<<CLIENT CONNECTED>>
 								//
-								outPacket.packetHead.clientNum = lastFreeClientNum++;
 								outPacket.packetHead.direction = Packet::PD_ServerClient;
 								outPacket.packetHead.sendTime = 0; // FIXME
 								outPacket.packetHead.type = PACKET_CLIENTACCEPT;
 								outPacket.packetHead.packetSize = 0; // FIXME
 
-								mOtherConnectedClients[outPacket.packetHead.clientNum] = pSocket;
-								numConnectedClients++;
-								R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", outPacket.packetHead.clientNum);
+								mOtherConnectedClients[numConnectedClients] = pSocket;
+								
+								R_Message(PRIORITY_MESSAGE, "ClientAccept: %i\n", numConnectedClients++);
 								bNewClient = true;
 							}
 							else {
 								//
 								// <<<CLIENT BLOCKED>>>
 								//
-								outPacket.packetHead.clientNum = -1;
 								outPacket.packetHead.direction = Packet::PD_ServerClient;
 								outPacket.packetHead.sendTime = 0; // FIXME
 								outPacket.packetHead.type = PACKET_CLIENTDENIED;
@@ -303,10 +303,10 @@ namespace Network {
 
 	// Send packet from client -> server
 	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetDataSize) {
-		Packet packet = { { packetType, myClientNum, Packet::PD_ClientServer, 0, packetDataSize }, packetData };
+		Packet packet = { { packetType, Packet::PD_ClientServer, 0, packetDataSize }, packetData };
 		if (remoteSocket == nullptr) {
 			// Not connected to a remote server, send it to ourselves instead
-			DispatchSingleClientPacket(packet);
+			DispatchSingleClientPacket(packet, 0);
 		}
 		else {
 			remoteSocket->SendPacket(packet);
@@ -376,13 +376,7 @@ namespace Network {
 					break;
 				}
 				else {
-					int packetClNum = packet.packetHead.clientNum;
-					if (packetClNum != clientNum) {
-						R_Message(PRIORITY_WARNING, "Client %i tried to send packet with invalid clientNum %i -- packet dropped\n", clientNum, packetClNum);
-					}
-					else {
-						DispatchSingleClientPacket(packet);
-					}
+					DispatchSingleClientPacket(packet, clientNum);
 				}
 			}
 
@@ -416,15 +410,15 @@ namespace Network {
 		}
 
 		// Write out any packets that need sending
-		for (auto& packet : vPacketsAwaitingSend) {
-			int8_t clientNum = packet.packetHead.clientNum;
+		for (auto& message : vPacketsAwaitingSend) {
+			Packet packet = message.first;
+			int clientNum = message.second;
 			if (clientNum != -1) {
 				auto found = mOtherConnectedClients.find(clientNum);
 				if (found == mOtherConnectedClients.end()) {
 					R_Message(PRIORITY_WARNING,
 						"Tried to send packet %i with bad client %i\n",
-						packet.packetHead.type,
-						packet.packetHead.clientNum);
+						packet.packetHead.type, clientNum);
 					continue;
 				}
 				found->second->SendPacket(packet);
@@ -464,8 +458,8 @@ namespace Network {
 			}
 
 			// Write packets to the server
-			for (auto& packet : vPacketsAwaitingSend) {
-				remoteSocket->SendPacket(packet);
+			for (auto& message : vPacketsAwaitingSend) {
+				remoteSocket->SendPacket(message.first);
 			}
 
 			// Clear list of packets that need sent

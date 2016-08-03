@@ -615,7 +615,7 @@ namespace Network {
 		NIC_MAX
 	};
 
-	typedef bool(*networkCallbackFunction)(void*);
+	typedef bool(*networkCallbackFunction)(...);
 
 	void Init();
 	void Shutdown();

@@ -167,17 +167,13 @@ bool Socket::SendEntireData(void* data, size_t dataSize) {
 bool Socket::SendPacket(Packet& outgoing) {
 	bool sent = SendEntireData(&outgoing.packetHead, sizeof(outgoing.packetHead));
 	if (!sent) {
-		R_Message(PRIORITY_WARNING,
-			"Failed to send packet header (packet type: %i; clientNum: %i)\n",
-			outgoing.packetHead.type, outgoing.packetHead.clientNum);
+		R_Message(PRIORITY_WARNING, "Failed to send packet header (packet type: %i)\n", outgoing.packetHead.type);
 		return false;
 	}
 	if (outgoing.packetHead.packetSize > 0) {
 		sent = SendEntireData(outgoing.packetData, outgoing.packetHead.packetSize);
 		if (!sent) {
-			R_Message(PRIORITY_WARNING,
-				"Failed to send packet data (packet type: %i; clientNum: %i\n",
-				outgoing.packetHead.type, outgoing.packetHead.clientNum);
+			R_Message(PRIORITY_WARNING, "Failed to send packet data (packet type: %i)\n", outgoing.packetHead.type);
 			return false;
 		}
 	}
