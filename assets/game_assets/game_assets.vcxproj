@@ -72,11 +72,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copyfiles.bat Debug</Command>
+      <Command>copyfiles.bat Release</Command>
       <Message>Copying assets...</Message>
     </PostBuildEvent>
     <PreLinkEvent>
-      <Command>compileassets.bat Debug</Command>
+      <Command>compileassets.bat Release</Command>
     </PreLinkEvent>
     <PreLinkEvent>
       <Message>Compiling assets...</Message>
