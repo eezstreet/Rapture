@@ -51,11 +51,11 @@
     </Link>
     <PostBuildEvent>
       <Command>copyfiles.bat Debug</Command>
-      <Message>Copying assets to gamedata...</Message>
+      <Message>Copying assets...</Message>
     </PostBuildEvent>
     <PreLinkEvent>
       <Command>compileassets.bat Debug</Command>
-      <Message>Compiling game assets</Message>
+      <Message>Compiling assets...</Message>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -71,6 +71,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>copyfiles.bat Debug</Command>
+      <Message>Copying assets...</Message>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>compileassets.bat Debug</Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Message>Compiling assets...</Message>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\Rapture\core\levels\LevelMaze.json" />

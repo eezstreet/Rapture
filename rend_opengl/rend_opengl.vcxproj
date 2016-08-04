@@ -41,9 +41,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(RAPTURE_INSTALL)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../libraries/SDL/include;../libraries/SDL_image/include;../libraries/awesomium/include;../libraries/json/include;../libraries/msgpack/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);../libraries/SDL/lib/x86;../libraries/SDL_image/lib/x86;../libraries/awesomium/lib;../libraries/msgpack/lib/x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(RAPTURE_INSTALL)\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../libraries/SDL/include;../libraries/SDL_image/include;../libraries/awesomium/include;../libraries/json/include;../libraries/msgpack/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);../libraries/SDL/lib/x86;../libraries/SDL_image/lib/x86;../libraries/awesomium/lib;../libraries/msgpack/lib/x86</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -63,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../SDL_image/include;../common;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../common;SDL/include;SDL_image/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -1,5 +1,5 @@
 #include "sys_local.h"
-#include "../json/cJSON.h"
+#include "json/cJSON.h"
 
 #define MAX_SAVEGAME_DEPTH	8
 #define SAVEGAME_INITIAL	128

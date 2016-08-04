@@ -43,24 +43,26 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>$(RAPTURE_INSTALL)\..\$(Configuration)\</IntDir>
-    <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../libraries/SDL/include;../libraries/SDL_image/include;../libraries/awesomium/include;../libraries/json/include;../libraries/msgpack/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);../libraries/SDL/lib/x86;../libraries/SDL_image/lib/x86;../libraries/awesomium/lib;../libraries/msgpack/lib/x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(RAPTURE_INSTALL)\</OutDir>
     <IntDir>$(RAPTURE_INSTALL)\..\$(Configuration)\</IntDir>
-    <IncludePath>..\SDL\include;..\awesomium\include;..\freeimage;$(IncludePath)</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../libraries/SDL/include;../libraries/SDL_image/include;../libraries/awesomium/include;../libraries/json/include;../libraries/msgpack/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);../libraries/SDL/lib/x86;../libraries/SDL_image/lib/x86;../libraries/awesomium/lib;../libraries/msgpack/lib/x86</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../SDL_image/include;../common;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../common;../libraries;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;SDL2test.lib;awesomium.lib;opengl32.lib;ws2_32.lib;msgpackd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -85,7 +87,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../SDL_image/include;../common;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../common;../libraries;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;USE_SDL2;WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -94,11 +96,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\SDL\lib\x86\SDL2.lib;..\SDL\lib\x86\SDL2_image.lib;..\SDL\lib\x86\SDL2_mixer.lib;..\SDL\lib\x86\SDL2_ttf.lib;..\SDL\lib\x86\SDL2main.lib;..\SDL\lib\x86\SDL2test.lib;..\awesomium\lib\awesomium.lib;opengl32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;SDL2test.lib;awesomium.lib;opengl32.lib;ws2_32.lib;msgpack.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>copyfiles.bat Release</Command>
+      <Command>
+      </Command>
       <Message>Copying assets to Gamedata...</Message>
     </PostBuildEvent>
     <PreBuildEvent>
@@ -107,10 +110,12 @@
       <Message>Compiling game assets</Message>
     </PreBuildEvent>
     <PreLinkEvent>
-      <Command>compileassets.bat Release</Command>
+      <Command>
+      </Command>
     </PreLinkEvent>
     <PreLinkEvent>
-      <Message>Compiling game assets</Message>
+      <Message>
+      </Message>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -143,7 +148,7 @@
     <ClCompile Include="..\game\UI.cpp" />
     <ClCompile Include="..\game\win32\Win32.cpp" />
     <ClCompile Include="..\game\Zone.cpp" />
-    <ClCompile Include="..\json\cJSON.c" />
+    <ClCompile Include="..\libraries\json\cJSON.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RaptureAsset.h" />

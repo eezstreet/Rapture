@@ -48,9 +48,6 @@
     <ClCompile Include="..\game\Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\json\cJSON.c">
-      <Filter>Libraries\JSON</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\GameModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -116,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="..\game\SaveGame.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\json\cJSON.c">
+      <Filter>Libraries\JSON</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
