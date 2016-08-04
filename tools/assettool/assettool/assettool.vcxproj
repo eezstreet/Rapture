@@ -39,11 +39,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\..\SDL\include;..\..\..\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\..\SDL\include;..\..\..\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -55,8 +55,9 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\..\SDL\lib\x86\SDL2.lib;..\..\..\SDL\lib\x86\SDL2_image.lib;..\..\..\SDL\lib\x86\SDL2_ttf.lib;..\..\..\SDL\lib\x86\SDL2main.lib;..\..\..\SDL\lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\..\..\libraries\SDL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,8 +74,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>..\..\..\SDL\lib\x86\SDL2.lib;..\..\..\SDL\lib\x86\SDL2_image.lib;..\..\..\SDL\lib\x86\SDL2_ttf.lib;..\..\..\SDL\lib\x86\SDL2main.lib;..\..\..\SDL\lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\..\..\libraries\SDL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -90,7 +92,7 @@
     <ClInclude Include="imgui_impl_sdl.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\json\cJSON.c" />
+    <ClCompile Include="..\..\..\libraries\json\cJSON.c" />
     <ClCompile Include="..\imgui\imgui.cpp" />
     <ClCompile Include="..\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\imgui\imgui_draw.cpp" />

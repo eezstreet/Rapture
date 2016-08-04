@@ -104,7 +104,7 @@
     <ClCompile Include="project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\json\cJSON.c">
+    <ClCompile Include="..\..\..\libraries\json\cJSON.c">
       <Filter>Source Files\cJSON</Filter>
     </ClCompile>
   </ItemGroup>
