@@ -11,7 +11,7 @@
 #pragma warning(disable:4996)
 
 // Reads a file for a component
-bool ReadFileForComponent(void** buffer, uint64_t& decompressedSize, const char* filePath) {
+bool ReadFileForComponent(void** buffer, size_t& decompressedSize, const char* filePath) {
 	// Open the file
 	FILE* fp = fopen(filePath, "rb+");
 	if (fp == nullptr) {

@@ -1,7 +1,7 @@
 #include "assettool.h"
 #include <SDL_ttf.h>
 
-void ImportFontFileTTF(uint8_t** fontData, uint64_t* decompressedSize, int ptSize, int index) {
+void ImportFontFileTTF(uint8_t** fontData, size_t* decompressedSize, int ptSize, int index) {
 	if (ptSize <= 0) {
 		DisplayMessageBox("Font import error", "Point size must be above 0.", MESSAGEBOX_ERROR);
 		return;
@@ -54,7 +54,7 @@ void ImportFontFileTTF(uint8_t** fontData, uint64_t* decompressedSize, int ptSiz
 const char* previewText 
 	= "THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG\nthe quick brown fox jumped over the lazy dog\n0123456789\n!@#$%^&()-=_+\\|/\n,.<>[]{}`~";
 SDL_Color previewColor = { 128, 128, 255, 128 };
-void PreviewFont(uint8_t* fontData, uint64_t decompSize, int ptSize, int style, int face) {
+void PreviewFont(uint8_t* fontData, size_t decompSize, int ptSize, int style, int face) {
 	SDL_RWops* rw = SDL_RWFromMem(fontData, decompSize);
 	if (rw == nullptr) {
 		DisplayMessageBox("Font Preview Error", "Couldn't read the memory from asset file", MESSAGEBOX_ERROR);

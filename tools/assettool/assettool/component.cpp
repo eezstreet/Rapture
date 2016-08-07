@@ -81,7 +81,7 @@ static void DrawNumberedCheckbox(int number, uint32_t* field) {
 	ImGui::CheckboxFlags(s.c_str(), (unsigned int*)field, (1 << number));
 }
 
-static void DrawUndefinedComponent(void** component, uint64_t* decompressedSize) {
+static void DrawUndefinedComponent(void** component, size_t* decompressedSize) {
 	if (ImGui::Button("Import Data")) {
 		const char* path = OpenFileDialog("All Files\0*.*", 0);
 		if (path[0] == '\0') {
@@ -133,7 +133,7 @@ static void DrawUndefinedComponent(void** component, uint64_t* decompressedSize)
 	}
 }
 
-static void DrawDataComponent(ComponentData* pDataComponent, uint64_t* decompressedSize) {
+static void DrawDataComponent(ComponentData* pDataComponent, size_t* decompressedSize) {
 	ImGui::TextWrapped("Import a file to auto-guess MIME type");
 	if (ImGui::Button("Import Data")) {
 		const char* path = OpenFileDialog("All Files\0*.*", 0);
@@ -450,7 +450,7 @@ static void DrawTileComponent(ComponentTile* pTileComponent) {
 	}
 }
 
-void DrawFontData(ComponentFont* ptFontComponent, uint64_t* decompSize) {
+void DrawFontData(ComponentFont* ptFontComponent, size_t* decompSize) {
 	ImGui::InputInt("Point Size (ingame)", (int*)&ptFontComponent->head.pointSize);
 	ImGui::CheckboxFlags("Bold", (unsigned int*)&ptFontComponent->head.style, TTF_STYLE_BOLD);
 	ImGui::CheckboxFlags("Italic", (unsigned int*)&ptFontComponent->head.style, TTF_STYLE_ITALIC);

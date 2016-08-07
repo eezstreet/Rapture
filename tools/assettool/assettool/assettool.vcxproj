@@ -39,11 +39,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>..\..\..\libraries\SDL\include;..\..\..\libraries\;..\..\..\libraries\SDL_image\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -55,7 +55,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;lib\x86\msgpack.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\..\..\libraries\SDL;..\..\..\libraries\msgpack;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -74,13 +74,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;lib\x86\msgpack.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\x86\SDL2.lib;lib\x86\SDL2_image.lib;lib\x86\SDL2_ttf.lib;lib\x86\SDL2main.lib;lib\x86\SDL2test.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\..\..\libraries\SDL;..\..\..\libraries\msgpack;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\common\RaptureAsset.h" />
+    <ClInclude Include="..\..\..\common\SerializedRaptureAsset.h" />
     <ClInclude Include="..\..\..\json\cJSON.h" />
     <ClInclude Include="..\imgui\imconfig.h" />
     <ClInclude Include="..\imgui\imgui.h" />

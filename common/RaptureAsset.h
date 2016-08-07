@@ -1,4 +1,5 @@
 // RaptureAsset: An asset created with the Asset Tool, that is loaded by the game
+// This file contains the unserialized definitions.
 #pragma once
 #include <inttypes.h>
 
@@ -17,6 +18,7 @@
 #define MAT_NAMELEN			64
 #define ANIM_NAMELEN		64
 #define COMPPART_NAMELEN	64
+#define MIME_LEN			64
 
 #define COMP_DATA_VERSION		1
 #define COMP_MATERIAL_VERSION	1
@@ -99,9 +101,9 @@ struct RaptureAsset {									// A Rapture Asset contains two things: a header, 
 
 struct AssetComponent {
 	struct AssetCompHead {
-		char				componentName[64];				// The name of this component
+		char				componentName[COMP_NAMELEN];	// The name of this component
 		ComponentType		componentType;					// What kind of component this is
-		uint64_t			decompressedSize;				// The total size (in bytes) of this component when decompressed
+		size_t				decompressedSize;				// The total size (in bytes) of this component when decompressed
 		uint8_t				componentVersion;				// The version number of this component type
 	};
 	AssetCompHead			meta;						// Metadata for this component
@@ -120,7 +122,7 @@ struct AssetComponent {
 /* Everything specific to Data Components */
 struct ComponentData {
 	struct DataHeader {
-		char				mime[64];					// The MIME type of the data
+		char				mime[MIME_LEN];				// The MIME type of the data
 	};
 	DataHeader				head;
 	char*					data;

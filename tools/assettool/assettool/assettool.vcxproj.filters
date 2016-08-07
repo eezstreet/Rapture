@@ -54,6 +54,9 @@
     <ClInclude Include="..\..\..\json\cJSON.h">
       <Filter>Header Files\cJSON</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\common\SerializedRaptureAsset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assettool.cpp">

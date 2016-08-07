@@ -3,6 +3,9 @@
 #include <vector>
 #include <concurrentqueue.h>
 #include <dirent.h>
+#include <SerializedRaptureAsset.h>
+#include <fstream>
+#include <cereal/archives/binary.hpp>
 
 unordered_map<string, AssetComponent*> m_assetComponents;
 
@@ -197,6 +200,8 @@ namespace Filesystem {
 	void Exit() {
 		Zone::FreeAll("files");
 
+		// FIXME: assets will leak memory
+
 		ShutdownThreadPool();
 	}
 
@@ -205,23 +210,27 @@ namespace Filesystem {
 	void LoadRaptureAsset(RaptureAsset** ptAsset, const string& assetName) {
 		RaptureAsset* pAsset = *ptAsset;
 		auto assetPath = m_assetList[assetName];
-		FILE* fp = fopen(assetPath.c_str(), "rb+");
-		if (fp == nullptr) {
+		ifstream infile;
+
+		infile.open(assetPath.c_str(), std::ios::binary);
+		if (infile.bad() || infile.eof()) {
 			R_Message(PRIORITY_ERRFATAL, "Could not load asset %s - try running as administrator\n", assetName.c_str());
 			return;
 		}
-		fread(pAsset, sizeof(AssetHeader), 1, fp);
+
+		cereal::BinaryInputArchive in(infile);
+		in >> pAsset->head;
 
 		if (pAsset->head.version != RASS_VERSION) {
 			R_Message(PRIORITY_WARNING, "Asset file with bad version (found %i, expected %i)\n", pAsset->head.version, RASS_VERSION);
-			fclose(fp);
+			infile.close();
 			return;
 		}
 
 		// TODO: compression
 		if (pAsset->head.compressionType != Compression_None) {
 			R_Message(PRIORITY_WARNING, "Compression not supported (found in asset %s)\n", pAsset->head.assetName);
-			fclose(fp);
+			infile.close();
 			return;
 		}
 
@@ -229,116 +238,12 @@ namespace Filesystem {
 
 		pAsset->components = (AssetComponent*)Zone::Alloc(sizeof(AssetComponent) * pAsset->head.numberComponents, "files");
 		for (int i = 0; i < pAsset->head.numberComponents; i++) {
-			AssetComponent* comp = &pAsset->components[i];
-			fread(&comp->meta, sizeof(comp->meta), 1, fp);
+			in >> pAsset->components[i];
 
-			switch (comp->meta.componentType) {
-				case Asset_Undefined:
-					comp->data.undefinedComponent = Zone::Alloc(comp->meta.decompressedSize, "files");
-					fread(comp->data.undefinedComponent, 1, comp->meta.decompressedSize, fp);
-					break;
-				case Asset_Data:
-					if (comp->meta.componentVersion == COMP_DATA_VERSION) {
-						comp->data.dataComponent = (ComponentData*)Zone::Alloc(sizeof(ComponentData), "files");
-						fread(comp->data.dataComponent, sizeof(ComponentData::DataHeader), 1, fp);
-						ComponentData* data = comp->data.dataComponent;
-						data->data = (char*)Zone::Alloc(comp->meta.decompressedSize, "files");
-						fread(data->data, sizeof(char), comp->meta.decompressedSize, fp);
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Data component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_DATA_VERSION);
-					}
-					break;
-				case Asset_Material:
-					if (comp->meta.componentVersion == COMP_MATERIAL_VERSION) {
-						comp->data.materialComponent = (ComponentMaterial*)Zone::Alloc(sizeof(ComponentMaterial), "files");
-						fread(comp->data.materialComponent, sizeof(ComponentMaterial::MaterialHeader), 1, fp);
-						ComponentMaterial* mat = comp->data.materialComponent;
-						if (mat->head.mapsPresent & (1 << Maptype_Diffuse)) {
-							size_t diffuseSize = sizeof(uint32_t) * mat->head.width * mat->head.height;
-							mat->diffusePixels = (uint32_t*)Zone::Alloc(diffuseSize, "materials");
-							fread(mat->diffusePixels, sizeof(uint32_t), mat->head.width * mat->head.height, fp);
-						}
-						if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
-							size_t depthSize = sizeof(uint16_t) * mat->head.depthWidth * mat->head.depthHeight;
-							mat->depthPixels = (uint16_t*)Zone::Alloc(depthSize, "materials");
-							fread(mat->depthPixels, sizeof(uint16_t), mat->head.depthWidth * mat->head.depthHeight, fp);
-						}
-						if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
-							size_t normalSize = sizeof(uint32_t) * mat->head.normalWidth * mat->head.normalHeight;
-							mat->normalPixels = (uint32_t*)Zone::Alloc(normalSize, "materials");
-							fread(mat->normalPixels, sizeof(uint32_t), mat->head.normalWidth * mat->head.normalHeight, fp);
-						}
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Material component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_MATERIAL_VERSION);
-					}
-					break;
-				case Asset_Image:
-					if (comp->meta.componentVersion == COMP_IMAGE_VERSION) {
-						comp->data.imageComponent = (ComponentImage*)Zone::Alloc(sizeof(ComponentImage), "files");
-						fread(comp->data.imageComponent, sizeof(ComponentImage::ImageHeader), 1, fp);
-						size_t pixelSize = sizeof(uint32_t) * comp->data.imageComponent->head.width * comp->data.imageComponent->head.height;
-						comp->data.imageComponent->pixels = (uint32_t*)Zone::Alloc(pixelSize, "images");
-						fread(comp->data.imageComponent->pixels, pixelSize, 1, fp);
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Image component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_IMAGE_VERSION);
-					}
-					break;
-				case Asset_Font:
-					if (comp->meta.componentVersion == COMP_FONT_VERSION) {
-						comp->data.fontComponent = (ComponentFont*)Zone::Alloc(sizeof(ComponentFont), "files");
-						fread(comp->data.fontComponent, sizeof(ComponentFont::FontHeader), 1, fp);
-						comp->data.fontComponent->fontData = (uint8_t*)Zone::Alloc(comp->meta.decompressedSize, "font");
-						fread(comp->data.fontComponent->fontData, 1, comp->meta.decompressedSize - sizeof(ComponentFont::FontHeader), fp);
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Font component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_FONT_VERSION);
-					}
-					break;
-				case Asset_Level:
-					if (comp->meta.componentVersion == COMP_LEVEL_VERSION) {
-						comp->data.levelComponent = (ComponentLevel*)Zone::Alloc(sizeof(ComponentLevel), "files");
-						fread(comp->data.levelComponent, sizeof(ComponentLevel::LevelHeader), 1, fp);
-						comp->data.levelComponent->tiles = (ComponentLevel::TileEntry*)Zone::Alloc(sizeof(ComponentLevel::TileEntry), "files");
-						fread(comp->data.levelComponent->tiles, sizeof(ComponentLevel::TileEntry), comp->data.levelComponent->head.numTiles, fp);
-						comp->data.levelComponent->ents = (ComponentLevel::EntityEntry*)Zone::Alloc(sizeof(ComponentLevel::EntityEntry), "files");
-						fread(comp->data.levelComponent->ents, sizeof(ComponentLevel::EntityEntry), comp->data.levelComponent->head.numEntities, fp);
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Level component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_LEVEL_VERSION);
-					}
-					break;
-				case Asset_Composition:
-					if (comp->meta.componentVersion == COMP_ANIM_VERSION) {
-						return; // not complete in RAT
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Comp component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_ANIM_VERSION);
-					}
-					break;
-				case Asset_Tile:
-					if (comp->meta.componentVersion == COMP_TILE_VERSION) {
-						comp->data.tileComponent = (ComponentTile*)Zone::Alloc(sizeof(ComponentTile), "files");
-						fread(comp->data.tileComponent, sizeof(ComponentTile), 1, fp);
-					}
-					else {
-						R_Message(PRIORITY_WARNING, "Tile component '%s' in %s has invalid version (expected %i, found %i)\n",
-							comp->meta.componentName, pAsset->head.assetName, comp->meta.componentVersion, COMP_TILE_VERSION);
-					}
-					break;
-			}
-			string szFullName = assetName + '/' + comp->meta.componentName;
-			m_assetComponents[szFullName] = comp;
+			string szFullName = assetName + '/' + pAsset->components[i].meta.componentName;
+			m_assetComponents[szFullName] = &pAsset->components[i];
 		}
-		fclose(fp);
+		infile.close();
 	}
 
 	/* Find a component residing within an asset file */

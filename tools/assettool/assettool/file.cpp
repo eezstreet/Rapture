@@ -1,218 +1,18 @@
 #include "assettool.h"
+#include "../../common/SerializedRaptureAsset.h"
+#include <cereal/archives/binary.hpp>
 #include <iostream>
 #include <fstream>
 
 #pragma warning (disable:4996)
 
-// Reading each type of component
-ComponentData* LoadDataComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentData* data = new ComponentData();
-	infile.read((char*)&data->head, sizeof(data->head));
-	if (decompSize > 0) {
-		data->data = (char*)malloc(decompSize);
-		infile.read(data->data, decompSize);
-	}
-	return data;
-}
-
-ComponentMaterial* LoadMaterialComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentMaterial* mat = new ComponentMaterial();
-	infile.read((char*)&mat->head, sizeof(ComponentMaterial::MaterialHeader));
-	
-	if (mat->head.mapsPresent & (1 << Maptype_Diffuse)) {
-		size_t diffuseSize = mat->head.width * mat->head.height * sizeof(uint32_t);
-		if (diffuseSize > 0) {
-			mat->diffusePixels = (uint32_t*)malloc(diffuseSize);
-			infile.read((char*)mat->diffusePixels, diffuseSize);
-		}
-	}
-	if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
-		size_t normalSize = mat->head.normalWidth * mat->head.normalHeight * sizeof(uint32_t);
-		if (normalSize > 0) {
-			mat->normalPixels = (uint32_t*)malloc(normalSize);
-			infile.read((char*)mat->normalPixels, normalSize);
-		}
-	}
-	if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
-		size_t depthSize = mat->head.depthWidth * mat->head.depthHeight * sizeof(uint16_t);
-		if (depthSize > 0) {
-			mat->depthPixels = (uint16_t*)malloc(depthSize);
-			infile.read((char*)mat->depthPixels, depthSize);
-		}
-	}
-	return mat;
-}
-
-ComponentImage* LoadImageComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentImage* img = new ComponentImage();
-	infile.read((char*)&img->head, sizeof(ComponentImage::ImageHeader));
-
-	size_t pixelsSize = img->head.width * img->head.height * sizeof(uint32_t);
-	if (pixelsSize > 0) {
-		img->pixels = (uint32_t*)malloc(pixelsSize);
-		infile.read((char*)img->pixels, pixelsSize);
-	}
-	return img;
-}
-
-ComponentFont* LoadFontComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentFont* font = new ComponentFont();
-	infile.read((char*)&font->head, sizeof(ComponentFont::FontHeader));
-	if (decompSize > 0) {
-		size_t fontFileSize = decompSize - sizeof(ComponentFont::FontHeader);
-
-		if (fontFileSize > 0) {
-			font->fontData = (uint8_t*)malloc(fontFileSize);
-			infile.read((char*)font->fontData, fontFileSize);
-		}
-	}
-	return font;
-}
-
-ComponentLevel* LoadLevelComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentLevel* lvl = new ComponentLevel();
-	infile.read((char*)&lvl->head, sizeof(ComponentLevel::LevelHeader));
-	size_t tileSize = sizeof(ComponentLevel::TileEntry) * lvl->head.numTiles;
-	size_t entSize = sizeof(ComponentLevel::EntityEntry) * lvl->head.numEntities;
-	if (tileSize > 0) {
-		lvl->tiles = (ComponentLevel::TileEntry*)malloc(tileSize);
-		infile.read((char*)lvl->tiles, tileSize);
-	}
-	if (entSize > 0) {
-		lvl->ents = (ComponentLevel::EntityEntry*)malloc(entSize);
-		infile.read((char*)lvl->ents, entSize);
-	}
-
-	return lvl;
-}
-
-ComponentComp* LoadCompComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentComp* comp = new ComponentComp();
-	infile.read((char*)&comp->head, sizeof(ComponentComp::CompHeader));
-	
-	size_t compSize = comp->head.numComponents * sizeof(ComponentComp::CompComponent);
-	size_t kfSize = comp->head.numKeyframes * sizeof(ComponentComp::CompKeyframe);
-	if (compSize > 0) {
-		comp->components = (ComponentComp::CompComponent*)malloc(compSize);
-		infile.read((char*)comp->components, compSize);
-	}
-	if (kfSize > 0) {
-		comp->keyframes = (ComponentComp::CompKeyframe*)malloc(kfSize);
-		infile.read((char*)comp->keyframes, kfSize);
-	}
-	return comp;
-}
-
-ComponentTile* LoadTileComponent(std::ifstream& infile, uint64_t decompSize) {
-	ComponentTile* tile = (ComponentTile*)malloc(sizeof(ComponentTile));
-	infile.read((char*)tile, sizeof(ComponentTile));
-	return tile;
-}
-
-// Writing each type of component
-void WriteDataComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentData* data = ptComponent->data.dataComponent;
-	outfile.write((const char*)&data->head, sizeof(data->head));
-	if (ptComponent->meta.decompressedSize > 0) {
-		outfile.write(data->data, ptComponent->meta.decompressedSize);
-	}
-}
-
-void WriteMaterialComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentMaterial* mat = ptComponent->data.materialComponent;
-	if (mat != nullptr) {
-		size_t imageSize;
-		outfile.write((const char*)&mat->head, sizeof(ComponentMaterial::MaterialHeader));
-		if (mat->head.mapsPresent & (1 << Maptype_Diffuse)) {
-			imageSize = mat->head.width * mat->head.height * sizeof(uint32_t);
-			if (imageSize > 0) {
-				outfile.write((const char*)mat->diffusePixels, imageSize);
-			}
-		}
-		if (mat->head.mapsPresent & (1 << Maptype_Normal)) {
-			imageSize = mat->head.normalWidth * mat->head.normalHeight * sizeof(uint32_t);
-			if (imageSize > 0) {
-				outfile.write((const char*)mat->normalPixels, imageSize);
-			}
-		}
-		if (mat->head.mapsPresent & (1 << Maptype_Depth)) {
-			imageSize = mat->head.depthWidth * mat->head.depthHeight * sizeof(uint16_t);
-			if (imageSize > 0) {
-				outfile.write((const char*)mat->depthPixels, imageSize);
-			}
-		}
-	}
-}
-
-void WriteImageComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentImage* img = ptComponent->data.imageComponent;
-	if (img != nullptr) {
-		size_t imageSize = img->head.width * img->head.height;
-		outfile.write((const char*)&img->head, sizeof(ComponentImage::ImageHeader));
-		if (imageSize > 0) {
-			outfile.write((const char*)img->pixels, imageSize * sizeof(uint32_t));
-		}
-	}
-}
-
-void WriteFontComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentFont* font = ptComponent->data.fontComponent;
-	if (font != nullptr) {
-		outfile.write((const char*)&font->head, sizeof(ComponentFont::FontHeader));
-
-		size_t fontSize = ptComponent->meta.decompressedSize - sizeof(ComponentFont::FontHeader);
-		if (fontSize > 0) {
-			outfile.write((const char*)font->fontData, fontSize);
-		}
-	}
-}
-
-void WriteLevelComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentLevel* lvl = ptComponent->data.levelComponent;
-	if (lvl != nullptr) {
-		size_t tileSize = sizeof(ComponentLevel::TileEntry) * lvl->head.numTiles;
-		size_t entSize = sizeof(ComponentLevel::EntityEntry) * lvl->head.numEntities;
-		outfile.write((const char*)&lvl->head, sizeof(ComponentLevel::LevelHeader));
-		if (tileSize > 0) {
-			outfile.write((const char*)lvl->tiles, tileSize);
-		}
-		if (entSize > 0) {
-			outfile.write((const char*)lvl->ents, entSize);
-		}
-	}
-}
-
-void WriteCompComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentComp* comp = ptComponent->data.compComponent;
-
-	if (comp != nullptr) {
-		size_t compSize = sizeof(ComponentComp::CompComponent) * comp->head.numComponents;
-		size_t kfSize = sizeof(ComponentComp::CompKeyframe) * comp->head.numKeyframes;
-
-		outfile.write((const char*)&comp->head, sizeof(ComponentComp::CompHeader));
-		if (compSize > 0) {
-			outfile.write((const char*)comp->components, compSize);
-		}
-		if (kfSize > 0) {
-			outfile.write((const char*)comp->keyframes, kfSize);
-		}
-	}
-}
-
-void WriteTileComponent(std::ofstream& outfile, AssetComponent* ptComponent) {
-	ComponentTile* tile = ptComponent->data.tileComponent;
-	if (tile != nullptr) {
-		outfile.write((const char*)tile, sizeof(ComponentTile));
-	}
-}
-
 AssetFile::AssetFile(const char* path) {
 	std::ifstream infile;
 
-	hasErrors = false;
 	infile.open(path, std::ios::binary);
 
-	infile.read((char*)&asset.head, sizeof(asset.head));
+	cereal::BinaryInputArchive in(infile);
+	in >> asset.head;
 	
 	// Some basic validation of the file
 	if (asset.head.header[0] != 'R' ||
@@ -222,105 +22,13 @@ AssetFile::AssetFile(const char* path) {
 		// not valid header
 		DisplayMessageBox("Open File Error", "Bad header for file", MESSAGEBOX_ERROR);
 		infile.close();
-		hasErrors = true;
-		return;
-	}
-
-	if (asset.head.version < RASS_VERSION) {
-		DisplayMessageBox("Outdated File",
-			"This asset file has an outdated version. The file will load, but there may be instability and crashes.", MESSAGEBOX_WARNING);
-	}
-
-	if (asset.head.version > RASS_VERSION) {
-		DisplayMessageBox("Outdated Editor",
-			"The RAT has detected that your editor is out of date for this file. It is recommended that you upgrade as soon as possible.", MESSAGEBOX_WARNING);
-	}
-
-	if (asset.head.numberComponents <= 0) {
-		infile.close();
 		return;
 	}
 
 	// Iterate through all of the components
 	for (int i = 0; i < asset.head.numberComponents; i++) {
 		AssetComponent comp;
-		infile.read((char*)&comp.meta, sizeof(comp.meta));
-
-		switch (comp.meta.componentType) {
-			case Asset_Undefined:
-				if (comp.meta.decompressedSize > 0) {
-					comp.data.undefinedComponent = malloc(comp.meta.decompressedSize);
-					infile.read((char*)comp.data.undefinedComponent, comp.meta.decompressedSize);
-				}
-				break;
-			case Asset_Data:
-				// slight hack
-				if (comp.meta.componentVersion < COMP_DATA_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found a data component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_DATA_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected a data component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.dataComponent = LoadDataComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Material:
-				if (comp.meta.componentVersion < COMP_MATERIAL_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found a material component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_MATERIAL_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected a material component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.materialComponent = LoadMaterialComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Image:
-				if (comp.meta.componentVersion < COMP_IMAGE_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found an image component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_IMAGE_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected an image component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.imageComponent = LoadImageComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Font:
-				if (comp.meta.componentVersion < COMP_FONT_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found a font component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_FONT_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected a font component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.fontComponent = LoadFontComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Level:
-				if (comp.meta.componentVersion < COMP_LEVEL_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found a level component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_LEVEL_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected a level component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.levelComponent = LoadLevelComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Composition:
-				if (comp.meta.componentVersion < COMP_ANIM_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found an animation component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_ANIM_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected an animation component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.compComponent = LoadCompComponent(infile, comp.meta.decompressedSize);
-				break;
-			case Asset_Tile:
-				if (comp.meta.componentVersion < COMP_TILE_VERSION) {
-					DisplayMessageBox("Outdated Component", "Found a tile component that is outdated. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				else if (comp.meta.componentVersion > COMP_TILE_VERSION) {
-					DisplayMessageBox("Outdated Tool", "The RAT detected a tile component that is newer than the tool. RAT will read it, but the data may not be correct.", MESSAGEBOX_INFO);
-				}
-				comp.data.tileComponent = LoadTileComponent(infile, comp.meta.decompressedSize);
-				break;
-			default:
-				DisplayMessageBox("Warning", "Found a component to this asset which we can't identify...alert eezstreet", MESSAGEBOX_INFO);
-				break;
-		}
+		in >> comp;
 		decompressedAssets.push_back(comp);
 	}
 
@@ -331,39 +39,12 @@ void AssetFile::SaveFile(const char* destination) {
 	std::ofstream outfile;
 	outfile.open(destination, std::ios::binary);
 
-	outfile.write((const char*)&asset.head, sizeof(asset.head));
+	cereal::BinaryOutputArchive out(outfile);
+	asset.head.numberComponents = decompressedAssets.size();
+	out << asset.head;
 
 	for (auto it = decompressedAssets.begin(); it != decompressedAssets.end(); ++it) {
-		outfile.write((const char*)&it->meta, sizeof(it->meta));
-
-		switch (it->meta.componentType) {
-			case Asset_Undefined:
-				if (it->data.undefinedComponent != nullptr) {
-					outfile.write((const char*)it->data.undefinedComponent, it->meta.decompressedSize);
-				}
-				break;
-			case Asset_Data:
-				WriteDataComponent(outfile, &(*it));
-				break;
-			case Asset_Material:
-				WriteMaterialComponent(outfile, &(*it));
-				break;
-			case Asset_Image:
-				WriteImageComponent(outfile, &(*it));
-				break;
-			case Asset_Font:
-				WriteFontComponent(outfile, &(*it));
-				break;
-			case Asset_Level:
-				WriteLevelComponent(outfile, &(*it));
-				break;
-			case Asset_Composition:
-				WriteCompComponent(outfile, &(*it));
-				break;
-			case Asset_Tile:
-				WriteTileComponent(outfile, &(*it));
-				break;
-		}
+		out << *it;
 	}
 	outfile.close();
 }

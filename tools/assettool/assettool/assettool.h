@@ -76,8 +76,8 @@ public:
 extern AssetFile* currentFile;
 
 // font.cpp
-void ImportFontFileTTF(uint8_t** fontData, uint64_t* decompressedSize, int ptSize, int index);
-void PreviewFont(uint8_t* fontData, uint64_t decompSize, int ptSize, int style, int face);
+void ImportFontFileTTF(uint8_t** fontData, size_t* decompressedSize, int ptSize, int index);
+void PreviewFont(uint8_t* fontData, size_t decompSize, int ptSize, int style, int face);
 
 
 // platform.cpp
