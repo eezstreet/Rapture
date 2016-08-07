@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\RaptureAsset.h" />
+    <ClInclude Include="..\common\SerializedRaptureAsset.h" />
     <ClInclude Include="..\game\sys_local.h" />
     <ClInclude Include="..\game\sys_shared.h" />
     <ClInclude Include="..\game\tr_local.h" />

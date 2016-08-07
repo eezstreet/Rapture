@@ -36,7 +36,12 @@ void save_(Archive& archive, ComponentData const& m, size_t const& dcs) {
 
 template<class Archive>
 void load_(Archive& archive, ComponentData& m, size_t const& dcs) {
-	m.data = (char*)malloc(dcs);
+	if (dcs > 0) {
+		m.data = (char*)malloc(dcs);
+	}
+	else {
+		m.data = nullptr;
+	}
 	archive(cereal::binary_data(m.head.mime, sizeof(char) * MIME_LEN),
 		cereal::binary_data(m.data, dcs));
 }
@@ -80,15 +85,24 @@ void load(Archive& archive, ComponentMaterial& m) {
 		m.diffusePixels = (uint32_t*)malloc(diffuseSize);
 		archive(cereal::binary_data(m.diffusePixels, diffuseSize));
 	}
+	else {
+		m.diffusePixels = nullptr;
+	}
 	if (m.head.mapsPresent & (1 << Maptype_Normal)) {
 		size_t normalSize = sizeof(uint32_t) * m.head.normalWidth * m.head.normalHeight;
 		m.normalPixels = (uint32_t*)malloc(normalSize);
 		archive(cereal::binary_data(m.normalPixels, normalSize));
 	}
+	else {
+		m.normalPixels = nullptr;
+	}
 	if (m.head.mapsPresent & (1 << Maptype_Depth)) {
 		size_t depthSize = sizeof(uint16_t) * m.head.depthWidth * m.head.depthHeight;
 		m.depthPixels = (uint16_t*)malloc(depthSize);
 		archive(cereal::binary_data(m.depthPixels, depthSize));
+	}
+	else {
+		m.depthPixels = nullptr;
 	}
 }
 
@@ -109,8 +123,13 @@ template<class Archive>
 void load(Archive& archive, ComponentImage& m) {
 	archive(m.head.width, m.head.height);
 	size_t imgSize = sizeof(uint32_t) * m.head.width * m.head.height;
-	m.pixels = (uint32_t*)malloc(imgSize);
-	archive(cereal::binary_data(m.pixels, imgSize));
+	if (imgSize > 0) {
+		m.pixels = (uint32_t*)malloc(imgSize);
+		archive(cereal::binary_data(m.pixels, imgSize));
+	}
+	else {
+		m.pixels = nullptr;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -131,8 +150,13 @@ template<class Archive>
 void load_(Archive& archive, ComponentFont& m, size_t const& dcs) {
 	archive(m.head.style, m.head.pointSize, m.head.fontFace);
 	size_t loadSize = dcs - sizeof(ComponentFont::FontHeader);
-	m.fontData = (uint8_t*)malloc(loadSize);
-	archive(cereal::binary_data(m.fontData, loadSize));
+	if (loadSize > 0) {
+		m.fontData = (uint8_t*)malloc(loadSize);
+		archive(cereal::binary_data(m.fontData, loadSize));
+	}
+	else {
+		m.fontData = nullptr;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -160,15 +184,25 @@ void save(Archive& archive, ComponentLevel const& m) {
 template<class Archive>
 void load(Archive& archive, ComponentLevel& m) {
 	archive(m.head.width, m.head.height, m.head.numTiles, m.head.numEntities);
-	m.tiles = (ComponentLevel::TileEntry*)malloc(m.head.numTiles * sizeof(ComponentLevel::TileEntry));
-	m.ents = (ComponentLevel::EntityEntry*)malloc(m.head.numEntities * sizeof(ComponentLevel::EntityEntry));
-	for (int i = 0; i < m.head.numTiles; i++) {
-		archive(cereal::binary_data(m.tiles[i].name, sizeof(char) * TILE_NAMELEN),
-			m.tiles[i].x, m.tiles[i].y, m.tiles[i].renderType, m.tiles[i].layerOffset);
+	if (m.head.numTiles > 0) {
+		m.tiles = (ComponentLevel::TileEntry*)malloc(m.head.numTiles * sizeof(ComponentLevel::TileEntry));
+		for (int i = 0; i < m.head.numTiles; i++) {
+			archive(cereal::binary_data(m.tiles[i].name, sizeof(char) * TILE_NAMELEN),
+				m.tiles[i].x, m.tiles[i].y, m.tiles[i].renderType, m.tiles[i].layerOffset);
+		}
 	}
-	for (int i = 0; i < m.head.numEntities; i++) {
-		archive(cereal::binary_data(m.ents[i].name, sizeof(char) * ENT_NAMELEN),
-			m.ents[i].x, m.ents[i].y, m.ents[i].spawnflags);
+	else {
+		m.tiles = nullptr;
+	}
+	if (m.head.numEntities > 0) {
+		m.ents = (ComponentLevel::EntityEntry*)malloc(m.head.numEntities * sizeof(ComponentLevel::EntityEntry));
+		for (int i = 0; i < m.head.numEntities; i++) {
+			archive(cereal::binary_data(m.ents[i].name, sizeof(char) * ENT_NAMELEN),
+				m.ents[i].x, m.ents[i].y, m.ents[i].spawnflags);
+		}
+	}
+	else {
+		m.ents = nullptr;
 	}
 }
 
@@ -196,14 +230,24 @@ void save(Archive& archive, ComponentComp const& m) {
 template<class Archive>
 void load(Archive& archive, ComponentComp& m) {
 	archive(m.head.numComponents, m.head.numKeyframes);
-	m.components = (ComponentComp::CompComponent*)malloc(sizeof(ComponentComp::CompComponent) * m.head.numComponents);
-	m.keyframes = (ComponentComp::CompKeyframe*)malloc(sizeof(ComponentComp::CompKeyframe) * m.head.numKeyframes);
-	for (int i = 0; i < m.head.numComponents; i++) {
-		archive(cereal::binary_data(m.components[i].partName, sizeof(char) * COMPPART_NAMELEN),
-			cereal::binary_data(m.components[i].matName, sizeof(char) * MAT_NAMELEN));
+	if (m.head.numComponents > 0) {
+		m.components = (ComponentComp::CompComponent*)malloc(sizeof(ComponentComp::CompComponent) * m.head.numComponents);
+		for (int i = 0; i < m.head.numComponents; i++) {
+			archive(cereal::binary_data(m.components[i].partName, sizeof(char) * COMPPART_NAMELEN),
+				cereal::binary_data(m.components[i].matName, sizeof(char) * MAT_NAMELEN));
+		}
 	}
-	for (int i = 0; i < m.head.numKeyframes; i++) {
-		archive(m.keyframes[i].type, m.keyframes[i].frame, m.keyframes[i].parm);
+	else {
+		m.components = nullptr;
+	}
+	if (m.head.numKeyframes > 0) {
+		m.keyframes = (ComponentComp::CompKeyframe*)malloc(sizeof(ComponentComp::CompKeyframe) * m.head.numKeyframes);
+		for (int i = 0; i < m.head.numKeyframes; i++) {
+			archive(m.keyframes[i].type, m.keyframes[i].frame, m.keyframes[i].parm);
+		}
+	}
+	else {
+		m.keyframes = nullptr;
 	}
 }
 

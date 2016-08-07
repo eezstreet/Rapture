@@ -78,6 +78,7 @@ void Resource::FreeResource(Resource* pResource) {
 void Resource::DequeRetrieve(assetRequestCallback callback) {
 	bool found = true;
 	string fullStr = szAssetFile + '/' + szComponent;
+	transform(fullStr.begin(), fullStr.end(), fullStr.begin(), ::tolower);
 	if (m_assetComponents.find(fullStr) == m_assetComponents.end()) {
 		// The asset file hasn't been opened
 		RaptureAsset* rap = (RaptureAsset*)Zone::Alloc(sizeof(RaptureAsset), "files");

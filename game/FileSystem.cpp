@@ -198,9 +198,78 @@ namespace Filesystem {
 
 	/* Shutdown the filesystem */
 	void Exit() {
-		Zone::FreeAll("files");
+		// Free misc resource data
+		for (auto it = m_assetComponents.begin(); it != m_assetComponents.end(); it++) {
+			AssetComponent* pComp = it->second;
+			switch (pComp->meta.componentType) {
+				case Asset_Undefined:
+					if (pComp->meta.decompressedSize > 0) {
+						free(pComp->data.undefinedComponent);
+						pComp->data.undefinedComponent = nullptr;
+					}
+					break;
+				case Asset_Data:
+					if (pComp->data.dataComponent->data) {
+						free(pComp->data.dataComponent->data);
+						pComp->data.dataComponent->data = nullptr;
+					}
+					free(pComp->data.dataComponent);
+					break;
+				case Asset_Material:
+					if (pComp->data.materialComponent->diffusePixels) {
+						free(pComp->data.materialComponent->diffusePixels);
+						pComp->data.materialComponent->diffusePixels = nullptr;
+					}
+					if (pComp->data.materialComponent->normalPixels) {
+						free(pComp->data.materialComponent->normalPixels);
+						pComp->data.materialComponent->normalPixels = nullptr;
+					}
+					if (pComp->data.materialComponent->depthPixels) {
+						free(pComp->data.materialComponent->depthPixels);
+						pComp->data.materialComponent->depthPixels = nullptr;
+					}
+					free(pComp->data.materialComponent);
+					break;
+				case Asset_Image:
+					if (pComp->data.imageComponent->pixels) {
+						free(pComp->data.imageComponent->pixels);
+						pComp->data.imageComponent->pixels = nullptr;
+					}
+					free(pComp->data.imageComponent);
+					break;
+				case Asset_Font:
+					if (pComp->data.fontComponent->fontData) {
+						free(pComp->data.fontComponent->fontData);
+						pComp->data.fontComponent->fontData = nullptr;
+					}
+					free(pComp->data.fontComponent);
+					break;
+				case Asset_Level:
+					if (pComp->data.levelComponent->tiles) {
+						free(pComp->data.levelComponent->tiles);
+						pComp->data.levelComponent->tiles = nullptr;
+					}
+					if (pComp->data.levelComponent->ents) {
+						free(pComp->data.levelComponent->ents);
+						pComp->data.levelComponent->ents = nullptr;
+					}
+					free(pComp->data.levelComponent);
+					break;
+				case Asset_Composition:
+					if (pComp->data.compComponent->components) {
+						free(pComp->data.compComponent->components);
+						pComp->data.compComponent->components = nullptr;
+					}
+					if (pComp->data.compComponent->keyframes) {
+						free(pComp->data.compComponent->keyframes);
+						pComp->data.compComponent->keyframes = nullptr;
+					}
+					free(pComp->data.compComponent);
+					break;
+			}
+		}
 
-		// FIXME: assets will leak memory
+		Zone::FreeAll("files");
 
 		ShutdownThreadPool();
 	}
@@ -241,6 +310,7 @@ namespace Filesystem {
 			in >> pAsset->components[i];
 
 			string szFullName = assetName + '/' + pAsset->components[i].meta.componentName;
+			transform(szFullName.begin(), szFullName.end(), szFullName.begin(), ::tolower);
 			m_assetComponents[szFullName] = &pAsset->components[i];
 		}
 		infile.close();
