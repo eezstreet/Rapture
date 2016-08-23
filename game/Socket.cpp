@@ -216,6 +216,40 @@ bool Socket::ReadEntireData(void* data, size_t dataSize) {
 	return true;
 }
 
+template<typename T>
+T Socket::Read() {
+#ifdef BIG_ENDIAN
+	static_assert(true, "Big endian systems don't deserialize!");
+#endif
+	T out;
+	size_t numReceived = 0;
+	while (numReceived < sizeof(T)) {
+		size_t received = recv(internalSocket, (char*)&out, sizeof(T), 0);
+		if (received == 0) {
+			// break
+			break;
+		}
+		numReceived += received;
+	}
+	return out;
+}
+
+template<typename T>
+void Socket::Write(T in) {
+#ifdef BIG_ENDIAN
+	static_assert(true, "Big endian systems doesn't serialize!");
+#endif
+	size_t numSent = 0;
+	while (numSent < sizeof(T)) {
+		size_t sent = send(internalSocket, (const char*)&in, sizeof(T), 0);
+		if (sent == 0) {
+			// break
+			break;
+		}
+		numSent += sent;
+	}
+}
+
 // Read a packet from a socket.
 // Guaranteed delivery (no fragmentation), may block.
 bool Socket::ReadPacket(Packet& incomingPacket) {
@@ -227,7 +261,7 @@ bool Socket::ReadPacket(Packet& incomingPacket) {
 	}
 
 	if (incomingPacket.packetHead.packetSize > 0) {
-		incomingPacket.packetData = Zone::Alloc(incomingPacket.packetHead.packetSize, "network");
+		incomingPacket.packetData = (char*)Zone::Alloc(incomingPacket.packetHead.packetSize, "network");
 		if (!ReadEntireData(&incomingPacket.packetData, incomingPacket.packetHead.packetSize)) {
 			Zone::FastFree(incomingPacket.packetData, "network");
 			return false;

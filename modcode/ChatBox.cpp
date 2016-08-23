@@ -65,5 +65,5 @@ void Chatbox::ChatCommand(vector<string>& args) {
 		chatLen += argLen;
 	}
 	
-	trap->SendClientPacket(PACKET_SENDCHAT, chatMessage, CHAT_MAXLEN);
+	trap->SendClientPacket(PACKET_SENDCHAT, CHAT_MAXLEN);
 }

@@ -88,20 +88,6 @@ void Editor_OnKeyPress(int x) {
 	}
 }
 
-bool Editor_InterpretClientPacket(Packet* packet, int clientNum) {
-	// The Editor isn't networked
-	return false;
-}
-
-bool Editor_InterpretServerPacket(Packet* packet) {
-	// The Editor isn't networked
-	return false;
-}
-
-bool Editor_AcceptClient(ClientPacket::ClientAttemptPacket* packet) {
-	return false;
-}
-
 void Editor_ServerFrame() {
 	return; // do nothing, it's totally client-side
 }
@@ -118,10 +104,7 @@ extern "C" {
 		exportFns.startserverfromsave = Editor_ServerInit;
 		exportFns.runserverframe = Editor_ServerFrame;
 		exportFns.runclientframe = Editor_ClientFrame;
-		exportFns.acceptclient = Editor_AcceptClient;
 		exportFns.saveandexit = Editor_Shutdown;
-		exportFns.interpretPacketFromClient = Editor_InterpretClientPacket;
-		exportFns.interpretPacketFromServer = Editor_InterpretServerPacket;
 		exportFns.passmouseup = Editor_OnMouseUp;
 		exportFns.passmousedown = Editor_OnMouseDown;
 		exportFns.passmousemove = Editor_OnMouseMove;

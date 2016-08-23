@@ -55,6 +55,7 @@ class Material;
 class Cvar;
 class AnimationManager;
 class Texture;
+class Socket;
 
 enum dispatchPriorities_e {
 	PRIORITY_NONE,
@@ -94,35 +95,15 @@ enum packetType_e {
 };
 
 struct Packet {
-	enum PacketDirection_e {
-		PD_ServerClient,	// Server -> Client
-		PD_ClientServer		// Client -> Server
-	};
-
 	struct PacketHeader {
 		packetType_e		type;			// Type of this packet
-		PacketDirection_e	direction;		// Direction this packet is going (indicates how clientNum is interpretted)
 		uint64_t			sendTime;		// Time this packet was sent
 		size_t				packetSize;		// Size of this packet (minus the header)
 	};
 
 	PacketHeader packetHead;
-	void* packetData;
+	char* packetData;
 };
-
-namespace ClientPacket {
-	struct ClientAttemptPacket {
-		uint8_t	netProtocol;
-	};
-
-	struct ClientAcceptPacket {
-		uint8_t clientNum;
-	};
-
-	struct ClientDeniedPacket {
-		char why[140];
-	};
-}
 
 /*
 ====================================================
@@ -252,8 +233,8 @@ extern "C" {
 		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);
 
 		// Network
-		void(*SendServerPacket)(packetType_e packetType, int clientNum, void* packetData, size_t packetSize);
-		void(*SendClientPacket)(packetType_e packetType, void* packetData, size_t packetSize);
+		void(*SendServerPacket)(packetType_e packetType, int clientNum, size_t packetSize);
+		void(*SendClientPacket)(packetType_e packetType, size_t packetSize);
 
 		// Cvars
 		int(*CvarIntVal)(Cvar* cvar, int* value);
@@ -287,15 +268,11 @@ extern "C" {
 		void(*runserverframe)();
 		void(*runclientframe)();
 		void(*saveandexit)();
-		bool(*acceptclient)(ClientPacket::ClientAttemptPacket* packet);
 
 		void(*passmouseup)(int x, int y);
 		void(*passmousedown)(int x, int y);
 		void(*passmousemove)(int x, int y);
 		void(*passkeypress)(int x);
-
-		bool(*interpretPacketFromClient)(Packet* packet, int clientNum);
-		bool(*interpretPacketFromServer)(Packet* packet);
 	};
 }
 

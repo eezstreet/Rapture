@@ -117,6 +117,12 @@
     <ClCompile Include="..\libraries\json\cJSON.c">
       <Filter>Libraries\JSON</Filter>
     </ClCompile>
+    <ClCompile Include="..\game\NetServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\NetClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\sys_shared.h">

@@ -602,33 +602,83 @@ typedef SOCKET socket_t;
 typedef int socket_t;
 #endif
 
+#define RAPTURE_DEFAULT_PORT		1750
+#define RAPTURE_DEFAULT_BACKLOG		32
+#define RAPTURE_DEFAULT_MAXCLIENTS	8
+
+#define RAPTURE_NETPROTOCOL			0
+#define RAPTURE_NETBUFFER_SIZE		4196
+
 // The Network namespace contains all of the basic, low-level functions 
 namespace Network {
 	enum NetworkInterfaceCallbacks {
 		NIC_ALL = -1,			// Not actually a callback, just a sentinel value for all callbacks
-		NIC_INTERPRETSERVER,	// trap->interpretPacketFromServer
-		NIC_INTERPRETCLIENT,	// trap->interpretPacketFromClient
-		NIC_ACCEPTCLIENT,		// trap->acceptClient
 		NIC_EXIT,				// trap->saveAndExit
 		NIC_SERVERFRAME,		// trap->serverFrame
 		NIC_CLIENTFRAME,		// trap->clientFrame
 		NIC_MAX
 	};
 
+	enum Netmode_e {
+		Netmode_Red,		// No connections allowed on the server, and any current connections are terminated
+		Netmode_Yellow,		// No new connections allowed, current connections aren't terminated
+		Netmode_Green,		// Anything goes
+	};
+
+	enum Netstate_e {
+		Netstate_NoConnect,		// Not connected to any network, not listening
+		Netstate_Listen,		// Listening
+		Netstate_NeedAuth,		// Connected to a server, need authorization packet
+		Netstate_Authorized,	// Connected to a server and authorized
+	};
+
 	typedef bool(*networkCallbackFunction)(...);
+	typedef pair<Packet, int> packetMsg;
+
+	extern Cvar* net_port;
+	extern Cvar* net_serverbacklog;
+	extern Cvar* net_maxclients;
+	extern Cvar* net_netmode;
+	extern Cvar* net_timeout;
+	extern Cvar* net_ipv6;
+
+	extern Socket*				localSocket;
+	extern map<int, Socket*>	mOtherConnectedClients;
+	extern Socket*				remoteSocket;
+	extern vector<packetMsg>	vPacketsAwaitingSend;
+	extern Netstate_e			currentNetState;
+	extern vector<Socket*>		vTemporaryConnections;
+
+	extern int			numConnectedClients;
+	extern int			myClientNum;				// Client 0 is always the host
+	extern int			lastFreeClientNum;
+
+	extern char			packetSendingBuffer[RAPTURE_NETBUFFER_SIZE];
+	extern char			packetReceivingBuffer[RAPTURE_NETBUFFER_SIZE];
+	extern size_t		packetSendingCursor;
+	extern size_t		packetReceivingCursor;
+	extern networkCallbackFunction	callbacks[NIC_MAX];
 
 	void Init();
 	void Shutdown();
-	void SendServerPacket(packetType_e packetType, int clientNum, void* packetData, size_t packetDataSize);
-	void SendClientPacket(packetType_e packetType, void* packetData, size_t packetSize);
-	void DisconnectFromRemote();
-	void ServerFrame();
-	void ClientFrame();
-	bool StartLocalServer();
-	bool JoinServer(const char* hostname);
-	void Connect(const char* hostname);
 	void AddCallback(NetworkInterfaceCallbacks callback, networkCallbackFunction func);
 	void RemoveCallback(NetworkInterfaceCallbacks callback);
+
+	namespace Server {
+		void SendPacket(packetType_e packetType, int clientNum, size_t packetDataSize);
+		void Frame();
+		bool StartLocalServer();
+		void DispatchSinglePacket(Packet& packet, int clientNum);
+	}
+
+	namespace Client {
+		void SendPacket(packetType_e packetType, size_t packetSize);
+		void DisconnectFromRemote();
+		void Frame();
+		bool JoinServer(const char* hostname);
+		void Connect(const char* hostname);
+		void DispatchSinglePacket(Packet& packet);
+	}
 };
 
 //
@@ -656,6 +706,13 @@ public:
 	bool Connect(const char* hostname, unsigned short port);
 	bool StartListening(unsigned short port, uint32_t backlog);
 	void Disconnect();
+
+	template<typename T>
+	T Read();
+
+	template<typename T>
+	void Write(T in);
+
 	bool SendPacket(Packet& outgoing);
 	bool ReadPacket(Packet& incoming);
 	Socket* CheckPendingConnections();

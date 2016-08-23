@@ -37,7 +37,7 @@ namespace Server {
 
 		sprintf(message, "Client %i: %s", clientNum, pPacket->packetData);
 		trap->printf(PRIORITY_MESSAGE, "%s\n", message);
-		trap->SendServerPacket(PACKET_RECVCHAT, -1, message, CHAT_MAXLEN);
+		trap->SendServerPacket(PACKET_RECVCHAT, -1, CHAT_MAXLEN);
 	}
 
 	bool ClientPacket(Packet* pPacket, int clientNum) {

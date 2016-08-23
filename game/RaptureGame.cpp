@@ -140,8 +140,8 @@ void RaptureGame::RunLoop() {
 	Video::ClearFrame();
 
 	// Do gamecode
-	Network::ServerFrame();
-	Network::ClientFrame();
+	Network::Server::Frame();
+	Network::Client::Frame();
 
 	// Do rendering
 	UI::Render();
@@ -230,8 +230,8 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	imp.AddCommand = Cmd::AddCommand;
 	imp.RemoveCommand = Cmd::RemoveCommand;
 
-	imp.SendServerPacket = Network::SendServerPacket;
-	imp.SendClientPacket = Network::SendClientPacket;
+	imp.SendServerPacket = Network::Server::SendPacket;
+	imp.SendClientPacket = Network::Client::SendPacket;
 
 	imp.RunJavaScript = UI::RunJavaScript;
 	imp.AddJSCallback = UI::AddJavaScriptCallback;
@@ -259,12 +259,9 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 
 	// Add callbacks to things that need them
 	Network::RemoveCallback(Network::NIC_ALL);
-	Network::AddCallback(Network::NIC_ACCEPTCLIENT, (Network::networkCallbackFunction)trap->acceptclient);
 	Network::AddCallback(Network::NIC_EXIT, (Network::networkCallbackFunction)trap->saveandexit);
 	Network::AddCallback(Network::NIC_CLIENTFRAME, (Network::networkCallbackFunction)trap->runclientframe);
 	Network::AddCallback(Network::NIC_SERVERFRAME, (Network::networkCallbackFunction)trap->runserverframe);
-	Network::AddCallback(Network::NIC_INTERPRETCLIENT, (Network::networkCallbackFunction)trap->interpretPacketFromClient);
-	Network::AddCallback(Network::NIC_INTERPRETSERVER, (Network::networkCallbackFunction)trap->interpretPacketFromServer);
 	return game;
 }
 
@@ -354,7 +351,7 @@ void RaptureGame::StartGameFromFile(const char* szSaveGameName, bool bMultiplaye
 		return;
 	}
 	if (bMultiplayer) {
-		Network::StartLocalServer();
+		Network::Server::StartLocalServer();
 	}
 	trap->startserverfromsave(szSaveGameName);
 	trap->startclientfromsave(szSaveGameName);
@@ -377,7 +374,7 @@ void RaptureGame::JoinRemoteGame(const char* szFileName, const char* szHostName)
 		return;
 	}
 
-	if (!Network::JoinServer(szHostName)) {
+	if (!Network::Client::JoinServer(szHostName)) {
 		return;
 	}
 	trap->startclientfromsave(szFileName);
@@ -409,7 +406,7 @@ void RaptureGame::SaveAndExit() {
 	if (trap) {
 		trap->saveandexit();
 	}
-	Network::DisconnectFromRemote();
+	Network::Client::DisconnectFromRemote();
 	R_Message(PRIORITY_MESSAGE, "creating main menu webview\n");
 	MainMenu::GetSingleton();
 
