@@ -607,7 +607,6 @@ typedef int socket_t;
 #define RAPTURE_DEFAULT_MAXCLIENTS	8
 
 #define RAPTURE_NETPROTOCOL			0
-#define RAPTURE_NETBUFFER_SIZE		4196
 
 // The Network namespace contains all of the basic, low-level functions 
 namespace Network {
@@ -616,6 +615,10 @@ namespace Network {
 		NIC_EXIT,				// trap->saveAndExit
 		NIC_SERVERFRAME,		// trap->serverFrame
 		NIC_CLIENTFRAME,		// trap->clientFrame
+		NIC_SERVERSERIALIZE,	// trap->serializepackettoclient
+		NIC_SERVERDESERIALIZE,	// trap->deserializepacketfromclient
+		NIC_CLIENTSERIALIZE,	// trap->serializepackettoserver
+		NIC_CLIENTDESERIALIZE,	// trap->deserializepacketfromserver
 		NIC_MAX
 	};
 
@@ -652,11 +655,6 @@ namespace Network {
 	extern int			numConnectedClients;
 	extern int			myClientNum;				// Client 0 is always the host
 	extern int			lastFreeClientNum;
-
-	extern char			packetSendingBuffer[RAPTURE_NETBUFFER_SIZE];
-	extern char			packetReceivingBuffer[RAPTURE_NETBUFFER_SIZE];
-	extern size_t		packetSendingCursor;
-	extern size_t		packetReceivingCursor;
 	extern networkCallbackFunction	callbacks[NIC_MAX];
 
 	void Init();
@@ -665,19 +663,42 @@ namespace Network {
 	void RemoveCallback(NetworkInterfaceCallbacks callback);
 
 	namespace Server {
-		void SendPacket(packetType_e packetType, int clientNum, size_t packetDataSize);
+		void QueuePacket(packetType_e packetType, int clientNum, void* extraData);
 		void Frame();
 		bool StartLocalServer();
 		void DispatchSinglePacket(Packet& packet, int clientNum);
+		void DropClient(int clientNum);
 	}
 
 	namespace Client {
-		void SendPacket(packetType_e packetType, size_t packetSize);
+		void QueuePacket(packetType_e packetType, void* extraData);
 		void DisconnectFromRemote();
 		void Frame();
 		bool JoinServer(const char* hostname);
 		void Connect(const char* hostname);
 		void DispatchSinglePacket(Packet& packet);
+	}
+
+	namespace Packets {
+		// Serverside handling
+		namespace Server {
+			void Packet_PingDeserialize(Packet& packet, int clientNum);
+			void Packet_DropSerialize(Packet& packet, int clientNum, void* extraData);
+			void Packet_DropDeserialize(Packet& packet, int clientNum);
+			void Packet_ClientAttemptDeserialize(Packet& packet, int clientNum);
+			void Packet_ClientAcceptSerialize(Packet& packet, int clientNum, void* extraData);
+			void Packet_ClientDeniedSerialize(Packet& packet, int clientNum, void* extraData);
+		}
+
+		// Clientside handling
+		namespace Client {
+			void Packet_PingDeserialize(Packet& packet, int clientNum);
+			void Packet_DropSerialize(Packet& packet, int clientNum, void* extraData);
+			void Packet_DropDeserialize(Packet& packet, int clientNum);
+			void Packet_ClientAttemptSerialize(Packet& packet, int clientNum, void* extraData);
+			void Packet_ClientAcceptDeserialize(Packet& packet, int clientNum);
+			void Packet_ClientDeniedDeserialize(Packet& packet, int clientNum);
+		}
 	}
 };
 
@@ -692,6 +713,8 @@ private:
 	int af, type;
 
 	bool SetNonBlocking();
+	bool SendPacketHeader(PacketHeader& head);
+	bool RecvPacketHeader(PacketHeader& head);
 	bool SendEntireData(void* data, size_t dataSize);
 	bool ReadEntireData(void* data, size_t dataSize);
 public:

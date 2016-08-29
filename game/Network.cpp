@@ -19,11 +19,6 @@ namespace Network {
 	int			numConnectedClients = 1;
 	int			myClientNum = 0;				// Client 0 is always the host
 	int			lastFreeClientNum = 1;
-
-	char			packetSendingBuffer[RAPTURE_NETBUFFER_SIZE] {0};
-	char			packetReceivingBuffer[RAPTURE_NETBUFFER_SIZE] {0};
-	size_t		packetSendingCursor = 0;
-	size_t		packetReceivingCursor = 0;
 	networkCallbackFunction	callbacks[NIC_MAX] {nullptr};
 
 	void Netmode_Callback(int newValue) {

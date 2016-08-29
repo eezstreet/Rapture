@@ -31,14 +31,6 @@ void Game_MouseUp(int x, int y) {
 
 }
 
-void Game_ServerFrame() {
-	Server::Frame();
-}
-
-void Game_ClientFrame() {
-	Client::Frame();
-}
-
 void Game_Shutdown() {
 	Simulation::Shutdown();
 	Server::Shutdown();
@@ -52,13 +44,18 @@ extern "C" {
 
 		exports.startclientfromsave = Game_InitClient;
 		exports.startserverfromsave = Game_InitServer;
-		exports.runserverframe = Game_ServerFrame;
-		exports.runclientframe = Game_ClientFrame;
+		exports.runserverframe = Server::Frame;
+		exports.runclientframe = Client::Frame;
+		exports.serializepackettoclient = Server::SerializePacket;
+		exports.deserializepacketfromclient = Server::DeserializePacket;
+		exports.serializepackettoserver = Client::SerializePacket;
+		exports.deserializepacketfromserver = Client::DeserializePacket;
+		exports.saveandexit = Game_Shutdown;
+
 		exports.passkeypress = Game_KeyPress;
 		exports.passmousedown = Game_MouseDown;
 		exports.passmousemove = Game_MouseMove;
 		exports.passmouseup = Game_MouseUp;
-		exports.saveandexit = Game_Shutdown;
 		return &exports;
 	}
 }

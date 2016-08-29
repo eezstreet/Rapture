@@ -230,8 +230,8 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	imp.AddCommand = Cmd::AddCommand;
 	imp.RemoveCommand = Cmd::RemoveCommand;
 
-	imp.SendServerPacket = Network::Server::SendPacket;
-	imp.SendClientPacket = Network::Client::SendPacket;
+	imp.SendServerPacket = Network::Server::QueuePacket;
+	imp.SendClientPacket = Network::Client::QueuePacket;
 
 	imp.RunJavaScript = UI::RunJavaScript;
 	imp.AddJSCallback = UI::AddJavaScriptCallback;
@@ -262,6 +262,10 @@ GameModule* RaptureGame::CreateGameModule(const char* bundle) {
 	Network::AddCallback(Network::NIC_EXIT, (Network::networkCallbackFunction)trap->saveandexit);
 	Network::AddCallback(Network::NIC_CLIENTFRAME, (Network::networkCallbackFunction)trap->runclientframe);
 	Network::AddCallback(Network::NIC_SERVERFRAME, (Network::networkCallbackFunction)trap->runserverframe);
+	Network::AddCallback(Network::NIC_SERVERSERIALIZE, (Network::networkCallbackFunction)trap->serializepackettoclient);
+	Network::AddCallback(Network::NIC_SERVERDESERIALIZE, (Network::networkCallbackFunction)trap->deserializepacketfromclient);
+	Network::AddCallback(Network::NIC_CLIENTSERIALIZE, (Network::networkCallbackFunction)trap->serializepackettoserver);
+	Network::AddCallback(Network::NIC_CLIENTDESERIALIZE, (Network::networkCallbackFunction)trap->deserializepacketfromserver);
 	return game;
 }
 

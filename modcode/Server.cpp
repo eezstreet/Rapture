@@ -3,9 +3,44 @@
 namespace Server {
 	static bool bInitialized = false;
 
+	/*
+		Packet serialization/deserialization functions.
+		The serialization function is called when a packet is next in the queue to be written.
+		The deserialization function is conversely called when a packet is received.
+		The deserialization function is expected to call the appropriate handler for the data as well.
+		If a serialization function is null, the engine will throw a warning upon queueing it for send from modcode.
+		If a deserialization function is null, the engine will throw a warning upon receipt.
+	*/
+	packetSerializationFunc serverFuncs[PACKET_MAX] = {
+		nullptr,			// PACKET_PING
+		nullptr,			// PACKET_PONG
+		nullptr,			// PACKET_DROP
+		nullptr,			// PACKET_CLIENTATTEMPT
+		nullptr,			// PACKET_CLIENTACCEPT
+		nullptr,			// PACKET_CLIENTDENIED
+		nullptr,			// PACKET_INFOREQUEST
+		nullptr,			// PACKET_INFOREQUESTED
+		nullptr,			// PACKET_SENDCHAT // FIXME
+		nullptr,			// PACKET_RECVCHAT // FIXME
+	};
+
+	packetDeserializationFunc dserverFuncs[PACKET_MAX] = {
+		nullptr,			// PACKET_PING
+		nullptr,			// PACKET_PONG
+		nullptr,			// PACKET_DROP
+		nullptr,			// PACKET_CLIENTATTEMPT
+		nullptr,			// PACKET_CLIENTACCEPT
+		nullptr,			// PACKET_CLIENTDENIED
+		nullptr,			// PACKET_INFOREQUEST
+		nullptr,			// PACKET_INFOREQUESTED
+		nullptr,			// PACKET_SENDCHAT // FIXME
+		nullptr,			// PACKET_RECVCHAT // FIXME
+	};
+
 	/* Serverside Initialization */
 	void Initialize() {
 		if (bInitialized) {
+			// Prevent double initialization
 			return;
 		}
 
@@ -16,6 +51,7 @@ namespace Server {
 	/* Serverside Shutdown */
 	void Shutdown() {
 		if (!bInitialized) {
+			// Prevent double shutdown
 			return;
 		}
 
@@ -27,25 +63,30 @@ namespace Server {
 
 	}
 
-	/* Serverside Packet Receieve */
-	void OnChatPacketReceived(Packet* pPacket, int clientNum) {
-		char message[CHAT_MAXLEN];
-		if (pPacket->packetHead.packetSize > CHAT_MAXLEN) {
-			trap->printf(PRIORITY_WARNING, "Chat message from client %i exceeded CHAT_MAXLEN\n", clientNum);
-			return;
+	/*
+		Packet serialization function.
+		This calls the appropriate function in serverFuncs (or returns false if it doesn't exist)
+		Called from the engine when a send packet attempt has been dequeued.
+		The data isn't sent across the wire in serverFuncs, it's translated to packetData.
+	*/
+	bool SerializePacket(Packet& packet, int clientNum, void* extraData) {
+		if (serverFuncs[packet.packetHead.type]) {
+			serverFuncs[packet.packetHead.type](packet, clientNum, extraData);
+			return true;
 		}
-
-		sprintf(message, "Client %i: %s", clientNum, pPacket->packetData);
-		trap->printf(PRIORITY_MESSAGE, "%s\n", message);
-		trap->SendServerPacket(PACKET_RECVCHAT, -1, CHAT_MAXLEN);
+		return false;
 	}
 
-	bool ClientPacket(Packet* pPacket, int clientNum) {
-		switch (pPacket->packetHead.type) {
-			case PACKET_SENDCHAT:
-				// Send chat to all other clients
-				OnChatPacketReceived(pPacket, clientNum);
-				return true;
+	/*
+		Packet deserialization function.
+		This calls the appropriate function in dserverFuncs (or returns false if it doesn't exist)
+		Called from the engine when we have received a packet.
+		The data is both deserialized and used in dserverFuncs
+	*/
+	bool DeserializePacket(Packet& packet, int clientNum) {
+		if (dserverFuncs[packet.packetHead.type]) {
+			dserverFuncs[packet.packetHead.type](packet, clientNum);
+			return true;
 		}
 		return false;
 	}

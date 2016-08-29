@@ -81,6 +81,11 @@ enum cvarFlags_e {
 NETWORKING INFORMATION
 ==============================================================
 */
+
+#define MAX_PACKET_DATASIZE			16385
+
+// Packet Types
+// If this enum changes, be sure to change the serialization functions in Client.cpp and Server.cpp!
 enum packetType_e {
 	PACKET_PING,			// Server <-> (Any)		--	Check if service is alive	
 	PACKET_PONG,			// Server <-> (Any)		--	Response to ping packet
@@ -92,18 +97,29 @@ enum packetType_e {
 	PACKET_INFOREQUESTED,	// Server  -> 3rdParty	--	Send the info that was requested from this server
 	PACKET_SENDCHAT,		// Server <-  Client	--	Client spoke
 	PACKET_RECVCHAT,		// Server  -> Client	--	Client is heard
+	PACKET_MAX,				// ...
+	PACKET_MODCODE_START = PACKET_SENDCHAT, // Anything beyond this point is considered "modcode packets"
 };
 
+// Packet structure
+
+// The packet header is always sent. Only packetHead.packetSize bytes of packetData gets sent across the wire.
+struct PacketHeader {
+	uint32_t			type;			// Type of this packet
+	uint64_t			sendTime;		// Time this packet was sent
+	size_t				packetSize;		// Size of this packet (minus the header)
+};
+
+// The actual packet itself just contains the header and the data, which is serialized
 struct Packet {
-	struct PacketHeader {
-		packetType_e		type;			// Type of this packet
-		uint64_t			sendTime;		// Time this packet was sent
-		size_t				packetSize;		// Size of this packet (minus the header)
-	};
-
 	PacketHeader packetHead;
-	char* packetData;
+	char packetData[MAX_PACKET_DATASIZE];
 };
+
+// Serialization functions.
+// These are used for the modcode and are called from the engine.
+typedef void(*packetSerializationFunc)(Packet& packet, int clientNum, void* extraData);
+typedef void(*packetDeserializationFunc)(Packet& packet, int clientNum);
 
 /*
 ====================================================
@@ -233,8 +249,8 @@ extern "C" {
 		bool  (*GetJSBoolArg)(Menu* ptMenu, unsigned int argNum);
 
 		// Network
-		void(*SendServerPacket)(packetType_e packetType, int clientNum, size_t packetSize);
-		void(*SendClientPacket)(packetType_e packetType, size_t packetSize);
+		void(*SendServerPacket)(packetType_e packetType, int clientNum, void* extraData);
+		void(*SendClientPacket)(packetType_e packetType, void* extraData);
 
 		// Cvars
 		int(*CvarIntVal)(Cvar* cvar, int* value);
@@ -267,6 +283,10 @@ extern "C" {
 		void(*startclientfromsave)(const char* szSaveGame);
 		void(*runserverframe)();
 		void(*runclientframe)();
+		bool(*serializepackettoclient)(Packet& packet, int clientNum, void* extraData);
+		bool(*serializepackettoserver)(Packet& packet, int clientNum, void* extraData);
+		bool(*deserializepacketfromserver)(Packet& packet, int clientNum);
+		bool(*deserializepacketfromclient)(Packet& packet, int clientNum);
 		void(*saveandexit)();
 
 		void(*passmouseup)(int x, int y);

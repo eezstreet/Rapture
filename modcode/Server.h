@@ -6,5 +6,9 @@ namespace Server {
 	void Shutdown();
 
 	void Frame();
-	bool ClientPacket(Packet* packet, int clientNum);
+	bool SerializePacket(Packet& packet, int clientNum, void* extraData);
+	bool DeserializePacket(Packet& packet, int clientNum);
+
+	extern packetSerializationFunc serverFuncs[PACKET_MAX];
+	extern packetDeserializationFunc dserverFuncs[PACKET_MAX];
 }

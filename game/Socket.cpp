@@ -162,10 +162,32 @@ bool Socket::SendEntireData(void* data, size_t dataSize) {
 	return true;
 }
 
+// Send a packet header across the network
+bool Socket::SendPacketHeader(PacketHeader& head) {
+#ifdef BIG_ENDIAN
+	static_assert(true, "Big endian systems don't deserialize!");
+#endif
+	bool sent = SendEntireData(&head.type, sizeof(head.type));
+	sent &= SendEntireData(&head.sendTime, sizeof(head.sendTime));
+	sent &= SendEntireData(&head.packetSize, sizeof(head.packetSize));
+	return sent;
+}
+
+// Receive a packet header from the network
+bool Socket::RecvPacketHeader(PacketHeader& head) {
+#ifdef BIG_ENDIAN
+	static_assert(true, "Big endian systems don't deserialize!");
+#endif
+	bool received = ReadEntireData(&head.type, sizeof(head.type));
+	received &= ReadEntireData(&head.sendTime, sizeof(head.sendTime));
+	received &= ReadEntireData(&head.packetSize, sizeof(head.packetSize));
+	return received;
+}
+
 // Send a packet across the network.
 // Guaranteed delivery (no fragmentation), does not block.
 bool Socket::SendPacket(Packet& outgoing) {
-	bool sent = SendEntireData(&outgoing.packetHead, sizeof(outgoing.packetHead));
+	bool sent = SendPacketHeader(outgoing.packetHead);
 	if (!sent) {
 		R_Message(PRIORITY_WARNING, "Failed to send packet header (packet type: %i)\n", outgoing.packetHead.type);
 		return false;
@@ -253,23 +275,14 @@ void Socket::Write(T in) {
 // Read a packet from a socket.
 // Guaranteed delivery (no fragmentation), may block.
 bool Socket::ReadPacket(Packet& incomingPacket) {
+	bool read;
+
 	memset(&incomingPacket, 0, sizeof(incomingPacket));
-
-	if (!ReadEntireData(&incomingPacket.packetHead, sizeof(incomingPacket.packetHead))) {
-		// TODO: make it rain fire from the sky, we dropped a packet
-		return false;
-	}
-
-	if (incomingPacket.packetHead.packetSize > 0) {
-		incomingPacket.packetData = (char*)Zone::Alloc(incomingPacket.packetHead.packetSize, "network");
-		if (!ReadEntireData(&incomingPacket.packetData, incomingPacket.packetHead.packetSize)) {
-			Zone::FastFree(incomingPacket.packetData, "network");
-			return false;
-		}
-	}
-
+	read = RecvPacketHeader(incomingPacket.packetHead);
+	read &= ReadEntireData(&incomingPacket.packetData, incomingPacket.packetHead.packetSize);
 	lastHeardFrom = SDL_GetTicks();
-	return true;
+
+	return read;
 }
 
 // Connect this socket to a hostname and port.

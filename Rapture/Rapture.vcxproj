@@ -134,6 +134,7 @@
     <ClCompile Include="..\game\MainMenu.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\NetClient.cpp" />
+    <ClCompile Include="..\game\NetPacket.cpp" />
     <ClCompile Include="..\game\NetServer.cpp" />
     <ClCompile Include="..\game\Network.cpp" />
     <ClCompile Include="..\game\Renderer.cpp" />
